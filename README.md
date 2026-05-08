@@ -43,8 +43,16 @@ Once materialized, objects are not modified in place.
 
 AIKernel.NET Core is designed as an OS-like layered runtime.
 
-```
-+-----------------------------+|        Hosting Layer        |  .NET application integration+-----------------------------+|         Kernel Layer        |  Governance and orchestration+-----------------------------+|          Core Layer         |  Pure logic: VFS / ROM / Context / Execution+-----------------------------+|        Provider Layer       |  External model and service boundaries+-----------------------------+
+```text
++-----------------------------+
+|        Hosting Layer        |  .NET application integration
++-----------------------------+
+|         Kernel Layer        |  Governance and orchestration
++-----------------------------+
+|          Core Layer         |  Pure logic: VFS / ROM / Context / Execution
++-----------------------------+
+|        Provider Layer       |  External model and service boundaries
++-----------------------------+
 ```
 
 ---
@@ -53,8 +61,18 @@ AIKernel.NET Core is designed as an OS-like layered runtime.
 
 This repository consists of runtime, provider, and verification layers.
 
-```
-src/  AIKernel.Core  AIKernel.Kernel  AIKernel.Hosting  Providers/    AIKernel.Providers.MicrosoftAItests/  AIKernel.TestKit  AIKernel.Core.Tests  AIKernel.IntegrationTests
+```text
+src/
+  AIKernel.Core
+  AIKernel.Kernel
+  AIKernel.Hosting
+  Providers/
+    AIKernel.Providers.MicrosoftAI
+
+tests/
+  AIKernel.TestKit
+  AIKernel.Core.Tests
+  AIKernel.IntegrationTests
 ```
 
 ### `src/` — Runtime Implementation
@@ -63,7 +81,7 @@ src/  AIKernel.Core  AIKernel.Kernel  AIKernel.Hosting  Providers/    AIKernel.P
 
 A pure logical engine responsible for the phase transition of knowledge.
 
-```
+```text
 VFS → ROM → Context → Execution
 ```
 
@@ -118,22 +136,57 @@ Integration tests that pass through multiple runtime layers.
 
 ### 1. Install Packages
 
-```
-dotnet add package AIKernel.Coredotnet add package AIKernel.Hostingdotnet add package AIKernel.Providers.MicrosoftAI
+```bash
+dotnet add package AIKernel.Core
+dotnet add package AIKernel.Hosting
+dotnet add package AIKernel.Providers.MicrosoftAI
 ```
 
 ### 2. Ignite the Kernel
 
-```
-// Configure the DI containerservices.AddAIKernelCore(options =>{    options.DefaultVfsProviderId = "local";});// Register an OpenAI-compatible Provider through Microsoft.Extensions.AIservices.AddOpenAICompatibleProvider(sp =>    new OpenAICompatibleClient(        new Uri("https://your-openai-compatible-endpoint.example.com"),        apiKey));// Execute through the Kernel Facadevar kernel = serviceProvider.GetRequiredService<IKernel>();var result = await kernel.ExecuteAsync(new KernelRequest{    Input = "Explain the design philosophy of AIKernel.",    RootRomId = new RomId("rom://aikernel/docs/vision"),    VfsProviderId = "local"});Console.WriteLine(result.PrimaryText);Console.WriteLine(result.ContextHash);
+```csharp
+// Configure the DI container
+services.AddAIKernelCore(options =>
+{
+    options.DefaultVfsProviderId = "local";
+});
+
+// Register an OpenAI-compatible Provider through Microsoft.Extensions.AI
+services.AddOpenAICompatibleProvider(sp =>
+    new OpenAICompatibleClient(
+        new Uri("https://your-openai-compatible-endpoint.example.com"),
+        apiKey));
+
+// Execute through the Kernel Facade
+var kernel = serviceProvider.GetRequiredService<IKernel>();
+
+var result = await kernel.ExecuteAsync(new KernelRequest
+{
+    Input = "Explain the design philosophy of AIKernel.",
+    RootRomId = new RomId("rom://aikernel/docs/vision"),
+    VfsProviderId = "local"
+});
+
+Console.WriteLine(result.PrimaryText);
+Console.WriteLine(result.ContextHash);
 ```
 
 ---
 
 ## Target Boot Experience
 
-```
-[KERNEL] Initializing AIKernel.NET Core v0.1.0...[KERNEL] Loading VFS Provider: local... [OK][KERNEL] Mounting ROM root... [OK][KERNEL] Building ContextSnapshot... [OK][KERNEL] Computing ContextHash... [OK][KERNEL] Resolving Provider: microsoft-ai.openai-compatible... [OK][KERNEL] Executing governed inference... [OK]> Hello Intelligence.> The Semantic Context is stable.> Execution is reproducible. Governance is active.
+```text
+[KERNEL] Initializing AIKernel.NET Core v0.1.0...
+[KERNEL] Loading VFS Provider: local... [OK]
+[KERNEL] Mounting ROM root... [OK]
+[KERNEL] Building ContextSnapshot... [OK]
+[KERNEL] Computing ContextHash... [OK]
+[KERNEL] Resolving Provider: microsoft-ai.openai-compatible... [OK]
+[KERNEL] Executing governed inference... [OK]
+
+> Hello Intelligence.
+> The Semantic Context is stable.
+> Execution is reproducible. Governance is active.
 ```
 
 ---
@@ -142,8 +195,15 @@ dotnet add package AIKernel.Coredotnet add package AIKernel.Hostingdotnet add pa
 
 In the minimal implementation, AIKernel.NET Core follows the execution path below.
 
-```
-KernelRequest→ VFS Mount→ ROM Load→ Context Build→ Governance Check→ Prompt Composition→ Provider Execution→ IExecutionResult
+```text
+KernelRequest
+→ VFS Mount
+→ ROM Load
+→ Context Build
+→ Governance Check
+→ Prompt Composition
+→ Provider Execution
+→ IExecutionResult
 ```
 
 In the initial implementation phase, prompt composition may be simplified and static.
@@ -241,8 +301,19 @@ It concretizes that progression on the Core implementation repository side.
 
 AIKernel.NET Core depends on the canonical contract packages defined in the main AIKernel.NET contract repository.
 
-```
-AIKernel.NET= contracts, DTOs, enums, documentation, contract-test skeletons        ↓AIKernel.Core= concrete runtime implementation and standard providers        ↓AIKernel.Providers.*= external model and service integrations
+```text
+AIKernel.NET
+= contracts, DTOs, enums, documentation, contract-test skeletons
+
+        ↓
+
+AIKernel.Core
+= concrete runtime implementation and standard providers
+
+        ↓
+
+AIKernel.Providers.*
+= external model and service integrations
 ```
 
 AIKernel.NET defines the contracts.  

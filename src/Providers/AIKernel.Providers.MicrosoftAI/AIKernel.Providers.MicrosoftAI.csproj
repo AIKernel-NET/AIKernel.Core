@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>AIKernel.Providers.MicrosoftAI</Title>
+    <Description>EN: Microsoft.Extensions.AI based provider implementation for AIKernel.NET. Enables OpenAI-compatible model execution while preserving AIKernel's capability-based provider model.
+
+JA: Microsoft.Extensions.AI を利用した AIKernel.NET 向け Provider 実装です。AIKernel の Capability ベース Provider モデルを維持しながら、OpenAI 互換モデル実行を可能にします。</Description>
+    <PackageIcon>aikernel-logo128x128.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\assets\aikernel-logo128x128.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AIKernel.Abstractions" Version="0.0.1" />
+    <PackageReference Include="AIKernel.Dtos" Version="0.0.1" />
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.5.2" />
+  </ItemGroup>
+
+</Project>

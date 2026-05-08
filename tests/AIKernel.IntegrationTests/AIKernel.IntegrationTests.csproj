@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <Description>EN: Integration tests for validating end-to-end AIKernel.NET runtime behavior across Core, Kernel, Hosting, and Providers.
+
+JA: Core、Kernel、Hosting、Provider を横断した AIKernel.NET ランタイムのエンドツーエンド動作を検証する結合テストです。</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AIKernel.Kernel\AIKernel.Kernel.csproj" />
+    <ProjectReference Include="..\..\src\AIKernel.Hosting\AIKernel.Hosting.csproj" />
+    <ProjectReference Include="..\..\src\Providers\AIKernel.Providers.MicrosoftAI\AIKernel.Providers.MicrosoftAI.csproj" />
+  </ItemGroup>
+
+</Project>

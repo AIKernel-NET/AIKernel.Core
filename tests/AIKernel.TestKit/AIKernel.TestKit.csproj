@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Description>EN: Contract testing toolkit for AIKernel.NET implementations. Provides reusable test skeletons and verification helpers to validate provider, VFS, context, and execution contract compliance.
+
+JA: AIKernel.NET 実装向けの Contract Test ツールキットです。Provider、VFS、Context、実行契約への準拠を検証するための再利用可能なテスト雛形と検証ヘルパーを提供します。</Description>
+    <PackageIcon>aikernel-logo128x128.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Title>AIKernel.TestKit</Title>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\aikernel-logo128x128.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AIKernel.Abstractions" Version="0.0.1" />
+    <PackageReference Include="AIKernel.Dtos" Version="0.0.1" />
+  </ItemGroup>
+
+</Project>

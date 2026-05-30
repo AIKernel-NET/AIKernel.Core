@@ -1,23 +1,46 @@
-﻿namespace AIKernel.Common.Results;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace AIKernel.Common.Results;
 
 public readonly struct Result<T>
 {
-    public bool IsSuccess { get; }
-    public bool IsFailure => !IsSuccess;
-    public T? Value { get; }
-    public string? Error { get; }
+    // -------------------------
+    // Core State
+    // -------------------------
 
-    private Result(bool success, T? value, string? error)
+    public bool IsSuccess { get; }
+
+    public bool IsFailure => !IsSuccess;
+
+    public T? Value { get; }
+
+    public ErrorContext? Error { get; }
+
+    // Nullable Flow Analysis:
+    // IsSuccess = true → Value は null ではない
+    // IsSuccess = false → Error は null ではない
+    [MemberNotNullWhen(true, nameof(Value))]
+    [MemberNotNullWhen(false, nameof(Error))]
+    public bool IsSuccessState => IsSuccess;
+
+    private Result(bool success, T? value, ErrorContext? error)
     {
         IsSuccess = success;
         Value = value;
         Error = error;
     }
 
+    // -------------------------
+    // Constructors
+    // -------------------------
+
     public static Result<T> Success(T value)
         => new(true, value, null);
 
-    public static Result<T> Fail(string error)
+    public static Result<T> Fail(string message)
+        => new(false, default, new ErrorContext(message, "ERROR", false));
+
+    public static Result<T> Fail(ErrorContext error)
         => new(false, default, error);
 
     // -------------------------
@@ -25,14 +48,34 @@ public readonly struct Result<T>
     // -------------------------
 
     public Result<U> Map<U>(Func<T, U> mapper)
-        => IsFailure
-            ? Result<U>.Fail(Error!)
-            : Result<U>.Success(mapper(Value!));
+    {
+        if (IsFailure)
+            return Result<U>.Fail(Error!);
+
+        try
+        {
+            return Result<U>.Success(mapper(Value!));
+        }
+        catch (Exception ex)
+        {
+            return Result<U>.Fail(ErrorContext.FromException(ex));
+        }
+    }
 
     public Result<U> Bind<U>(Func<T, Result<U>> binder)
-        => IsFailure
-            ? Result<U>.Fail(Error!)
-            : binder(Value!);
+    {
+        if (IsFailure)
+            return Result<U>.Fail(Error!);
+
+        try
+        {
+            return binder(Value!);
+        }
+        catch (Exception ex)
+        {
+            return Result<U>.Fail(ErrorContext.FromException(ex));
+        }
+    }
 
     // -------------------------
     // LINQ Support
@@ -48,11 +91,18 @@ public readonly struct Result<T>
         if (IsFailure)
             return Result<V>.Fail(Error!);
 
-        var r = binder(Value!);
-        if (r.IsFailure)
-            return Result<V>.Fail(r.Error!);
+        try
+        {
+            var r = binder(Value!);
+            if (r.IsFailure)
+                return Result<V>.Fail(r.Error!);
 
-        return Result<V>.Success(projector(Value!, r.Value!));
+            return Result<V>.Success(projector(Value!, r.Value!));
+        }
+        catch (Exception ex)
+        {
+            return Result<V>.Fail(ErrorContext.FromException(ex));
+        }
     }
 
     public override string ToString()

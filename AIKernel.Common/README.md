@@ -1,0 +1,116 @@
+﻿# AIKernel.Common
+
+**English | 日本語**
+
+---
+
+## Overview / 概要
+
+**AIKernel.Common** provides foundational utility components shared across the entire AIKernel ecosystem.  
+This library contains cross-cutting features such as JSON serialization helpers, file and path utilities, logging primitives, and common exception types.
+
+AIKernel.Common is designed as a lightweight, implementation-level support module used by:
+
+- AIKernel.Core  
+- AIKernel.Tools  
+- AIKernel.CLI  
+- AIKernel.Foundation (optional)
+
+It does **not** include domain logic or kernel abstractions.  
+Instead, it offers standardized behaviors and reusable helpers that ensure consistency across all AIKernel modules.
+
+---
+
+## Features / 主な機能
+
+###  JSON Utilities  
+- Unified `JsonSerializerOptions`  
+- Helper methods for serialization/deserialization  
+- JSON file load/save utilities  
+
+###  File & Path Utilities  
+- Safe file read/write  
+- Path normalization  
+- Directory helpers  
+
+###  Logging Primitives  
+- Lightweight logging helpers  
+- Common log formatting utilities  
+
+###  Common Exceptions  
+- Shared exception types  
+- Error handling helpers  
+
+###  Shared Helpers  
+- Result / Option / Try patterns (future)  
+- Cross-module reusable utilities  
+
+---
+
+## Design Philosophy / 設計思想
+
+AIKernel.Common follows the **Interface-Led Architecture (ILA)** principles:
+
+- No domain logic  
+- No kernel abstractions  
+- No dependency on AIKernel.NET (abstractions)  
+- Pure implementation-level utilities  
+- Stable, reusable, cross-cutting components  
+
+This ensures that all AIKernel modules behave consistently while keeping the architecture clean and layered.
+
+---
+
+## Repository Structure / リポジトリ構成
+
+```text
+AIKernel.Common/ 
+├─ Json/ 
+│ ├─ JsonOptions.cs 
+│ ├─ JsonUtil.cs 
+│ └─ JsonFile.cs 
+├─ IO/ 
+│ ├─ FileUtil.cs 
+│ └─ PathUtil.cs 
+├─ Logging/ 
+│ └─ LogUtil.cs 
+├─ Exceptions/ 
+│ └─ CommonException.cs 
+└─ README.md
+```
+
+---
+
+## Usage Examples / 使用例
+
+### JSON Serialization
+
+```csharp
+var json = JsonUtil.ToJson(obj);
+var obj2 = JsonUtil.FromJson<MyType>(json);
+```
+### JSON File I/O
+
+```csharp
+await JsonFile.SaveAsync("data.json", obj);
+var loaded = await JsonFile.LoadAsync<MyType>("data.json");
+```
+
+### Path Utilities
+
+```csharp
+var full = PathUtil.Normalize("~/data/output.txt");
+```
+
+## License / ライセンス
+
+MIT License
+
+## Contributing / コントリビュート
+
+Contributions are welcome. Please follow the AIKernel ecosystem’s coding style and architectural guidelines.
+
+AIKernel 全体のアーキテクチャガイドラインに従ってください。
+## Maintainer / メンテナー
+
+AIKernel Project Maintained by **Takuya.S**

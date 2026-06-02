@@ -1,6 +1,7 @@
 namespace AIKernel.IntegrationTests;
 
 using AIKernel.Abstractions.Providers;
+using AIKernel.Dtos.Core;
 using AIKernel.Providers.MicrosoftAI;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -40,7 +41,40 @@ public sealed class OpenAICompatibleProviderTests
             StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task GetHealthAsync_UsesCurrentInitializationState()
+    {
+        OpenAICompatibleProviderHealthContext? observedContext = null;
+
+        var provider = CreateProvider(
+            context =>
+            {
+                observedContext = context;
+                return new ProviderHealthStatus(
+                    IsHealthy: context.IsInitialized,
+                    Message: context.IsInitialized ? "OK" : "Not initialized",
+                    CheckedAt: context.CheckedAtUtc.UtcDateTime,
+                    ResponseTimeMs: 0);
+            });
+
+        await provider.InitializeAsync();
+
+        var health = await provider.GetHealthAsync();
+
+        Assert.True(health.IsHealthy);
+        Assert.NotNull(observedContext);
+        Assert.True(observedContext.IsInitialized);
+        Assert.Equal("openai-compatible", observedContext.ProviderId);
+        Assert.Equal("gpt-test", observedContext.ModelId);
+    }
+
     private static OpenAICompatibleProvider CreateProvider()
+    {
+        return CreateProvider(healthStatusFactory: null);
+    }
+
+    private static OpenAICompatibleProvider CreateProvider(
+        Func<OpenAICompatibleProviderHealthContext, ProviderHealthStatus>? healthStatusFactory)
     {
         return new OpenAICompatibleProvider(
             new StubChatClient(),
@@ -49,7 +83,8 @@ public sealed class OpenAICompatibleProviderTests
             new OpenAICompatibleProviderOptions
             {
                 ModelId = "gpt-test",
-                ApiKey = "sk-test-123456"
+                ApiKey = "sk-test-123456",
+                HealthStatusFactory = healthStatusFactory
             },
             NullLogger<OpenAICompatibleProvider>.Instance);
     }

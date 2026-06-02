@@ -6,7 +6,6 @@ using AIKernel.Dtos.Core;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 public sealed class OpenAICompatibleProvider : IModelProvider
@@ -35,6 +34,7 @@ public sealed class OpenAICompatibleProvider : IModelProvider
     private readonly OpenAICompatibleProviderOptions _options;
     private readonly ILogger<OpenAICompatibleProvider> _logger;
     private readonly IKernelClock _clock;
+    private readonly OpenAICompatibleProviderHealthCheck _healthCheck;
 
     private volatile bool _isInitialized;
 
@@ -69,6 +69,7 @@ public sealed class OpenAICompatibleProvider : IModelProvider
         _options = options ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _clock = clock ?? KernelClock.System();
+        _healthCheck = new OpenAICompatibleProviderHealthCheck(_options, _logger, _clock);
 
         ProviderId = RequireNonEmpty(_options.ProviderId, nameof(_options.ProviderId));
         Name = RequireNonEmpty(_options.Name, nameof(_options.Name));
@@ -105,101 +106,12 @@ public sealed class OpenAICompatibleProvider : IModelProvider
 
     public async Task<ProviderHealthStatus> GetHealthAsync()
     {
-        ProviderHealthStatus healthStatus;
-
-        try
-        {
-            var factory = _options.HealthStatusFactory;
-
-            if (factory is null)
-            {
-                var exception = new InvalidOperationException(
-                    "OpenAICompatibleProviderOptions.HealthStatusFactory is not configured.");
-
-                // Fail-Closed:
-                // ヘルス状態を生成する方法が未定義なら、状態不明のまま上位に制御を渡さない。
-                // default(ProviderHealthStatus) は「正常・異常・未初期化」の区別ができず、
-                // Kernel / Router が誤った判断をする可能性があるため禁止する。
-                if (_logger.IsEnabled(LogLevel.Error))
-                {
-                    LogProviderFailed(
-                        _logger,
-                        ProviderId,
-                        "provider_health_status_factory_missing",
-                        exception);
-                }
-
-                throw new ProviderApiException(
-                    "Provider health status factory is not configured.",
-                    exception);
-            }
-
-            var context = new OpenAICompatibleProviderHealthContext
-            {
-                ProviderId = ProviderId,
-                Name = Name,
-                Version = Version,
-                ModelId = _options.ModelId,
-                IsInitialized = _isInitialized,
-                CheckedAtUtc = _clock.Now
-            };
-
-            healthStatus = factory(context);
-        }
-        catch (ProviderApiException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            // ProviderHealthStatus の生成失敗は、推論ロジックの失敗ではなく、
-            // Provider 基盤そのものの状態定義不全として扱う。
-            // そのため ProviderApiException に包み、Fail-Closed で停止させる。
-            if (_logger.IsEnabled(LogLevel.Error))
-            {
-                LogProviderFailed(
-                    _logger,
-                    ProviderId,
-                    "provider_health_status_creation_failed",
-                    ex);
-            }
-
-            throw new ProviderApiException(
-                "Provider health status could not be created.",
-                ex);
-        }
-
-        if (IsNullHealthStatus(healthStatus))
-        {
-            var exception = new InvalidOperationException(
-                "Provider health status factory returned null.");
-
-            // Explicit Null Check:
-            // ProviderHealthStatus が null ということは、Provider の健全性を判定できない状態。
-            // 不確定な状態で上位レイヤーへ制御を渡すと、
-            // Router / Kernel が「利用可能」と誤判定する可能性がある。
-            //
-            // 将来的に ProviderHealthStatus が struct / enum になった場合、
-            // この null チェックは常に false になるが、default 値を生成しない設計は維持される。
-            // つまり「null を拒否する」だけでなく、
-            // 「そもそも default に依存しない」ことがこの実装の本質である。
-            if (_logger.IsEnabled(LogLevel.Error))
-            {
-                LogProviderFailed(
-                    _logger,
-                    ProviderId,
-                    "provider_health_status_null",
-                    exception);
-            }
-
-            throw new ProviderApiException(
-                "Provider health status was null.",
-                exception);
-        }
-
-        // 非同期 API としての一貫性を保つため Task.FromResult を使うが、
-        // await + ConfigureAwait(false) に揃え、呼び出し側の SynchronizationContext に依存しない。
-        return await Task.FromResult(healthStatus)
+        return await _healthCheck
+            .GetHealthAsync(
+                ProviderId,
+                Name,
+                Version,
+                _isInitialized)
             .ConfigureAwait(false);
     }
 
@@ -355,12 +267,6 @@ public sealed class OpenAICompatibleProvider : IModelProvider
         messages.Add(new OpenAICompatibleModelMessage("user", question));
 
         return GenerateAsync(messages, cancellationToken);
-    }
-
-    private static bool IsNullHealthStatus(
-        [NotNullWhen(false)] ProviderHealthStatus? healthStatus)
-    {
-        return healthStatus is null;
     }
 
     private void ValidateMessages(IReadOnlyList<IModelMessage> messages)

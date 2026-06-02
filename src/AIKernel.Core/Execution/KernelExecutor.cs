@@ -14,6 +14,7 @@ public sealed class KernelExecutor : IKernelExecutor
     private readonly ITokenizer _tokenizer;
     private readonly IKernelClock _clock;
     private readonly KernelExecutionIdFactory _executionIdFactory = new();
+    private readonly KernelExecutionFailureResultFactory _failureResultFactory;
     private long _executionSequence;
 
     public KernelExecutor(
@@ -26,6 +27,7 @@ public sealed class KernelExecutor : IKernelExecutor
         _capabilityResolver = capabilityResolver ?? throw new ArgumentNullException(nameof(capabilityResolver));
         _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
         _clock = clock ?? KernelClock.System();
+        _failureResultFactory = new KernelExecutionFailureResultFactory(_clock);
     }
 
     public async Task<KernelRequestExecutionResult> ExecuteAsync(
@@ -119,35 +121,12 @@ public sealed class KernelExecutor : IKernelExecutor
         }
         catch (OperationCanceledException)
         {
-            var completedAt = _clock.Now;
-
-            return new KernelRequestExecutionResult
-            {
-                ExecutionId = CreateExecutionIdOrFailureCode(
-                    request,
-                    ExecutionStatus.Canceled,
-                    prompt?.PromptHash ?? string.Empty,
-                    "canceled",
-                    startedAt,
-                    executionSequence),
-                Status = ExecutionStatus.Canceled,
-                ProviderId = capability?.ProviderId ?? "unknown",
-                ModelId = capability?.ModelId ?? request.RequestedModelId ?? "unknown",
-                ContextSnapshotId = GetContextSnapshotId(request),
-                ContextHash = GetContextHash(request),
-                PromptHash = prompt?.PromptHash ?? string.Empty,
-                OutputText = null,
-                Usage = new ExecutionUsage(
-                    InputTokens: prompt?.EstimatedInputTokens ?? 0,
-                    OutputTokens: 0,
-                    TotalTokens: prompt?.EstimatedInputTokens ?? 0),
-                Error = new ExecutionError(
-                    Code: "canceled",
-                    Message: "Execution was canceled."),
-                StartedAtUtc = startedAt,
-                CompletedAtUtc = completedAt,
-                Metadata = ImmutableDictionary<string, string>.Empty
-            };
+            return _failureResultFactory.Resolve(_failureResultFactory.CreateCanceledResult(
+                request,
+                capability,
+                prompt,
+                startedAt,
+                executionSequence));
         }
         catch (Exception ex)
         {
@@ -173,36 +152,15 @@ public sealed class KernelExecutor : IKernelExecutor
         string message,
         string? detail = null)
     {
-        var completedAt = _clock.Now;
-
-        return new KernelRequestExecutionResult
-        {
-            ExecutionId = CreateExecutionIdOrFailureCode(
-                request,
-                ExecutionStatus.Failed,
-                prompt?.PromptHash ?? string.Empty,
-                code,
-                startedAt,
-                executionSequence),
-            Status = ExecutionStatus.Failed,
-            ProviderId = capability?.ProviderId ?? "unknown",
-            ModelId = capability?.ModelId ?? request.RequestedModelId ?? "unknown",
-            ContextSnapshotId = GetContextSnapshotId(request),
-            ContextHash = GetContextHash(request),
-            PromptHash = prompt?.PromptHash ?? string.Empty,
-            OutputText = null,
-            Usage = new ExecutionUsage(
-                InputTokens: prompt?.EstimatedInputTokens ?? 0,
-                OutputTokens: 0,
-                TotalTokens: prompt?.EstimatedInputTokens ?? 0),
-            Error = new ExecutionError(
-                Code: code,
-                Message: message,
-                Detail: detail),
-            StartedAtUtc = startedAt,
-            CompletedAtUtc = completedAt,
-            Metadata = ImmutableDictionary<string, string>.Empty
-        };
+        return _failureResultFactory.Resolve(_failureResultFactory.CreateFailedResult(
+            request,
+            capability,
+            prompt,
+            startedAt,
+            executionSequence,
+            code,
+            message,
+            detail));
     }
 
     private string CreateExecutionIdOrFailureCode(
@@ -227,15 +185,5 @@ public sealed class KernelExecutor : IKernelExecutor
         }
 
         return "exec:failed:" + executionId.Error!.Code.ToLowerInvariant();
-    }
-
-    private static string GetContextSnapshotId(KernelExecutionRequest request)
-    {
-        return request.ContextSnapshot?.SnapshotId ?? "unknown";
-    }
-
-    private static string GetContextHash(KernelExecutionRequest request)
-    {
-        return request.ContextSnapshot?.ContextHash ?? "unknown";
     }
 }

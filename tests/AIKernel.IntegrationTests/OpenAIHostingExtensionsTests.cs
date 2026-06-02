@@ -2,6 +2,7 @@
 
 using AIKernel.Abstractions.Providers;
 using AIKernel.Core.Security;
+using AIKernel.Dtos.Context;
 using AIKernel.Hosting;
 using AIKernel.Kernel;
 using AIKernel.Providers.MicrosoftAI;
@@ -30,6 +31,36 @@ public sealed class OpenAIHostingExtensionsTests
         Assert.NotNull(kernel.GetProviderRouter());
         Assert.NotNull(kernel.GetGuard());
         Assert.NotNull(kernel.GetPdp());
+    }
+
+    [Fact]
+    public async Task AddAIKernelKernel_FailsClosed_ForLegacyContextExecution()
+    {
+        var services = new ServiceCollection();
+
+        services.AddAIKernelCore();
+        services.AddAIKernelKernel();
+
+        using var provider = services.BuildServiceProvider();
+
+        var kernel = (AIKernel.Kernel.Kernel)provider
+            .GetRequiredService<AIKernel.Abstractions.Kernel.IKernel>();
+
+        var result = await kernel.ExecuteAsync(new UnifiedContextDto
+        {
+            Id = "legacy-context",
+            Orchestration = new OrchestrationContextDto
+            {
+                Purpose = "legacy",
+                Structure = "legacy"
+            }
+        });
+
+        Assert.False(result.Success);
+        Assert.Null(result.Data);
+        Assert.Equal(
+            "KernelRequest execution is required for the AIKernel.Core pipeline.",
+            result.Error);
     }
 
     [Fact]

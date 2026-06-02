@@ -177,8 +177,10 @@ public sealed class Kernel : IKernel
 
         return Task.FromResult(new KernelExecutionResult
         {
-            Success = true,
-            Data = contract.Id,
+            Success = false,
+            Data = null,
+            Error = "KernelRequest execution is required for the AIKernel.Core pipeline.",
+            FailureModes = [FailureMode.ReasoningStopped],
             ExecutionTime = TimeSpan.Zero
         });
     }

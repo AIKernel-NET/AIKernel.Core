@@ -1,5 +1,8 @@
 ﻿namespace AIKernel.Kernel;
 
+using System.Collections.Immutable;
+using System.Security.Cryptography;
+using System.Text;
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Kernel;
@@ -13,7 +16,6 @@ using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Dtos.Security;
 using AIKernel.Enums;
-using System.Collections.Immutable;
 
 public sealed class Kernel : IKernel
 {
@@ -58,9 +60,9 @@ public sealed class Kernel : IKernel
         _transactionIdFactory = transactionIdFactory
             ?? throw new ArgumentNullException(nameof(transactionIdFactory));
 
-        _providerRouter = providerRouter ?? NullProviderRouter.Instance;
-        _guard = guard ?? NullGuard.Instance;
-        _pdp = pdp ?? NullPdp.Instance;
+        _providerRouter = providerRouter ?? FailClosedProviderRouter.Instance;
+        _guard = guard ?? FailClosedGuard.Instance;
+        _pdp = pdp ?? FailClosedPdp.Instance;
         _clock = clock ?? KernelClock.System();
     }
 
@@ -291,7 +293,8 @@ public sealed class Kernel : IKernel
 
         return new KernelRequestExecutionResult
         {
-            ExecutionId = transaction?.TransactionId ?? $"exec:{Guid.NewGuid():N}",
+            ExecutionId = transaction?.TransactionId
+                ?? CreateFallbackExecutionId(request, ExecutionStatus.Rejected),
             Status = ExecutionStatus.Rejected,
             ProviderId = "none",
             ModelId = request.RequestedModelId ?? "none",
@@ -324,7 +327,8 @@ public sealed class Kernel : IKernel
 
         return new KernelRequestExecutionResult
         {
-            ExecutionId = transaction?.TransactionId ?? $"exec:{Guid.NewGuid():N}",
+            ExecutionId = transaction?.TransactionId
+                ?? CreateFallbackExecutionId(request, ExecutionStatus.Failed),
             Status = ExecutionStatus.Failed,
             ProviderId = "unknown",
             ModelId = request.RequestedModelId ?? "unknown",
@@ -356,7 +360,8 @@ public sealed class Kernel : IKernel
 
         return new KernelRequestExecutionResult
         {
-            ExecutionId = transaction?.TransactionId ?? $"exec:{Guid.NewGuid():N}",
+            ExecutionId = transaction?.TransactionId
+                ?? CreateFallbackExecutionId(request, ExecutionStatus.Canceled),
             Status = ExecutionStatus.Canceled,
             ProviderId = "none",
             ModelId = request.RequestedModelId ?? "none",
@@ -418,183 +423,23 @@ public sealed class Kernel : IKernel
         return builder.ToImmutable();
     }
 
-    private sealed class NullProviderRouter : IProviderRouter
+    private static string CreateFallbackExecutionId(
+        KernelRequest request,
+        ExecutionStatus status)
     {
-        public static NullProviderRouter Instance { get; } = new();
+        var payload = string.Join(
+            '\n',
+            request.Input ?? string.Empty,
+            request.RootRomId?.Value ?? string.Empty,
+            request.VfsProviderId ?? string.Empty,
+            request.ParentSnapshotId ?? string.Empty,
+            request.RequestedModelId ?? string.Empty,
+            status.ToString());
 
-        private NullProviderRouter()
-        {
-        }
+        var bytes = Encoding.UTF8.GetBytes(payload);
+        var hash = SHA256.HashData(bytes);
 
-        public Task<MaterialContextDto> RetrieveAsync(
-            string source,
-            string query)
-        {
-            return Task.FromResult(new MaterialContextDto
-            {
-                Source = source,
-                RawData = string.Empty,
-                NormalizedData = string.Empty,
-                RelevanceScore = 0.0,
-                RetrievedAt = DateTime.UtcNow
-            });
-        }
-
-        public Task<IReadOnlyList<MaterialContextDto>> RetrieveMultipleAsync(
-            IReadOnlyList<string> sources,
-            string query)
-        {
-            ArgumentNullException.ThrowIfNull(sources);
-
-            IReadOnlyList<MaterialContextDto> materials = sources
-                .Select(source => new MaterialContextDto
-                {
-                    Source = source,
-                    RawData = string.Empty,
-                    NormalizedData = string.Empty,
-                    RelevanceScore = 0.0,
-                    RetrievedAt = DateTime.UtcNow
-                })
-                .ToArray();
-
-            return Task.FromResult(materials);
-        }
-
-        public Task<MaterialContextDto?> GetFromCacheAsync(
-            string cacheKey)
-        {
-            return Task.FromResult<MaterialContextDto?>(null);
-        }
-
-        public Task CacheMaterialAsync(
-            string cacheKey,
-            MaterialContextDto data)
-        {
-            ArgumentNullException.ThrowIfNull(data);
-
-            return Task.CompletedTask;
-        }
-
-        public void RegisterProvider(
-            string name,
-            IProvider provider)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name);
-            ArgumentNullException.ThrowIfNull(provider);
-        }
-
-        public bool UnregisterProvider(
-            string name)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name);
-
-            return false;
-        }
-
-        public IReadOnlyList<string> GetRegisteredProviders()
-        {
-            return [];
-        }
+        return "exec:sha256:" + Convert.ToHexString(hash).ToLowerInvariant();
     }
 
-    private sealed class NullGuard : IGuard
-    {
-        public static NullGuard Instance { get; } = new();
-
-        private NullGuard()
-        {
-        }
-
-        public Task<bool> CanExecuteAsync(
-            IPrincipal principal,
-            string action,
-            string resource)
-        {
-            return Task.FromResult(false);
-        }
-
-        public Task<bool> CanAccessContextAsync(
-            IPrincipal principal,
-            UnifiedContextDto contract)
-        {
-            return Task.FromResult(false);
-        }
-
-        public Task<bool> CanReadAsync(
-            IPrincipal principal,
-            string resource)
-        {
-            return Task.FromResult(false);
-        }
-
-        public Task<bool> CanWriteAsync(
-            IPrincipal principal,
-            string resource)
-        {
-            return Task.FromResult(false);
-        }
-
-        public Task<GuardAction> EnforceAsync(
-            IPrincipal principal,
-            string action,
-            string resource)
-        {
-            return Task.FromResult(GuardAction.Block);
-        }
-
-        public Task<GuardAction> OnFailureModeDetectedAsync(
-            FailureMode mode,
-            string context)
-        {
-            return Task.FromResult(GuardAction.Block);
-        }
-    }
-
-    private sealed class NullPdp : IPdp
-    {
-        public static NullPdp Instance { get; } = new();
-
-        private NullPdp()
-        {
-        }
-
-        public Task<AccessDecision> EvaluateAsync(
-            AccessRequest request)
-        {
-            return Task.FromResult(new AccessDecision
-            {
-                Allowed = false,
-                Reason = "No PDP policy is registered."
-            });
-        }
-
-        public void AddPolicy(
-            IPolicy policy)
-        {
-            ArgumentNullException.ThrowIfNull(policy);
-        }
-
-        public bool RemovePolicy(
-            string policyId)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(policyId);
-
-            return false;
-        }
-
-        public IReadOnlyList<IPolicy> GetPolicies()
-        {
-            return [];
-        }
-
-        public Task<PolicyEvaluationResult> EvaluatePoliciesAsync(
-            UnifiedContextDto contract)
-        {
-            return Task.FromResult(new PolicyEvaluationResult
-            {
-                AllAllowed = false,
-                RiskLevel = "High"
-            });
-        }
-    }
 }

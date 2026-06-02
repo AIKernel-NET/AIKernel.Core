@@ -1,6 +1,8 @@
 namespace AIKernel.Core.Execution;
 
 using System.Collections.Immutable;
+using System.Security.Cryptography;
+using System.Text;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
 using AIKernel.Core.Time;
@@ -12,6 +14,7 @@ public sealed class KernelExecutor : IKernelExecutor
     private readonly IModelPromptCapabilityResolver _capabilityResolver;
     private readonly ITokenizer _tokenizer;
     private readonly IKernelClock _clock;
+    private long _executionSequence;
 
     public KernelExecutor(
         IPromptGenerator promptGenerator,
@@ -34,6 +37,7 @@ public sealed class KernelExecutor : IKernelExecutor
         ArgumentNullException.ThrowIfNull(request);
 
         var startedAt = _clock.Now;
+        var executionSequence = Interlocked.Increment(ref _executionSequence);
 
         ModelPromptCapability? capability = null;
         GeneratedPrompt? prompt = null;
@@ -65,6 +69,7 @@ public sealed class KernelExecutor : IKernelExecutor
                     capability,
                     prompt,
                     startedAt,
+                    executionSequence,
                     code: "empty_output",
                     message: "Model provider returned empty output.");
             }
@@ -78,6 +83,7 @@ public sealed class KernelExecutor : IKernelExecutor
                     capability,
                     prompt,
                     startedAt,
+                    executionSequence,
                     code: "output_token_budget_exceeded",
                     message: $"Output token budget exceeded. Actual={outputTokens}, Max={capability.MaxOutputTokens}.");
             }
@@ -86,7 +92,13 @@ public sealed class KernelExecutor : IKernelExecutor
 
             return new KernelRequestExecutionResult
             {
-                ExecutionId = $"exec:{Guid.NewGuid():N}",
+                ExecutionId = CreateExecutionId(
+                    request,
+                    ExecutionStatus.Succeeded,
+                    prompt.PromptHash,
+                    output,
+                    startedAt,
+                    executionSequence),
                 Status = ExecutionStatus.Succeeded,
                 ProviderId = capability.ProviderId,
                 ModelId = capability.ModelId,
@@ -111,7 +123,13 @@ public sealed class KernelExecutor : IKernelExecutor
 
             return new KernelRequestExecutionResult
             {
-                ExecutionId = $"exec:{Guid.NewGuid():N}",
+                ExecutionId = CreateExecutionId(
+                    request,
+                    ExecutionStatus.Canceled,
+                    prompt?.PromptHash ?? string.Empty,
+                    "canceled",
+                    startedAt,
+                    executionSequence),
                 Status = ExecutionStatus.Canceled,
                 ProviderId = capability?.ProviderId ?? "unknown",
                 ModelId = capability?.ModelId ?? request.RequestedModelId ?? "unknown",
@@ -138,6 +156,7 @@ public sealed class KernelExecutor : IKernelExecutor
                 capability,
                 prompt,
                 startedAt,
+                executionSequence,
                 code: "execution_failed",
                 message: ex.Message,
                 detail: ex.GetType().FullName);
@@ -149,6 +168,7 @@ public sealed class KernelExecutor : IKernelExecutor
         ModelPromptCapability? capability,
         GeneratedPrompt? prompt,
         DateTimeOffset startedAt,
+        long executionSequence,
         string code,
         string message,
         string? detail = null)
@@ -157,7 +177,13 @@ public sealed class KernelExecutor : IKernelExecutor
 
         return new KernelRequestExecutionResult
         {
-            ExecutionId = $"exec:{Guid.NewGuid():N}",
+            ExecutionId = CreateExecutionId(
+                request,
+                ExecutionStatus.Failed,
+                prompt?.PromptHash ?? string.Empty,
+                code,
+                startedAt,
+                executionSequence),
             Status = ExecutionStatus.Failed,
             ProviderId = capability?.ProviderId ?? "unknown",
             ModelId = capability?.ModelId ?? request.RequestedModelId ?? "unknown",
@@ -177,5 +203,30 @@ public sealed class KernelExecutor : IKernelExecutor
             CompletedAtUtc = completedAt,
             Metadata = ImmutableDictionary<string, string>.Empty
         };
+    }
+
+    private static string CreateExecutionId(
+        KernelExecutionRequest request,
+        ExecutionStatus status,
+        string promptHash,
+        string resultDiscriminator,
+        DateTimeOffset startedAt,
+        long executionSequence)
+    {
+        var payload = string.Join(
+            '\n',
+            request.ContextSnapshot.ContextHash,
+            request.ContextSnapshot.SnapshotId,
+            request.RequestedModelId ?? string.Empty,
+            promptHash,
+            status.ToString(),
+            resultDiscriminator,
+            startedAt.Ticks.ToString("D20"),
+            executionSequence.ToString("D16"));
+
+        var bytes = Encoding.UTF8.GetBytes(payload);
+        var hash = SHA256.HashData(bytes);
+
+        return "exec:sha256:" + Convert.ToHexString(hash).ToLowerInvariant();
     }
 }

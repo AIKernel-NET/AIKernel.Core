@@ -26,7 +26,10 @@ public abstract class RomLoaderContractTests
         await using var session = CreateReadableSession();
 
         // Act
-        var snapshot = await loader.LoadAsync(session, ValidRomPath);
+        var snapshot = await loader.LoadAsync(
+            session,
+            ValidRomPath,
+            TestContext.Current.CancellationToken);
 
         // Assert
         Assert.False(string.IsNullOrWhiteSpace(snapshot.RomId.Value));
@@ -48,7 +51,10 @@ public abstract class RomLoaderContractTests
 
         // Act / Assert
         await Assert.ThrowsAsync<RomLoadException>(
-            () => loader.LoadAsync(session, MissingRomIdPath));
+            () => loader.LoadAsync(
+                session,
+                MissingRomIdPath,
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -60,7 +66,10 @@ public abstract class RomLoaderContractTests
 
         // Act / Assert
         await Assert.ThrowsAsync<RomSignatureVerificationException>(
-            () => loader.LoadAsync(session, InvalidSignaturePath));
+            () => loader.LoadAsync(
+                session,
+                InvalidSignaturePath,
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -71,7 +80,10 @@ public abstract class RomLoaderContractTests
         await using var session = CreateReadableSession();
 
         // Act
-        var snapshot = await loader.LoadAsync(session, ValidRomPath);
+        var snapshot = await loader.LoadAsync(
+            session,
+            ValidRomPath,
+            TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(ValidRomPath, snapshot.SourcePath);

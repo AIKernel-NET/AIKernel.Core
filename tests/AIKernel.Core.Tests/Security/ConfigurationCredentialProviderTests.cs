@@ -23,7 +23,9 @@ public sealed class ConfigurationCredentialProviderTests
 
         var provider = new ConfigurationCredentialProvider(configuration);
 
-        var secret = await provider.GetSecretAsync("OpenAI:ApiKey");
+        var secret = await provider.GetSecretAsync(
+            "OpenAI:ApiKey",
+            TestContext.Current.CancellationToken);
 
         Assert.Equal("sk-config-123456", secret);
     }
@@ -38,7 +40,9 @@ public sealed class ConfigurationCredentialProviderTests
         var provider = new ConfigurationCredentialProvider(configuration);
 
         await Assert.ThrowsAsync<SecureCredentialNotFoundException>(
-            async () => await provider.GetSecretAsync("OpenAI:ApiKey"));
+            async () => await provider.GetSecretAsync(
+                "OpenAI:ApiKey",
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -55,6 +59,8 @@ public sealed class ConfigurationCredentialProviderTests
         var provider = new ConfigurationCredentialProvider(configuration);
 
         await Assert.ThrowsAsync<SecureCredentialInvalidException>(
-            async () => await provider.GetSecretAsync("OpenAI:ApiKey"));
+            async () => await provider.GetSecretAsync(
+                "OpenAI:ApiKey",
+                TestContext.Current.CancellationToken));
     }
 }

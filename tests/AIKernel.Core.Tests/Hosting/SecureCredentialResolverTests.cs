@@ -35,7 +35,7 @@ public sealed class SecureCredentialResolverTests
 
         var resolver = provider.GetRequiredService<SecureCredentialResolver<TestSecureOptions>>();
 
-        var options = await resolver.ResolveAsync();
+        var options = await resolver.ResolveAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal("sk-test-123456", options.ApiKey);
     }
@@ -61,7 +61,7 @@ public sealed class SecureCredentialResolverTests
 
         var resolver = provider.GetRequiredService<SecureCredentialResolver<TestSecureOptions>>();
 
-        var options = await resolver.ResolveAsync();
+        var options = await resolver.ResolveAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal("sk-direct-123456", options.ApiKey);
     }
@@ -82,7 +82,7 @@ public sealed class SecureCredentialResolverTests
         var resolver = provider.GetRequiredService<SecureCredentialResolver<TestSecureOptions>>();
 
         await Assert.ThrowsAsync<SecureCredentialNotFoundException>(
-            async () => await resolver.ResolveAsync());
+            async () => await resolver.ResolveAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public sealed class SecureCredentialResolverTests
         var resolver = provider.GetRequiredService<SecureCredentialResolver<TestSecureOptions>>();
 
         await Assert.ThrowsAsync<SecureCredentialAmbiguousException>(
-            async () => await resolver.ResolveAsync());
+            async () => await resolver.ResolveAsync(TestContext.Current.CancellationToken));
     }
 
     private sealed class TestSecureOptions : ISecureOptions

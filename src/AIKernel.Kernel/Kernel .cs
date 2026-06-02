@@ -11,6 +11,7 @@ using AIKernel.Dtos.Context;
 using AIKernel.Core.Rom;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
+using AIKernel.Dtos.Security;
 using AIKernel.Enums;
 using System.Collections.Immutable;
 
@@ -22,6 +23,9 @@ public sealed class Kernel : IKernel
     private readonly AIKernel.Abstractions.Execution.IKernelExecutor _kernelExecutor;
     private readonly IKernelRequestHasher _requestHasher;
     private readonly IKernelTransactionIdFactory _transactionIdFactory;
+    private readonly IProviderRouter _providerRouter;
+    private readonly IGuard _guard;
+    private readonly IPdp _pdp;
     private readonly IKernelClock _clock;
 
     public Kernel(
@@ -31,7 +35,10 @@ public sealed class Kernel : IKernel
         AIKernel.Abstractions.Execution.IKernelExecutor kernelExecutor,
         IKernelRequestHasher requestHasher,
         IKernelTransactionIdFactory transactionIdFactory,
-        IKernelClock? clock = null)
+        IKernelClock? clock = null,
+        IProviderRouter? providerRouter = null,
+        IGuard? guard = null,
+        IPdp? pdp = null)
     {
         _vfsSessionFactory = vfsSessionFactory
             ?? throw new ArgumentNullException(nameof(vfsSessionFactory));
@@ -51,6 +58,9 @@ public sealed class Kernel : IKernel
         _transactionIdFactory = transactionIdFactory
             ?? throw new ArgumentNullException(nameof(transactionIdFactory));
 
+        _providerRouter = providerRouter ?? NullProviderRouter.Instance;
+        _guard = guard ?? NullGuard.Instance;
+        _pdp = pdp ?? NullPdp.Instance;
         _clock = clock ?? KernelClock.System();
     }
 
@@ -207,20 +217,17 @@ public sealed class Kernel : IKernel
 
     public IProviderRouter GetProviderRouter()
     {
-        throw new NotSupportedException(
-            "Provider router accessor is not wired in AIKernel.Kernel yet. Use IKernelModelProviderSelector for KernelRequest execution.");
+        return _providerRouter;
     }
 
     public IGuard GetGuard()
     {
-        throw new NotSupportedException(
-            "Guard accessor is not wired in AIKernel.Kernel yet. Use context governance policies for KernelRequest execution.");
+        return _guard;
     }
 
     public IPdp GetPdp()
     {
-        throw new NotSupportedException(
-            "PDP accessor is not wired in AIKernel.Kernel yet. Use context governance policies for KernelRequest execution.");
+        return _pdp;
     }
 
     private static void ValidateRequest(KernelRequest request)
@@ -409,5 +416,185 @@ public sealed class Kernel : IKernel
         }
 
         return builder.ToImmutable();
+    }
+
+    private sealed class NullProviderRouter : IProviderRouter
+    {
+        public static NullProviderRouter Instance { get; } = new();
+
+        private NullProviderRouter()
+        {
+        }
+
+        public Task<MaterialContextDto> RetrieveAsync(
+            string source,
+            string query)
+        {
+            return Task.FromResult(new MaterialContextDto
+            {
+                Source = source,
+                RawData = string.Empty,
+                NormalizedData = string.Empty,
+                RelevanceScore = 0.0,
+                RetrievedAt = DateTime.UtcNow
+            });
+        }
+
+        public Task<IReadOnlyList<MaterialContextDto>> RetrieveMultipleAsync(
+            IReadOnlyList<string> sources,
+            string query)
+        {
+            ArgumentNullException.ThrowIfNull(sources);
+
+            IReadOnlyList<MaterialContextDto> materials = sources
+                .Select(source => new MaterialContextDto
+                {
+                    Source = source,
+                    RawData = string.Empty,
+                    NormalizedData = string.Empty,
+                    RelevanceScore = 0.0,
+                    RetrievedAt = DateTime.UtcNow
+                })
+                .ToArray();
+
+            return Task.FromResult(materials);
+        }
+
+        public Task<MaterialContextDto?> GetFromCacheAsync(
+            string cacheKey)
+        {
+            return Task.FromResult<MaterialContextDto?>(null);
+        }
+
+        public Task CacheMaterialAsync(
+            string cacheKey,
+            MaterialContextDto data)
+        {
+            ArgumentNullException.ThrowIfNull(data);
+
+            return Task.CompletedTask;
+        }
+
+        public void RegisterProvider(
+            string name,
+            IProvider provider)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+            ArgumentNullException.ThrowIfNull(provider);
+        }
+
+        public bool UnregisterProvider(
+            string name)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+            return false;
+        }
+
+        public IReadOnlyList<string> GetRegisteredProviders()
+        {
+            return [];
+        }
+    }
+
+    private sealed class NullGuard : IGuard
+    {
+        public static NullGuard Instance { get; } = new();
+
+        private NullGuard()
+        {
+        }
+
+        public Task<bool> CanExecuteAsync(
+            IPrincipal principal,
+            string action,
+            string resource)
+        {
+            return Task.FromResult(false);
+        }
+
+        public Task<bool> CanAccessContextAsync(
+            IPrincipal principal,
+            UnifiedContextDto contract)
+        {
+            return Task.FromResult(false);
+        }
+
+        public Task<bool> CanReadAsync(
+            IPrincipal principal,
+            string resource)
+        {
+            return Task.FromResult(false);
+        }
+
+        public Task<bool> CanWriteAsync(
+            IPrincipal principal,
+            string resource)
+        {
+            return Task.FromResult(false);
+        }
+
+        public Task<GuardAction> EnforceAsync(
+            IPrincipal principal,
+            string action,
+            string resource)
+        {
+            return Task.FromResult(GuardAction.Block);
+        }
+
+        public Task<GuardAction> OnFailureModeDetectedAsync(
+            FailureMode mode,
+            string context)
+        {
+            return Task.FromResult(GuardAction.Block);
+        }
+    }
+
+    private sealed class NullPdp : IPdp
+    {
+        public static NullPdp Instance { get; } = new();
+
+        private NullPdp()
+        {
+        }
+
+        public Task<AccessDecision> EvaluateAsync(
+            AccessRequest request)
+        {
+            return Task.FromResult(new AccessDecision
+            {
+                Allowed = false,
+                Reason = "No PDP policy is registered."
+            });
+        }
+
+        public void AddPolicy(
+            IPolicy policy)
+        {
+            ArgumentNullException.ThrowIfNull(policy);
+        }
+
+        public bool RemovePolicy(
+            string policyId)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(policyId);
+
+            return false;
+        }
+
+        public IReadOnlyList<IPolicy> GetPolicies()
+        {
+            return [];
+        }
+
+        public Task<PolicyEvaluationResult> EvaluatePoliciesAsync(
+            UnifiedContextDto contract)
+        {
+            return Task.FromResult(new PolicyEvaluationResult
+            {
+                AllAllowed = false,
+                RiskLevel = "High"
+            });
+        }
     }
 }

@@ -26,7 +26,7 @@ public sealed class EnvironmentCredentialProviderTests : IDisposable
 
         var provider = new EnvironmentCredentialProvider();
 
-        var secret = await provider.GetSecretAsync(Key);
+        var secret = await provider.GetSecretAsync(Key, TestContext.Current.CancellationToken);
 
         Assert.Equal("sk-test-123456", secret);
     }
@@ -39,7 +39,7 @@ public sealed class EnvironmentCredentialProviderTests : IDisposable
         var provider = new EnvironmentCredentialProvider();
 
         await Assert.ThrowsAsync<SecureCredentialNotFoundException>(
-            async () => await provider.GetSecretAsync(Key));
+            async () => await provider.GetSecretAsync(Key, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public sealed class EnvironmentCredentialProviderTests : IDisposable
         var provider = new EnvironmentCredentialProvider();
 
         await Assert.ThrowsAsync<SecureCredentialInvalidException>(
-            async () => await provider.GetSecretAsync(Key));
+            async () => await provider.GetSecretAsync(Key, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class EnvironmentCredentialProviderTests : IDisposable
         var provider = new EnvironmentCredentialProvider();
 
         await Assert.ThrowsAsync<SecureCredentialInvalidException>(
-            async () => await provider.GetSecretAsync(Key));
+            async () => await provider.GetSecretAsync(Key, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public sealed class EnvironmentCredentialProviderTests : IDisposable
         var provider = new EnvironmentCredentialProvider();
 
         await Assert.ThrowsAsync<SecureCredentialInvalidException>(
-            async () => await provider.GetSecretAsync(Key));
+            async () => await provider.GetSecretAsync(Key, TestContext.Current.CancellationToken));
     }
 
     public void Dispose()

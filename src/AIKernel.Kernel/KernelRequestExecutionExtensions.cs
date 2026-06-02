@@ -19,7 +19,7 @@ public static class KernelRequestExecutionExtensions
             return coreKernel.ExecuteAsync(request, cancellationToken);
         }
 
-        throw new NotSupportedException(
+        throw new InvalidOperationException(
             "This IKernel implementation does not expose KernelRequest execution.");
     }
 }

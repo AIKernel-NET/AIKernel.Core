@@ -2,6 +2,7 @@
 
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
+using AIKernel.Abstractions.Kernel;
 using AIKernel.Abstractions.Rom;
 using AIKernel.Abstractions.Security;
 using AIKernel.Core.Context;
@@ -9,6 +10,8 @@ using AIKernel.Core.Execution;
 using AIKernel.Core.Rom;
 using AIKernel.Core.Security;
 using AIKernel.Core.Time;
+using AIKernel.Dtos.Rom;
+using AIKernel.Kernel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -89,6 +92,8 @@ public static class AIKernelCoreHostingExtensions
 
         services.TryAddSingleton<IContextCollectionFactory, DefaultContextCollectionFactory>();
         services.TryAddSingleton<IContextHashCalculator, DefaultContextHashCalculator>();
+        services.TryAddSingleton<IRomPathResolver>(
+            _ => new DictionaryRomPathResolver(new Dictionary<RomId, string>()));
         services.TryAddSingleton<IContextAssemblyGovernancePolicy>(
             _ => new SecurityTagContextAssemblyPolicy(["public", "internal"]));
         services.TryAddSingleton<IContextAssembler, ContextAssembler>();
@@ -98,6 +103,11 @@ public static class AIKernelCoreHostingExtensions
         services.TryAddSingleton<IPromptGenerator, DefaultPromptGenerator>();
         services.TryAddSingleton<IModelPromptCapabilityResolver, StaticModelPromptCapabilityResolver>();
         services.TryAddSingleton<AIKernel.Abstractions.Execution.IKernelExecutor, KernelExecutor>();
+        services.TryAddSingleton<IKernelVfsSessionFactory, KernelVfsSessionFactory>();
+        services.TryAddSingleton<IKernelModelProviderSelector, StaticKernelModelProviderSelector>();
+        services.TryAddSingleton<IKernelRequestHasher, KernelRequestHasher>();
+        services.TryAddSingleton<IKernelTransactionIdFactory, KernelTransactionIdFactory>();
+        services.TryAddSingleton<AIKernel.Abstractions.Kernel.IKernel, global::AIKernel.Kernel.Kernel>();
 
         return services;
     }

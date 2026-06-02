@@ -24,7 +24,7 @@ public abstract class KernelContractTests
         var request = CreateValidRequest();
 
         // Act
-        var result = await kernel.ExecuteAsync(request);
+        var result = await kernel.ExecuteAsync(request, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(ExecutionStatus.Succeeded, result.Status);
@@ -44,7 +44,7 @@ public abstract class KernelContractTests
         var request = CreateRequestWithDeniedRom();
 
         // Act
-        var result = await kernel.ExecuteAsync(request);
+        var result = await kernel.ExecuteAsync(request, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(ExecutionStatus.Rejected, result.Status);
@@ -61,7 +61,7 @@ public abstract class KernelContractTests
         var request = CreateRequestWithInvalidSignature();
 
         // Act
-        var result = await kernel.ExecuteAsync(request);
+        var result = await kernel.ExecuteAsync(request, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(ExecutionStatus.Rejected, result.Status);
@@ -98,8 +98,8 @@ public abstract class KernelContractTests
         var request = CreateValidRequest();
 
         // Act
-        var first = await kernel.ExecuteAsync(request);
-        var second = await kernel.ExecuteAsync(request);
+        var first = await kernel.ExecuteAsync(request, TestContext.Current.CancellationToken);
+        var second = await kernel.ExecuteAsync(request, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(first.ContextHash, second.ContextHash);

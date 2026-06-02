@@ -46,7 +46,7 @@ public sealed class OpenAIHostingExtensionsTests
 
         foreach (var hostedService in hostedServices)
         {
-            await hostedService.StartAsync(CancellationToken.None);
+            await hostedService.StartAsync(TestContext.Current.CancellationToken);
         }
 
         var modelProvider = provider.GetRequiredService<IModelProvider>();
@@ -56,7 +56,8 @@ public sealed class OpenAIHostingExtensionsTests
         var output = await modelProvider.GenerateAsync(
         [
             new TestModelMessage("user", "hello")
-        ]);
+        ],
+        TestContext.Current.CancellationToken);
 
         Assert.Equal("ok", output);
     }
@@ -92,7 +93,7 @@ public sealed class OpenAIHostingExtensionsTests
             {
                 foreach (var hostedService in hostedServices)
                 {
-                    await hostedService.StartAsync(CancellationToken.None);
+                    await hostedService.StartAsync(TestContext.Current.CancellationToken);
                 }
             });
     }

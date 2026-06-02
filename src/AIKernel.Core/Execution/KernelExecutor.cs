@@ -1,9 +1,7 @@
 namespace AIKernel.Core.Execution;
 
-using System.Collections.Immutable;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
-using AIKernel.Common.Results;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Execution;
 
@@ -13,7 +11,7 @@ public sealed class KernelExecutor : IKernelExecutor
     private readonly IModelPromptCapabilityResolver _capabilityResolver;
     private readonly ITokenizer _tokenizer;
     private readonly IKernelClock _clock;
-    private readonly KernelExecutionIdFactory _executionIdFactory = new();
+    private readonly KernelExecutionSuccessResultFactory _successResultFactory = new();
     private readonly KernelExecutionFailureResultFactory _failureResultFactory;
     private long _executionSequence;
 
@@ -92,32 +90,30 @@ public sealed class KernelExecutor : IKernelExecutor
 
             var completedAt = _clock.Now;
 
-            return new KernelRequestExecutionResult
+            var successResult = _successResultFactory.CreateSucceededResult(
+                request,
+                capability,
+                prompt,
+                output,
+                outputTokens,
+                startedAt,
+                completedAt,
+                executionSequence);
+
+            if (successResult.IsSuccess)
             {
-                ExecutionId = CreateExecutionIdOrFailureCode(
-                    request,
-                    ExecutionStatus.Succeeded,
-                    prompt.PromptHash,
-                    output,
-                    startedAt,
-                    executionSequence),
-                Status = ExecutionStatus.Succeeded,
-                ProviderId = capability.ProviderId,
-                ModelId = capability.ModelId,
-                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
-                ContextHash = request.ContextSnapshot.ContextHash,
-                PromptHash = prompt.PromptHash,
-                OutputText = output,
-                Usage = new ExecutionUsage(
-                    InputTokens: prompt.EstimatedInputTokens,
-                    OutputTokens: outputTokens,
-                    TotalTokens: prompt.EstimatedInputTokens + outputTokens),
-                Error = null,
-                StartedAtUtc = startedAt,
-                CompletedAtUtc = completedAt,
-                Metadata = ImmutableDictionary<string, string>.Empty
-                    .Add("message_format", capability.MessageFormat.ToString())
-            };
+                return successResult.Value!;
+            }
+
+            return CreateFailedResult(
+                request,
+                capability,
+                prompt,
+                startedAt,
+                executionSequence,
+                code: "execution_id_generation_failed",
+                message: successResult.Error!.Message,
+                detail: successResult.Error.Code);
         }
         catch (OperationCanceledException)
         {
@@ -161,29 +157,5 @@ public sealed class KernelExecutor : IKernelExecutor
             code,
             message,
             detail));
-    }
-
-    private string CreateExecutionIdOrFailureCode(
-        KernelExecutionRequest request,
-        ExecutionStatus status,
-        string promptHash,
-        string resultDiscriminator,
-        DateTimeOffset startedAt,
-        long executionSequence)
-    {
-        Result<string> executionId = _executionIdFactory.CreateExecutionIdResult(
-            request,
-            status,
-            promptHash,
-            resultDiscriminator,
-            startedAt,
-            executionSequence);
-
-        if (executionId.IsSuccess)
-        {
-            return executionId.Value!;
-        }
-
-        return "exec:failed:" + executionId.Error!.Code.ToLowerInvariant();
     }
 }

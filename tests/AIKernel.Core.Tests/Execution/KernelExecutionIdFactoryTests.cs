@@ -13,6 +13,46 @@ using Xunit;
 public sealed class KernelExecutionIdFactoryTests
 {
     [Fact]
+    public void SemanticStateHash_IsDeterministic_ForSameMaterial()
+    {
+        var hasher = new SemanticStateHasher();
+        var material = SemanticStateMaterial.FromKernelExecution(
+            CreateExecutionRequest(),
+            ExecutionStatus.Succeeded,
+            promptHash: "sha256:prompt",
+            resultDiscriminator: "output",
+            DateTimeOffset.UnixEpoch,
+            executionSequence: 1);
+
+        var first = hasher.ComputeHash(material);
+        var second = hasher.ComputeHash(material);
+
+        Assert.Equal(first, second);
+        Assert.Equal("sha256", first.Algorithm);
+        Assert.Equal("exec:" + first, first.ToExecutionId());
+    }
+
+    [Fact]
+    public void SemanticStateMaterial_SeparatesExecutionAndFallbackDomains()
+    {
+        var execution = SemanticStateMaterial.FromKernelExecution(
+            CreateExecutionRequest(),
+            ExecutionStatus.Succeeded,
+            promptHash: "sha256:prompt",
+            resultDiscriminator: "output",
+            DateTimeOffset.UnixEpoch,
+            executionSequence: 1);
+
+        var fallback = SemanticStateMaterial.FromKernelFallback(
+            CreateKernelRequest(),
+            ExecutionStatus.Succeeded);
+
+        Assert.Equal("kernel.execution", execution.Domain);
+        Assert.Equal("kernel.fallback", fallback.Domain);
+        Assert.NotEqual(execution.CanonicalPayload, fallback.CanonicalPayload);
+    }
+
+    [Fact]
     public void CreateExecutionId_IsDeterministic_ForSameCanonicalState()
     {
         var factory = new KernelExecutionIdFactory();

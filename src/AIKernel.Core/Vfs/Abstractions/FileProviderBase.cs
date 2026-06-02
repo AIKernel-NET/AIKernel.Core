@@ -49,15 +49,15 @@ public abstract class FileProviderBase(
 
     public virtual Task<bool> IsAvailableAsync()
     {
-        return Task.FromResult(true);
+        return Task.FromResult(false);
     }
 
     public virtual Task<VfsProviderHealth> GetHealthAsync()
     {
         return Task.FromResult(new VfsProviderHealth
         {
-            IsHealthy = true,
-            Message = "OK",
+            IsHealthy = false,
+            Message = "Provider health is not implemented.",
             CheckedAtUtc = Clock.Now
         });
     }

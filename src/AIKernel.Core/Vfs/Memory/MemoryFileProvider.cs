@@ -43,6 +43,21 @@ public sealed class MemoryFileProvider(
             ModifiedAtUtc: now);
     }
 
+    public override Task<bool> IsAvailableAsync()
+    {
+        return Task.FromResult(true);
+    }
+
+    public override Task<VfsProviderHealth> GetHealthAsync()
+    {
+        return Task.FromResult(new VfsProviderHealth
+        {
+            IsHealthy = true,
+            Message = "OK",
+            CheckedAtUtc = Clock.Now
+        });
+    }
+
     protected override Task<IVfsSession> OpenSessionCoreAsync(string sessionId)
     {
         // Provider が保持する Clock を Session へ必ず渡す。

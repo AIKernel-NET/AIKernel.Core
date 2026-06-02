@@ -16,10 +16,6 @@ JA: AIKernel.NET の Core ランタイムエンジンです。決定論的な Kn
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Abstractions\**\*.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

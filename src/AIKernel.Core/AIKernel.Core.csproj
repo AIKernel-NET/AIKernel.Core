@@ -16,6 +16,10 @@ JA: AIKernel.NET の Core ランタイムエンジンです。決定論的な Kn
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Abstractions\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -27,8 +31,13 @@ JA: AIKernel.NET の Core ランタイムエンジンです。決定論的な Kn
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AIKernel.Abstractions" Version="0.0.1" />
-    <PackageReference Include="AIKernel.Dtos" Version="0.0.1" />
+    <PackageReference Include="AIKernel.Abstractions" Version="0.0.3" />
+    <PackageReference Include="AIKernel.Dtos" Version="0.0.3" />
+    <PackageReference Include="AIKernel.Enums" Version="0.0.3" />
+    <PackageReference Include="AIKernel.Vfs" Version="0.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.7" />
     <PackageReference Include="YamlDotNet" Version="17.1.0" />
   </ItemGroup>
 

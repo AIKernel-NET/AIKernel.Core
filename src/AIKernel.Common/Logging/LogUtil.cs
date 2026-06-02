@@ -13,7 +13,6 @@ public static class LogUtil
 
     private static void Write(string level, string message)
     {
-        var timestamp = DateTime.UtcNow.ToString("o");
-        Console.WriteLine($"[{timestamp}] [{level}] {message}");
+        Console.WriteLine($"[{level}] {message}");
     }
 }

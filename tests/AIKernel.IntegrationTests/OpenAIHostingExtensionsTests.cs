@@ -1,0 +1,156 @@
+﻿namespace AIKernel.IntegrationTests;
+
+using AIKernel.Abstractions.Providers;
+using AIKernel.Core.Security;
+using AIKernel.Hosting;
+using AIKernel.Providers.MicrosoftAI;
+using AIKernel.Providers.MicrosoftAI.DependencyInjection;
+using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Xunit;
+
+public sealed class OpenAIHostingExtensionsTests
+{
+    [Fact]
+    public async Task WithOpenAI_ResolvesSecretBeforeProviderUse()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["OpenAI:ApiKey"] = "sk-config-123456",
+                    ["AIKernel:Providers:OpenAI:ModelId"] = "gpt-test",
+                    ["AIKernel:Providers:OpenAI:SecretKeyName"] = "OpenAI:ApiKey"
+                })
+            .Build();
+
+        var services = new ServiceCollection();
+
+        services.AddSingleton<IProviderCapabilities, TestProviderCapabilities>();
+
+        services
+            .AddAIKernelCore(configuration)
+            .WithOpenAI(
+                configuration.GetSection("AIKernel:Providers:OpenAI"),
+                (_, options) =>
+                {
+                    Assert.Equal("sk-config-123456", options.ApiKey);
+                    return new StubChatClient("ok");
+                });
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        var hostedServices = provider.GetServices<IHostedService>();
+
+        foreach (var hostedService in hostedServices)
+        {
+            await hostedService.StartAsync(CancellationToken.None);
+        }
+
+        var modelProvider = provider.GetRequiredService<IModelProvider>();
+
+        await modelProvider.InitializeAsync();
+
+        var output = await modelProvider.GenerateAsync(
+        [
+            new TestModelMessage("user", "hello")
+        ]);
+
+        Assert.Equal("ok", output);
+    }
+
+    [Fact]
+    public async Task WithOpenAI_FailsClosed_WhenSecretIsMissing()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["AIKernel:Providers:OpenAI:ModelId"] = "gpt-test",
+                    ["AIKernel:Providers:OpenAI:SecretKeyName"] = "OpenAI:ApiKey"
+                })
+            .Build();
+
+        var services = new ServiceCollection();
+
+        services.AddSingleton<IProviderCapabilities, TestProviderCapabilities>();
+
+        services
+            .AddAIKernelCore(configuration)
+            .WithOpenAI(
+                configuration.GetSection("AIKernel:Providers:OpenAI"),
+                (_, _) => new StubChatClient("ok"));
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        var hostedServices = provider.GetServices<IHostedService>();
+
+        await Assert.ThrowsAsync<SecureCredentialNotFoundException>(
+            async () =>
+            {
+                foreach (var hostedService in hostedServices)
+                {
+                    await hostedService.StartAsync(CancellationToken.None);
+                }
+            });
+    }
+
+    [Fact]
+    public void WithOpenAI_Extension_BelongsToProviderAssembly()
+    {
+        var assembly = typeof(
+            AIKernel.Providers.MicrosoftAI.DependencyInjection.OpenAIHostingExtensions
+        ).Assembly;
+
+        Assert.Equal(
+            "AIKernel.Providers.MicrosoftAI",
+            assembly.GetName().Name);
+    }
+
+    private sealed record TestModelMessage(
+        string Role,
+        string Content) : IModelMessage;
+
+    private sealed class StubChatClient : IChatClient
+    {
+        private readonly string _output;
+
+        public StubChatClient(string output)
+        {
+            _output = output;
+        }
+
+        public Task<ChatResponse> GetResponseAsync(
+            IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(
+                new ChatResponse(
+                    new ChatMessage(ChatRole.Assistant, _output))
+                {
+                    ModelId = options?.ModelId
+                });
+        }
+
+        public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(
+            IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null,
+            [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            await Task.CompletedTask;
+            yield break;
+        }
+
+        public object? GetService(Type serviceType, object? serviceKey = null)
+        {
+            return null;
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+}

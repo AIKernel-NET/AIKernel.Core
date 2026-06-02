@@ -1,8 +1,6 @@
 namespace AIKernel.Core.Execution;
 
 using System.Collections.Immutable;
-using System.Security.Cryptography;
-using System.Text;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
 using AIKernel.Core.Time;
@@ -14,6 +12,7 @@ public sealed class KernelExecutor : IKernelExecutor
     private readonly IModelPromptCapabilityResolver _capabilityResolver;
     private readonly ITokenizer _tokenizer;
     private readonly IKernelClock _clock;
+    private readonly KernelExecutionIdFactory _executionIdFactory = new();
     private long _executionSequence;
 
     public KernelExecutor(
@@ -92,7 +91,7 @@ public sealed class KernelExecutor : IKernelExecutor
 
             return new KernelRequestExecutionResult
             {
-                ExecutionId = CreateExecutionId(
+                ExecutionId = _executionIdFactory.CreateExecutionId(
                     request,
                     ExecutionStatus.Succeeded,
                     prompt.PromptHash,
@@ -123,7 +122,7 @@ public sealed class KernelExecutor : IKernelExecutor
 
             return new KernelRequestExecutionResult
             {
-                ExecutionId = CreateExecutionId(
+                ExecutionId = _executionIdFactory.CreateExecutionId(
                     request,
                     ExecutionStatus.Canceled,
                     prompt?.PromptHash ?? string.Empty,
@@ -177,7 +176,7 @@ public sealed class KernelExecutor : IKernelExecutor
 
         return new KernelRequestExecutionResult
         {
-            ExecutionId = CreateExecutionId(
+            ExecutionId = _executionIdFactory.CreateExecutionId(
                 request,
                 ExecutionStatus.Failed,
                 prompt?.PromptHash ?? string.Empty,
@@ -203,30 +202,5 @@ public sealed class KernelExecutor : IKernelExecutor
             CompletedAtUtc = completedAt,
             Metadata = ImmutableDictionary<string, string>.Empty
         };
-    }
-
-    private static string CreateExecutionId(
-        KernelExecutionRequest request,
-        ExecutionStatus status,
-        string promptHash,
-        string resultDiscriminator,
-        DateTimeOffset startedAt,
-        long executionSequence)
-    {
-        var payload = string.Join(
-            '\n',
-            request.ContextSnapshot.ContextHash,
-            request.ContextSnapshot.SnapshotId,
-            request.RequestedModelId ?? string.Empty,
-            promptHash,
-            status.ToString(),
-            resultDiscriminator,
-            startedAt.Ticks.ToString("D20"),
-            executionSequence.ToString("D16"));
-
-        var bytes = Encoding.UTF8.GetBytes(payload);
-        var hash = SHA256.HashData(bytes);
-
-        return "exec:sha256:" + Convert.ToHexString(hash).ToLowerInvariant();
     }
 }

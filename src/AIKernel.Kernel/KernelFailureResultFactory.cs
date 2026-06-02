@@ -1,10 +1,9 @@
 namespace AIKernel.Kernel;
 
 using System.Collections.Immutable;
-using System.Security.Cryptography;
-using System.Text;
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
+using AIKernel.Core.Execution;
 using AIKernel.Core.Rom;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Execution;
@@ -13,6 +12,7 @@ using AIKernel.Dtos.Kernel;
 internal sealed class KernelFailureResultFactory
 {
     private readonly IKernelClock _clock;
+    private readonly KernelExecutionIdFactory _executionIdFactory = new();
 
     public KernelFailureResultFactory(IKernelClock clock)
     {
@@ -98,7 +98,7 @@ internal sealed class KernelFailureResultFactory
         return new KernelRequestExecutionResult
         {
             ExecutionId = transaction?.TransactionId
-                ?? CreateFallbackExecutionId(request, status),
+                ?? _executionIdFactory.CreateFallbackExecutionId(request, status),
             Status = status,
             ProviderId = providerId,
             ModelId = request.RequestedModelId ?? modelIdFallback,
@@ -160,22 +160,4 @@ internal sealed class KernelFailureResultFactory
         return builder.ToImmutable();
     }
 
-    private static string CreateFallbackExecutionId(
-        KernelRequest request,
-        ExecutionStatus status)
-    {
-        var payload = string.Join(
-            '\n',
-            request.Input ?? string.Empty,
-            request.RootRomId?.Value ?? string.Empty,
-            request.VfsProviderId ?? string.Empty,
-            request.ParentSnapshotId ?? string.Empty,
-            request.RequestedModelId ?? string.Empty,
-            status.ToString());
-
-        var bytes = Encoding.UTF8.GetBytes(payload);
-        var hash = SHA256.HashData(bytes);
-
-        return "exec:sha256:" + Convert.ToHexString(hash).ToLowerInvariant();
-    }
 }

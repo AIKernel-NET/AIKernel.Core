@@ -1,8 +1,5 @@
 ﻿namespace AIKernel.Kernel;
 
-using System.Collections.Immutable;
-using System.Security.Cryptography;
-using System.Text;
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Kernel;
@@ -29,6 +26,7 @@ public sealed class Kernel : IKernel
     private readonly IGuard _guard;
     private readonly IPdp _pdp;
     private readonly IKernelClock _clock;
+    private readonly KernelFailureResultFactory _failureResultFactory;
 
     public Kernel(
         IKernelVfsSessionFactory vfsSessionFactory,
@@ -64,6 +62,7 @@ public sealed class Kernel : IKernel
         _guard = guard ?? FailClosedGuard.Instance;
         _pdp = pdp ?? FailClosedPdp.Instance;
         _clock = clock ?? KernelClock.System();
+        _failureResultFactory = new KernelFailureResultFactory(_clock);
     }
 
     public async Task<KernelRequestExecutionResult> ExecuteAsync(
@@ -136,7 +135,7 @@ public sealed class Kernel : IKernel
         }
         catch (OperationCanceledException)
         {
-            return CreateCanceledResult(
+            return _failureResultFactory.CreateCanceledResult(
                 request,
                 transaction,
                 contextSnapshot,
@@ -144,7 +143,7 @@ public sealed class Kernel : IKernel
         }
         catch (Exception ex) when (IsRejectedException(ex))
         {
-            return CreateRejectedResult(
+            return _failureResultFactory.CreateRejectedResult(
                 request,
                 transaction,
                 contextSnapshot,
@@ -153,7 +152,7 @@ public sealed class Kernel : IKernel
         }
         catch (Exception ex)
         {
-            return CreateFailedResult(
+            return _failureResultFactory.CreateFailedResult(
                 request,
                 transaction,
                 contextSnapshot,
@@ -282,166 +281,6 @@ public sealed class Kernel : IKernel
             or RomRequiredMetadataMissingException
             or PromptTokenBudgetExceededException
             or UnsupportedPromptCapabilityException;
-    }
-
-    private KernelRequestExecutionResult CreateRejectedResult(
-        KernelRequest request,
-        KernelTransactionSnapshot? transaction,
-        IContextSnapshot? contextSnapshot,
-        DateTimeOffset startedAtUtc,
-        Exception exception)
-    {
-        var completedAtUtc = _clock.Now;
-
-        return new KernelRequestExecutionResult
-        {
-            ExecutionId = transaction?.TransactionId
-                ?? CreateFallbackExecutionId(request, ExecutionStatus.Rejected),
-            Status = ExecutionStatus.Rejected,
-            ProviderId = "none",
-            ModelId = request.RequestedModelId ?? "none",
-            ContextSnapshotId = contextSnapshot?.SnapshotId ?? string.Empty,
-            ContextHash = contextSnapshot?.ContextHash ?? string.Empty,
-            PromptHash = string.Empty,
-            OutputText = null,
-            Usage = new ExecutionUsage(
-                InputTokens: 0,
-                OutputTokens: 0,
-                TotalTokens: 0),
-            Error = new ExecutionError(
-                Code: ResolveRejectedCode(exception),
-                Message: exception.Message,
-                Detail: exception.GetType().FullName),
-            StartedAtUtc = startedAtUtc,
-            CompletedAtUtc = completedAtUtc,
-            Metadata = BuildFailureMetadata(request, transaction, exception)
-        };
-    }
-
-    private KernelRequestExecutionResult CreateFailedResult(
-        KernelRequest request,
-        KernelTransactionSnapshot? transaction,
-        IContextSnapshot? contextSnapshot,
-        DateTimeOffset startedAtUtc,
-        Exception exception)
-    {
-        var completedAtUtc = _clock.Now;
-
-        return new KernelRequestExecutionResult
-        {
-            ExecutionId = transaction?.TransactionId
-                ?? CreateFallbackExecutionId(request, ExecutionStatus.Failed),
-            Status = ExecutionStatus.Failed,
-            ProviderId = "unknown",
-            ModelId = request.RequestedModelId ?? "unknown",
-            ContextSnapshotId = contextSnapshot?.SnapshotId ?? string.Empty,
-            ContextHash = contextSnapshot?.ContextHash ?? string.Empty,
-            PromptHash = string.Empty,
-            OutputText = null,
-            Usage = new ExecutionUsage(
-                InputTokens: 0,
-                OutputTokens: 0,
-                TotalTokens: 0),
-            Error = new ExecutionError(
-                Code: "kernel_transaction_failed",
-                Message: exception.Message,
-                Detail: exception.GetType().FullName),
-            StartedAtUtc = startedAtUtc,
-            CompletedAtUtc = completedAtUtc,
-            Metadata = BuildFailureMetadata(request, transaction, exception)
-        };
-    }
-
-    private KernelRequestExecutionResult CreateCanceledResult(
-        KernelRequest request,
-        KernelTransactionSnapshot? transaction,
-        IContextSnapshot? contextSnapshot,
-        DateTimeOffset startedAtUtc)
-    {
-        var completedAtUtc = _clock.Now;
-
-        return new KernelRequestExecutionResult
-        {
-            ExecutionId = transaction?.TransactionId
-                ?? CreateFallbackExecutionId(request, ExecutionStatus.Canceled),
-            Status = ExecutionStatus.Canceled,
-            ProviderId = "none",
-            ModelId = request.RequestedModelId ?? "none",
-            ContextSnapshotId = contextSnapshot?.SnapshotId ?? string.Empty,
-            ContextHash = contextSnapshot?.ContextHash ?? string.Empty,
-            PromptHash = string.Empty,
-            OutputText = null,
-            Usage = new ExecutionUsage(
-                InputTokens: 0,
-                OutputTokens: 0,
-                TotalTokens: 0),
-            Error = new ExecutionError(
-                Code: "canceled",
-                Message: "Kernel transaction was canceled."),
-            StartedAtUtc = startedAtUtc,
-            CompletedAtUtc = completedAtUtc,
-            Metadata = transaction?.Metadata
-                ?? ImmutableDictionary<string, string>.Empty
-        };
-    }
-
-    private static string ResolveRejectedCode(Exception exception)
-    {
-        return exception switch
-        {
-            KernelRequestValidationException => "invalid_kernel_request",
-            ContextAssemblyGovernanceException => "context_rejected",
-            RomSignatureVerificationException => "rom_signature_verification_failed",
-            RomRequiredMetadataMissingException => "rom_required_metadata_missing",
-            PromptTokenBudgetExceededException => "prompt_token_budget_exceeded",
-            UnsupportedPromptCapabilityException => "unsupported_prompt_capability",
-            _ => "kernel_transaction_rejected"
-        };
-    }
-
-    private static ImmutableDictionary<string, string> BuildFailureMetadata(
-        KernelRequest request,
-        KernelTransactionSnapshot? transaction,
-        Exception exception)
-    {
-        var builder = ImmutableDictionary.CreateBuilder<string, string>(StringComparer.Ordinal);
-
-        builder["root_rom_id"] = request.RootRomId?.Value ?? string.Empty;
-        builder["vfs_provider_id"] = request.VfsProviderId ?? string.Empty;
-        builder["requested_model_id"] = request.RequestedModelId ?? string.Empty;
-        builder["exception_type"] = exception.GetType().FullName ?? exception.GetType().Name;
-
-        if (transaction is not null)
-        {
-            builder["transaction_id"] = transaction.TransactionId;
-            builder["input_hash"] = transaction.InputHash;
-        }
-
-        foreach (var item in request.Metadata)
-        {
-            builder[item.Key] = item.Value;
-        }
-
-        return builder.ToImmutable();
-    }
-
-    private static string CreateFallbackExecutionId(
-        KernelRequest request,
-        ExecutionStatus status)
-    {
-        var payload = string.Join(
-            '\n',
-            request.Input ?? string.Empty,
-            request.RootRomId?.Value ?? string.Empty,
-            request.VfsProviderId ?? string.Empty,
-            request.ParentSnapshotId ?? string.Empty,
-            request.RequestedModelId ?? string.Empty,
-            status.ToString());
-
-        var bytes = Encoding.UTF8.GetBytes(payload);
-        var hash = SHA256.HashData(bytes);
-
-        return "exec:sha256:" + Convert.ToHexString(hash).ToLowerInvariant();
     }
 
 }

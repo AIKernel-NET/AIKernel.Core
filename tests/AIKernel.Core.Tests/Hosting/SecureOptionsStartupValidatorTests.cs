@@ -26,6 +26,21 @@ public sealed class SecureHostingDependencyTests
     }
 
     [Fact]
+    public void AIKernelHosting_DoesNotReferenceKernelFacade()
+    {
+        var hostingAssembly = typeof(SecureHostingExtensions).Assembly;
+
+        var referencedAssemblies = hostingAssembly
+            .GetReferencedAssemblies()
+            .Select(x => x.Name)
+            .ToArray();
+
+        Assert.DoesNotContain(
+            "AIKernel.Kernel",
+            referencedAssemblies);
+    }
+
+    [Fact]
     public void AIKernelHosting_DoesNotContainOpenAICompatibleCredentialCache()
     {
         var hostingAssembly = typeof(SecureHostingExtensions).Assembly;

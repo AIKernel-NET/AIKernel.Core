@@ -3,6 +3,7 @@
 using AIKernel.Abstractions.Providers;
 using AIKernel.Core.Security;
 using AIKernel.Hosting;
+using AIKernel.Kernel;
 using AIKernel.Providers.MicrosoftAI;
 using AIKernel.Providers.MicrosoftAI.DependencyInjection;
 using Microsoft.Extensions.AI;
@@ -13,6 +14,24 @@ using Xunit;
 
 public sealed class OpenAIHostingExtensionsTests
 {
+    [Fact]
+    public void AddAIKernelKernel_RegistersKernelFacadeAndAccessors()
+    {
+        var services = new ServiceCollection();
+
+        services.AddAIKernelCore();
+        services.AddAIKernelKernel();
+
+        using var provider = services.BuildServiceProvider();
+
+        var kernel = provider.GetRequiredService<AIKernel.Abstractions.Kernel.IKernel>();
+
+        Assert.NotNull(kernel);
+        Assert.NotNull(kernel.GetProviderRouter());
+        Assert.NotNull(kernel.GetGuard());
+        Assert.NotNull(kernel.GetPdp());
+    }
+
     [Fact]
     public async Task WithOpenAI_ResolvesSecretBeforeProviderUse()
     {
@@ -108,6 +127,23 @@ public sealed class OpenAIHostingExtensionsTests
         Assert.Equal(
             "AIKernel.Providers.MicrosoftAI",
             assembly.GetName().Name);
+    }
+
+    [Fact]
+    public void MicrosoftAIProvider_DoesNotReferenceKernelFacade()
+    {
+        var assembly = typeof(
+            AIKernel.Providers.MicrosoftAI.DependencyInjection.OpenAIHostingExtensions
+        ).Assembly;
+
+        var referencedAssemblies = assembly
+            .GetReferencedAssemblies()
+            .Select(x => x.Name)
+            .ToArray();
+
+        Assert.DoesNotContain(
+            "AIKernel.Kernel",
+            referencedAssemblies);
     }
 
     private sealed record TestModelMessage(

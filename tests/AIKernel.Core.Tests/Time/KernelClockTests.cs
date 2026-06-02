@@ -1,6 +1,5 @@
 namespace AIKernel.Core.Tests.Time;
 
-using AIKernel.Abstractions.Kernel;
 using AIKernel.Core.Time;
 using AIKernel.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,20 +85,4 @@ public sealed class KernelClockTests
         Assert.Equal(fixedUtcNow, resolvedClock.Now);
     }
 
-    [Fact]
-    public void AddAIKernelCore_RegistersKernelFacadeAndAccessors()
-    {
-        var services = new ServiceCollection();
-
-        services.AddAIKernelCore();
-
-        using var provider = services.BuildServiceProvider();
-
-        var kernel = provider.GetRequiredService<IKernel>();
-
-        Assert.NotNull(kernel);
-        Assert.NotNull(kernel.GetProviderRouter());
-        Assert.NotNull(kernel.GetGuard());
-        Assert.NotNull(kernel.GetPdp());
-    }
 }

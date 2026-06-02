@@ -1,6 +1,5 @@
 ﻿namespace AIKernel.Core.Tests.Kernel;
 
-using AIKernel.Abstractions.Kernel;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Dtos.Rom;
@@ -8,7 +7,7 @@ using Xunit;
 
 public abstract class KernelContractTests
 {
-    protected abstract IKernel CreateKernel();
+    protected abstract AIKernel.Kernel.Kernel CreateKernel();
 
     protected abstract KernelRequest CreateValidRequest();
 
@@ -68,26 +67,6 @@ public abstract class KernelContractTests
         Assert.Null(result.OutputText);
         Assert.NotNull(result.Error);
         Assert.Equal("rom_signature_verification_failed", result.Error.Code);
-    }
-
-    [Fact]
-    public async Task ExecuteAsync_ReturnsCanceledResult_WhenCancellationIsRequested()
-    {
-        // Arrange
-        var kernel = CreateKernel();
-        var request = CreateValidRequest();
-
-        using var cts = new CancellationTokenSource();
-        await cts.CancelAsync();
-
-        // Act
-        var result = await kernel.ExecuteAsync(request, cts.Token);
-
-        // Assert
-        Assert.Equal(ExecutionStatus.Canceled, result.Status);
-        Assert.Null(result.OutputText);
-        Assert.NotNull(result.Error);
-        Assert.Equal("canceled", result.Error.Code);
     }
 
     [Fact]

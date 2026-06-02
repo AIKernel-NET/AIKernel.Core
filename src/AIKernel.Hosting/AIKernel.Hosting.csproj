@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AIKernel.Kernel\AIKernel.Kernel.csproj" />
+    <ProjectReference Include="..\AIKernel.Core\AIKernel.Core.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

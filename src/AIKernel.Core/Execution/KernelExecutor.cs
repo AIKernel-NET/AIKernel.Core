@@ -3,6 +3,7 @@ namespace AIKernel.Core.Execution;
 using System.Collections.Immutable;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
+using AIKernel.Common.Results;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Execution;
 
@@ -91,7 +92,7 @@ public sealed class KernelExecutor : IKernelExecutor
 
             return new KernelRequestExecutionResult
             {
-                ExecutionId = _executionIdFactory.CreateExecutionId(
+                ExecutionId = CreateExecutionIdOrFailureCode(
                     request,
                     ExecutionStatus.Succeeded,
                     prompt.PromptHash,
@@ -122,7 +123,7 @@ public sealed class KernelExecutor : IKernelExecutor
 
             return new KernelRequestExecutionResult
             {
-                ExecutionId = _executionIdFactory.CreateExecutionId(
+                ExecutionId = CreateExecutionIdOrFailureCode(
                     request,
                     ExecutionStatus.Canceled,
                     prompt?.PromptHash ?? string.Empty,
@@ -132,8 +133,8 @@ public sealed class KernelExecutor : IKernelExecutor
                 Status = ExecutionStatus.Canceled,
                 ProviderId = capability?.ProviderId ?? "unknown",
                 ModelId = capability?.ModelId ?? request.RequestedModelId ?? "unknown",
-                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
-                ContextHash = request.ContextSnapshot.ContextHash,
+                ContextSnapshotId = GetContextSnapshotId(request),
+                ContextHash = GetContextHash(request),
                 PromptHash = prompt?.PromptHash ?? string.Empty,
                 OutputText = null,
                 Usage = new ExecutionUsage(
@@ -176,7 +177,7 @@ public sealed class KernelExecutor : IKernelExecutor
 
         return new KernelRequestExecutionResult
         {
-            ExecutionId = _executionIdFactory.CreateExecutionId(
+            ExecutionId = CreateExecutionIdOrFailureCode(
                 request,
                 ExecutionStatus.Failed,
                 prompt?.PromptHash ?? string.Empty,
@@ -186,8 +187,8 @@ public sealed class KernelExecutor : IKernelExecutor
             Status = ExecutionStatus.Failed,
             ProviderId = capability?.ProviderId ?? "unknown",
             ModelId = capability?.ModelId ?? request.RequestedModelId ?? "unknown",
-            ContextSnapshotId = request.ContextSnapshot.SnapshotId,
-            ContextHash = request.ContextSnapshot.ContextHash,
+            ContextSnapshotId = GetContextSnapshotId(request),
+            ContextHash = GetContextHash(request),
             PromptHash = prompt?.PromptHash ?? string.Empty,
             OutputText = null,
             Usage = new ExecutionUsage(
@@ -202,5 +203,39 @@ public sealed class KernelExecutor : IKernelExecutor
             CompletedAtUtc = completedAt,
             Metadata = ImmutableDictionary<string, string>.Empty
         };
+    }
+
+    private string CreateExecutionIdOrFailureCode(
+        KernelExecutionRequest request,
+        ExecutionStatus status,
+        string promptHash,
+        string resultDiscriminator,
+        DateTimeOffset startedAt,
+        long executionSequence)
+    {
+        Result<string> executionId = _executionIdFactory.CreateExecutionIdResult(
+            request,
+            status,
+            promptHash,
+            resultDiscriminator,
+            startedAt,
+            executionSequence);
+
+        if (executionId.IsSuccess)
+        {
+            return executionId.Value!;
+        }
+
+        return "exec:failed:" + executionId.Error!.Code.ToLowerInvariant();
+    }
+
+    private static string GetContextSnapshotId(KernelExecutionRequest request)
+    {
+        return request.ContextSnapshot?.SnapshotId ?? "unknown";
+    }
+
+    private static string GetContextHash(KernelExecutionRequest request)
+    {
+        return request.ContextSnapshot?.ContextHash ?? "unknown";
     }
 }

@@ -27,6 +27,10 @@ JA: AIKernel.NET の Core ランタイムエンジンです。決定論的な Kn
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AIKernel.Common\AIKernel.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AIKernel.Abstractions" Version="0.0.3" />
     <PackageReference Include="AIKernel.Dtos" Version="0.0.3" />
     <PackageReference Include="AIKernel.Enums" Version="0.0.3" />

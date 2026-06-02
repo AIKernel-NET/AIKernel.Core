@@ -53,6 +53,21 @@ public sealed class KernelExecutionIdFactoryTests
     }
 
     [Fact]
+    public void SemanticStateMaterial_ReturnsFailure_WhenExecutionRequestIsMissing()
+    {
+        var result = SemanticStateMaterial.CreateKernelExecutionResult(
+            request: null!,
+            ExecutionStatus.Failed,
+            promptHash: string.Empty,
+            resultDiscriminator: "failed",
+            DateTimeOffset.UnixEpoch,
+            executionSequence: 1);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("KernelExecutionRequest is required.", result.Error!.Message);
+    }
+
+    [Fact]
     public void CreateExecutionId_IsDeterministic_ForSameCanonicalState()
     {
         var factory = new KernelExecutionIdFactory();

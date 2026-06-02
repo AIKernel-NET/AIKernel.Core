@@ -1,5 +1,6 @@
 namespace AIKernel.Core.Execution;
 
+using AIKernel.Common.Results;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 
@@ -29,7 +30,33 @@ public sealed record SemanticStateMaterial
         DateTimeOffset startedAt,
         long executionSequence)
     {
-        ArgumentNullException.ThrowIfNull(request);
+        return Unwrap(
+            CreateKernelExecutionResult(
+                request,
+                status,
+                promptHash,
+                resultDiscriminator,
+                startedAt,
+                executionSequence));
+    }
+
+    public static Result<SemanticStateMaterial> CreateKernelExecutionResult(
+        KernelExecutionRequest request,
+        ExecutionStatus status,
+        string promptHash,
+        string resultDiscriminator,
+        DateTimeOffset startedAt,
+        long executionSequence)
+    {
+        if (request is null)
+        {
+            return Result<SemanticStateMaterial>.Fail("KernelExecutionRequest is required.");
+        }
+
+        if (request.ContextSnapshot is null)
+        {
+            return Result<SemanticStateMaterial>.Fail("ContextSnapshot is required.");
+        }
 
         // Phase-2 SemanticStateHash boundary:
         // ContextSnapshot and prompt material are canonicalized here before hashing.
@@ -46,16 +73,26 @@ public sealed record SemanticStateMaterial
             startedAt.Ticks.ToString("D20"),
             executionSequence.ToString("D16"));
 
-        return new SemanticStateMaterial(
+        return Result<SemanticStateMaterial>.Success(new SemanticStateMaterial(
             "kernel.execution",
-            payload);
+            payload));
     }
 
     public static SemanticStateMaterial FromKernelFallback(
         KernelRequest request,
         ExecutionStatus status)
     {
-        ArgumentNullException.ThrowIfNull(request);
+        return Unwrap(CreateKernelFallbackResult(request, status));
+    }
+
+    public static Result<SemanticStateMaterial> CreateKernelFallbackResult(
+        KernelRequest request,
+        ExecutionStatus status)
+    {
+        if (request is null)
+        {
+            return Result<SemanticStateMaterial>.Fail("KernelRequest is required.");
+        }
 
         // Phase-2 SemanticStateHash boundary:
         // This path runs before ContextSnapshot exists, so the KernelRequest
@@ -69,8 +106,19 @@ public sealed record SemanticStateMaterial
             request.RequestedModelId ?? string.Empty,
             status.ToString());
 
-        return new SemanticStateMaterial(
+        return Result<SemanticStateMaterial>.Success(new SemanticStateMaterial(
             "kernel.fallback",
-            payload);
+            payload));
+    }
+
+    private static SemanticStateMaterial Unwrap(
+        Result<SemanticStateMaterial> result)
+    {
+        if (result.IsSuccess)
+        {
+            return result.Value!;
+        }
+
+        throw new InvalidOperationException(result.Error!.Message);
     }
 }

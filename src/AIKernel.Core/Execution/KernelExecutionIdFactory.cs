@@ -1,5 +1,6 @@
 namespace AIKernel.Core.Execution;
 
+using AIKernel.Common.Results;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 
@@ -17,17 +18,14 @@ public sealed class KernelExecutionIdFactory
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var material = SemanticStateMaterial.FromKernelExecution(
-            request,
-            status,
-            promptHash,
-            resultDiscriminator,
-            startedAt,
-            executionSequence);
-
-        return _semanticStateHasher
-            .ComputeHash(material)
-            .ToExecutionId();
+        return Unwrap(
+            CreateExecutionIdResult(
+                request,
+                status,
+                promptHash,
+                resultDiscriminator,
+                startedAt,
+                executionSequence));
     }
 
     public string CreateFallbackExecutionId(
@@ -36,10 +34,46 @@ public sealed class KernelExecutionIdFactory
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var material = SemanticStateMaterial.FromKernelFallback(request, status);
+        return Unwrap(CreateFallbackExecutionIdResult(request, status));
+    }
 
-        return _semanticStateHasher
-            .ComputeHash(material)
-            .ToExecutionId();
+    internal Result<string> CreateExecutionIdResult(
+        KernelExecutionRequest request,
+        ExecutionStatus status,
+        string promptHash,
+        string resultDiscriminator,
+        DateTimeOffset startedAt,
+        long executionSequence)
+    {
+        return SemanticStateMaterial
+            .CreateKernelExecutionResult(
+                request,
+                status,
+                promptHash,
+                resultDiscriminator,
+                startedAt,
+                executionSequence)
+            .Map(_semanticStateHasher.ComputeHash)
+            .Map(hash => hash.ToExecutionId());
+    }
+
+    internal Result<string> CreateFallbackExecutionIdResult(
+        KernelRequest request,
+        ExecutionStatus status)
+    {
+        return SemanticStateMaterial
+            .CreateKernelFallbackResult(request, status)
+            .Map(_semanticStateHasher.ComputeHash)
+            .Map(hash => hash.ToExecutionId());
+    }
+
+    private static string Unwrap(Result<string> result)
+    {
+        if (result.IsSuccess)
+        {
+            return result.Value!;
+        }
+
+        throw new InvalidOperationException(result.Error!.Message);
     }
 }

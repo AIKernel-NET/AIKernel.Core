@@ -130,7 +130,7 @@ public sealed class OpenAIHostingExtensionsTests
     }
 
     [Fact]
-    public void MicrosoftAIProvider_DoesNotReferenceKernelFacade()
+    public void MicrosoftAIProvider_DoesNotReferenceKernelFacadeOrHosting()
     {
         var assembly = typeof(
             AIKernel.Providers.MicrosoftAI.DependencyInjection.OpenAIHostingExtensions
@@ -143,6 +143,10 @@ public sealed class OpenAIHostingExtensionsTests
 
         Assert.DoesNotContain(
             "AIKernel.Kernel",
+            referencedAssemblies);
+
+        Assert.DoesNotContain(
+            "AIKernel.Hosting",
             referencedAssemblies);
     }
 

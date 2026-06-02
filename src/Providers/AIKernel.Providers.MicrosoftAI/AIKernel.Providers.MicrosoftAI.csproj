@@ -28,14 +28,16 @@ JA: Microsoft.Extensions.AI を利用した AIKernel.NET 向け Provider 実装�
     <PackageReference Include="AIKernel.Abstractions" Version="0.0.3" />
     <PackageReference Include="AIKernel.Dtos" Version="0.0.3" />
     <PackageReference Include="AIKernel.Enums" Version="0.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.7" />
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.5.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.7" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.7" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\AIKernel.Core\AIKernel.Core.csproj" />
-    <ProjectReference Include="..\..\AIKernel.Hosting\AIKernel.Hosting.csproj" />
   </ItemGroup>
 
 </Project>

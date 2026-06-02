@@ -82,6 +82,54 @@ public sealed class OpenAIHostingExtensionsTests
     }
 
     [Fact]
+    public async Task WithOpenAI_UsesDirectApiKey_WhenConfigured()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["AIKernel:Providers:OpenAI:ModelId"] = "gpt-test",
+                    ["AIKernel:Providers:OpenAI:ApiKey"] = "sk-direct-123456"
+                })
+            .Build();
+
+        var services = new ServiceCollection();
+
+        services.AddSingleton<IProviderCapabilities, TestProviderCapabilities>();
+
+        services
+            .AddAIKernelCore()
+            .WithOpenAI(
+                configuration.GetSection("AIKernel:Providers:OpenAI"),
+                (_, options) =>
+                {
+                    Assert.Equal("sk-direct-123456", options.ApiKey);
+                    return new StubChatClient("direct-ok");
+                });
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        var hostedServices = provider.GetServices<IHostedService>();
+
+        foreach (var hostedService in hostedServices)
+        {
+            await hostedService.StartAsync(TestContext.Current.CancellationToken);
+        }
+
+        var modelProvider = provider.GetRequiredService<IModelProvider>();
+
+        await modelProvider.InitializeAsync();
+
+        var output = await modelProvider.GenerateAsync(
+        [
+            new TestModelMessage("user", "hello")
+        ],
+        TestContext.Current.CancellationToken);
+
+        Assert.Equal("direct-ok", output);
+    }
+
+    [Fact]
     public async Task WithOpenAI_FailsClosed_WhenSecretIsMissing()
     {
         var configuration = new ConfigurationBuilder()

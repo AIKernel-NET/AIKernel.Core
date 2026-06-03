@@ -27,16 +27,21 @@ public static class TaskOptionExtensions
         Func<T, Task<Option<U>>> binder,
         Func<T, U, V> projector)
         => await option
-            .Bind(value => binder(value).Select(bound => projector(value, bound)))
+            .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
-    public static async Task<Option<U>> Select<T, U>(
+    public static async Task<Option<U>> Map<T, U>(
         this Task<Option<T>> task,
         Func<T, U> selector)
     {
         var opt = await task.ConfigureAwait(false);
         return opt.Map(selector);
     }
+
+    public static Task<Option<U>> Select<T, U>(
+        this Task<Option<T>> task,
+        Func<T, U> selector)
+        => task.Map(selector);
 
     public static async Task<Option<U>> Bind<T, U>(
         this Option<T> option,
@@ -74,7 +79,7 @@ public static class TaskOptionExtensions
         Func<T, Task<Option<U>>> binder,
         Func<T, U, V> projector)
         => await task
-            .Bind(value => binder(value).Select(bound => projector(value, bound)))
+            .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
     public static async Task<Option<V>> SelectMany<T, U, V>(

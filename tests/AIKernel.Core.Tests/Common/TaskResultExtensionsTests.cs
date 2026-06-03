@@ -103,6 +103,27 @@ public sealed class TaskResultExtensionsTests
     }
 
     [Fact]
+    public async Task Map_MapsTaskResultSuccess()
+    {
+        var result = await SuccessAsync(3)
+            .Map(value => value + 4);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(7, result.Value);
+    }
+
+    [Fact]
+    public async Task Map_CatchesSelectorException()
+    {
+        var result = await SuccessAsync(3).Map<int, int>(
+            _ => throw new InvalidOperationException("map-boom"));
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("map-boom", result.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
+    }
+
+    [Fact]
     public async Task LinqQuery_ShortCircuitsBeforeSynchronousBinder()
     {
         var called = false;

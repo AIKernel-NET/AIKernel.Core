@@ -92,6 +92,29 @@ public sealed class TaskResultStepExtensionsTests
     }
 
     [Fact]
+    public async Task Map_MapsValueAndPreservesState()
+    {
+        var step = await SuccessAsync("prompt", 2)
+            .Map(value => value + 3);
+
+        Assert.True(step.IsSuccess);
+        Assert.Equal("prompt", step.State);
+        Assert.Equal(5, step.Value);
+    }
+
+    [Fact]
+    public async Task Map_CatchesSelectorExceptionWithCurrentState()
+    {
+        var step = await SuccessAsync("prompt", 2)
+            .Map<string, int, int>(_ => throw new InvalidOperationException("step-map-boom"));
+
+        Assert.True(step.IsFailure);
+        Assert.Equal("prompt", step.State);
+        Assert.Equal("step-map-boom", step.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", step.Error.Code);
+    }
+
+    [Fact]
     public async Task Tap_RunsAsyncActionForSuccessAndPreservesValue()
     {
         var observed = 0;

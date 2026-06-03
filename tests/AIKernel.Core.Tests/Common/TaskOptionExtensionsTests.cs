@@ -87,6 +87,26 @@ public sealed class TaskOptionExtensionsTests
     }
 
     [Fact]
+    public async Task Map_MapsTaskOptionSome()
+    {
+        var option = await SomeAsync(3)
+            .Map(value => value + 4);
+
+        Assert.True(option.HasValue);
+        Assert.Equal(7, option.Value);
+    }
+
+    [Fact]
+    public async Task Map_PropagatesSelectorException()
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await SomeAsync(3).Map<int, int>(
+                _ => throw new InvalidOperationException("option-map-boom")));
+
+        Assert.Equal("option-map-boom", exception.Message);
+    }
+
+    [Fact]
     public async Task LinqQuery_ShortCircuitsSynchronousNoneBeforeTaskOption()
     {
         var called = false;

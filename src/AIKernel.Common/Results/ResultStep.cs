@@ -248,7 +248,7 @@ public readonly struct ResultStep<TState, TValue>
     public async Task<ResultStep<TState, TResult>> SelectMany<TNext, TResult>(
         Func<TValue, Task<ResultStep<TState, TNext>>> binder,
         Func<TValue, TNext, TResult> projector)
-        => await BindAsync(value => binder(value).Select(next => projector(value, next)))
+        => await BindAsync(value => binder(value).Map(next => projector(value, next)))
             .ConfigureAwait(false);
 
     private ResultStep<TState, TNext> PropagateFailure<TNext>()

@@ -29,13 +29,18 @@ public static class TaskResultStepExtensions
         }
     }
 
-    public static async Task<ResultStep<TState, TNext>> Select<TState, TValue, TNext>(
+    public static async Task<ResultStep<TState, TNext>> Map<TState, TValue, TNext>(
         this Task<ResultStep<TState, TValue>> task,
         Func<TValue, TNext> selector)
     {
         var step = await task.ConfigureAwait(false);
         return step.Map(selector);
     }
+
+    public static Task<ResultStep<TState, TNext>> Select<TState, TValue, TNext>(
+        this Task<ResultStep<TState, TValue>> task,
+        Func<TValue, TNext> selector)
+        => task.Map(selector);
 
     public static async Task<ResultStep<TState, TNext>> Bind<TState, TValue, TNext>(
         this Task<ResultStep<TState, TValue>> task,
@@ -58,7 +63,7 @@ public static class TaskResultStepExtensions
         Func<TValue, Task<ResultStep<TState, TNext>>> binder,
         Func<TValue, TNext, TResult> projector)
         => await task
-            .Bind(value => binder(value).Select(next => projector(value, next)))
+            .Bind(value => binder(value).Map(next => projector(value, next)))
             .ConfigureAwait(false);
 
     public static async Task<ResultStep<TState, TResult>> SelectMany<TState, TValue, TNext, TResult>(

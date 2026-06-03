@@ -42,7 +42,7 @@ public static class TaskResultExtensions
     // -------------------------
     // Map（Select）
     // -------------------------
-    public static async Task<Result<U>> Select<T, U>(
+    public static async Task<Result<U>> Map<T, U>(
         this Task<Result<T>> task,
         Func<T, U> selector)
     {
@@ -79,6 +79,11 @@ public static class TaskResultExtensions
             return Result<U>.Fail(ErrorContext.FromException(ex));
         }
     }
+
+    public static Task<Result<U>> Select<T, U>(
+        this Task<Result<T>> task,
+        Func<T, U> selector)
+        => task.Map(selector);
 
     public static async Task<Result<U>> Bind<T, U>(
         this Task<Result<T>> task,
@@ -121,7 +126,7 @@ public static class TaskResultExtensions
         Func<T, Task<Result<U>>> binder,
         Func<T, U, V> projector)
         => await result
-            .Bind(value => binder(value).Select(bound => projector(value, bound)))
+            .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
     public static async Task<Result<V>> SelectMany<T, U, V>(
@@ -129,7 +134,7 @@ public static class TaskResultExtensions
         Func<T, Task<Result<U>>> binder,
         Func<T, U, V> projector)
         => await task
-            .Bind(value => binder(value).Select(bound => projector(value, bound)))
+            .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
     public static async Task<Result<V>> SelectMany<T, U, V>(

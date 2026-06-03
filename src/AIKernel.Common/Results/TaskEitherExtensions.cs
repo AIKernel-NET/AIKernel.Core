@@ -27,10 +27,10 @@ public static class TaskEitherExtensions
         Func<R, Task<Either<L, U>>> binder,
         Func<R, U, V> projector)
         => await either
-            .Bind(value => binder(value).Select(bound => projector(value, bound)))
+            .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
-    public static async Task<Either<L, U>> Select<L, R, U>(
+    public static async Task<Either<L, U>> Map<L, R, U>(
         this Task<Either<L, R>> task,
         Func<R, U> selector)
     {
@@ -39,6 +39,11 @@ public static class TaskEitherExtensions
             ? Either<L, U>.FromRight(selector(e.Right!))
             : Either<L, U>.FromLeft(e.Left!);
     }
+
+    public static Task<Either<L, U>> Select<L, R, U>(
+        this Task<Either<L, R>> task,
+        Func<R, U> selector)
+        => task.Map(selector);
 
     public static async Task<Either<L, U>> Bind<L, R, U>(
         this Either<L, R> either,
@@ -76,7 +81,7 @@ public static class TaskEitherExtensions
         Func<R, Task<Either<L, U>>> binder,
         Func<R, U, V> projector)
         => await task
-            .Bind(value => binder(value).Select(bound => projector(value, bound)))
+            .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
     public static async Task<Either<L, V>> SelectMany<L, R, U, V>(

@@ -88,6 +88,26 @@ public sealed class TaskEitherExtensionsTests
     }
 
     [Fact]
+    public async Task Map_MapsTaskEitherRight()
+    {
+        var either = await RightAsync(3)
+            .Map(value => value + 4);
+
+        Assert.True(either.IsRight);
+        Assert.Equal(7, either.Right);
+    }
+
+    [Fact]
+    public async Task Map_PropagatesSelectorException()
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await RightAsync(3).Map<string, int, int>(
+                _ => throw new InvalidOperationException("either-map-boom")));
+
+        Assert.Equal("either-map-boom", exception.Message);
+    }
+
+    [Fact]
     public async Task LinqQuery_ShortCircuitsSynchronousLeftBeforeTaskEither()
     {
         var called = false;

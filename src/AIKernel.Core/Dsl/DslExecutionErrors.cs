@@ -43,16 +43,31 @@ internal static class DslExecutionErrors
     public static ErrorContext CapabilityReturnedNull(
         string capabilityName)
     {
-        return new ErrorContext(
+        return InvalidPipelineValue(
             "Capability returned a successful null DSL value.",
-            "DSL_RUNTIME_ERROR",
-            false)
+            OriginStep.Capability,
+            capabilityName);
+    }
+
+    public static ErrorContext InvalidPipelineValue(
+        string message,
+        OriginStep originStep,
+        string? capabilityName = null)
+    {
+        var metadata = ImmutableDictionary.CreateBuilder<string, string>(
+            StringComparer.Ordinal);
+
+        if (!string.IsNullOrWhiteSpace(capabilityName))
+        {
+            metadata["dsl.capability_name"] = capabilityName;
+        }
+
+        return new ErrorContext(message, "DSL_RUNTIME_ERROR", false)
         {
             FailureKind = FailureKind.FailClosed,
-            OriginStep = OriginStep.Capability,
+            OriginStep = originStep,
             SemanticSlot = SemanticSlot.T,
-            Metadata = ImmutableDictionary<string, string>.Empty
-                .Add("dsl.capability_name", capabilityName)
+            Metadata = metadata.ToImmutable()
         };
     }
 

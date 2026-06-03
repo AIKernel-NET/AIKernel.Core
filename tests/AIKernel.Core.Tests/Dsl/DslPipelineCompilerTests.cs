@@ -278,6 +278,58 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void Execute_CapabilityNullDataReturnsFailClosedReplayEntry()
+    {
+        var pipeline = Compile(
+            """
+            {
+              "type": "Pipeline",
+              "steps": [
+                { "type": "CallCapability", "name": "NullData" }
+              ]
+            }
+            """,
+            new TestCapabilityRegistry("NullData"));
+
+        var result = pipeline.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_RUNTIME_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
+        Assert.Equal("NullData", result.Error.Metadata!["dsl.capability_name"]);
+        var entry = Assert.Single(result.ReplayLog);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("DSL_RUNTIME_ERROR", entry.ErrorCode);
+    }
+
+    [Fact]
+    public void Execute_CapabilityNullDataValueReturnsFailClosedReplayEntry()
+    {
+        var pipeline = Compile(
+            """
+            {
+              "type": "Pipeline",
+              "steps": [
+                { "type": "CallCapability", "name": "NullDataValue" }
+              ]
+            }
+            """,
+            new TestCapabilityRegistry("NullDataValue"));
+
+        var result = pipeline.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_RUNTIME_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
+        Assert.Equal("NullDataValue", result.Error.Metadata!["dsl.capability_name"]);
+        var entry = Assert.Single(result.ReplayLog);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("DSL_RUNTIME_ERROR", entry.ErrorCode);
+    }
+
+    [Fact]
     public void Execute_LoopUntilStopsBeforeBodyWhenTimeoutReached()
     {
         var pipeline = Compile("""
@@ -387,6 +439,31 @@ public sealed class DslPipelineCompilerTests
         Assert.Equal("dsl.context.invalid", entry.SemanticDelta.Label);
     }
 
+    [Fact]
+    public void Execute_NullInputDataReturnsFailClosedReplayEntry()
+    {
+        var pipeline = Compile("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "Step", "name": "start" }
+          ]
+        }
+        """);
+        var context = new DslPipelineExecutionContext(
+            new DslPipelineValue(null!),
+            DateTimeOffset.UnixEpoch);
+
+        var result = pipeline.Execute(context);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_RUNTIME_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        var entry = Assert.Single(result.ReplayLog);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("dsl.context.invalid", entry.SemanticDelta.Label);
+    }
+
     private static IKernelPipeline Compile(
         string json,
         IDslCapabilityRegistry? registry = null,
@@ -477,6 +554,21 @@ public sealed class DslPipelineCompilerTests
             if (string.Equals(name, "NullSuccess", StringComparison.Ordinal))
             {
                 return Result<DslPipelineValue>.Success(null!);
+            }
+
+            if (string.Equals(name, "NullData", StringComparison.Ordinal))
+            {
+                return Result<DslPipelineValue>.Success(
+                    new DslPipelineValue(null!));
+            }
+
+            if (string.Equals(name, "NullDataValue", StringComparison.Ordinal))
+            {
+                return Result<DslPipelineValue>.Success(
+                    new DslPipelineValue(new Dictionary<string, string>
+                    {
+                        ["bad"] = null!
+                    }));
             }
 
             return Contains(name)

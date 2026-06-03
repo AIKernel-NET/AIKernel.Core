@@ -32,6 +32,15 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
             return InvalidExecutionContext("DSL execution input is required.");
         }
 
+        if (!TryValidatePipelineValue(
+            context.Input,
+            OriginStep.KernelFacade,
+            capabilityName: null,
+            out var inputError))
+        {
+            return InvalidExecutionContext(inputError);
+        }
+
         var initial = ResultStep<DslPipelineState, DslPipelineValue>.Success(
             DslPipelineState.Initial("dsl.pipeline"),
             context.Input);
@@ -41,11 +50,15 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
 
     private static ResultStep<DslPipelineState, DslPipelineValue> InvalidExecutionContext(
         string message)
+        => InvalidExecutionContext(DslExecutionErrors.InvalidRuntime(message));
+
+    private static ResultStep<DslPipelineState, DslPipelineValue> InvalidExecutionContext(
+        ErrorContext error)
     {
         return ResultStep<DslPipelineState, DslPipelineValue>
             .Fail(
                 DslPipelineState.Initial("dsl.pipeline"),
-                DslExecutionErrors.InvalidRuntime(message))
+                error)
             .WithSemanticDelta(DslSemanticDeltaFactory.CreateNodeDelta(
                 "dsl.context.invalid",
                 "fail_closed",
@@ -151,13 +164,29 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
                 delta);
         }
 
-        return capabilityResult.Value is null
-            ? DslResultStepAppender.AppendFailure(
+        if (capabilityResult.Value is null)
+        {
+            return DslResultStepAppender.AppendFailure(
                 current,
                 nextState,
                 DslExecutionErrors.CapabilityReturnedNull(node.Name),
-                delta)
-            : DslResultStepAppender.AppendSuccess(
+                delta);
+        }
+
+        if (!TryValidatePipelineValue(
+            capabilityResult.Value,
+            OriginStep.Capability,
+            node.Name,
+            out var outputError))
+        {
+            return DslResultStepAppender.AppendFailure(
+                current,
+                nextState,
+                outputError,
+                delta);
+        }
+
+        return DslResultStepAppender.AppendSuccess(
                 current,
                 nextState,
                 capabilityResult.Value,
@@ -278,6 +307,46 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
                 current.State.Advance("suspend"),
                 node.Reason)
             .WithReplayLogPrefix(current.ReplayLog);
+    }
+
+    private static bool TryValidatePipelineValue(
+        DslPipelineValue value,
+        OriginStep originStep,
+        string? capabilityName,
+        out ErrorContext error)
+    {
+        if (value.Data is null)
+        {
+            error = DslExecutionErrors.InvalidPipelineValue(
+                "DSL pipeline value data is required.",
+                originStep,
+                capabilityName);
+            return false;
+        }
+
+        foreach (var item in value.Data)
+        {
+            if (item.Key is null)
+            {
+                error = DslExecutionErrors.InvalidPipelineValue(
+                    "DSL pipeline value data keys must not be null.",
+                    originStep,
+                    capabilityName);
+                return false;
+            }
+
+            if (item.Value is null)
+            {
+                error = DslExecutionErrors.InvalidPipelineValue(
+                    "DSL pipeline value data values must not be null.",
+                    originStep,
+                    capabilityName);
+                return false;
+            }
+        }
+
+        error = DslExecutionErrors.InvalidRuntime("unreachable");
+        return true;
     }
 
 }

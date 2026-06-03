@@ -25,11 +25,31 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
                 "DSL document is required."));
         }
 
-        return ValidateNode(document.Root)
-            .Map<IKernelPipeline>(_ => new CompiledDslPipeline(
-                document.Root,
+        return ValidateRoot(document.Root)
+            .Map<IKernelPipeline>(root => new CompiledDslPipeline(
+                root,
                 _capabilityRegistry,
                 _clock));
+    }
+
+    private Result<PipelineRootNode> ValidateRoot(PipelineNode root)
+    {
+        if (root is null)
+        {
+            return Result<PipelineRootNode>.Fail(
+                CompileBoundaryFailure("Pipeline root is required."));
+        }
+
+        if (root is not PipelineRootNode pipeline)
+        {
+            return Result<PipelineRootNode>.Fail(
+                InvalidError("DSL root node must be a Pipeline."));
+        }
+
+        var result = ValidateNodes(pipeline.Steps);
+        return result.IsSuccess
+            ? Result<PipelineRootNode>.Success(pipeline)
+            : Result<PipelineRootNode>.Fail(result.Error!);
     }
 
     private Result<bool> ValidateNode(PipelineNode node)
@@ -145,12 +165,15 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
     }
 
     private static Result<bool> Invalid(string message)
-        => Result<bool>.Fail(new ErrorContext(message, "DSL_COMPILE_ERROR", false)
+        => Result<bool>.Fail(InvalidError(message));
+
+    private static ErrorContext InvalidError(string message)
+        => new(message, "DSL_COMPILE_ERROR", false)
         {
             FailureKind = FailureKind.Reject,
             OriginStep = OriginStep.KernelFacade,
             SemanticSlot = SemanticSlot.T
-        });
+        };
 
     private static Result<bool> CompileBoundaryFailureResult(string message)
         => Result<bool>.Fail(CompileBoundaryFailure(message));

@@ -114,6 +114,33 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void Compile_NullRootReturnsFailClosedResult()
+    {
+        var compiler = new DslPipelineCompiler(new TestCapabilityRegistry());
+        var document = new DslDocument(null!);
+
+        var result = compiler.Compile(document);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_COMPILE_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.KernelFacade, result.Error.OriginStep);
+    }
+
+    [Fact]
+    public void Compile_RejectsNonPipelineRoot()
+    {
+        var compiler = new DslPipelineCompiler(new TestCapabilityRegistry());
+        var document = new DslDocument(new StepNode("start"));
+
+        var result = compiler.Compile(document);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_COMPILE_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.Reject, result.Error.FailureKind);
+    }
+
+    [Fact]
     public void Compile_CapabilityResolutionExceptionReturnsFailClosedResult()
     {
         var document = DslDocument.FromJson("""

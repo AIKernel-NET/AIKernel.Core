@@ -25,7 +25,7 @@ public static class TaskResultStepExtensions
         }
         catch (Exception ex)
         {
-            return ResultStep<TState, TValue>.Fail(step.State, ErrorContext.FromException(ex));
+            return step.Tap(_ => throw ex);
         }
     }
 

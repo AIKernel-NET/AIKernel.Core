@@ -60,6 +60,27 @@ public sealed class TaskResultStepExtensionsTests
     }
 
     [Fact]
+    public async Task Bind_CatchesAsyncBinderExceptionAndMarksReplayLogFailure()
+    {
+        var delta = new SemanticDelta(
+            "kernel.provider.generate",
+            OriginStep.Provider,
+            SemanticSlot.T);
+
+        var step = await Task.FromResult(ResultStep<string, int>
+                .Success("provider", 2)
+                .WithSemanticDelta(delta))
+            .Bind<string, int, int>(_ => ThrowsAsync());
+
+        var entry = Assert.Single(step.ReplayLog);
+        Assert.True(step.IsFailure);
+        Assert.Equal(step.StepId, entry.StepId);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("UNHANDLED_EXCEPTION", entry.ErrorCode);
+        Assert.Equal(delta, entry.SemanticDelta);
+    }
+
+    [Fact]
     public async Task Select_MapsValueAndPreservesState()
     {
         var step = await SuccessAsync("prompt", 2)
@@ -86,6 +107,29 @@ public sealed class TaskResultStepExtensionsTests
         Assert.Equal("provider", step.State);
         Assert.Equal(4, step.Value);
         Assert.Equal(4, observed);
+    }
+
+    [Fact]
+    public async Task Tap_CatchesAsyncActionExceptionAndMarksReplayLogFailure()
+    {
+        var delta = new SemanticDelta(
+            "kernel.provider.generate",
+            OriginStep.Provider,
+            SemanticSlot.T);
+
+        var step = await Task.FromResult(ResultStep<string, int>
+                .Success("provider", 4)
+                .WithSemanticDelta(delta))
+            .Tap(_ => throw new InvalidOperationException("async-tap-boom"));
+
+        var entry = Assert.Single(step.ReplayLog);
+        Assert.True(step.IsFailure);
+        Assert.Equal("async-tap-boom", step.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", step.Error.Code);
+        Assert.Equal(step.StepId, entry.StepId);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("UNHANDLED_EXCEPTION", entry.ErrorCode);
+        Assert.Equal(delta, entry.SemanticDelta);
     }
 
     [Fact]

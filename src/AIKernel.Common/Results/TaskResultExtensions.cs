@@ -27,11 +27,13 @@ public static class TaskResultExtensions
         try
         {
             var result = await task.ConfigureAwait(false);
-            if (result.IsFailure)
-                return result;
-
-            await action(result.Value!).ConfigureAwait(false);
-            return result;
+            return await result
+                .Bind(async value =>
+                {
+                    await action(value).ConfigureAwait(false);
+                    return Result<T>.Success(value);
+                })
+                .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -49,10 +51,7 @@ public static class TaskResultExtensions
         try
         {
             var r = await task.ConfigureAwait(false);
-            if (r.IsFailure)
-                return Result<U>.Fail(r.Error!);
-
-            return Result<U>.Success(selector(r.Value!));
+            return r.Map(selector);
         }
         catch (Exception ex)
         {
@@ -110,10 +109,7 @@ public static class TaskResultExtensions
         try
         {
             var result = await task.ConfigureAwait(false);
-            if (result.IsFailure)
-                return Result<U>.Fail(result.Error!);
-
-            return binder(result.Value!);
+            return result.Bind(binder);
         }
         catch (Exception ex)
         {

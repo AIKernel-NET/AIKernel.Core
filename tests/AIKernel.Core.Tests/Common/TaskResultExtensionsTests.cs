@@ -124,6 +124,24 @@ public sealed class TaskResultExtensionsTests
     }
 
     [Fact]
+    public async Task Map_ShortCircuitsFailureWithoutRunningSelector()
+    {
+        var called = false;
+        var failure = new ErrorContext("blocked", "BLOCKED", false);
+
+        var result = await FailAsync<int>(failure)
+            .Map(value =>
+            {
+                called = true;
+                return value + 1;
+            });
+
+        Assert.True(result.IsFailure);
+        Assert.False(called);
+        Assert.Same(failure, result.Error);
+    }
+
+    [Fact]
     public async Task LinqQuery_ShortCircuitsBeforeSynchronousBinder()
     {
         var called = false;
@@ -296,6 +314,17 @@ public sealed class TaskResultExtensionsTests
 
         Assert.True(result.IsFailure);
         Assert.Equal("task-tap-boom", result.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
+    }
+
+    [Fact]
+    public async Task Tap_CatchesAsyncActionException()
+    {
+        var result = await SuccessAsync(4)
+            .Tap(_ => Task.FromException(new InvalidOperationException("task-async-tap-boom")));
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("task-async-tap-boom", result.Error!.Message);
         Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
     }
 

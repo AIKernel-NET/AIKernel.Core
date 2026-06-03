@@ -171,10 +171,10 @@ public sealed class KernelExecutor : IKernelExecutor
             }
         }
 
-        metadata["step_id"] = stepId;
-        metadata["semantic_delta"] = semanticDelta.Label;
-        metadata["replay_log_count"] = replayLogCount.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        metadata["replay_log_hash"] = replayLogHash;
+        metadata[ReplayMetadataKeys.StepId] = stepId;
+        metadata[ReplayMetadataKeys.SemanticDelta] = semanticDelta.Label;
+        metadata[ReplayMetadataKeys.ReplayLogCount] = replayLogCount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        metadata[ReplayMetadataKeys.ReplayLogHash] = replayLogHash;
 
         return error with
         {

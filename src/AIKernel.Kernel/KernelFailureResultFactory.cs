@@ -207,9 +207,9 @@ internal sealed class KernelFailureResultFactory
             builder[item.Key] = item.Value;
         }
 
-        builder["failure_kind"] = failureKind.ToString();
-        builder["origin_step"] = originStep.ToString();
-        builder["semantic_slot"] = semanticSlot.ToString();
+        builder[ReplayMetadataKeys.FailureKind] = failureKind.ToString();
+        builder[ReplayMetadataKeys.OriginStep] = originStep.ToString();
+        builder[ReplayMetadataKeys.SemanticSlot] = semanticSlot.ToString();
 
         AddFailureObservationMetadata(
             builder,
@@ -243,10 +243,10 @@ internal sealed class KernelFailureResultFactory
                 originStep,
                 semanticSlot));
 
-        builder["step_id"] = step.StepId;
-        builder["semantic_delta"] = step.SemanticDelta.Label;
-        builder["replay_log_count"] = step.ReplayLog.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        builder["replay_log_hash"] = step.ReplayLogHash;
+        builder[ReplayMetadataKeys.StepId] = step.StepId;
+        builder[ReplayMetadataKeys.SemanticDelta] = step.SemanticDelta.Label;
+        builder[ReplayMetadataKeys.ReplayLogCount] = step.ReplayLog.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        builder[ReplayMetadataKeys.ReplayLogHash] = step.ReplayLogHash;
     }
 
     private static SemanticSlot ResolveRejectedSemanticSlot(Exception exception)

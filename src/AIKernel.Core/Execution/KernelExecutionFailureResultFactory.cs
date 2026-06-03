@@ -194,17 +194,17 @@ internal sealed class KernelExecutionFailureResultFactory
 
         if (errorContext?.FailureKind is { } failureKind)
         {
-            builder["failure_kind"] = failureKind.ToString();
+            builder[ReplayMetadataKeys.FailureKind] = failureKind.ToString();
         }
 
         if (errorContext?.OriginStep is { } originStep)
         {
-            builder["origin_step"] = originStep.ToString();
+            builder[ReplayMetadataKeys.OriginStep] = originStep.ToString();
         }
 
         if (errorContext?.SemanticSlot is { } semanticSlot)
         {
-            builder["semantic_slot"] = semanticSlot.ToString();
+            builder[ReplayMetadataKeys.SemanticSlot] = semanticSlot.ToString();
         }
 
         return builder.ToImmutable();

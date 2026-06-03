@@ -70,32 +70,32 @@ internal sealed class KernelExecutionSuccessResultFactory
 
         if (!string.IsNullOrWhiteSpace(finalStepId))
         {
-            builder["step_id"] = finalStepId;
+            builder[ReplayMetadataKeys.StepId] = finalStepId;
         }
 
         if (finalSemanticDelta is not null)
         {
-            builder["semantic_delta"] = finalSemanticDelta.Label;
+            builder[ReplayMetadataKeys.SemanticDelta] = finalSemanticDelta.Label;
 
             if (finalSemanticDelta.OriginStep is { } originStep)
             {
-                builder["origin_step"] = originStep.ToString();
+                builder[ReplayMetadataKeys.OriginStep] = originStep.ToString();
             }
 
             if (finalSemanticDelta.SemanticSlot is { } semanticSlot)
             {
-                builder["semantic_slot"] = semanticSlot.ToString();
+                builder[ReplayMetadataKeys.SemanticSlot] = semanticSlot.ToString();
             }
         }
 
         if (replayLogCount is { } count)
         {
-            builder["replay_log_count"] = count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            builder[ReplayMetadataKeys.ReplayLogCount] = count.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
         if (!string.IsNullOrWhiteSpace(replayLogHash))
         {
-            builder["replay_log_hash"] = replayLogHash;
+            builder[ReplayMetadataKeys.ReplayLogHash] = replayLogHash;
         }
 
         return builder.ToImmutable();

@@ -2,6 +2,7 @@ namespace AIKernel.Core.Tests.Support;
 
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using AIKernel.Common.Results;
 
 internal static partial class ReplayMetadataAssertions
 {
@@ -20,10 +21,10 @@ internal static partial class ReplayMetadataAssertions
         string semanticDelta,
         string replayLogCount)
     {
-        AssertStepId(metadata["step_id"]);
-        Assert.Equal(semanticDelta, metadata["semantic_delta"]);
-        Assert.Equal(replayLogCount, metadata["replay_log_count"]);
-        AssertReplayLogHash(metadata["replay_log_hash"]);
+        AssertStepId(metadata[ReplayMetadataKeys.StepId]);
+        Assert.Equal(semanticDelta, metadata[ReplayMetadataKeys.SemanticDelta]);
+        Assert.Equal(replayLogCount, metadata[ReplayMetadataKeys.ReplayLogCount]);
+        AssertReplayLogHash(metadata[ReplayMetadataKeys.ReplayLogHash]);
     }
 
     [GeneratedRegex("^step:sha256:[0-9a-f]{64}$")]

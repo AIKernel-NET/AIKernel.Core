@@ -210,6 +210,13 @@ This supports policies such as low-tier versus high-tier LLM selection, or
 routing `aik...` contexts to a CLI-backed capability adapter, while keeping
 Kernel execution driven by the same ProviderId / ModelId contract.
 
+AIKernel.Core also includes a standard JSON DSL pipeline runtime for
+AI-generated plans. The DSL compiles to deterministic `ResultStep` pipelines,
+supports finite `Loop` / `LoopUntil` / `Suspend` nodes, and can be saved as DSL
+ROM under `rom/dsl/{namespace}/{name}.json` for later invocation through
+`dsl://{namespace}/{name}`. The canonical schema and operational rules are
+documented in AIKernel.NET as `docs/architecture/18.DSL_PIPELINE_AND_ROM_SPEC.md`.
+
 ---
 
 ## Target Boot Experience

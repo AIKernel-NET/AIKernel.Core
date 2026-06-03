@@ -209,6 +209,13 @@ request metadata に適用できます。
 これにより、低レベル / 高レベル LLM の切替や、`aik...` で始まるコンテキストを
 CLI に紐づく Capability Adapter へ流す方針を、同じ ProviderId / ModelId 契約で扱えます。
 
+AIKernel.Core には、AI が生成した計画を扱う標準 JSON DSL pipeline runtime も含まれます。
+DSL は決定論的な `ResultStep` pipeline に compile され、有限 `Loop` / `LoopUntil` /
+`Suspend` node をサポートします。また、`rom/dsl/{namespace}/{name}.json` に DSL ROM
+として保存し、`dsl://{namespace}/{name}` で再利用可能 capability として呼び出せます。
+schema と運用規則は、AIKernel.NET の
+`docs/architecture/18.DSL_PIPELINE_AND_ROM_SPEC-jp.md` にある正典文書で定義されています。
+
 ---
 
 ## 目標とする起動体験

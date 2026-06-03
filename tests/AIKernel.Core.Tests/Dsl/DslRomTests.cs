@@ -94,6 +94,77 @@ public sealed class DslRomTests
     }
 
     [Fact]
+    public async Task LoadDslRomAsync_ReturnsFailure_WhenRegistryThrows()
+    {
+        await using var session = await OpenSessionAsync();
+        var compiler = CreateCompiler(new TestCapabilityRegistry());
+        var seedStore = new DslRomStore(
+            new DslRomProvider(compiler),
+            new DslRomRegistry());
+        var saved = await seedStore.SaveDslAsRomAsync(
+            session,
+            "agent",
+            "plan1",
+            PlanDsl,
+            DateTimeOffset.UnixEpoch);
+        Assert.True(saved.IsSuccess, saved.Error?.Message);
+
+        var failingStore = new DslRomStore(
+            new DslRomProvider(compiler),
+            new ThrowingRomRegistry());
+
+        var loaded = await failingStore.LoadDslRomAsync(
+            session,
+            "agent",
+            "plan1",
+            DateTimeOffset.UnixEpoch,
+            saved.Value!.RomHash);
+
+        Assert.True(loaded.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", loaded.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, loaded.Error.FailureKind);
+        Assert.Equal(OriginStep.KernelFacade, loaded.Error.OriginStep);
+    }
+
+    [Fact]
+    public void DslRomMetadataKeys_ExposeStableContractNames()
+    {
+        Assert.Equal("dsl_rom_hash", DslRomMetadataKeys.RomHash);
+        Assert.Equal("dsl_rom_call", DslRomMetadataKeys.RomCall);
+        Assert.Equal("dsl_rom_path", DslRomMetadataKeys.RomPath);
+        Assert.Equal("dsl_rom_namespace", DslRomMetadataKeys.RomNamespace);
+        Assert.Equal("dsl_rom_name", DslRomMetadataKeys.RomName);
+        Assert.Equal("dsl_rom_replay_log_count", DslRomMetadataKeys.RomReplayLogCount);
+        Assert.Equal("dsl_rom_replay_log_hash", DslRomMetadataKeys.RomReplayLogHash);
+    }
+
+    [Fact]
+    public void DslRomPath_CreatesStablePathAndCapabilityName()
+    {
+        var path = DslRomPath.Create("agent", "plan1");
+        var capabilityName = DslRomPath.CreateCapabilityName("agent", "plan1");
+        var parsed = DslRomPath.ParseCapabilityName("dsl://agent/plan1");
+
+        Assert.True(path.IsSuccess, path.Error?.Message);
+        Assert.True(capabilityName.IsSuccess, capabilityName.Error?.Message);
+        Assert.True(parsed.IsSuccess, parsed.Error?.Message);
+        Assert.Equal("rom/dsl/agent/plan1.json", path.Value);
+        Assert.Equal("dsl://agent/plan1", capabilityName.Value);
+        Assert.Equal("agent", parsed.Value.Namespace);
+        Assert.Equal("plan1", parsed.Value.Name);
+    }
+
+    [Fact]
+    public void DslRomPath_RejectsNestedCapabilityName()
+    {
+        var parsed = DslRomPath.ParseCapabilityName("dsl://agent/nested/plan1");
+
+        Assert.True(parsed.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", parsed.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, parsed.Error.FailureKind);
+    }
+
+    [Fact]
     public void DslRomProvider_ReturnsFailure_WhenCompilerThrows()
     {
         var provider = new DslRomProvider(new ThrowingCompiler());

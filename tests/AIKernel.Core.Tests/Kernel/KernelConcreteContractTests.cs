@@ -10,6 +10,7 @@ using AIKernel.Common.Results;
 using AIKernel.Core.Context;
 using AIKernel.Core.Rom;
 using AIKernel.Core.Tests.Support;
+using AIKernel.Kernel;
 using AIKernel.Dtos.Core;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
@@ -77,6 +78,9 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 .Add(ReplayMetadataKeys.FailureKind, "user-value")
                 .Add(ReplayMetadataKeys.OriginStep, "user-value")
                 .Add(ReplayMetadataKeys.SemanticSlot, "user-value")
+                .Add(KernelFacadeMetadataKeys.RootRomId, "user-value")
+                .Add(KernelFacadeMetadataKeys.VfsProviderId, "user-value")
+                .Add(KernelFacadeMetadataKeys.RequestedModelId, "user-value")
                 .Add("custom_key", "custom-value"));
 
         var result = await kernel.ExecuteAsync(
@@ -87,6 +91,9 @@ public sealed class KernelConcreteContractTests : KernelContractTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
+        Assert.Equal("valid-rom", result.Metadata[KernelFacadeMetadataKeys.RootRomId]);
+        Assert.Equal("memory-file", result.Metadata[KernelFacadeMetadataKeys.VfsProviderId]);
+        Assert.Equal("gpt-test", result.Metadata[KernelFacadeMetadataKeys.RequestedModelId]);
         Assert.Equal("custom-value", result.Metadata["custom_key"]);
         Assert.Equal("kernel.facade.fail", result.Metadata[ReplayMetadataKeys.SemanticDelta]);
     }

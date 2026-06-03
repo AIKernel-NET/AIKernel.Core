@@ -187,6 +187,11 @@ internal sealed class KernelFailureResultFactory
     {
         var builder = ImmutableDictionary.CreateBuilder<string, string>(StringComparer.Ordinal);
 
+        foreach (var item in request.Metadata)
+        {
+            builder[item.Key] = item.Value;
+        }
+
         builder[KernelFacadeMetadataKeys.RootRomId] = request.RootRomId?.Value ?? string.Empty;
         builder[KernelFacadeMetadataKeys.VfsProviderId] = request.VfsProviderId ?? string.Empty;
         builder[KernelFacadeMetadataKeys.RequestedModelId] = request.RequestedModelId ?? string.Empty;
@@ -200,11 +205,6 @@ internal sealed class KernelFailureResultFactory
         {
             builder[KernelFacadeMetadataKeys.TransactionId] = transaction.TransactionId;
             builder[KernelFacadeMetadataKeys.InputHash] = transaction.InputHash;
-        }
-
-        foreach (var item in request.Metadata)
-        {
-            builder[item.Key] = item.Value;
         }
 
         builder[ReplayMetadataKeys.FailureKind] = failureKind.ToString();

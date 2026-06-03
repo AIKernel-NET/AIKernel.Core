@@ -198,6 +198,11 @@ services.AddAIKernelBrowserVfsProviders();
 これにより、AIKernel.Tools、AIKernel.RH、その他 Provider パッケージ間で
 metadata 文字列を直書きせずに統合できます。
 
+外部 Provider パッケージは、Assembly 参照された Provider とプロセス実行を包む
+Adapter Provider のどちらも `WithModelProvider<TProvider>` で接続できます。
+この拡張は `IModelProvider` 実装と `ModelPromptCapability` を同時に登録するため、
+Core に Provider 固有の配線を追加せずに、ProviderId / ModelId を解決できます。
+
 ---
 
 ## 目標とする起動体験

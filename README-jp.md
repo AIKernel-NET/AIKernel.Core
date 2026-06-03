@@ -131,9 +131,6 @@ ABI と振る舞いの規律を検証するための Contract Test Framework で
 
 ## クイックスタート
 
-> このセクションは、v0.1.0 に向けた想定 Draft API を示します。  
-> 名前やシグネチャは、v0.0.x / v0.1.0 実装フェーズで調整される可能性があります。
-
 ### 1. パッケージのインストール
 
 ```bash
@@ -142,34 +139,58 @@ dotnet add package AIKernel.Hosting
 dotnet add package AIKernel.Providers.MicrosoftAI
 ```
 
-### 2. カーネルの点火
+### 2. API ホスト向けに Core を登録する
+
+OpenAI 互換 Provider の実行とモデル認証情報の保持は Server/API ホスト側で行います。
+browser/WASM クライアントは独自 API 境界の背後に置き、モデル API キーを
+WebAssembly クライアントへ配置しないでください。
 
 ```csharp
-// DI コンテナの設定
-services.AddAIKernelCore(options =>
-{
-    options.DefaultVfsProviderId = "local";
-});
+builder.Services
+    .AddAIKernelCore(builder.Configuration)
+    .WithOpenAI(
+        builder.Configuration.GetSection("AIKernel:Providers:OpenAI"),
+        (sp, options) =>
+        {
+            // Microsoft.Extensions.AI の IChatClient を返します。
+            // Provider パッケージは、設定された ProviderId / ModelId に対応する
+            // 既定 capabilities と prompt capability metadata を登録します。
+            return CreateChatClient(options);
+        });
 
-// Microsoft.Extensions.AI 経由で OpenAI 互換 Provider を登録
-services.AddOpenAICompatibleProvider(sp =>
-    new OpenAICompatibleClient(
-        new Uri("https://your-openai-compatible-endpoint.example.com"),
-        apiKey));
-
-// Kernel Facade 経由で実行
-var kernel = serviceProvider.GetRequiredService<IKernel>();
-
-var result = await kernel.ExecuteAsync(new KernelRequest
-{
-    Input = "AIKernel の設計思想を説明せよ",
-    RootRomId = new RomId("rom://aikernel/docs/vision"),
-    VfsProviderId = "local"
-});
-
-Console.WriteLine(result.PrimaryText);
-Console.WriteLine(result.ContextHash);
+builder.Services.AddAIKernelKernel();
 ```
+
+設定例:
+
+```json
+{
+  "AIKernel": {
+    "Providers": {
+      "OpenAI": {
+        "ProviderId": "openai-compatible",
+        "ModelId": "gpt-4.1-mini",
+        "SecretKeyName": "OpenAI:ApiKey",
+        "MaxInputTokens": 8192,
+        "MaxOutputTokens": 1024
+      }
+    }
+  },
+  "OpenAI": {
+    "ApiKey": "<user-secrets、Key Vault、または環境設定へ保存してください>"
+  }
+}
+```
+
+browser/WASM 向けクライアントでは、クライアント側 service collection に
+browser-safe な VFS Provider だけを登録します。
+
+```csharp
+services.AddAIKernelBrowserVfsProviders();
+```
+
+`AddAIKernelCoreVfsProviders` は、ローカルファイルシステムアクセスが想定される
+信頼済み Server / Desktop ホストでのみ使用してください。
 
 ---
 

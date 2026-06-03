@@ -278,6 +278,35 @@ public sealed class OpenAIHostingExtensionsTests
     }
 
     [Fact]
+    public void WithOpenAI_DoesNotReplaceCustomProviderCapabilities()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["AIKernel:Providers:OpenAI:ModelId"] = "gpt-demo",
+                    ["AIKernel:Providers:OpenAI:ApiKey"] = "sk-direct-123456"
+                })
+            .Build();
+
+        var services = new ServiceCollection();
+
+        services.AddSingleton<IProviderCapabilities, TestProviderCapabilities>();
+
+        services
+            .AddAIKernelCore()
+            .WithOpenAI(
+                configuration.GetSection("AIKernel:Providers:OpenAI"),
+                (_, _) => new StubChatClient("ok"));
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        var capabilities = provider.GetRequiredService<IProviderCapabilities>();
+
+        Assert.IsType<TestProviderCapabilities>(capabilities);
+    }
+
+    [Fact]
     public void OpenAIOptionsValidator_FailsClosed_ForInvalidTokenLimits()
     {
         var validator = new OpenAICompatibleProviderOptionsValidator();

@@ -25,4 +25,33 @@ public static class TaskOptionExtensions
 
         return Option<V>.Some(projector(o1.Value!, o2.Value!));
     }
+
+    public static async Task<Option<V>> SelectMany<T, U, V>(
+        this Task<Option<T>> task,
+        Func<T, Option<U>> binder,
+        Func<T, U, V> projector)
+    {
+        var o1 = await task;
+        if (!o1.HasValue)
+            return Option<V>.None();
+
+        var o2 = binder(o1.Value!);
+        if (!o2.HasValue)
+            return Option<V>.None();
+
+        return Option<V>.Some(projector(o1.Value!, o2.Value!));
+    }
+
+    public static async Task<Option<T>> Where<T>(
+        this Task<Option<T>> task,
+        Func<T, bool> predicate)
+    {
+        var option = await task;
+        if (!option.HasValue)
+            return option;
+
+        return predicate(option.Value!)
+            ? option
+            : Option<T>.None();
+    }
 }

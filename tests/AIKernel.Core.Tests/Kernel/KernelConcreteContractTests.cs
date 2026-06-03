@@ -6,6 +6,7 @@ using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Kernel;
 using AIKernel.Abstractions.Models;
 using AIKernel.Abstractions.Providers;
+using AIKernel.Common.Results;
 using AIKernel.Core.Context;
 using AIKernel.Core.Rom;
 using AIKernel.Dtos.Core;
@@ -45,6 +46,38 @@ public sealed class KernelConcreteContractTests : KernelContractTests
         return CreateRequest("invalid-signature-rom");
     }
 
+    [Fact]
+    public async Task ExecuteAsync_ReturnsFailedMetadata_WhenExecutorFails()
+    {
+        var kernel = CreateKernel(new FailingKernelExecutor());
+
+        var result = await kernel.ExecuteAsync(
+            CreateValidRequest(),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Failed, result.Status);
+        Assert.Equal("kernel_transaction_failed", result.Error?.Code);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
+        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ReturnsCanceledMetadata_WhenExecutorCancels()
+    {
+        var kernel = CreateKernel(new CanceledKernelExecutor());
+
+        var result = await kernel.ExecuteAsync(
+            CreateValidRequest(),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Canceled, result.Status);
+        Assert.Equal("canceled", result.Error?.Code);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
+        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+    }
+
     private static KernelRequest CreateRequest(string rootRomId)
     {
         return new KernelRequest
@@ -64,6 +97,20 @@ public sealed class KernelConcreteContractTests : KernelContractTests
             RequestedModelId = "gpt-test",
             Metadata = ImmutableDictionary<string, string>.Empty
         };
+    }
+
+    private static AIKernel.Kernel.Kernel CreateKernel(
+        AIKernel.Abstractions.Execution.IKernelExecutor kernelExecutor)
+    {
+        var requestHasher = new AIKernel.Kernel.KernelRequestHasher();
+
+        return new AIKernel.Kernel.Kernel(
+            new FakeVfsSessionFactory(),
+            new FakeContextAssembler(),
+            new FakeModelProviderSelector(),
+            kernelExecutor,
+            requestHasher,
+            new AIKernel.Kernel.KernelTransactionIdFactory(requestHasher));
     }
 
     private sealed class FakeVfsSessionFactory : IKernelVfsSessionFactory
@@ -156,6 +203,28 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 CompletedAtUtc = DateTimeOffset.UnixEpoch,
                 Metadata = ImmutableDictionary<string, string>.Empty
             });
+        }
+    }
+
+    private sealed class FailingKernelExecutor : AIKernel.Abstractions.Execution.IKernelExecutor
+    {
+        public Task<KernelRequestExecutionResult> ExecuteAsync(
+            IModelProvider provider,
+            KernelExecutionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            throw new InvalidOperationException("executor failed");
+        }
+    }
+
+    private sealed class CanceledKernelExecutor : AIKernel.Abstractions.Execution.IKernelExecutor
+    {
+        public Task<KernelRequestExecutionResult> ExecuteAsync(
+            IModelProvider provider,
+            KernelExecutionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            throw new OperationCanceledException();
         }
     }
 

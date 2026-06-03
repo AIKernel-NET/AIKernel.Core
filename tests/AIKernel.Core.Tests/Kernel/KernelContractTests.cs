@@ -3,6 +3,7 @@
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Dtos.Rom;
+using AIKernel.Common.Results;
 using Xunit;
 
 public abstract class KernelContractTests
@@ -50,6 +51,9 @@ public abstract class KernelContractTests
         Assert.Null(result.OutputText);
         Assert.NotNull(result.Error);
         Assert.Equal("context_rejected", result.Error.Code);
+        Assert.Equal(FailureKind.Reject.ToString(), result.Metadata["failure_kind"]);
+        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
+        Assert.Equal(SemanticSlot.G.ToString(), result.Metadata["semantic_slot"]);
     }
 
     [Fact]
@@ -67,6 +71,9 @@ public abstract class KernelContractTests
         Assert.Null(result.OutputText);
         Assert.NotNull(result.Error);
         Assert.Equal("rom_signature_verification_failed", result.Error.Code);
+        Assert.Equal(FailureKind.Reject.ToString(), result.Metadata["failure_kind"]);
+        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
+        Assert.Equal(SemanticSlot.G.ToString(), result.Metadata["semantic_slot"]);
     }
 
     [Fact]

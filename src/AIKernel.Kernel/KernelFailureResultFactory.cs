@@ -3,6 +3,7 @@ namespace AIKernel.Kernel;
 using System.Collections.Immutable;
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
+using AIKernel.Common.Results;
 using AIKernel.Core.Execution;
 using AIKernel.Core.Rom;
 using AIKernel.Core.Time;
@@ -37,7 +38,13 @@ internal sealed class KernelFailureResultFactory
             errorCode: ResolveRejectedCode(exception),
             errorMessage: exception.Message,
             errorDetail: exception.GetType().FullName,
-            metadata: BuildFailureMetadata(request, transaction, exception));
+            metadata: BuildFailureMetadata(
+                request,
+                transaction,
+                exception,
+                FailureKind.Reject,
+                OriginStep.KernelFacade,
+                ResolveRejectedSemanticSlot(exception)));
     }
 
     public KernelRequestExecutionResult CreateFailedResult(
@@ -58,7 +65,13 @@ internal sealed class KernelFailureResultFactory
             errorCode: "kernel_transaction_failed",
             errorMessage: exception.Message,
             errorDetail: exception.GetType().FullName,
-            metadata: BuildFailureMetadata(request, transaction, exception));
+            metadata: BuildFailureMetadata(
+                request,
+                transaction,
+                exception,
+                FailureKind.FailClosed,
+                OriginStep.KernelFacade,
+                SemanticSlot.T));
     }
 
     public KernelRequestExecutionResult CreateCanceledResult(
@@ -78,8 +91,13 @@ internal sealed class KernelFailureResultFactory
             errorCode: "canceled",
             errorMessage: "Kernel transaction was canceled.",
             errorDetail: null,
-            metadata: transaction?.Metadata
-                ?? ImmutableDictionary<string, string>.Empty);
+            metadata: BuildFailureMetadata(
+                request,
+                transaction,
+                exception: null,
+                FailureKind.FailClosed,
+                OriginStep.KernelFacade,
+                SemanticSlot.T));
     }
 
     private KernelRequestExecutionResult CreateFailureResult(
@@ -158,14 +176,24 @@ internal sealed class KernelFailureResultFactory
     private static ImmutableDictionary<string, string> BuildFailureMetadata(
         KernelRequest request,
         KernelTransactionSnapshot? transaction,
-        Exception exception)
+        Exception? exception,
+        FailureKind failureKind,
+        OriginStep originStep,
+        SemanticSlot semanticSlot)
     {
         var builder = ImmutableDictionary.CreateBuilder<string, string>(StringComparer.Ordinal);
 
         builder["root_rom_id"] = request.RootRomId?.Value ?? string.Empty;
         builder["vfs_provider_id"] = request.VfsProviderId ?? string.Empty;
         builder["requested_model_id"] = request.RequestedModelId ?? string.Empty;
-        builder["exception_type"] = exception.GetType().FullName ?? exception.GetType().Name;
+        builder["failure_kind"] = failureKind.ToString();
+        builder["origin_step"] = originStep.ToString();
+        builder["semantic_slot"] = semanticSlot.ToString();
+
+        if (exception is not null)
+        {
+            builder["exception_type"] = exception.GetType().FullName ?? exception.GetType().Name;
+        }
 
         if (transaction is not null)
         {
@@ -179,6 +207,17 @@ internal sealed class KernelFailureResultFactory
         }
 
         return builder.ToImmutable();
+    }
+
+    private static SemanticSlot ResolveRejectedSemanticSlot(Exception exception)
+    {
+        return exception switch
+        {
+            ContextAssemblyGovernanceException
+                or RomSignatureVerificationException
+                or RomRequiredMetadataMissingException => SemanticSlot.G,
+            _ => SemanticSlot.T
+        };
     }
 
 }

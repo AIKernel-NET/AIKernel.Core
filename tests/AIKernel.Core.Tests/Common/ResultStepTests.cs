@@ -96,6 +96,59 @@ public sealed class ResultStepTests
     }
 
     [Fact]
+    public void StepId_Changes_WhenOutcomeChanges()
+    {
+        var delta = new SemanticDelta(
+            "kernel.provider.generate",
+            OriginStep.Provider,
+            SemanticSlot.T);
+        var error = new ErrorContext("blocked", "BLOCKED", false);
+
+        var success = ResultStep<string, int>
+            .Success("provider", 2)
+            .WithSemanticDelta(delta);
+        var failure = ResultStep<string, int>
+            .Fail("provider", error)
+            .WithSemanticDelta(delta);
+
+        Assert.NotEqual(success.StepId, failure.StepId);
+        Assert.False(failure.ReplayLog[0].IsSuccess);
+        Assert.Equal(error.Code, failure.ReplayLog[0].ErrorCode);
+    }
+
+    [Fact]
+    public void StepId_IsDeterministic_ForEquivalentSemanticDeltaMetadataOrder()
+    {
+        var firstDelta = new SemanticDelta(
+            "kernel.provider.generate",
+            OriginStep.Provider,
+            SemanticSlot.T,
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["b"] = "2",
+                ["a"] = "1"
+            });
+        var secondDelta = new SemanticDelta(
+            "kernel.provider.generate",
+            OriginStep.Provider,
+            SemanticSlot.T,
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["a"] = "1",
+                ["b"] = "2"
+            });
+
+        var first = ResultStep<string, int>
+            .Success("provider", 2)
+            .WithSemanticDelta(firstDelta);
+        var second = ResultStep<string, int>
+            .Success("provider", 2)
+            .WithSemanticDelta(secondDelta);
+
+        Assert.Equal(first.StepId, second.StepId);
+    }
+
+    [Fact]
     public void Bind_ReparentsNextStepToCurrentStepId()
     {
         var firstDelta = new SemanticDelta(

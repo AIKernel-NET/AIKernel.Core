@@ -33,6 +33,16 @@ public sealed class OpenAICompatibleProviderOptionsValidator
             failures.Add("ModelId is required.");
         }
 
+        if (options.MaxInputTokens <= 0)
+        {
+            failures.Add("MaxInputTokens must be greater than zero.");
+        }
+
+        if (options.MaxOutputTokens is <= 0)
+        {
+            failures.Add("MaxOutputTokens must be greater than zero when specified.");
+        }
+
         var hasDirectApiKey = !string.IsNullOrWhiteSpace(options.ApiKey);
         var hasSecretKeyName = !string.IsNullOrWhiteSpace(options.SecretKeyName);
 

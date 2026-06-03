@@ -16,6 +16,8 @@ public sealed record OpenAICompatibleProviderOptions : ISecureOptions
 
     public Uri? Endpoint { get; init; }
 
+    public int MaxInputTokens { get; init; } = 8192;
+
     public int? MaxOutputTokens { get; init; }
 
     public float? Temperature { get; init; }

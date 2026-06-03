@@ -1,8 +1,12 @@
 ﻿namespace AIKernel.IntegrationTests;
 
+using AIKernel.Abstractions.Context;
+using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
+using AIKernel.Core.Context;
 using AIKernel.Core.Security;
 using AIKernel.Dtos.Context;
+using AIKernel.Dtos.Execution;
 using AIKernel.Hosting;
 using AIKernel.Kernel;
 using AIKernel.Providers.MicrosoftAI;
@@ -161,6 +165,110 @@ public sealed class OpenAIHostingExtensionsTests
     }
 
     [Fact]
+    public void WithOpenAI_RegistersPromptCapabilityForKernelExecution()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["AIKernel:Providers:OpenAI:ProviderId"] = "openai-demo",
+                    ["AIKernel:Providers:OpenAI:ModelId"] = "gpt-demo",
+                    ["AIKernel:Providers:OpenAI:ApiKey"] = "sk-direct-123456",
+                    ["AIKernel:Providers:OpenAI:MaxInputTokens"] = "4096",
+                    ["AIKernel:Providers:OpenAI:MaxOutputTokens"] = "512"
+                })
+            .Build();
+
+        var services = new ServiceCollection();
+
+        services.AddSingleton<IProviderCapabilities, TestProviderCapabilities>();
+
+        services
+            .AddAIKernelCore()
+            .WithOpenAI(
+                configuration.GetSection("AIKernel:Providers:OpenAI"),
+                (_, _) => new StubChatClient("ok"));
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        var capability = provider.GetRequiredService<ModelPromptCapability>();
+
+        Assert.Equal("openai-demo", capability.ProviderId);
+        Assert.Equal("gpt-demo", capability.ModelId);
+        Assert.Equal(4096, capability.MaxInputTokens);
+        Assert.Equal(512, capability.MaxOutputTokens);
+        Assert.Contains(ModelMessageRoles.User, capability.SupportedRoles);
+        Assert.Contains(ModelMessageRoles.System, capability.SupportedRoles);
+    }
+
+    [Fact]
+    public void WithOpenAI_RegisteredPromptCapabilityIsResolvable()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["AIKernel:Providers:OpenAI:ProviderId"] = "openai-demo",
+                    ["AIKernel:Providers:OpenAI:ModelId"] = "gpt-demo",
+                    ["AIKernel:Providers:OpenAI:ApiKey"] = "sk-direct-123456"
+                })
+            .Build();
+
+        var services = new ServiceCollection();
+
+        services.AddSingleton<IProviderCapabilities, TestProviderCapabilities>();
+
+        services
+            .AddAIKernelCore()
+            .WithOpenAI(
+                configuration.GetSection("AIKernel:Providers:OpenAI"),
+                (_, _) => new StubChatClient("ok"));
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        var modelProvider = provider.GetRequiredService<IModelProvider>();
+        var resolver = provider.GetRequiredService<IModelPromptCapabilityResolver>();
+
+        var capability = resolver.Resolve(
+            modelProvider,
+            new KernelExecutionRequest
+            {
+                ContextSnapshot = CreateContextSnapshot(),
+                UserInstruction = "hello",
+                PromptOptions = PromptGenerationOptions.Default,
+                ExecutionOptions = ExecutionOptions.DeterministicDefault,
+                RequestedModelId = "gpt-demo"
+            });
+
+        Assert.Equal("openai-demo", capability.ProviderId);
+        Assert.Equal("gpt-demo", capability.ModelId);
+    }
+
+    [Fact]
+    public void OpenAIOptionsValidator_FailsClosed_ForInvalidTokenLimits()
+    {
+        var validator = new OpenAICompatibleProviderOptionsValidator();
+
+        var result = validator.Validate(
+            name: null,
+            new OpenAICompatibleProviderOptions
+            {
+                ModelId = "gpt-demo",
+                ApiKey = "sk-direct-123456",
+                MaxInputTokens = 0,
+                MaxOutputTokens = 0
+            });
+
+        Assert.True(result.Failed);
+        Assert.Contains(
+            "MaxInputTokens must be greater than zero.",
+            result.Failures);
+        Assert.Contains(
+            "MaxOutputTokens must be greater than zero when specified.",
+            result.Failures);
+    }
+
+    [Fact]
     public async Task WithOpenAI_FailsClosed_WhenSecretIsMissing()
     {
         var configuration = new ConfigurationBuilder()
@@ -232,6 +340,16 @@ public sealed class OpenAIHostingExtensionsTests
     private sealed record TestModelMessage(
         string Role,
         string Content) : IModelMessage;
+
+    private static IContextSnapshot CreateContextSnapshot()
+    {
+        return new AssembledContextSnapshot(
+            snapshotId: "snapshot:openai-hosting",
+            parentSnapshotId: null,
+            createdAtUtc: DateTimeOffset.UnixEpoch,
+            contextHash: "sha256:openai-hosting",
+            context: new ContextCollectionSnapshot([]));
+    }
 
     private sealed class StubChatClient : IChatClient
     {

@@ -1,6 +1,8 @@
 namespace AIKernel.Providers.MicrosoftAI.DependencyInjection;
 
+using System.Collections.Immutable;
 using AIKernel.Abstractions.Providers;
+using AIKernel.Dtos.Execution;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -81,7 +83,49 @@ public static class OpenAIHostingExtensions
             return chatClientFactory(serviceProvider, options);
         });
 
+        services.AddSingleton(CreateModelPromptCapability);
         services.AddSingleton<IModelProvider, OpenAICompatibleProvider>();
+    }
+
+    private static ModelPromptCapability CreateModelPromptCapability(
+        IServiceProvider serviceProvider)
+    {
+        var options = serviceProvider
+            .GetRequiredService<IOptions<OpenAICompatibleProviderOptions>>()
+            .Value;
+
+        var supportedRoles = new List<string>
+        {
+            ModelMessageRoles.User
+        };
+
+        if (options.SupportsSystemRole)
+        {
+            supportedRoles.Add(ModelMessageRoles.System);
+        }
+
+        if (options.SupportsAssistantRole)
+        {
+            supportedRoles.Add(ModelMessageRoles.Assistant);
+        }
+
+        if (options.SupportsToolRole)
+        {
+            supportedRoles.Add(ModelMessageRoles.Tool);
+        }
+
+        return new ModelPromptCapability
+        {
+            ProviderId = options.ProviderId,
+            ModelId = options.ModelId,
+            MessageFormat = PromptMessageFormat.ChatMessages,
+            MaxInputTokens = options.MaxInputTokens,
+            MaxOutputTokens = options.MaxOutputTokens ?? 1024,
+            SupportedRoles = supportedRoles.ToImmutableArray(),
+            SystemInstructionRole = options.SupportsSystemRole
+                ? ModelMessageRoles.System
+                : ModelMessageRoles.User
+        };
     }
 
     private static IServiceCollection GetServices<TBuilder>(

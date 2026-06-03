@@ -131,12 +131,7 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
         ResultStep<DslPipelineState, DslPipelineValue> current)
     {
         var nextState = current.State.Advance(node.Name);
-        var delta = DslSemanticDeltaFactory.CreateNodeDelta(
-            "dsl.capability.call",
-            "execute",
-            "call_capability",
-            node.Name,
-            node.Args);
+        var delta = CreateCapabilityDelta(node);
 
         Result<DslPipelineValue> capabilityResult;
         try
@@ -161,7 +156,7 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
                 current,
                 nextState,
                 capabilityResult.Error!,
-                delta);
+                CreateCapabilityDelta(node, capabilityResult.Error!.Metadata));
         }
 
         if (capabilityResult.Value is null)
@@ -190,7 +185,7 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
                 current,
                 nextState,
                 capabilityResult.Value,
-                delta);
+                CreateCapabilityDelta(node, capabilityResult.Value.Data));
     }
 
     private ResultStep<DslPipelineState, DslPipelineValue> ExecuteLoop(
@@ -356,6 +351,40 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
 
         error = DslExecutionErrors.InvalidRuntime("unreachable");
         return true;
+    }
+
+    private static SemanticDelta CreateCapabilityDelta(
+        CallCapabilityNode node,
+        IReadOnlyDictionary<string, string>? sourceMetadata = null)
+    {
+        Dictionary<string, string>? romMetadata = null;
+        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomCall, ref romMetadata);
+        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomHash, ref romMetadata);
+        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomPath, ref romMetadata);
+        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomNamespace, ref romMetadata);
+        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomName, ref romMetadata);
+
+        return DslSemanticDeltaFactory.CreateNodeDelta(
+            "dsl.capability.call",
+            "execute",
+            "call_capability",
+            node.Name,
+            node.Args,
+            romMetadata);
+    }
+
+    private static void AddIfPresent(
+        IReadOnlyDictionary<string, string>? source,
+        string key,
+        ref Dictionary<string, string>? target)
+    {
+        if (source is null || !source.TryGetValue(key, out var value))
+        {
+            return;
+        }
+
+        target ??= new Dictionary<string, string>(StringComparer.Ordinal);
+        target[key] = value;
     }
 
 }

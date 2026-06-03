@@ -63,6 +63,7 @@ public sealed class ResultTests
     {
         Assert.Equal("message_format", ExecutionMetadataKeys.MessageFormat);
         Assert.Equal("overflow_policy", ExecutionMetadataKeys.OverflowPolicy);
+        Assert.Equal("dsl_rom_hash", ExecutionMetadataKeys.DslRomHash);
     }
 
     [Fact]

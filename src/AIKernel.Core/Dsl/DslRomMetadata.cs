@@ -1,0 +1,22 @@
+namespace AIKernel.Core.Dsl;
+
+public sealed record DslRomMetadata(
+    string Namespace,
+    string Name,
+    string Path,
+    string CapabilityName,
+    string RomHash,
+    DateTimeOffset CreatedAtUtc);
+
+public static class DslRomMetadataKeys
+{
+    public const string RomHash = "dsl_rom_hash";
+
+    public const string RomCall = "dsl_rom_call";
+
+    public const string RomPath = "dsl_rom_path";
+
+    public const string RomNamespace = "dsl_rom_namespace";
+
+    public const string RomName = "dsl_rom_name";
+}

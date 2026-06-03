@@ -51,7 +51,8 @@ internal static class DslSemanticDeltaFactory
         string kind,
         string nodeType,
         string nodeName,
-        IReadOnlyDictionary<string, string>? args = null)
+        IReadOnlyDictionary<string, string>? args = null,
+        IReadOnlyDictionary<string, string>? extraMetadata = null)
     {
         var metadata = ImmutableDictionary.CreateBuilder<string, string>(
             StringComparer.Ordinal);
@@ -66,6 +67,16 @@ internal static class DslSemanticDeltaFactory
                 StringComparer.Ordinal))
             {
                 metadata[$"dsl.arg.{item.Key}"] = item.Value;
+            }
+        }
+
+        if (extraMetadata is not null)
+        {
+            foreach (var item in extraMetadata.OrderBy(
+                item => item.Key,
+                StringComparer.Ordinal))
+            {
+                metadata[item.Key] = item.Value;
             }
         }
 

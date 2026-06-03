@@ -8,10 +8,8 @@ using AIKernel.Dtos.Execution;
 
 public sealed class KernelExecutor : IKernelExecutor
 {
-    private readonly IPromptGenerator _promptGenerator;
-    private readonly IModelPromptCapabilityResolver _capabilityResolver;
-    private readonly ITokenizer _tokenizer;
     private readonly IKernelClock _clock;
+    private readonly KernelExecutionStepRunner _stepRunner;
     private readonly KernelExecutionSuccessResultFactory _successResultFactory = new();
     private readonly KernelExecutionFailureResultFactory _failureResultFactory;
     private long _executionSequence;
@@ -22,10 +20,15 @@ public sealed class KernelExecutor : IKernelExecutor
         ITokenizer tokenizer,
         IKernelClock? clock = null)
     {
-        _promptGenerator = promptGenerator ?? throw new ArgumentNullException(nameof(promptGenerator));
-        _capabilityResolver = capabilityResolver ?? throw new ArgumentNullException(nameof(capabilityResolver));
-        _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
+        ArgumentNullException.ThrowIfNull(promptGenerator);
+        ArgumentNullException.ThrowIfNull(capabilityResolver);
+        ArgumentNullException.ThrowIfNull(tokenizer);
+
         _clock = clock ?? KernelClock.System();
+        _stepRunner = new KernelExecutionStepRunner(
+            promptGenerator,
+            capabilityResolver,
+            tokenizer);
         _failureResultFactory = new KernelExecutionFailureResultFactory(_clock);
     }
 
@@ -40,7 +43,7 @@ public sealed class KernelExecutor : IKernelExecutor
         var startedAt = _clock.Now;
         var executionSequence = Interlocked.Increment(ref _executionSequence);
 
-        var capabilityResult = ResolveCapabilityResult(provider, request);
+        var capabilityResult = _stepRunner.ResolveCapability(provider, request);
         if (capabilityResult.IsFailure)
         {
             return CreateStepFailureResult(
@@ -53,7 +56,7 @@ public sealed class KernelExecutor : IKernelExecutor
         }
 
         var capability = capabilityResult.Value!;
-        var promptResult = await GeneratePromptResult(
+        var promptResult = await _stepRunner.GeneratePromptAsync(
                 request,
                 capability,
                 cancellationToken)
@@ -70,7 +73,7 @@ public sealed class KernelExecutor : IKernelExecutor
         }
 
         var prompt = promptResult.Value!;
-        var outputResult = await GenerateOutputResult(
+        var outputResult = await _stepRunner.GenerateOutputAsync(
                 provider,
                 prompt,
                 cancellationToken)
@@ -99,7 +102,7 @@ public sealed class KernelExecutor : IKernelExecutor
                 message: "Model provider returned empty output.");
         }
 
-        var outputTokensResult = CountOutputTokensResult(output);
+        var outputTokensResult = _stepRunner.CountOutputTokens(output);
         if (outputTokensResult.IsFailure)
         {
             return CreateStepFailureResult(
@@ -201,96 +204,4 @@ public sealed class KernelExecutor : IKernelExecutor
             message: error.Message);
     }
 
-    private Result<ModelPromptCapability> ResolveCapabilityResult(
-        IModelProvider provider,
-        KernelExecutionRequest request)
-    {
-        try
-        {
-            return Result<ModelPromptCapability>.Success(
-                _capabilityResolver.Resolve(provider, request));
-        }
-        catch (OperationCanceledException)
-        {
-            return Result<ModelPromptCapability>.Fail(CanceledError());
-        }
-        catch (Exception ex)
-        {
-            return Result<ModelPromptCapability>.Fail(ExecutionFailedError(ex));
-        }
-    }
-
-    private async Task<Result<GeneratedPrompt>> GeneratePromptResult(
-        KernelExecutionRequest request,
-        ModelPromptCapability capability,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var prompt = await _promptGenerator
-                .GenerateAsync(
-                    new PromptGenerationRequest(
-                        request.ContextSnapshot,
-                        request.UserInstruction,
-                        capability,
-                        request.PromptOptions),
-                    cancellationToken)
-                .ConfigureAwait(false);
-
-            return Result<GeneratedPrompt>.Success(prompt);
-        }
-        catch (OperationCanceledException)
-        {
-            return Result<GeneratedPrompt>.Fail(CanceledError());
-        }
-        catch (Exception ex)
-        {
-            return Result<GeneratedPrompt>.Fail(ExecutionFailedError(ex));
-        }
-    }
-
-    private async Task<Result<string>> GenerateOutputResult(
-        IModelProvider provider,
-        GeneratedPrompt prompt,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var output = await provider
-                .GenerateAsync(prompt.Messages, cancellationToken)
-                .ConfigureAwait(false);
-
-            return Result<string>.Success(output);
-        }
-        catch (OperationCanceledException)
-        {
-            return Result<string>.Fail(CanceledError());
-        }
-        catch (Exception ex)
-        {
-            return Result<string>.Fail(ExecutionFailedError(ex));
-        }
-    }
-
-    private Result<int> CountOutputTokensResult(string output)
-    {
-        try
-        {
-            return Result<int>.Success(_tokenizer.CountTokens(output));
-        }
-        catch (Exception ex)
-        {
-            return Result<int>.Fail(ExecutionFailedError(ex));
-        }
-    }
-
-    private static ErrorContext CanceledError()
-    {
-        return new ErrorContext("Execution was canceled.", "canceled", false);
-    }
-
-    private static ErrorContext ExecutionFailedError(Exception exception)
-    {
-        return new ErrorContext(exception.Message, "execution_failed", false);
-    }
 }

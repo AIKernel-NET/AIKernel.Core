@@ -136,6 +136,7 @@ Integration tests that pass through multiple runtime layers.
 ```bash
 dotnet add package AIKernel.Core
 dotnet add package AIKernel.Hosting
+dotnet add package AIKernel.Kernel
 dotnet add package AIKernel.Providers.MicrosoftAI
 ```
 

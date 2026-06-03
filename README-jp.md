@@ -136,6 +136,7 @@ ABI と振る舞いの規律を検証するための Contract Test Framework で
 ```bash
 dotnet add package AIKernel.Core
 dotnet add package AIKernel.Hosting
+dotnet add package AIKernel.Kernel
 dotnet add package AIKernel.Providers.MicrosoftAI
 ```
 

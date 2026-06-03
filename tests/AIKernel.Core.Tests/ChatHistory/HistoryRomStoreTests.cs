@@ -145,6 +145,24 @@ public sealed class HistoryRomStoreTests
         Assert.Equal("HISTORY_ROM_NOT_FOUND", resolved.Error!.Code);
     }
 
+    [Fact]
+    public void HistoryRomMetadataKeys_ExposeStableContractNames()
+    {
+        Assert.Equal("history_rom_hash", HistoryRomMetadataKeys.RomHash);
+        Assert.Equal("history_rom_id", HistoryRomMetadataKeys.RomId);
+        Assert.Equal("history_rom_path", HistoryRomMetadataKeys.RomPath);
+        Assert.Equal("history_rom_namespace", HistoryRomMetadataKeys.RomNamespace);
+        Assert.Equal("history_rom_name", HistoryRomMetadataKeys.RomName);
+    }
+
+    [Fact]
+    public void HistoryRomRegistry_ContainsReturnsFalseForMalformedRomId()
+    {
+        var registry = new HistoryRomRegistry();
+
+        Assert.False(registry.Contains("history://agent/nested/demo"));
+    }
+
     private static HistoryRomStore CreateStore(IHistoryRomRegistry registry)
         => new(
             new HistoryRomProvider(),

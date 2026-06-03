@@ -233,12 +233,6 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
             return Error("DSL ROM capability name is required.");
         }
 
-        var parsed = DslRomPath.ParseCapabilityName(metadata.CapabilityName);
-        if (parsed.IsFailure)
-        {
-            return AttachRomMetadata(Error(parsed.Error!.Message), metadata);
-        }
-
         if (string.IsNullOrWhiteSpace(metadata.RomHash))
         {
             return AttachRomMetadata(Error("DSL ROM hash is required."), metadata);
@@ -259,38 +253,10 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
             return AttachRomMetadata(Error("DSL ROM name is required."), metadata);
         }
 
-        var expectedCapabilityName = DslRomPath.CreateCapabilityName(
-            metadata.Namespace,
-            metadata.Name);
-        if (expectedCapabilityName.IsFailure)
+        var identityError = DslRomMetadataValidator.ValidateCanonicalIdentity(metadata);
+        if (identityError is not null)
         {
-            return AttachRomMetadata(Error(expectedCapabilityName.Error!.Message), metadata);
-        }
-
-        if (!string.Equals(
-                expectedCapabilityName.Value,
-                metadata.CapabilityName,
-                StringComparison.Ordinal))
-        {
-            return AttachRomMetadata(
-                Error("DSL ROM capability name must match dsl://{namespace}/{name}."),
-                metadata);
-        }
-
-        var expectedPath = DslRomPath.Create(metadata.Namespace, metadata.Name);
-        if (expectedPath.IsFailure)
-        {
-            return AttachRomMetadata(Error(expectedPath.Error!.Message), metadata);
-        }
-
-        if (!string.Equals(
-                expectedPath.Value,
-                metadata.Path,
-                StringComparison.Ordinal))
-        {
-            return AttachRomMetadata(
-                Error("DSL ROM path must match rom/dsl/{namespace}/{name}.json."),
-                metadata);
+            return AttachRomMetadata(Error(identityError.Message), metadata);
         }
 
         return null;

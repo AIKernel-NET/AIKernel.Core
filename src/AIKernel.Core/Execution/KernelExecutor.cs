@@ -61,7 +61,9 @@ public sealed class KernelExecutor : IKernelExecutor
                 WithStepMetadata(
                     pipelineResult.Error!,
                     pipelineResult.StepId,
-                    pipelineResult.SemanticDelta));
+                    pipelineResult.SemanticDelta,
+                    pipelineResult.ReplayLog.Count,
+                    pipelineResult.ReplayLogHash));
         }
 
         var tokenStep = pipelineResult.Value!;
@@ -77,7 +79,9 @@ public sealed class KernelExecutor : IKernelExecutor
             completedAt,
             executionSequence,
             pipelineResult.StepId,
-            pipelineResult.SemanticDelta);
+            pipelineResult.SemanticDelta,
+            pipelineResult.ReplayLog.Count,
+            pipelineResult.ReplayLogHash);
 
         if (successResult.IsSuccess)
         {
@@ -153,7 +157,9 @@ public sealed class KernelExecutor : IKernelExecutor
     private static ErrorContext WithStepMetadata(
         ErrorContext error,
         string stepId,
-        SemanticDelta semanticDelta)
+        SemanticDelta semanticDelta,
+        int replayLogCount,
+        string replayLogHash)
     {
         var metadata = new Dictionary<string, string>(StringComparer.Ordinal);
 
@@ -167,6 +173,8 @@ public sealed class KernelExecutor : IKernelExecutor
 
         metadata["step_id"] = stepId;
         metadata["semantic_delta"] = semanticDelta.Label;
+        metadata["replay_log_count"] = replayLogCount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        metadata["replay_log_hash"] = replayLogHash;
 
         return error with
         {

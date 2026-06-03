@@ -16,37 +16,64 @@ public readonly struct ResultStep<TState, TValue>
 
     public SemanticDelta SemanticDelta { get; }
 
+    public string? ParentStepId { get; }
+
+    public IReadOnlyList<ResultStepReplayLogEntry> ReplayLog { get; }
+
+    public string ReplayLogHash { get; }
+
     private ResultStep(
         bool isSuccess,
         TState state,
         TValue? value,
         ErrorContext? error,
         string? stepId,
-        SemanticDelta? semanticDelta)
+        SemanticDelta? semanticDelta,
+        string? parentStepId,
+        IReadOnlyList<ResultStepReplayLogEntry>? replayLog)
     {
         IsSuccess = isSuccess;
         State = state;
         Value = value;
         Error = error;
         SemanticDelta = semanticDelta ?? SemanticDelta.Empty;
+        ParentStepId = parentStepId;
         StepId = string.IsNullOrWhiteSpace(stepId)
             ? ResultStepIdentity.Create(
-                parentStepId: null,
+                parentStepId,
                 SemanticDelta,
                 IsSuccess,
                 Error?.Code)
             : stepId;
+        ReplayLog = replayLog ?? Array.Empty<ResultStepReplayLogEntry>();
+        ReplayLogHash = ResultStepIdentity.CreateReplayLogHash(ReplayLog);
     }
 
     public static ResultStep<TState, TValue> Success(
         TState state,
         TValue value)
-        => new(true, state, value, null, stepId: null, semanticDelta: null);
+        => new(
+            true,
+            state,
+            value,
+            null,
+            stepId: null,
+            semanticDelta: null,
+            parentStepId: null,
+            replayLog: null);
 
     public static ResultStep<TState, TValue> Fail(
         TState state,
         ErrorContext error)
-        => new(false, state, default, error, stepId: null, semanticDelta: null);
+        => new(
+            false,
+            state,
+            default,
+            error,
+            stepId: null,
+            semanticDelta: null,
+            parentStepId: null,
+            replayLog: null);
 
     public static ResultStep<TState, TValue> FromResult(
         TState state,
@@ -57,23 +84,54 @@ public readonly struct ResultStep<TState, TValue>
 
     public ResultStep<TState, TValue> WithState(TState state)
         => IsSuccess
-            ? new(true, state, Value!, null, StepId, SemanticDelta)
-            : new(false, state, default, Error!, StepId, SemanticDelta);
+            ? new(
+                true,
+                state,
+                Value!,
+                null,
+                StepId,
+                SemanticDelta,
+                ParentStepId,
+                ReplayLog)
+            : new(
+                false,
+                state,
+                default,
+                Error!,
+                StepId,
+                SemanticDelta,
+                ParentStepId,
+                ReplayLog);
 
     public ResultStep<TState, TValue> WithSemanticDelta(
         SemanticDelta semanticDelta,
         string? parentStepId = null)
-        => new(
+    {
+        var resolvedParentStepId = parentStepId ?? StepId;
+        var stepId = ResultStepIdentity.Create(
+            resolvedParentStepId,
+            semanticDelta,
+            IsSuccess,
+            Error?.Code);
+        var replayLog = AppendReplayLogEntry(
+            ReplayLog,
+            new ResultStepReplayLogEntry(
+                stepId,
+                resolvedParentStepId,
+                semanticDelta,
+                IsSuccess,
+                Error?.Code));
+
+        return new(
             IsSuccess,
             State,
             Value,
             Error,
-            ResultStepIdentity.Create(
-                parentStepId ?? StepId,
-                semanticDelta,
-                IsSuccess,
-                Error?.Code),
-            semanticDelta);
+            stepId,
+            semanticDelta,
+            resolvedParentStepId,
+            replayLog);
+    }
 
     public ResultStep<TState, TValue> MapState(
         Func<TState, TValue, TState> mapper)
@@ -89,7 +147,9 @@ public readonly struct ResultStep<TState, TValue>
                 Value!,
                 null,
                 StepId,
-                SemanticDelta);
+                SemanticDelta,
+                ParentStepId,
+                ReplayLog);
         }
         catch (Exception ex)
         {
@@ -105,8 +165,15 @@ public readonly struct ResultStep<TState, TValue>
 
         try
         {
-            return ResultStep<TState, TNext>.Success(State, mapper(Value!))
-                .WithSemanticDelta(SemanticDelta, StepId);
+            return new ResultStep<TState, TNext>(
+                true,
+                State,
+                mapper(Value!),
+                null,
+                StepId,
+                SemanticDelta,
+                ParentStepId,
+                ReplayLog);
         }
         catch (Exception ex)
         {
@@ -123,7 +190,7 @@ public readonly struct ResultStep<TState, TValue>
         try
         {
             var next = await binder(Value!).ConfigureAwait(false);
-            return next.WithParentStepId(StepId);
+            return next.WithParentStepId(StepId, ReplayLog);
         }
         catch (Exception ex)
         {
@@ -139,7 +206,7 @@ public readonly struct ResultStep<TState, TValue>
 
         try
         {
-            return binder(Value!).WithParentStepId(StepId);
+            return binder(Value!).WithParentStepId(StepId, ReplayLog);
         }
         catch (Exception ex)
         {
@@ -186,20 +253,112 @@ public readonly struct ResultStep<TState, TValue>
 
     private ResultStep<TState, TNext> FailWithCurrentTrace<TNext>(
         ErrorContext error)
-        => ResultStep<TState, TNext>
-            .Fail(State, error)
-            .WithSemanticDelta(SemanticDelta, StepId);
-
-    private ResultStep<TState, TValue> WithParentStepId(string parentStepId)
         => new(
+            false,
+            State,
+            default,
+            error,
+            StepId,
+            SemanticDelta,
+            ParentStepId,
+            ReplayLog);
+
+    private ResultStep<TState, TValue> WithParentStepId(
+        string parentStepId,
+        IReadOnlyList<ResultStepReplayLogEntry> replayLogPrefix)
+    {
+        var rebasedReplayLog = RebaseReplayLog(ReplayLog, parentStepId);
+        var finalReplayLog = ConcatReplayLogs(replayLogPrefix, rebasedReplayLog);
+        var finalEntry = rebasedReplayLog.Count > 0
+            ? rebasedReplayLog[^1]
+            : new ResultStepReplayLogEntry(
+                ResultStepIdentity.Create(
+                    parentStepId,
+                    SemanticDelta,
+                    IsSuccess,
+                    Error?.Code),
+                parentStepId,
+                SemanticDelta,
+                IsSuccess,
+                Error?.Code);
+
+        return new(
             IsSuccess,
             State,
             Value,
             Error,
-            ResultStepIdentity.Create(
-                parentStepId,
-                SemanticDelta,
-                IsSuccess,
-                Error?.Code),
-            SemanticDelta);
+            finalEntry.StepId,
+            finalEntry.SemanticDelta,
+            finalEntry.ParentStepId,
+            finalReplayLog);
+    }
+
+    private static IReadOnlyList<ResultStepReplayLogEntry> AppendReplayLogEntry(
+        IReadOnlyList<ResultStepReplayLogEntry> replayLog,
+        ResultStepReplayLogEntry entry)
+    {
+        var entries = new ResultStepReplayLogEntry[replayLog.Count + 1];
+
+        for (var i = 0; i < replayLog.Count; i++)
+        {
+            entries[i] = replayLog[i];
+        }
+
+        entries[^1] = entry;
+        return entries;
+    }
+
+    private static IReadOnlyList<ResultStepReplayLogEntry> ConcatReplayLogs(
+        IReadOnlyList<ResultStepReplayLogEntry> first,
+        IReadOnlyList<ResultStepReplayLogEntry> second)
+    {
+        if (first.Count == 0)
+            return second;
+
+        if (second.Count == 0)
+            return first;
+
+        var entries = new ResultStepReplayLogEntry[first.Count + second.Count];
+
+        for (var i = 0; i < first.Count; i++)
+        {
+            entries[i] = first[i];
+        }
+
+        for (var i = 0; i < second.Count; i++)
+        {
+            entries[first.Count + i] = second[i];
+        }
+
+        return entries;
+    }
+
+    private static IReadOnlyList<ResultStepReplayLogEntry> RebaseReplayLog(
+        IReadOnlyList<ResultStepReplayLogEntry> replayLog,
+        string parentStepId)
+    {
+        if (replayLog.Count == 0)
+            return Array.Empty<ResultStepReplayLogEntry>();
+
+        var entries = new ResultStepReplayLogEntry[replayLog.Count];
+        var currentParentStepId = parentStepId;
+
+        for (var i = 0; i < replayLog.Count; i++)
+        {
+            var entry = replayLog[i];
+            var stepId = ResultStepIdentity.Create(
+                currentParentStepId,
+                entry.SemanticDelta,
+                entry.IsSuccess,
+                entry.ErrorCode);
+            entries[i] = entry with
+            {
+                StepId = stepId,
+                ParentStepId = currentParentStepId
+            };
+            currentParentStepId = stepId;
+        }
+
+        return entries;
+    }
 }

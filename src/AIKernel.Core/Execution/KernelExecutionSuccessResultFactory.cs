@@ -18,7 +18,9 @@ internal sealed class KernelExecutionSuccessResultFactory
         DateTimeOffset completedAt,
         long executionSequence,
         string? finalStepId = null,
-        SemanticDelta? finalSemanticDelta = null)
+        SemanticDelta? finalSemanticDelta = null,
+        int? replayLogCount = null,
+        string? replayLogHash = null)
     {
         return
             from executionId in _executionIdFactory.CreateExecutionIdResult(
@@ -48,14 +50,18 @@ internal sealed class KernelExecutionSuccessResultFactory
                 Metadata = BuildMetadata(
                     capability,
                     finalStepId,
-                    finalSemanticDelta)
+                    finalSemanticDelta,
+                    replayLogCount,
+                    replayLogHash)
             };
     }
 
     private static ImmutableDictionary<string, string> BuildMetadata(
         ModelPromptCapability capability,
         string? finalStepId,
-        SemanticDelta? finalSemanticDelta)
+        SemanticDelta? finalSemanticDelta,
+        int? replayLogCount,
+        string? replayLogHash)
     {
         var builder = ImmutableDictionary.CreateBuilder<string, string>(
             StringComparer.Ordinal);
@@ -80,6 +86,16 @@ internal sealed class KernelExecutionSuccessResultFactory
             {
                 builder["semantic_slot"] = semanticSlot.ToString();
             }
+        }
+
+        if (replayLogCount is { } count)
+        {
+            builder["replay_log_count"] = count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        if (!string.IsNullOrWhiteSpace(replayLogHash))
+        {
+            builder["replay_log_hash"] = replayLogHash;
         }
 
         return builder.ToImmutable();

@@ -121,6 +121,60 @@ public sealed class ResultStepTests
     }
 
     [Fact]
+    public void Bind_AppendsDeterministicReplayLog()
+    {
+        var firstDelta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+        var secondDelta = new SemanticDelta(
+            "kernel.prompt.generate",
+            OriginStep.Prompt,
+            SemanticSlot.T);
+
+        var first = ResultStep<string, int>
+            .Success("capability", 2)
+            .WithSemanticDelta(firstDelta);
+        var bound = first.Bind(value => ResultStep<string, string>
+            .Success("prompt", $"value:{value}")
+            .WithSemanticDelta(secondDelta));
+
+        Assert.Equal(2, bound.ReplayLog.Count);
+        Assert.Equal(first.StepId, bound.ReplayLog[0].StepId);
+        Assert.Equal(firstDelta, bound.ReplayLog[0].SemanticDelta);
+        Assert.Equal(bound.StepId, bound.ReplayLog[1].StepId);
+        Assert.Equal(first.StepId, bound.ReplayLog[1].ParentStepId);
+        Assert.Equal(secondDelta, bound.ReplayLog[1].SemanticDelta);
+        Assert.StartsWith("replay:sha256:", bound.ReplayLogHash, StringComparison.Ordinal);
+
+        var repeated = ResultStep<string, int>
+            .Success("capability", 2)
+            .WithSemanticDelta(firstDelta)
+            .Bind(value => ResultStep<string, string>
+                .Success("prompt", $"value:{value}")
+                .WithSemanticDelta(secondDelta));
+
+        Assert.Equal(bound.ReplayLogHash, repeated.ReplayLogHash);
+    }
+
+    [Fact]
+    public void Map_PreservesReplayLogWithoutAddingProjectionNode()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var step = ResultStep<string, int>
+            .Success("capability", 2)
+            .WithSemanticDelta(delta)
+            .Map(value => value + 1);
+
+        var entry = Assert.Single(step.ReplayLog);
+        Assert.Equal(delta, entry.SemanticDelta);
+    }
+
+    [Fact]
     public void MapState_UpdatesStateOnlyOnSuccess()
     {
         var step = ResultStep<string, int>

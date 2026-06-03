@@ -94,6 +94,63 @@ public sealed class DslRomTests
     }
 
     [Fact]
+    public void DslRomRegistry_RejectsSnapshotWithNullPipeline()
+    {
+        var registry = new DslRomRegistry();
+        var snapshot = new DslRomSnapshot(
+            CreateMetadata(PlanDsl),
+            PlanDsl,
+            Pipeline: null!);
+
+        var result = registry.Register(snapshot);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Contains("pipeline", result.Error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void DslRomRegistry_RejectsSnapshotWhenHashDoesNotMatchJson()
+    {
+        var registry = new DslRomRegistry();
+        var pipeline = Compile(PlanDsl, new TestCapabilityRegistry());
+        var metadata = CreateMetadata(PlanDsl) with
+        {
+            RomHash = DslRomHasher.ComputeHash(MutatedPlanDsl)
+        };
+        var snapshot = new DslRomSnapshot(metadata, PlanDsl, pipeline);
+
+        var result = registry.Register(snapshot);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Contains("hash", result.Error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void DslRomRegistry_RejectsSnapshotWithoutDslCapabilityScheme()
+    {
+        var registry = new DslRomRegistry();
+        var pipeline = Compile(PlanDsl, new TestCapabilityRegistry());
+        var snapshot = new DslRomSnapshot(
+            CreateMetadata(PlanDsl) with
+            {
+                CapabilityName = "agent/plan1"
+            },
+            PlanDsl,
+            pipeline);
+
+        var result = registry.Register(snapshot);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Contains("dsl://", result.Error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task DslRomCapabilityRegistry_ExecutesRegisteredRomDeterministically()
     {
         await using var session = await OpenSessionAsync();
@@ -223,6 +280,15 @@ public sealed class DslRomTests
         Assert.True(compiled.IsSuccess, compiled.Error?.Message);
         return compiled.Value!;
     }
+
+    private static DslRomMetadata CreateMetadata(string json)
+        => new(
+            "agent",
+            "plan1",
+            "rom/dsl/agent/plan1.json",
+            "dsl://agent/plan1",
+            DslRomHasher.ComputeHash(json),
+            DateTimeOffset.UnixEpoch);
 
     private const string PlanDsl = """
         {

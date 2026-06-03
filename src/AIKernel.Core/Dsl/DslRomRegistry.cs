@@ -40,6 +40,45 @@ public sealed class DslRomRegistry : IDslRomRegistry
             return Result<DslRomMetadata>.Fail(Error("DSL ROM hash is required."));
         }
 
+        if (string.IsNullOrWhiteSpace(snapshot.Metadata.Namespace))
+        {
+            return Result<DslRomMetadata>.Fail(Error("DSL ROM namespace is required."));
+        }
+
+        if (string.IsNullOrWhiteSpace(snapshot.Metadata.Name))
+        {
+            return Result<DslRomMetadata>.Fail(Error("DSL ROM name is required."));
+        }
+
+        if (string.IsNullOrWhiteSpace(snapshot.Metadata.Path))
+        {
+            return Result<DslRomMetadata>.Fail(Error("DSL ROM path is required."));
+        }
+
+        if (!DslRomPath.IsDslCapability(snapshot.Metadata.CapabilityName))
+        {
+            return Result<DslRomMetadata>.Fail(Error("DSL ROM capability name must use the dsl:// scheme."));
+        }
+
+        if (string.IsNullOrWhiteSpace(snapshot.JsonDsl))
+        {
+            return Result<DslRomMetadata>.Fail(Error("DSL ROM JSON is required."));
+        }
+
+        if (snapshot.Pipeline is null)
+        {
+            return Result<DslRomMetadata>.Fail(Error("DSL ROM pipeline is required."));
+        }
+
+        var actualHash = DslRomHasher.ComputeHash(snapshot.JsonDsl);
+        if (!string.Equals(
+                actualHash,
+                snapshot.Metadata.RomHash,
+                StringComparison.Ordinal))
+        {
+            return Result<DslRomMetadata>.Fail(Error("DSL ROM hash does not match JSON content."));
+        }
+
         var existing = _snapshots.GetOrAdd(
             snapshot.Metadata.CapabilityName,
             snapshot);

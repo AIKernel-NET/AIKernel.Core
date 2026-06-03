@@ -130,7 +130,11 @@ internal sealed class KernelExecutionStepRunner
         {
             FailureKind = FailureKind.FailClosed,
             OriginStep = originStep,
-            SemanticSlot = SemanticSlot.T
+            SemanticSlot = SemanticSlot.T,
+            Metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["exception_type"] = exception.GetType().FullName ?? exception.GetType().Name
+            }
         };
     }
 }

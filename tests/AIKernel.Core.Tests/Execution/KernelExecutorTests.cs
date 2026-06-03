@@ -146,6 +146,9 @@ public sealed class KernelExecutorTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.Prompt.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(
+            typeof(InvalidOperationException).FullName,
+            result.Metadata["exception_type"]);
     }
 
     [Fact]
@@ -172,6 +175,9 @@ public sealed class KernelExecutorTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.Provider.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(
+            typeof(InvalidOperationException).FullName,
+            result.Metadata["exception_type"]);
     }
 
     [Fact]

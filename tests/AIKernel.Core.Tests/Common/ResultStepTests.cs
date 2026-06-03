@@ -200,6 +200,27 @@ public sealed class ResultStepTests
     }
 
     [Fact]
+    public void MapState_ExceptionMarksCurrentReplayLogEntryAsFailure()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var step = ResultStep<string, int>
+            .Success("capability", 2)
+            .WithSemanticDelta(delta)
+            .MapState((_, _) => throw new InvalidOperationException("state-boom"));
+
+        var entry = Assert.Single(step.ReplayLog);
+        Assert.True(step.IsFailure);
+        Assert.Equal(step.StepId, entry.StepId);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("UNHANDLED_EXCEPTION", entry.ErrorCode);
+        Assert.Equal(delta, entry.SemanticDelta);
+    }
+
+    [Fact]
     public void Bind_PropagatesFailureWithStateWithoutRunningBinder()
     {
         var called = false;
@@ -304,6 +325,27 @@ public sealed class ResultStepTests
         Assert.Equal("provider", step.State);
         Assert.Equal("tap-boom", step.Error!.Message);
         Assert.Equal("UNHANDLED_EXCEPTION", step.Error.Code);
+    }
+
+    [Fact]
+    public void Tap_ExceptionMarksCurrentReplayLogEntryAsFailure()
+    {
+        var delta = new SemanticDelta(
+            "kernel.provider.generate",
+            OriginStep.Provider,
+            SemanticSlot.T);
+
+        var step = ResultStep<string, int>
+            .Success("provider", 4)
+            .WithSemanticDelta(delta)
+            .Tap(_ => throw new InvalidOperationException("tap-boom"));
+
+        var entry = Assert.Single(step.ReplayLog);
+        Assert.True(step.IsFailure);
+        Assert.Equal(step.StepId, entry.StepId);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("UNHANDLED_EXCEPTION", entry.ErrorCode);
+        Assert.Equal(delta, entry.SemanticDelta);
     }
 
     [Fact]

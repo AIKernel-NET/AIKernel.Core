@@ -95,10 +95,12 @@ internal sealed class KernelFailureResultFactory
         string? errorDetail,
         ImmutableDictionary<string, string> metadata)
     {
+        var executionId = transaction?.TransactionId
+            ?? ResolveFallbackExecutionId(request, status, errorCode);
+
         return new KernelRequestExecutionResult
         {
-            ExecutionId = transaction?.TransactionId
-                ?? _executionIdFactory.CreateFallbackExecutionId(request, status),
+            ExecutionId = executionId,
             Status = status,
             ProviderId = providerId,
             ModelId = request.RequestedModelId ?? modelIdFallback,
@@ -118,6 +120,25 @@ internal sealed class KernelFailureResultFactory
             CompletedAtUtc = _clock.Now,
             Metadata = metadata
         };
+    }
+
+    private string ResolveFallbackExecutionId(
+        KernelRequest request,
+        ExecutionStatus status,
+        string errorCode)
+    {
+        var result = _executionIdFactory.TryCreateFallbackExecutionId(request, status);
+
+        return result.IsSuccess
+            ? result.Value!
+            : $"exec:failed:{ResolveFailureCode(errorCode, result.Error?.Code)}";
+    }
+
+    private static string ResolveFailureCode(string errorCode, string? resultErrorCode)
+    {
+        return string.IsNullOrWhiteSpace(errorCode)
+            ? resultErrorCode ?? "ERROR"
+            : errorCode;
     }
 
     private static string ResolveRejectedCode(Exception exception)

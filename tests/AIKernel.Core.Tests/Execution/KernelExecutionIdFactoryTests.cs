@@ -120,6 +120,30 @@ public sealed class KernelExecutionIdFactoryTests
     }
 
     [Fact]
+    public void TryCreateExecutionId_ReturnsFailure_WhenContextSnapshotIsMissing()
+    {
+        var factory = new KernelExecutionIdFactory();
+
+        var result = factory.TryCreateExecutionId(
+            new KernelExecutionRequest
+            {
+                ContextSnapshot = null!,
+                UserInstruction = "hello",
+                PromptOptions = PromptGenerationOptions.Default,
+                ExecutionOptions = ExecutionOptions.DeterministicDefault,
+                RequestedModelId = "gpt-test"
+            },
+            ExecutionStatus.Failed,
+            promptHash: string.Empty,
+            resultDiscriminator: "failed",
+            DateTimeOffset.UnixEpoch,
+            executionSequence: 1);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("ContextSnapshot is required.", result.Error!.Message);
+    }
+
+    [Fact]
     public void CreateFallbackExecutionId_Changes_WhenStatusChanges()
     {
         var factory = new KernelExecutionIdFactory();
@@ -134,6 +158,19 @@ public sealed class KernelExecutionIdFactoryTests
             ExecutionStatus.Failed);
 
         Assert.NotEqual(rejected, failed);
+    }
+
+    [Fact]
+    public void TryCreateFallbackExecutionId_ReturnsFailure_WhenRequestIsMissing()
+    {
+        var factory = new KernelExecutionIdFactory();
+
+        var result = factory.TryCreateFallbackExecutionId(
+            request: null!,
+            ExecutionStatus.Failed);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("KernelRequest is required.", result.Error!.Message);
     }
 
     private static KernelExecutionRequest CreateExecutionRequest()

@@ -28,6 +28,23 @@ public sealed class KernelExecutionIdFactory
                 executionSequence));
     }
 
+    public Result<string> TryCreateExecutionId(
+        KernelExecutionRequest request,
+        ExecutionStatus status,
+        string promptHash,
+        string resultDiscriminator,
+        DateTimeOffset startedAt,
+        long executionSequence)
+    {
+        return CreateExecutionIdResult(
+            request,
+            status,
+            promptHash,
+            resultDiscriminator,
+            startedAt,
+            executionSequence);
+    }
+
     public string CreateFallbackExecutionId(
         KernelRequest request,
         ExecutionStatus status)
@@ -35,6 +52,13 @@ public sealed class KernelExecutionIdFactory
         ArgumentNullException.ThrowIfNull(request);
 
         return Unwrap(CreateFallbackExecutionIdResult(request, status));
+    }
+
+    public Result<string> TryCreateFallbackExecutionId(
+        KernelRequest request,
+        ExecutionStatus status)
+    {
+        return CreateFallbackExecutionIdResult(request, status);
     }
 
     internal Result<string> CreateExecutionIdResult(

@@ -1,6 +1,7 @@
 namespace AIKernel.Core.Dsl;
 
 using System.Collections.Immutable;
+using System.Globalization;
 using AIKernel.Common.Results;
 
 public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
@@ -50,19 +51,26 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
         return Result<DslPipelineValue>.Success(AttachRomData(
             result.Value!,
             snapshot.Value.Metadata,
+            result.ReplayLog.Count,
             result.ReplayLogHash));
     }
 
     private static DslPipelineValue AttachRomData(
         DslPipelineValue value,
         DslRomMetadata metadata,
+        int replayLogCount,
         string replayLogHash)
     {
         return value
             .With(DslRomMetadataKeys.RomCall, metadata.CapabilityName)
             .With(DslRomMetadataKeys.RomHash, metadata.RomHash)
             .With(DslRomMetadataKeys.RomPath, metadata.Path)
-            .With("dsl_rom_replay_log_hash", replayLogHash);
+            .With(DslRomMetadataKeys.RomNamespace, metadata.Namespace)
+            .With(DslRomMetadataKeys.RomName, metadata.Name)
+            .With(
+                DslRomMetadataKeys.RomReplayLogCount,
+                replayLogCount.ToString(CultureInfo.InvariantCulture))
+            .With(DslRomMetadataKeys.RomReplayLogHash, replayLogHash);
     }
 
     private static ErrorContext AttachRomMetadata(

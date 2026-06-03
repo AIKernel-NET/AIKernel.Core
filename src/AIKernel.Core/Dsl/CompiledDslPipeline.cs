@@ -363,6 +363,8 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
         AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomPath, ref romMetadata);
         AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomNamespace, ref romMetadata);
         AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomName, ref romMetadata);
+        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomReplayLogCount, ref romMetadata);
+        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomReplayLogHash, ref romMetadata);
 
         return DslSemanticDeltaFactory.CreateNodeDelta(
             "dsl.capability.call",

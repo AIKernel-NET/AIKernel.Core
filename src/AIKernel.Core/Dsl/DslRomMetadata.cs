@@ -19,4 +19,8 @@ public static class DslRomMetadataKeys
     public const string RomNamespace = "dsl_rom_namespace";
 
     public const string RomName = "dsl_rom_name";
+
+    public const string RomReplayLogCount = "dsl_rom_replay_log_count";
+
+    public const string RomReplayLogHash = "dsl_rom_replay_log_hash";
 }

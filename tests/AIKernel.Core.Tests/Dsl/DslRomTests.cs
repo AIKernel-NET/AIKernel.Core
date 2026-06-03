@@ -129,11 +129,23 @@ public sealed class DslRomTests
         Assert.Equal(first.ReplayLogHash, second.ReplayLogHash);
         Assert.Equal(saved.Value!.RomHash, first.Value!.Data[DslRomMetadataKeys.RomHash]);
         Assert.Equal("dsl://agent/plan1", first.Value.Data[DslRomMetadataKeys.RomCall]);
+        Assert.Equal("agent", first.Value.Data[DslRomMetadataKeys.RomNamespace]);
+        Assert.Equal("plan1", first.Value.Data[DslRomMetadataKeys.RomName]);
+        Assert.True(first.Value.Data.ContainsKey(DslRomMetadataKeys.RomReplayLogCount));
+        Assert.True(first.Value.Data.ContainsKey(DslRomMetadataKeys.RomReplayLogHash));
 
         var entry = Assert.Single(first.ReplayLog);
         Assert.Equal("dsl.capability.call", entry.SemanticDelta.Label);
         Assert.Equal(saved.Value.RomHash, entry.SemanticDelta.Metadata![DslRomMetadataKeys.RomHash]);
         Assert.Equal("dsl://agent/plan1", entry.SemanticDelta.Metadata[DslRomMetadataKeys.RomCall]);
+        Assert.Equal("agent", entry.SemanticDelta.Metadata[DslRomMetadataKeys.RomNamespace]);
+        Assert.Equal("plan1", entry.SemanticDelta.Metadata[DslRomMetadataKeys.RomName]);
+        Assert.Equal(
+            first.Value.Data[DslRomMetadataKeys.RomReplayLogCount],
+            entry.SemanticDelta.Metadata[DslRomMetadataKeys.RomReplayLogCount]);
+        Assert.Equal(
+            first.Value.Data[DslRomMetadataKeys.RomReplayLogHash],
+            entry.SemanticDelta.Metadata[DslRomMetadataKeys.RomReplayLogHash]);
         ReplayMetadataAssertions.AssertReplayLogHash(first.ReplayLogHash);
     }
 

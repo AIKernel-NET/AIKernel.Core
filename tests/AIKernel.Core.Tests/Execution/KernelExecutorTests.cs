@@ -17,6 +17,31 @@ using Xunit;
 public sealed class KernelExecutorTests
 {
     [Fact]
+    public async Task ExecuteAsync_ReturnsSucceededResult_WhenProviderReturnsOutput()
+    {
+        var executor = new KernelExecutor(
+            new FixedPromptGenerator(),
+            new FixedCapabilityResolver(maxOutputTokens: 8),
+            new SimpleTokenizer(),
+            KernelClock.Replay(DateTimeOffset.UnixEpoch));
+
+        var result = await executor.ExecuteAsync(
+            new FakeModelProvider(output: "contract output"),
+            CreateExecutionRequest(),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Succeeded, result.Status);
+        Assert.StartsWith("exec:sha256:", result.ExecutionId, StringComparison.Ordinal);
+        Assert.Equal("fake-provider", result.ProviderId);
+        Assert.Equal("gpt-test", result.ModelId);
+        Assert.Equal("snapshot:executor", result.ContextSnapshotId);
+        Assert.Equal("sha256:executor-context", result.ContextHash);
+        Assert.Equal("sha256:executor-prompt", result.PromptHash);
+        Assert.Equal("contract output", result.OutputText);
+        Assert.Null(result.Error);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsFailedResult_WhenContextSnapshotIsMissing()
     {
         var executor = new KernelExecutor(
@@ -87,6 +112,29 @@ public sealed class KernelExecutorTests
 
         Assert.Equal(ExecutionStatus.Failed, result.Status);
         Assert.Equal("empty_output", result.Error?.Code);
+        Assert.Equal("snapshot:executor", result.ContextSnapshotId);
+        Assert.Equal("sha256:executor-context", result.ContextHash);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ReturnsFailedResult_WhenProviderThrows()
+    {
+        var executor = new KernelExecutor(
+            new FixedPromptGenerator(),
+            new FixedCapabilityResolver(maxOutputTokens: 8),
+            new SimpleTokenizer(),
+            KernelClock.Replay(DateTimeOffset.UnixEpoch));
+
+        var result = await executor.ExecuteAsync(
+            new FakeModelProvider(
+                output: "unused",
+                exception: new InvalidOperationException("provider failed")),
+            CreateExecutionRequest(),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Failed, result.Status);
+        Assert.Equal("execution_failed", result.Error?.Code);
+        Assert.Equal("provider failed", result.Error?.Message);
         Assert.Equal("snapshot:executor", result.ContextSnapshotId);
         Assert.Equal("sha256:executor-context", result.ContextHash);
     }
@@ -196,10 +244,14 @@ public sealed class KernelExecutorTests
     private sealed class FakeModelProvider : IModelProvider
     {
         private readonly string _output;
+        private readonly Exception? _exception;
 
-        public FakeModelProvider(string output = "contract output")
+        public FakeModelProvider(
+            string output = "contract output",
+            Exception? exception = null)
         {
             _output = output;
+            _exception = exception;
         }
 
         public string ProviderId => "fake-provider";
@@ -241,6 +293,11 @@ public sealed class KernelExecutorTests
             IReadOnlyList<IModelMessage> messages,
             CancellationToken cancellationToken = default)
         {
+            if (_exception is not null)
+            {
+                throw _exception;
+            }
+
             return Task.FromResult(_output);
         }
 

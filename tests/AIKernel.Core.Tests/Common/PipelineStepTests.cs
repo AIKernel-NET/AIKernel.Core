@@ -52,6 +52,29 @@ public sealed class PipelineStepTests
     }
 
     [Fact]
+    public void Loop_BodyExceptionRecordsFailedIterationWithoutMutatingPriorReplayLog()
+    {
+        var step = PipelineStep.Loop(
+            ResultStep<string, int>.Success("agent", 0),
+            maxIterations: 3,
+            (iteration, value) => iteration == 1
+                ? throw new InvalidOperationException("loop body failed")
+                : ResultStep<string, int>.Success($"agent:{iteration}", value + 1));
+
+        Assert.True(step.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", step.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, step.Error.FailureKind);
+        Assert.Equal(OriginStep.KernelFacade, step.Error.OriginStep);
+        Assert.Equal(SemanticSlot.T, step.Error.SemanticSlot);
+        Assert.Equal(2, step.ReplayLog.Count);
+        Assert.True(step.ReplayLog[0].IsSuccess);
+        Assert.False(step.ReplayLog[1].IsSuccess);
+        Assert.Equal("UNHANDLED_EXCEPTION", step.ReplayLog[1].ErrorCode);
+        Assert.Equal(step.ReplayLog[0].StepId, step.ReplayLog[1].ParentStepId);
+        Assert.Equal("1", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopIteration]);
+    }
+
+    [Fact]
     public void LoopUntil_StopsAtTimeoutWithTimestampMetadata()
     {
         var start = DateTimeOffset.UnixEpoch;
@@ -77,6 +100,47 @@ public sealed class PipelineStepTests
         Assert.Equal("2", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopIteration]);
         Assert.Equal(start.AddSeconds(3).ToString("O"), step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopTimestamp]);
         Assert.Equal(3, step.ReplayLog.Count);
+    }
+
+    [Fact]
+    public void LoopUntil_ClockExceptionRecordsClockFailedIteration()
+    {
+        var step = PipelineStep.LoopUntil(
+            ResultStep<string, int>.Success("agent", 0),
+            timeout: TimeSpan.FromSeconds(2),
+            startedAtUtc: DateTimeOffset.UnixEpoch,
+            nowProvider: () => throw new InvalidOperationException("clock failed"),
+            maxIterations: 5,
+            static (iteration, _, value) => ResultStep<string, int>
+                .Success($"agent:{iteration}", value + 1));
+
+        Assert.True(step.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", step.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, step.Error.FailureKind);
+        Assert.Equal(OriginStep.KernelFacade, step.Error.OriginStep);
+        Assert.Equal(SemanticSlot.T, step.Error.SemanticSlot);
+        Assert.Equal("loop", step.SemanticDelta.Kind);
+        Assert.Equal("clock_failed", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopDecision]);
+        Assert.Equal("0", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopIteration]);
+        var entry = Assert.Single(step.ReplayLog);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("UNHANDLED_EXCEPTION", entry.ErrorCode);
+    }
+
+    [Fact]
+    public void Loop_RejectsNegativeIterationLimitAsDeterministicFailure()
+    {
+        var step = PipelineStep.Loop(
+            ResultStep<string, int>.Success("agent", 0),
+            maxIterations: -1,
+            static (_, value) => ResultStep<string, int>
+                .Success("agent", value + 1));
+
+        Assert.True(step.IsFailure);
+        Assert.Equal("INVALID_PIPELINE_LOOP", step.Error!.Code);
+        Assert.Equal(FailureKind.Reject, step.Error.FailureKind);
+        Assert.Equal("loop", step.SemanticDelta.Kind);
+        Assert.Equal("invalid", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopDecision]);
     }
 
     [Fact]
@@ -114,6 +178,7 @@ public sealed class PipelineStepTests
         Assert.True(resumed.IsSuccess);
         Assert.Equal(42, resumed.Value);
         Assert.Equal(2, resumed.ReplayLog.Count);
+        Assert.Equal("1", resumed.SemanticDelta.Metadata![PipelineStepMetadataKeys.PreviousReplayLogCount]);
         Assert.Equal(suspended.ReplayLogHash, resumed.SemanticDelta.Metadata![PipelineStepMetadataKeys.PreviousReplayLogHash]);
         Assert.Equal(suspended.StepId, resumed.ReplayLog[^1].ParentStepId);
         Assert.Equal("resume", resumed.SemanticDelta.Kind);

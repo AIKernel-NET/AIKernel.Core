@@ -91,8 +91,8 @@ public static class PipelineStep
             catch (Exception ex)
             {
                 return current
-                    .Bind<TValue>(_ => throw ex)
-                    .WithSemanticDelta(
+                    .FailLoopIteration(
+                        ex,
                         CreateLoopUntilDelta(
                             iteration,
                             timestamp: null,
@@ -206,7 +206,7 @@ public static class PipelineStep
         }
         catch (Exception ex)
         {
-            next = current.Bind<TValue>(_ => throw ex);
+            return current.FailLoopIteration(ex, loopDelta);
         }
 
         var combined = next.WithReplayLogPrefix(replayLogPrefix);
@@ -249,6 +249,28 @@ public static class PipelineStep
                     .Add(PipelineStepMetadataKeys.DeltaKind, "loop")
                     .Add(PipelineStepMetadataKeys.LoopDecision, "invalid"),
                 Kind: "loop"));
+    }
+
+    private static ResultStep<TState, TValue> FailLoopIteration<TState, TValue>(
+        this ResultStep<TState, TValue> current,
+        Exception exception,
+        SemanticDelta loopDelta)
+    {
+        var error = ErrorContext.FromException(exception) with
+        {
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = OriginStep.KernelFacade,
+            SemanticSlot = SemanticSlot.T,
+            Metadata = loopDelta.Metadata
+        };
+        var parentStepId = current.ReplayLog.Count == 0
+            ? null
+            : current.ReplayLog[^1].StepId;
+
+        return ResultStep<TState, TValue>
+            .Fail(current.State, error)
+            .WithReplayLogPrefix(current.ReplayLog)
+            .WithSemanticDelta(loopDelta, parentStepId);
     }
 
     private static SemanticDelta CreateLoopDelta(

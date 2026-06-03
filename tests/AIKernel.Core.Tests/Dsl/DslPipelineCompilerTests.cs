@@ -42,6 +42,23 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void FromJson_RejectsNonObjectArgs()
+    {
+        var document = DslDocument.FromJson("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "CallCapability", "name": "Observe", "args": ["bad"] }
+          ]
+        }
+        """);
+
+        Assert.True(document.IsFailure);
+        Assert.Equal("INVALID_DSL", document.Error!.Code);
+        Assert.Equal(FailureKind.Reject, document.Error.FailureKind);
+    }
+
+    [Fact]
     public void Compile_RejectsUnknownCapability()
     {
         var document = DslDocument.FromJson("""

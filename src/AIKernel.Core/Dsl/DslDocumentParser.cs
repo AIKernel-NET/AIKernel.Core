@@ -79,10 +79,10 @@ public static class DslDocumentParser
 
     private static Result<PipelineNode> ParseCallCapability(JsonElement element)
     {
-        return ReadRequiredString(element, "name")
-            .Map<PipelineNode>(name => new CallCapabilityNode(
-                name,
-                ReadArgs(element)));
+        return
+            from name in ReadRequiredString(element, "name")
+            from args in ReadArgs(element)
+            select (PipelineNode)new CallCapabilityNode(name, args);
     }
 
     private static Result<PipelineNode> ParseLoop(JsonElement element)
@@ -220,12 +220,18 @@ public static class DslDocumentParser
         });
     }
 
-    private static IReadOnlyDictionary<string, string> ReadArgs(JsonElement element)
+    private static Result<IReadOnlyDictionary<string, string>> ReadArgs(JsonElement element)
     {
-        if (!element.TryGetProperty("args", out var args) ||
-            args.ValueKind != JsonValueKind.Object)
+        if (!element.TryGetProperty("args", out var args))
         {
-            return ImmutableDictionary<string, string>.Empty;
+            return Result<IReadOnlyDictionary<string, string>>.Success(
+                ImmutableDictionary<string, string>.Empty);
+        }
+
+        if (args.ValueKind != JsonValueKind.Object)
+        {
+            return Invalid<IReadOnlyDictionary<string, string>>(
+                "args must be a JSON object.");
         }
 
         var builder = ImmutableDictionary.CreateBuilder<string, string>(
@@ -238,7 +244,8 @@ public static class DslDocumentParser
                 : item.Value.GetRawText();
         }
 
-        return builder.ToImmutable();
+        return Result<IReadOnlyDictionary<string, string>>.Success(
+            builder.ToImmutable());
     }
 
     private static Result<T> Invalid<T>(string message)

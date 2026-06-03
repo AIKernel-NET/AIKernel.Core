@@ -31,6 +31,16 @@ public readonly struct Option<T>
             ? binder(Value!)
             : Option<U>.None();
 
+    public Option<T> Tap(Action<T> action)
+    {
+        if (HasValue)
+        {
+            action(Value!);
+        }
+
+        return this;
+    }
+
     public T OrElse(T fallback)
         => HasValue ? Value! : fallback;
 

@@ -38,6 +38,16 @@ public readonly struct Either<L, R>
             ? binder(Right!)
             : Either<L, U>.FromLeft(Left!);
 
+    public Either<L, R> Tap(Action<R> action)
+    {
+        if (IsRight)
+        {
+            action(Right!);
+        }
+
+        return this;
+    }
+
     // -------------------------
     // LINQ Support
     // -------------------------

@@ -76,6 +76,33 @@ public sealed class OptionTests
         Assert.False(called);
     }
 
+    [Fact]
+    public void Tap_RunsActionForSomeAndPreservesValue()
+    {
+        var observed = 0;
+
+        var option = Option<int>
+            .Some(4)
+            .Tap(value => observed = value);
+
+        Assert.True(option.HasValue);
+        Assert.Equal(4, option.Value);
+        Assert.Equal(4, observed);
+    }
+
+    [Fact]
+    public void Tap_ShortCircuitsNoneWithoutRunningAction()
+    {
+        var called = false;
+
+        var option = Option<int>
+            .None()
+            .Tap(_ => called = true);
+
+        Assert.False(option.HasValue);
+        Assert.False(called);
+    }
+
     private static Option<int> Track(
         int value,
         Action onCall)

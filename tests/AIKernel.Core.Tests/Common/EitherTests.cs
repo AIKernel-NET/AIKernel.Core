@@ -96,6 +96,34 @@ public sealed class EitherTests
         Assert.Equal("blocked", either.Left);
     }
 
+    [Fact]
+    public void Tap_RunsActionForRightAndPreservesValue()
+    {
+        var observed = 0;
+
+        var either = Either<string, int>
+            .FromRight(4)
+            .Tap(value => observed = value);
+
+        Assert.True(either.IsRight);
+        Assert.Equal(4, either.Right);
+        Assert.Equal(4, observed);
+    }
+
+    [Fact]
+    public void Tap_ShortCircuitsLeftWithoutRunningAction()
+    {
+        var called = false;
+
+        var either = Either<string, int>
+            .FromLeft("blocked")
+            .Tap(_ => called = true);
+
+        Assert.True(either.IsLeft);
+        Assert.False(called);
+        Assert.Equal("blocked", either.Left);
+    }
+
     private static Either<string, int> Track(
         int value,
         Action onCall)

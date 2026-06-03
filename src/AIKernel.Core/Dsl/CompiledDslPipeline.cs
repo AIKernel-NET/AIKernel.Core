@@ -1,7 +1,5 @@
 namespace AIKernel.Core.Dsl;
 
-using System.Collections.Immutable;
-using System.Globalization;
 using AIKernel.Common.Results;
 using AIKernel.Core.Time;
 
@@ -49,11 +47,16 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
             LoopNode loop => ExecuteLoop(loop, current, context),
             LoopUntilNode loopUntil => ExecuteLoopUntil(loopUntil, current, context),
             SuspendNode suspend => ExecuteSuspend(suspend, current),
-            _ => AppendFailure(
+            _ => DslResultStepAppender.AppendFailure(
                 current,
                 current.State,
-                UnsupportedNodeError(node),
-                CreateDelta("dsl.invalid-node", "execute", "invalid", node.Type))
+                DslExecutionErrors.InvalidRuntime(
+                    $"Unsupported pipeline node: {node.GetType().Name}."),
+                DslSemanticDeltaFactory.CreateNodeDelta(
+                    "dsl.invalid-node",
+                    "execute",
+                    "invalid",
+                    node.Type))
         };
     }
 
@@ -77,11 +80,15 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
         StepNode node,
         ResultStep<DslPipelineState, DslPipelineValue> current)
     {
-        return AppendSuccess(
+        return DslResultStepAppender.AppendSuccess(
             current,
             current.State.Advance(node.Name),
             current.Value!,
-            CreateDelta("dsl.step", "execute", "step", node.Name));
+            DslSemanticDeltaFactory.CreateNodeDelta(
+                "dsl.step",
+                "execute",
+                "step",
+                node.Name));
     }
 
     private ResultStep<DslPipelineState, DslPipelineValue> ExecuteCapability(
@@ -93,7 +100,7 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
             node.Name,
             current.Value!,
             node.Args);
-        var delta = CreateDelta(
+        var delta = DslSemanticDeltaFactory.CreateNodeDelta(
             "dsl.capability.call",
             "execute",
             "call_capability",
@@ -101,8 +108,8 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
             node.Args);
 
         return capabilityResult.IsSuccess
-            ? AppendSuccess(current, nextState, capabilityResult.Value!, delta)
-            : AppendFailure(current, nextState, capabilityResult.Error!, delta);
+            ? DslResultStepAppender.AppendSuccess(current, nextState, capabilityResult.Value!, delta)
+            : DslResultStepAppender.AppendFailure(current, nextState, capabilityResult.Error!, delta);
     }
 
     private ResultStep<DslPipelineState, DslPipelineValue> ExecuteLoop(
@@ -112,18 +119,19 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
     {
         if (node.MaxIterations < 0)
         {
-            return AppendFailure(
+            return DslResultStepAppender.AppendFailure(
                 current,
                 current.State,
-                InvalidRuntime("maxIterations must be greater than or equal to zero."),
-                CreateLoopDelta(0, "invalid"));
+                DslExecutionErrors.InvalidRuntime(
+                    "maxIterations must be greater than or equal to zero."),
+                DslSemanticDeltaFactory.CreateLoopDelta(0, "invalid"));
         }
 
         var result = current;
         for (var iteration = 0; iteration < node.MaxIterations; iteration++)
         {
             result = ExecuteNodes(node.BodyNodes, result, context);
-            result = AppendLoopTransition(
+            result = DslResultStepAppender.AppendLoopTransition(
                 result,
                 iteration,
                 iteration == node.MaxIterations - 1
@@ -136,7 +144,7 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
         }
 
         return node.MaxIterations == 0
-            ? AppendLoopTransition(
+            ? DslResultStepAppender.AppendLoopTransition(
                 result,
                 0,
                 "max_iterations_reached",
@@ -151,11 +159,11 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
     {
         if (node.MaxIterations < 0 || node.Timeout < TimeSpan.Zero)
         {
-            return AppendFailure(
+            return DslResultStepAppender.AppendFailure(
                 current,
                 current.State,
-                InvalidRuntime("LoopUntil has invalid bounds."),
-                CreateLoopUntilDelta(0, null, "invalid"));
+                DslExecutionErrors.InvalidRuntime("LoopUntil has invalid bounds."),
+                DslSemanticDeltaFactory.CreateLoopUntilDelta(0, null, "invalid"));
         }
 
         var result = current;
@@ -164,7 +172,7 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
             var now = _clock.Now;
             if (now - context.StartedAtUtc >= node.Timeout)
             {
-                return AppendLoopTransition(
+                return DslResultStepAppender.AppendLoopTransition(
                     result,
                     iteration,
                     "timeout_reached",
@@ -172,7 +180,7 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
             }
 
             result = ExecuteNodes(node.BodyNodes, result, context);
-            result = AppendLoopTransition(
+            result = DslResultStepAppender.AppendLoopTransition(
                 result,
                 iteration,
                 iteration == node.MaxIterations - 1
@@ -184,7 +192,7 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
                 return result;
         }
 
-        return AppendLoopTransition(
+        return DslResultStepAppender.AppendLoopTransition(
             result,
             node.MaxIterations,
             "max_iterations_reached",
@@ -202,130 +210,4 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
             .WithReplayLogPrefix(current.ReplayLog);
     }
 
-    private static ResultStep<DslPipelineState, DslPipelineValue> AppendLoopTransition(
-        ResultStep<DslPipelineState, DslPipelineValue> current,
-        int iteration,
-        string decision,
-        DateTimeOffset? timestamp)
-    {
-        var delta = timestamp is null
-            ? CreateLoopDelta(iteration, decision)
-            : CreateLoopUntilDelta(iteration, timestamp, decision);
-
-        return current.IsSuccess
-            ? AppendSuccess(current, current.State, current.Value!, delta)
-            : AppendFailure(current, current.State, current.Error!, delta);
-    }
-
-    private static ResultStep<DslPipelineState, DslPipelineValue> AppendSuccess(
-        ResultStep<DslPipelineState, DslPipelineValue> current,
-        DslPipelineState state,
-        DslPipelineValue value,
-        SemanticDelta delta)
-    {
-        return ResultStep<DslPipelineState, DslPipelineValue>
-            .Success(state, value)
-            .WithReplayLogPrefix(current.ReplayLog)
-            .WithSemanticDelta(delta, LastStepId(current));
-    }
-
-    private static ResultStep<DslPipelineState, DslPipelineValue> AppendFailure(
-        ResultStep<DslPipelineState, DslPipelineValue> current,
-        DslPipelineState state,
-        ErrorContext error,
-        SemanticDelta delta)
-    {
-        return ResultStep<DslPipelineState, DslPipelineValue>
-            .Fail(state, error)
-            .WithReplayLogPrefix(current.ReplayLog)
-            .WithSemanticDelta(delta, LastStepId(current));
-    }
-
-    private static string? LastStepId(
-        ResultStep<DslPipelineState, DslPipelineValue> current)
-        => current.ReplayLog.Count == 0
-            ? null
-            : current.ReplayLog[^1].StepId;
-
-    private static SemanticDelta CreateLoopDelta(
-        int iteration,
-        string decision)
-    {
-        return new SemanticDelta(
-            "dsl.loop.iteration",
-            OriginStep.KernelFacade,
-            SemanticSlot.T,
-            ImmutableDictionary<string, string>.Empty
-                .Add(PipelineStepMetadataKeys.DeltaKind, "loop")
-                .Add(PipelineStepMetadataKeys.LoopIteration, iteration.ToString(CultureInfo.InvariantCulture))
-                .Add(PipelineStepMetadataKeys.LoopDecision, decision),
-            Kind: "loop");
-    }
-
-    private static SemanticDelta CreateLoopUntilDelta(
-        int iteration,
-        DateTimeOffset? timestamp,
-        string decision)
-    {
-        var metadata = ImmutableDictionary<string, string>.Empty
-            .Add(PipelineStepMetadataKeys.DeltaKind, "loop")
-            .Add(PipelineStepMetadataKeys.LoopIteration, iteration.ToString(CultureInfo.InvariantCulture))
-            .Add(PipelineStepMetadataKeys.LoopDecision, decision);
-
-        if (timestamp is { } value)
-        {
-            metadata = metadata.Add(
-                PipelineStepMetadataKeys.LoopTimestamp,
-                value.ToString("O", CultureInfo.InvariantCulture));
-        }
-
-        return new SemanticDelta(
-            "dsl.loop_until.iteration",
-            OriginStep.KernelFacade,
-            SemanticSlot.T,
-            metadata,
-            Kind: "loop");
-    }
-
-    private static SemanticDelta CreateDelta(
-        string label,
-        string kind,
-        string nodeType,
-        string nodeName,
-        IReadOnlyDictionary<string, string>? args = null)
-    {
-        var metadata = ImmutableDictionary.CreateBuilder<string, string>(
-            StringComparer.Ordinal);
-        metadata[PipelineStepMetadataKeys.DeltaKind] = kind;
-        metadata["dsl.node_type"] = nodeType;
-        metadata["dsl.node_name"] = nodeName;
-
-        if (args is not null)
-        {
-            foreach (var item in args.OrderBy(
-                item => item.Key,
-                StringComparer.Ordinal))
-            {
-                metadata[$"dsl.arg.{item.Key}"] = item.Value;
-            }
-        }
-
-        return new SemanticDelta(
-            label,
-            OriginStep.KernelFacade,
-            SemanticSlot.T,
-            metadata.ToImmutable(),
-            Kind: kind);
-    }
-
-    private static ErrorContext UnsupportedNodeError(PipelineNode node)
-        => InvalidRuntime($"Unsupported pipeline node: {node.GetType().Name}.");
-
-    private static ErrorContext InvalidRuntime(string message)
-        => new(message, "DSL_RUNTIME_ERROR", false)
-        {
-            FailureKind = FailureKind.FailClosed,
-            OriginStep = OriginStep.KernelFacade,
-            SemanticSlot = SemanticSlot.T
-        };
 }

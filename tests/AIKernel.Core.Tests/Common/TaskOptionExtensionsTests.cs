@@ -117,6 +117,26 @@ public sealed class TaskOptionExtensionsTests
     }
 
     [Fact]
+    public async Task Bind_PropagatesAsyncBinderException()
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await SomeAsync(3)
+                .Bind<int, int>(_ => ThrowsAsync()));
+
+        Assert.Equal("option-binder-boom", exception.Message);
+    }
+
+    [Fact]
+    public async Task Bind_PropagatesSynchronousBinderException()
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await SomeAsync(3)
+                .Bind<int, int>(_ => Throws()));
+
+        Assert.Equal("option-sync-binder-boom", exception.Message);
+    }
+
+    [Fact]
     public async Task LinqQuery_AppliesWhereToTaskOption()
     {
         var option = await (
@@ -197,5 +217,15 @@ public sealed class TaskOptionExtensionsTests
     {
         onCall();
         return SomeAsync(value);
+    }
+
+    private static Task<Option<int>> ThrowsAsync()
+    {
+        throw new InvalidOperationException("option-binder-boom");
+    }
+
+    private static Option<int> Throws()
+    {
+        throw new InvalidOperationException("option-sync-binder-boom");
     }
 }

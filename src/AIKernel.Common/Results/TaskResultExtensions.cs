@@ -120,44 +120,23 @@ public static class TaskResultExtensions
         this Result<T> result,
         Func<T, Task<Result<U>>> binder,
         Func<T, U, V> projector)
-    {
-        return await result
-            .Bind(binder)
-            .Select(bound => projector(result.Value!, bound))
+        => await result
+            .Bind(value => binder(value).Select(bound => projector(value, bound)))
             .ConfigureAwait(false);
-    }
 
     public static async Task<Result<V>> SelectMany<T, U, V>(
         this Task<Result<T>> task,
         Func<T, Task<Result<U>>> binder,
         Func<T, U, V> projector)
-    {
-        var captured = default(T);
-
-        return await task
-            .Bind(value =>
-            {
-                captured = value;
-                return binder(value);
-            })
-            .Select(bound => projector(captured!, bound))
+        => await task
+            .Bind(value => binder(value).Select(bound => projector(value, bound)))
             .ConfigureAwait(false);
-    }
 
     public static async Task<Result<V>> SelectMany<T, U, V>(
         this Task<Result<T>> task,
         Func<T, Result<U>> binder,
         Func<T, U, V> projector)
-    {
-        var captured = default(T);
-
-        return await task
-            .Bind(value =>
-            {
-                captured = value;
-                return binder(value);
-            })
-            .Select(bound => projector(captured!, bound))
+        => await task
+            .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
-    }
 }

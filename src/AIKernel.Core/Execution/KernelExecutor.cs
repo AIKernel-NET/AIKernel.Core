@@ -43,83 +43,24 @@ public sealed class KernelExecutor : IKernelExecutor
         var startedAt = _clock.Now;
         var executionSequence = Interlocked.Increment(ref _executionSequence);
 
-        var capabilityResult = _stepRunner.ResolveCapability(provider, request);
-        if (capabilityResult.IsFailure)
+        var pipelineResult = await ExecutePipelineAsync(
+            provider,
+            request,
+            startedAt,
+            executionSequence,
+            cancellationToken).ConfigureAwait(false);
+        if (pipelineResult.IsFailure)
         {
             return CreateStepFailureResult(
                 request,
-                capability: null,
-                prompt: null,
-                startedAt,
-                executionSequence,
-                capabilityResult.Error!);
+                pipelineResult.State.Capability,
+                pipelineResult.State.Prompt,
+                pipelineResult.State.StartedAt,
+                pipelineResult.State.ExecutionSequence,
+                pipelineResult.Error!);
         }
 
-        var capability = capabilityResult.Value!;
-        var promptResult = await (
-            from prompt in _stepRunner.GeneratePromptAsync(
-                request,
-                capability,
-                cancellationToken)
-            select new PromptExecutionStep(capability, prompt))
-            .ConfigureAwait(false);
-        if (promptResult.IsFailure)
-        {
-            return CreateStepFailureResult(
-                request,
-                capability,
-                prompt: null,
-                startedAt,
-                executionSequence,
-                promptResult.Error!);
-        }
-
-        var promptStep = promptResult.Value!;
-        var outputResult = await (
-            from output in _stepRunner.GenerateOutputAsync(
-                provider,
-                promptStep.Prompt,
-                cancellationToken)
-            from validatedOutput in ValidateOutput(output)
-            select new OutputExecutionStep(
-                promptStep.Capability,
-                promptStep.Prompt,
-                validatedOutput))
-            .ConfigureAwait(false);
-        if (outputResult.IsFailure)
-        {
-            return CreateStepFailureResult(
-                request,
-                promptStep.Capability,
-                promptStep.Prompt,
-                startedAt,
-                executionSequence,
-                outputResult.Error!);
-        }
-
-        var outputStep = outputResult.Value!;
-        var outputTokensResult =
-            from outputTokens in _stepRunner.CountOutputTokens(outputStep.Output)
-            from validatedOutputTokens in ValidateOutputTokenBudget(
-                outputTokens,
-                outputStep.Capability)
-            select new TokenExecutionStep(
-                outputStep.Capability,
-                outputStep.Prompt,
-                outputStep.Output,
-                validatedOutputTokens);
-        if (outputTokensResult.IsFailure)
-        {
-            return CreateStepFailureResult(
-                request,
-                outputStep.Capability,
-                outputStep.Prompt,
-                startedAt,
-                executionSequence,
-                outputTokensResult.Error!);
-        }
-
-        var tokenStep = outputTokensResult.Value!;
+        var tokenStep = pipelineResult.Value!;
         var completedAt = _clock.Now;
 
         var successResult = _successResultFactory.CreateSucceededResult(
@@ -156,6 +97,117 @@ public sealed class KernelExecutor : IKernelExecutor
                     ["source_error_code"] = successResult.Error.Code
                 }
             });
+    }
+
+    private async Task<ResultStep<KernelExecutionPipelineState, TokenExecutionStep>> ExecutePipelineAsync(
+        IModelProvider provider,
+        KernelExecutionRequest request,
+        DateTimeOffset startedAt,
+        long executionSequence,
+        CancellationToken cancellationToken)
+    {
+        var capabilityStep = await CreatePipelineStart(
+                provider,
+                request,
+                startedAt,
+                executionSequence)
+            .BindAsync(step => Task.FromResult(ResolveCapabilityStep(step)))
+            .ConfigureAwait(false);
+        var promptStep = await capabilityStep
+            .BindAsync(step => GeneratePromptStepAsync(step, cancellationToken))
+            .ConfigureAwait(false);
+        var outputStep = await promptStep
+            .BindAsync(step => GenerateOutputStepAsync(step, provider, cancellationToken))
+            .ConfigureAwait(false);
+
+        return await outputStep
+            .BindAsync(step => Task.FromResult(CountOutputTokensStep(step)))
+            .ConfigureAwait(false);
+    }
+
+    private static ResultStep<KernelExecutionPipelineState, IModelProvider> CreatePipelineStart(
+        IModelProvider provider,
+        KernelExecutionRequest request,
+        DateTimeOffset startedAt,
+        long executionSequence)
+    {
+        return ResultStep<KernelExecutionPipelineState, IModelProvider>.Success(
+            new KernelExecutionPipelineState(
+                request,
+                startedAt,
+                executionSequence,
+                Capability: null,
+                Prompt: null),
+            provider);
+    }
+
+    private ResultStep<KernelExecutionPipelineState, ModelPromptCapability> ResolveCapabilityStep(
+        ResultStep<KernelExecutionPipelineState, IModelProvider> step)
+    {
+        return ResultStep<KernelExecutionPipelineState, ModelPromptCapability>
+            .FromResult(
+                step.State,
+                _stepRunner.ResolveCapability(step.Value!, step.State.Request))
+            .MapState(current => current.State with { Capability = current.Value });
+    }
+
+    private async Task<ResultStep<KernelExecutionPipelineState, PromptExecutionStep>> GeneratePromptStepAsync(
+        ResultStep<KernelExecutionPipelineState, ModelPromptCapability> step,
+        CancellationToken cancellationToken)
+    {
+        var prompt = await _stepRunner.GeneratePromptAsync(
+                step.State.Request,
+                step.Value!,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        return ResultStep<KernelExecutionPipelineState, GeneratedPrompt>
+            .FromResult(step.State, prompt)
+            .MapState(current => current.State with { Prompt = current.Value })
+            .Map(current => new PromptExecutionStep(
+                current.State.Capability!,
+                current.Value!));
+    }
+
+    private async Task<ResultStep<KernelExecutionPipelineState, OutputExecutionStep>> GenerateOutputStepAsync(
+        ResultStep<KernelExecutionPipelineState, PromptExecutionStep> step,
+        IModelProvider provider,
+        CancellationToken cancellationToken)
+    {
+        var output = await _stepRunner.GenerateOutputAsync(
+                provider,
+                step.Value!.Prompt,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        return ResultStep<KernelExecutionPipelineState, string>
+            .FromResult(step.State, output)
+            .Bind(current => ResultStep<KernelExecutionPipelineState, string>
+                .FromResult(current.State, ValidateOutput(current.Value!)))
+            .Map(current => new OutputExecutionStep(
+                current.State.Capability!,
+                current.State.Prompt!,
+                current.Value!));
+    }
+
+    private ResultStep<KernelExecutionPipelineState, TokenExecutionStep> CountOutputTokensStep(
+        ResultStep<KernelExecutionPipelineState, OutputExecutionStep> step)
+    {
+        return ResultStep<KernelExecutionPipelineState, int>
+            .FromResult(
+                step.State,
+                _stepRunner.CountOutputTokens(step.Value!.Output))
+            .Bind(current => ResultStep<KernelExecutionPipelineState, int>
+                .FromResult(
+                    current.State,
+                    ValidateOutputTokenBudget(
+                        current.Value,
+                        step.Value!.Capability)))
+            .Map(current => new TokenExecutionStep(
+                step.Value!.Capability,
+                step.Value.Prompt,
+                step.Value.Output,
+                current.Value));
     }
 
     private KernelRequestExecutionResult CreateFailedResult(
@@ -250,4 +302,10 @@ public sealed class KernelExecutor : IKernelExecutor
         string Output,
         int OutputTokens);
 
+    private sealed record KernelExecutionPipelineState(
+        KernelExecutionRequest Request,
+        DateTimeOffset StartedAt,
+        long ExecutionSequence,
+        ModelPromptCapability? Capability,
+        GeneratedPrompt? Prompt);
 }

@@ -120,6 +120,26 @@ public sealed class TaskEitherExtensionsTests
     }
 
     [Fact]
+    public async Task Bind_PropagatesAsyncBinderException()
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await RightAsync(3)
+                .Bind<string, int, int>(_ => ThrowsAsync()));
+
+        Assert.Equal("either-binder-boom", exception.Message);
+    }
+
+    [Fact]
+    public async Task Bind_PropagatesSynchronousBinderException()
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await RightAsync(3)
+                .Bind<string, int, int>(_ => Throws()));
+
+        Assert.Equal("either-sync-binder-boom", exception.Message);
+    }
+
+    [Fact]
     public async Task LinqQuery_ReturnsSynchronousBinderLeft()
     {
         var either = await (
@@ -190,5 +210,15 @@ public sealed class TaskEitherExtensionsTests
     {
         onCall();
         return RightAsync(value);
+    }
+
+    private static Task<Either<string, int>> ThrowsAsync()
+    {
+        throw new InvalidOperationException("either-binder-boom");
+    }
+
+    private static Either<string, int> Throws()
+    {
+        throw new InvalidOperationException("either-sync-binder-boom");
     }
 }

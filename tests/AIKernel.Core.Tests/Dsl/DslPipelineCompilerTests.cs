@@ -209,6 +209,53 @@ public sealed class DslPipelineCompilerTests
         Assert.False(result.Value!.Data.ContainsKey("last_capability"));
     }
 
+    [Fact]
+    public void Execute_NullContextReturnsFailClosedReplayEntry()
+    {
+        var pipeline = Compile("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "Step", "name": "start" }
+          ]
+        }
+        """);
+
+        var result = pipeline.Execute(null!);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_RUNTIME_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        var entry = Assert.Single(result.ReplayLog);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("dsl.context.invalid", entry.SemanticDelta.Label);
+    }
+
+    [Fact]
+    public void Execute_NullInputReturnsFailClosedReplayEntry()
+    {
+        var pipeline = Compile("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "Step", "name": "start" }
+          ]
+        }
+        """);
+        var context = new DslPipelineExecutionContext(
+            null!,
+            DateTimeOffset.UnixEpoch);
+
+        var result = pipeline.Execute(context);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_RUNTIME_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        var entry = Assert.Single(result.ReplayLog);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("dsl.context.invalid", entry.SemanticDelta.Label);
+    }
+
     private static IKernelPipeline Compile(
         string json,
         IDslCapabilityRegistry? registry = null)

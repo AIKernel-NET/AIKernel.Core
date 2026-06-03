@@ -22,13 +22,35 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
     public ResultStep<DslPipelineState, DslPipelineValue> Execute(
         DslPipelineExecutionContext context)
     {
-        ArgumentNullException.ThrowIfNull(context);
+        if (context is null)
+        {
+            return InvalidExecutionContext("DSL execution context is required.");
+        }
+
+        if (context.Input is null)
+        {
+            return InvalidExecutionContext("DSL execution input is required.");
+        }
 
         var initial = ResultStep<DslPipelineState, DslPipelineValue>.Success(
             DslPipelineState.Initial("dsl.pipeline"),
             context.Input);
 
         return ExecuteNode(_root, initial, context);
+    }
+
+    private static ResultStep<DslPipelineState, DslPipelineValue> InvalidExecutionContext(
+        string message)
+    {
+        return ResultStep<DslPipelineState, DslPipelineValue>
+            .Fail(
+                DslPipelineState.Initial("dsl.pipeline"),
+                DslExecutionErrors.InvalidRuntime(message))
+            .WithSemanticDelta(DslSemanticDeltaFactory.CreateNodeDelta(
+                "dsl.context.invalid",
+                "fail_closed",
+                "context",
+                "execution_context"));
     }
 
     private ResultStep<DslPipelineState, DslPipelineValue> ExecuteNode(

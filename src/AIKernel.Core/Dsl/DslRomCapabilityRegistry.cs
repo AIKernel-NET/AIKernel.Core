@@ -29,19 +29,41 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
     {
         if (!DslRomPath.IsDslCapability(name))
         {
-            return _inner.Invoke(name, input, args);
+            try
+            {
+                return _inner.Invoke(name, input, args);
+            }
+            catch (Exception ex)
+            {
+                return Result<DslPipelineValue>.Fail(CapabilityException(name, ex));
+            }
         }
 
-        var snapshot = _romRegistry.Resolve(name);
+        Result<DslRomSnapshot> snapshot;
+        try
+        {
+            snapshot = _romRegistry.Resolve(name);
+        }
+        catch (Exception ex)
+        {
+            return Result<DslPipelineValue>.Fail(CapabilityException(name, ex));
+        }
+
         if (snapshot.IsFailure)
         {
             return Result<DslPipelineValue>.Fail(snapshot.Error!);
         }
 
+        var validated = ValidateSnapshot(name, snapshot.Value);
+        if (validated.IsFailure)
+        {
+            return Result<DslPipelineValue>.Fail(validated.Error!);
+        }
+
         ResultStep<DslPipelineState, DslPipelineValue> result;
         try
         {
-            result = snapshot.Value!.Pipeline.Execute(
+            result = validated.Value!.Pipeline.Execute(
                 DslPipelineExecutionContext.Create(input));
         }
         catch (Exception ex)
@@ -53,14 +75,14 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
                     OriginStep = OriginStep.Capability,
                     SemanticSlot = SemanticSlot.T
                 },
-                snapshot.Value!.Metadata));
+                validated.Value!.Metadata));
         }
 
         if (result.IsFailure)
         {
             return Result<DslPipelineValue>.Fail(AttachRomMetadata(
                 result.Error!,
-                snapshot.Value.Metadata,
+                validated.Value.Metadata,
                 result.ReplayLog.Count,
                 result.ReplayLogHash));
         }
@@ -69,16 +91,74 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
         {
             return Result<DslPipelineValue>.Fail(AttachRomMetadata(
                 Error("DSL ROM pipeline returned a successful null value."),
-                snapshot.Value.Metadata,
+                validated.Value.Metadata,
                 result.ReplayLog.Count,
                 result.ReplayLogHash));
         }
 
         return Result<DslPipelineValue>.Success(AttachRomData(
             result.Value,
-            snapshot.Value.Metadata,
+            validated.Value.Metadata,
             result.ReplayLog.Count,
             result.ReplayLogHash));
+    }
+
+    private static Result<DslRomSnapshot> ValidateSnapshot(
+        string requestedCapabilityName,
+        DslRomSnapshot? snapshot)
+    {
+        if (snapshot is null)
+        {
+            return Result<DslRomSnapshot>.Fail(Error("DSL ROM snapshot is required."));
+        }
+
+        if (snapshot.Metadata is null)
+        {
+            return Result<DslRomSnapshot>.Fail(Error("DSL ROM metadata is required."));
+        }
+
+        if (snapshot.Pipeline is null)
+        {
+            return Result<DslRomSnapshot>.Fail(AttachRomMetadata(
+                Error("DSL ROM pipeline is required."),
+                snapshot.Metadata));
+        }
+
+        var metadataError = ValidateMetadata(snapshot.Metadata);
+        if (metadataError is not null)
+        {
+            return Result<DslRomSnapshot>.Fail(metadataError);
+        }
+
+        if (string.IsNullOrWhiteSpace(snapshot.JsonDsl))
+        {
+            return Result<DslRomSnapshot>.Fail(AttachRomMetadata(
+                Error("DSL ROM JSON is required."),
+                snapshot.Metadata));
+        }
+
+        if (!string.Equals(
+                snapshot.Metadata.CapabilityName,
+                requestedCapabilityName,
+                StringComparison.Ordinal))
+        {
+            return Result<DslRomSnapshot>.Fail(AttachRomMetadata(
+                Error("Resolved DSL ROM capability name does not match the requested capability."),
+                snapshot.Metadata));
+        }
+
+        var actualHash = DslRomHasher.ComputeHash(snapshot.JsonDsl);
+        if (!string.Equals(
+                actualHash,
+                snapshot.Metadata.RomHash,
+                StringComparison.Ordinal))
+        {
+            return Result<DslRomSnapshot>.Fail(AttachRomMetadata(
+                Error("DSL ROM hash does not match JSON content."),
+                snapshot.Metadata));
+        }
+
+        return Result<DslRomSnapshot>.Success(snapshot);
     }
 
     private static DslPipelineValue AttachRomData(
@@ -116,11 +196,11 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
             }
         }
 
-        builder[DslRomMetadataKeys.RomCall] = metadata.CapabilityName;
-        builder[DslRomMetadataKeys.RomHash] = metadata.RomHash;
-        builder[DslRomMetadataKeys.RomPath] = metadata.Path;
-        builder[DslRomMetadataKeys.RomNamespace] = metadata.Namespace;
-        builder[DslRomMetadataKeys.RomName] = metadata.Name;
+        AddIfValue(builder, DslRomMetadataKeys.RomCall, metadata.CapabilityName);
+        AddIfValue(builder, DslRomMetadataKeys.RomHash, metadata.RomHash);
+        AddIfValue(builder, DslRomMetadataKeys.RomPath, metadata.Path);
+        AddIfValue(builder, DslRomMetadataKeys.RomNamespace, metadata.Namespace);
+        AddIfValue(builder, DslRomMetadataKeys.RomName, metadata.Name);
         if (replayLogCount is { } count)
         {
             builder[DslRomMetadataKeys.RomReplayLogCount] =
@@ -145,4 +225,77 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
             OriginStep = OriginStep.Capability,
             SemanticSlot = SemanticSlot.T
         };
+
+    private static ErrorContext? ValidateMetadata(DslRomMetadata metadata)
+    {
+        if (string.IsNullOrWhiteSpace(metadata.CapabilityName))
+        {
+            return Error("DSL ROM capability name is required.");
+        }
+
+        if (!DslRomPath.IsDslCapability(metadata.CapabilityName))
+        {
+            return Error("DSL ROM capability name must use the dsl:// scheme.");
+        }
+
+        if (string.IsNullOrWhiteSpace(metadata.RomHash))
+        {
+            return AttachRomMetadata(Error("DSL ROM hash is required."), metadata);
+        }
+
+        if (string.IsNullOrWhiteSpace(metadata.Path))
+        {
+            return AttachRomMetadata(Error("DSL ROM path is required."), metadata);
+        }
+
+        if (string.IsNullOrWhiteSpace(metadata.Namespace))
+        {
+            return AttachRomMetadata(Error("DSL ROM namespace is required."), metadata);
+        }
+
+        if (string.IsNullOrWhiteSpace(metadata.Name))
+        {
+            return AttachRomMetadata(Error("DSL ROM name is required."), metadata);
+        }
+
+        return null;
+    }
+
+    private static void AddIfValue(
+        ImmutableDictionary<string, string>.Builder builder,
+        string key,
+        string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            builder[key] = value;
+        }
+    }
+
+    private static ErrorContext CapabilityException(
+        string capabilityName,
+        Exception exception)
+    {
+        var source = ErrorContext.FromException(exception);
+        var builder = ImmutableDictionary.CreateBuilder<string, string>(
+            StringComparer.Ordinal);
+
+        if (source.Metadata is not null)
+        {
+            foreach (var item in source.Metadata)
+            {
+                builder[item.Key] = item.Value;
+            }
+        }
+
+        builder["dsl.capability_name"] = capabilityName;
+
+        return source with
+        {
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = OriginStep.Capability,
+            SemanticSlot = SemanticSlot.T,
+            Metadata = builder.ToImmutable()
+        };
+    }
 }

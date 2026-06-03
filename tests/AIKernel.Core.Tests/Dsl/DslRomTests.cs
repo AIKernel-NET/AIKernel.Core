@@ -310,6 +310,67 @@ public sealed class DslRomTests
         Assert.Contains("null", result.Error.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    public void DslRomCapabilityRegistry_ReturnsFailure_WhenRomResolveThrows()
+    {
+        var registry = new DslRomCapabilityRegistry(
+            new TestCapabilityRegistry(),
+            new ThrowingRomRegistry());
+
+        var result = registry.Invoke(
+            "dsl://agent/plan1",
+            DslPipelineValue.Empty,
+            new Dictionary<string, string>());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal("dsl://agent/plan1", result.Error.Metadata!["dsl.capability_name"]);
+    }
+
+    [Fact]
+    public void DslRomCapabilityRegistry_ReturnsFailure_WhenInnerInvokeThrows()
+    {
+        var registry = new DslRomCapabilityRegistry(
+            new ThrowingCapabilityRegistry(),
+            new DslRomRegistry());
+
+        var result = registry.Invoke(
+            "Observe",
+            DslPipelineValue.Empty,
+            new Dictionary<string, string>());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal("Observe", result.Error.Metadata!["dsl.capability_name"]);
+    }
+
+    [Fact]
+    public void DslRomCapabilityRegistry_ReturnsFailure_WhenResolvedSnapshotIsInvalid()
+    {
+        var metadata = CreateMetadata(PlanDsl) with
+        {
+            RomHash = ""
+        };
+        var registry = new DslRomCapabilityRegistry(
+            new TestCapabilityRegistry(),
+            new FixedRomRegistry(new DslRomSnapshot(
+                metadata,
+                PlanDsl,
+                Compile(PlanDsl, new TestCapabilityRegistry()))));
+
+        var result = registry.Invoke(
+            metadata.CapabilityName,
+            DslPipelineValue.Empty,
+            new Dictionary<string, string>());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Contains("hash", result.Error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static async Task<IVfsSession> OpenSessionAsync()
     {
         var provider = new MemoryFileProvider(
@@ -430,6 +491,43 @@ public sealed class DslRomTests
                 .Success(
                     DslPipelineState.Initial("dsl.pipeline"),
                     null!);
+    }
+
+    private sealed class ThrowingCapabilityRegistry : IDslCapabilityRegistry
+    {
+        public bool Contains(string name) => true;
+
+        public Result<DslPipelineValue> Invoke(
+            string name,
+            DslPipelineValue input,
+            IReadOnlyDictionary<string, string> args)
+        {
+            throw new InvalidOperationException("Inner capability exploded.");
+        }
+    }
+
+    private sealed class ThrowingRomRegistry : IDslRomRegistry
+    {
+        public Result<DslRomMetadata> Register(DslRomSnapshot snapshot)
+            => throw new InvalidOperationException("ROM register exploded.");
+
+        public bool Contains(string capabilityName) => true;
+
+        public Result<DslRomSnapshot> Resolve(string capabilityName)
+            => throw new InvalidOperationException("ROM resolve exploded.");
+    }
+
+    private sealed class FixedRomRegistry(DslRomSnapshot snapshot) : IDslRomRegistry
+    {
+        private readonly DslRomSnapshot _snapshot = snapshot;
+
+        public Result<DslRomMetadata> Register(DslRomSnapshot snapshot)
+            => Result<DslRomMetadata>.Success(snapshot.Metadata);
+
+        public bool Contains(string capabilityName) => true;
+
+        public Result<DslRomSnapshot> Resolve(string capabilityName)
+            => Result<DslRomSnapshot>.Success(_snapshot);
     }
 
     private sealed class TestVfsCredentials : IVfsCredentials

@@ -18,6 +18,7 @@ public static class DslDocumentParser
         {
             using var document = JsonDocument.Parse(json);
             return ParseNode(document.RootElement)
+                .Bind(RequirePipelineRoot)
                 .Map(node => new DslDocument(node));
         }
         catch (JsonException ex)
@@ -55,6 +56,13 @@ public static class DslDocumentParser
                 SemanticSlot = SemanticSlot.T
             })
         };
+    }
+
+    private static Result<PipelineNode> RequirePipelineRoot(PipelineNode node)
+    {
+        return node is PipelineRootNode
+            ? Result<PipelineNode>.Success(node)
+            : Invalid<PipelineNode>("DSL root node must be a Pipeline.");
     }
 
     private static Result<PipelineNode> ParsePipeline(JsonElement element)

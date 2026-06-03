@@ -30,6 +30,18 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void FromJson_RejectsNonPipelineRoot()
+    {
+        var document = DslDocument.FromJson("""
+        { "type": "Step", "name": "start" }
+        """);
+
+        Assert.True(document.IsFailure);
+        Assert.Equal("INVALID_DSL", document.Error!.Code);
+        Assert.Equal(FailureKind.Reject, document.Error.FailureKind);
+    }
+
+    [Fact]
     public void Compile_RejectsUnknownCapability()
     {
         var document = DslDocument.FromJson("""
@@ -105,6 +117,32 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void Execute_RecordsCapabilityFailureAsFailedReplayLogEntry()
+    {
+        var pipeline = Compile(
+            """
+            {
+              "type": "Pipeline",
+              "steps": [
+                { "type": "CallCapability", "name": "RejectPlan" }
+              ]
+            }
+            """,
+            new TestCapabilityRegistry("RejectPlan"));
+
+        var result = pipeline.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("CAPABILITY_REJECTED", result.Error!.Code);
+        Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
+        var entry = Assert.Single(result.ReplayLog);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("CAPABILITY_REJECTED", entry.ErrorCode);
+        Assert.Equal("dsl.capability.call", entry.SemanticDelta.Label);
+        Assert.Equal("RejectPlan", entry.SemanticDelta.Metadata!["dsl.node_name"]);
+    }
+
+    [Fact]
     public void Execute_LoopUntilStopsBeforeBodyWhenTimeoutReached()
     {
         var pipeline = Compile("""
@@ -132,13 +170,15 @@ public sealed class DslPipelineCompilerTests
         Assert.False(result.Value!.Data.ContainsKey("last_capability"));
     }
 
-    private static IKernelPipeline Compile(string json)
+    private static IKernelPipeline Compile(
+        string json,
+        IDslCapabilityRegistry? registry = null)
     {
         var document = DslDocument.FromJson(json);
         Assert.True(document.IsSuccess, document.Error?.Message);
 
         var compiler = new DslPipelineCompiler(
-            new TestCapabilityRegistry(),
+            registry ?? new TestCapabilityRegistry(),
             KernelClock.Replay(DateTimeOffset.UnixEpoch));
         var pipeline = compiler.Compile(document.Value!);
         Assert.True(pipeline.IsSuccess, pipeline.Error?.Message);
@@ -148,16 +188,24 @@ public sealed class DslPipelineCompilerTests
 
     private sealed class TestCapabilityRegistry : IDslCapabilityRegistry
     {
-        private static readonly HashSet<string> Known = new(StringComparer.Ordinal)
+        private readonly HashSet<string> _known = new(StringComparer.Ordinal)
         {
             "Observe",
             "Decide",
             "ExecutePlan"
         };
 
+        public TestCapabilityRegistry(params string[] additionalKnown)
+        {
+            foreach (var name in additionalKnown)
+            {
+                _known.Add(name);
+            }
+        }
+
         public bool Contains(string name)
         {
-            return Known.Contains(name);
+            return _known.Contains(name);
         }
 
         public Result<DslPipelineValue> Invoke(
@@ -165,6 +213,19 @@ public sealed class DslPipelineCompilerTests
             DslPipelineValue input,
             IReadOnlyDictionary<string, string> args)
         {
+            if (string.Equals(name, "RejectPlan", StringComparison.Ordinal))
+            {
+                return Result<DslPipelineValue>.Fail(new ErrorContext(
+                    "Capability rejected the plan.",
+                    "CAPABILITY_REJECTED",
+                    false)
+                {
+                    FailureKind = FailureKind.Reject,
+                    OriginStep = OriginStep.Capability,
+                    SemanticSlot = SemanticSlot.T
+                });
+            }
+
             return Contains(name)
                 ? Result<DslPipelineValue>.Success(input
                     .With("last_capability", name)

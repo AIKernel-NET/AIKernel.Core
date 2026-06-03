@@ -194,7 +194,7 @@ internal sealed class KernelFailureResultFactory
     {
         var builder = ImmutableDictionary.CreateBuilder<string, string>(StringComparer.Ordinal);
 
-        foreach (var item in request.Metadata)
+        foreach (var item in request.Metadata ?? Enumerable.Empty<KeyValuePair<string, string>>())
         {
             builder[item.Key] = item.Value;
         }
@@ -278,7 +278,8 @@ internal sealed class KernelFailureResultFactory
             return providerId;
         }
 
-        if (request.Metadata.TryGetValue(KernelFacadeMetadataKeys.ProviderId, out var requestedProviderId)
+        if (request.Metadata is not null
+            && request.Metadata.TryGetValue(KernelFacadeMetadataKeys.ProviderId, out var requestedProviderId)
             && !string.IsNullOrWhiteSpace(requestedProviderId))
         {
             return requestedProviderId;

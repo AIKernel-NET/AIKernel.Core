@@ -267,6 +267,11 @@ public sealed class Kernel : IKernel
             throw new KernelRequestValidationException("Scope is required.");
         }
 
+        if (request.Scope.Metadata is null)
+        {
+            throw new KernelRequestValidationException("Scope.Metadata is required.");
+        }
+
         if (request.PromptOptions is null)
         {
             throw new KernelRequestValidationException("PromptOptions is required.");
@@ -275,6 +280,11 @@ public sealed class Kernel : IKernel
         if (request.ExecutionOptions is null)
         {
             throw new KernelRequestValidationException("ExecutionOptions is required.");
+        }
+
+        if (request.Metadata is null)
+        {
+            throw new KernelRequestValidationException("Metadata is required.");
         }
     }
 

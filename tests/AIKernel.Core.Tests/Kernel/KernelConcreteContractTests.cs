@@ -128,9 +128,48 @@ public sealed class KernelConcreteContractTests : KernelContractTests
             "1");
     }
 
+    [Fact]
+    public async Task ExecuteAsync_ReturnsRejectedResult_WhenMetadataIsMissing()
+    {
+        var kernel = CreateKernel();
+        var request = CreateRequest(
+            "valid-rom",
+            useNullMetadata: true);
+
+        var result = await kernel.ExecuteAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Rejected, result.Status);
+        Assert.Equal("invalid_kernel_request", result.Error?.Code);
+        Assert.Equal("Metadata is required.", result.Error?.Message);
+        Assert.Equal(string.Empty, result.Metadata[KernelFacadeMetadataKeys.ProviderId]);
+        Assert.Equal(FailureKind.Reject.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ReturnsRejectedResult_WhenScopeMetadataIsMissing()
+    {
+        var kernel = CreateKernel();
+        var request = CreateRequest(
+            "valid-rom",
+            useNullScopeMetadata: true);
+
+        var result = await kernel.ExecuteAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Rejected, result.Status);
+        Assert.Equal("invalid_kernel_request", result.Error?.Code);
+        Assert.Equal("Scope.Metadata is required.", result.Error?.Message);
+        Assert.Equal(FailureKind.Reject.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+    }
+
     private static KernelRequest CreateRequest(
         string rootRomId,
-        ImmutableDictionary<string, string>? metadata = null)
+        ImmutableDictionary<string, string>? metadata = null,
+        bool useNullMetadata = false,
+        bool useNullScopeMetadata = false)
     {
         return new KernelRequest
         {
@@ -142,12 +181,16 @@ public sealed class KernelConcreteContractTests : KernelContractTests
             {
                 Purpose = "contract-test",
                 Capabilities = ["summarize"],
-                Metadata = ImmutableDictionary<string, string>.Empty
+                Metadata = useNullScopeMetadata
+                    ? null!
+                    : ImmutableDictionary<string, string>.Empty
             },
             PromptOptions = PromptGenerationOptions.Default,
             ExecutionOptions = ExecutionOptions.DeterministicDefault,
             RequestedModelId = "gpt-test",
-            Metadata = metadata ?? ImmutableDictionary<string, string>.Empty
+            Metadata = useNullMetadata
+                ? null!
+                : metadata ?? ImmutableDictionary<string, string>.Empty
         };
     }
 

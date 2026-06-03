@@ -10,7 +10,7 @@ public sealed class ResultStepTests
     {
         var step = ResultStep<string, int>
             .Success("capability", 2)
-            .Map(current => current.Value + 3);
+            .Map(value => value + 3);
 
         Assert.True(step.IsSuccess);
         Assert.Equal("capability", step.State);
@@ -22,8 +22,8 @@ public sealed class ResultStepTests
     {
         var step = ResultStep<string, int>
             .Success("capability", 2)
-            .Bind(current => ResultStep<string, string>
-                .Success($"{current.State}:prompt", $"value:{current.Value}"));
+            .Bind(value => ResultStep<string, string>
+                .Success("capability:prompt", $"value:{value}"));
 
         Assert.True(step.IsSuccess);
         Assert.Equal("capability:prompt", step.State);
@@ -61,7 +61,7 @@ public sealed class ResultStepTests
     {
         var step = ResultStep<string, int>
             .Success("capability", 2)
-            .MapState(current => $"{current.State}:prompt");
+            .MapState((state, _) => $"{state}:prompt");
 
         Assert.True(step.IsSuccess);
         Assert.Equal("capability:prompt", step.State);
@@ -73,7 +73,7 @@ public sealed class ResultStepTests
     {
         var step = ResultStep<string, int>
             .Success("capability", 2)
-            .MapState(_ => throw new InvalidOperationException("state-boom"));
+            .MapState((_, _) => throw new InvalidOperationException("state-boom"));
 
         Assert.True(step.IsFailure);
         Assert.Equal("capability", step.State);
@@ -119,8 +119,8 @@ public sealed class ResultStepTests
     {
         var step = await ResultStep<string, int>
             .Success("capability", 2)
-            .BindAsync(current => Task.FromResult(ResultStep<string, string>
-                .Success($"{current.State}:prompt", $"value:{current.Value}")));
+            .BindAsync(value => Task.FromResult(ResultStep<string, string>
+                .Success("capability:prompt", $"value:{value}")));
 
         Assert.True(step.IsSuccess);
         Assert.Equal("capability:prompt", step.State);
@@ -168,7 +168,7 @@ public sealed class ResultStepTests
 
         var step = ResultStep<string, int>
             .Success("provider", 4)
-            .Tap(current => observed = current.Value);
+            .Tap(value => observed = value);
 
         Assert.True(step.IsSuccess);
         Assert.Equal(4, step.Value);
@@ -194,9 +194,9 @@ public sealed class ResultStepTests
         var step =
             from capability in ResultStep<string, int>.Success("capability", 2)
             from prompt in ResultStep<string, int>.Success(
-                $"{capability.State}:prompt",
-                capability.Value + 3)
-            select $"{prompt.State}:{prompt.Value}";
+                "capability:prompt",
+                capability + 3)
+            select $"capability:prompt:{prompt}";
 
         Assert.True(step.IsSuccess);
         Assert.Equal("capability:prompt", step.State);
@@ -211,9 +211,9 @@ public sealed class ResultStepTests
         var step =
             from capability in ResultStep<string, int>.Success("capability", 2)
             from prompt in ResultStep<string, int>.Fail(
-                $"{capability.State}:prompt",
+                "capability:prompt",
                 failure)
-            select $"{prompt.State}:{prompt.Value}";
+            select $"capability:prompt:{prompt}";
 
         Assert.True(step.IsFailure);
         Assert.Equal("capability:prompt", step.State);

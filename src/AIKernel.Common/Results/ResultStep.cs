@@ -47,14 +47,14 @@ public readonly struct ResultStep<TState, TValue>
             : Fail(state, Error!);
 
     public ResultStep<TState, TValue> MapState(
-        Func<ResultStep<TState, TValue>, TState> mapper)
+        Func<TState, TValue, TState> mapper)
     {
         if (IsFailure)
             return this;
 
         try
         {
-            return Success(mapper(this), Value!);
+            return Success(mapper(State, Value!), Value!);
         }
         catch (Exception ex)
         {
@@ -63,14 +63,14 @@ public readonly struct ResultStep<TState, TValue>
     }
 
     public ResultStep<TState, TNext> Map<TNext>(
-        Func<ResultStep<TState, TValue>, TNext> mapper)
+        Func<TValue, TNext> mapper)
     {
         if (IsFailure)
             return ResultStep<TState, TNext>.Fail(State, Error!);
 
         try
         {
-            return ResultStep<TState, TNext>.Success(State, mapper(this));
+            return ResultStep<TState, TNext>.Success(State, mapper(Value!));
         }
         catch (Exception ex)
         {
@@ -79,14 +79,14 @@ public readonly struct ResultStep<TState, TValue>
     }
 
     public async Task<ResultStep<TState, TNext>> BindAsync<TNext>(
-        Func<ResultStep<TState, TValue>, Task<ResultStep<TState, TNext>>> binder)
+        Func<TValue, Task<ResultStep<TState, TNext>>> binder)
     {
         if (IsFailure)
             return ResultStep<TState, TNext>.Fail(State, Error!);
 
         try
         {
-            return await binder(this).ConfigureAwait(false);
+            return await binder(Value!).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -95,14 +95,14 @@ public readonly struct ResultStep<TState, TValue>
     }
 
     public ResultStep<TState, TNext> Bind<TNext>(
-        Func<ResultStep<TState, TValue>, ResultStep<TState, TNext>> binder)
+        Func<TValue, ResultStep<TState, TNext>> binder)
     {
         if (IsFailure)
             return ResultStep<TState, TNext>.Fail(State, Error!);
 
         try
         {
-            return binder(this);
+            return binder(Value!);
         }
         catch (Exception ex)
         {
@@ -111,14 +111,14 @@ public readonly struct ResultStep<TState, TValue>
     }
 
     public ResultStep<TState, TValue> Tap(
-        Action<ResultStep<TState, TValue>> action)
+        Action<TValue> action)
     {
         if (IsFailure)
             return this;
 
         try
         {
-            action(this);
+            action(Value!);
             return this;
         }
         catch (Exception ex)
@@ -133,11 +133,17 @@ public readonly struct ResultStep<TState, TValue>
             : Result<TValue>.Fail(Error!);
 
     public ResultStep<TState, TNext> Select<TNext>(
-        Func<ResultStep<TState, TValue>, TNext> selector)
+        Func<TValue, TNext> selector)
         => Map(selector);
 
     public ResultStep<TState, TResult> SelectMany<TNext, TResult>(
-        Func<ResultStep<TState, TValue>, ResultStep<TState, TNext>> binder,
-        Func<ResultStep<TState, TValue>, ResultStep<TState, TNext>, TResult> projector)
-        => Bind(step => binder(step).Map(next => projector(step, next)));
+        Func<TValue, ResultStep<TState, TNext>> binder,
+        Func<TValue, TNext, TResult> projector)
+        => Bind(value => binder(value).Map(next => projector(value, next)));
+
+    public async Task<ResultStep<TState, TResult>> SelectMany<TNext, TResult>(
+        Func<TValue, Task<ResultStep<TState, TNext>>> binder,
+        Func<TValue, TNext, TResult> projector)
+        => await BindAsync(value => binder(value).Select(next => projector(value, next)))
+            .ConfigureAwait(false);
 }

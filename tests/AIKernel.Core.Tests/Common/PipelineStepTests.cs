@@ -66,6 +66,10 @@ public sealed class PipelineStepTests
         Assert.Equal(FailureKind.FailClosed, step.Error.FailureKind);
         Assert.Equal(OriginStep.KernelFacade, step.Error.OriginStep);
         Assert.Equal(SemanticSlot.T, step.Error.SemanticSlot);
+        Assert.Equal(
+            typeof(InvalidOperationException).FullName,
+            step.Error.Metadata![ResultMetadataKeys.ExceptionType]);
+        Assert.Equal("1", step.Error.Metadata![PipelineStepMetadataKeys.LoopIteration]);
         Assert.Equal(2, step.ReplayLog.Count);
         Assert.True(step.ReplayLog[0].IsSuccess);
         Assert.False(step.ReplayLog[1].IsSuccess);
@@ -119,6 +123,10 @@ public sealed class PipelineStepTests
         Assert.Equal(FailureKind.FailClosed, step.Error.FailureKind);
         Assert.Equal(OriginStep.KernelFacade, step.Error.OriginStep);
         Assert.Equal(SemanticSlot.T, step.Error.SemanticSlot);
+        Assert.Equal(
+            typeof(InvalidOperationException).FullName,
+            step.Error.Metadata![ResultMetadataKeys.ExceptionType]);
+        Assert.Equal("clock_failed", step.Error.Metadata![PipelineStepMetadataKeys.LoopDecision]);
         Assert.Equal("loop", step.SemanticDelta.Kind);
         Assert.Equal("clock_failed", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopDecision]);
         Assert.Equal("0", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopIteration]);

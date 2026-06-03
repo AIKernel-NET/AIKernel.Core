@@ -15,7 +15,13 @@ public sealed record ErrorContext(
     public IReadOnlyDictionary<string, string>? Metadata { get; init; }
 
     public static ErrorContext FromException(Exception ex)
-        => new(ex.Message, "UNHANDLED_EXCEPTION", false);
+        => new(ex.Message, "UNHANDLED_EXCEPTION", false)
+        {
+            Metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                [ResultMetadataKeys.ExceptionType] = ex.GetType().FullName ?? ex.GetType().Name
+            }
+        };
 
     public override string ToString() => $"{Code}: {Message}";
 }

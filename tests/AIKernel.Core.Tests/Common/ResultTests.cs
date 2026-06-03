@@ -45,6 +45,20 @@ public sealed class ResultTests
     }
 
     [Fact]
+    public void ErrorContext_FromException_AddsExceptionTypeMetadata()
+    {
+        var error = ErrorContext.FromException(
+            new InvalidOperationException("boom"));
+
+        Assert.Equal("boom", error.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", error.Code);
+        Assert.False(error.IsRetryable);
+        Assert.Equal(
+            typeof(InvalidOperationException).FullName,
+            error.Metadata![ResultMetadataKeys.ExceptionType]);
+    }
+
+    [Fact]
     public void ExecutionMetadataKeys_ExposeStableContractNames()
     {
         Assert.Equal("message_format", ExecutionMetadataKeys.MessageFormat);

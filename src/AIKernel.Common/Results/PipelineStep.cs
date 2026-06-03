@@ -256,12 +256,15 @@ public static class PipelineStep
         Exception exception,
         SemanticDelta loopDelta)
     {
-        var error = ErrorContext.FromException(exception) with
+        var exceptionError = ErrorContext.FromException(exception);
+        var error = exceptionError with
         {
             FailureKind = FailureKind.FailClosed,
             OriginStep = OriginStep.KernelFacade,
             SemanticSlot = SemanticSlot.T,
-            Metadata = loopDelta.Metadata
+            Metadata = MergeMetadata(
+                exceptionError.Metadata,
+                loopDelta.Metadata)
         };
         var parentStepId = current.ReplayLog.Count == 0
             ? null
@@ -271,6 +274,32 @@ public static class PipelineStep
             .Fail(current.State, error)
             .WithReplayLogPrefix(current.ReplayLog)
             .WithSemanticDelta(loopDelta, parentStepId);
+    }
+
+    private static IReadOnlyDictionary<string, string>? MergeMetadata(
+        IReadOnlyDictionary<string, string>? first,
+        IReadOnlyDictionary<string, string>? second)
+    {
+        if (first is null)
+            return second;
+
+        if (second is null)
+            return first;
+
+        var builder = ImmutableDictionary.CreateBuilder<string, string>(
+            StringComparer.Ordinal);
+
+        foreach (var item in first)
+        {
+            builder[item.Key] = item.Value;
+        }
+
+        foreach (var item in second)
+        {
+            builder[item.Key] = item.Value;
+        }
+
+        return builder.ToImmutable();
     }
 
     private static SemanticDelta CreateLoopDelta(

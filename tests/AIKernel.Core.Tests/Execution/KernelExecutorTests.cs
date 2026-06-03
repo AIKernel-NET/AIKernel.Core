@@ -1,8 +1,11 @@
 namespace AIKernel.Core.Tests.Execution;
 
+using System.Collections.Immutable;
+using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Models;
 using AIKernel.Abstractions.Providers;
+using AIKernel.Core.Context;
 using AIKernel.Core.Execution;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Core;
@@ -68,6 +71,46 @@ public sealed class KernelExecutorTests
         Assert.Equal("unknown", result.ContextHash);
     }
 
+    [Fact]
+    public async Task ExecuteAsync_ReturnsFailedResult_WhenProviderReturnsEmptyOutput()
+    {
+        var executor = new KernelExecutor(
+            new FixedPromptGenerator(),
+            new FixedCapabilityResolver(maxOutputTokens: 8),
+            new SimpleTokenizer(),
+            KernelClock.Replay(DateTimeOffset.UnixEpoch));
+
+        var result = await executor.ExecuteAsync(
+            new FakeModelProvider(output: string.Empty),
+            CreateExecutionRequest(),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Failed, result.Status);
+        Assert.Equal("empty_output", result.Error?.Code);
+        Assert.Equal("snapshot:executor", result.ContextSnapshotId);
+        Assert.Equal("sha256:executor-context", result.ContextHash);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ReturnsFailedResult_WhenOutputTokenBudgetIsExceeded()
+    {
+        var executor = new KernelExecutor(
+            new FixedPromptGenerator(),
+            new FixedCapabilityResolver(maxOutputTokens: 1),
+            new SimpleTokenizer(),
+            KernelClock.Replay(DateTimeOffset.UnixEpoch));
+
+        var result = await executor.ExecuteAsync(
+            new FakeModelProvider(output: "two tokens"),
+            CreateExecutionRequest(),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Failed, result.Status);
+        Assert.Equal("output_token_budget_exceeded", result.Error?.Code);
+        Assert.Equal("snapshot:executor", result.ContextSnapshotId);
+        Assert.Equal("sha256:executor-context", result.ContextHash);
+    }
+
     private sealed class FailingCapabilityResolver : IModelPromptCapabilityResolver
     {
         public ModelPromptCapability Resolve(
@@ -88,6 +131,33 @@ public sealed class KernelExecutorTests
         }
     }
 
+    private sealed class FixedCapabilityResolver : IModelPromptCapabilityResolver
+    {
+        private readonly int _maxOutputTokens;
+
+        public FixedCapabilityResolver(int maxOutputTokens)
+        {
+            _maxOutputTokens = maxOutputTokens;
+        }
+
+        public ModelPromptCapability Resolve(
+            IModelProvider provider,
+            KernelExecutionRequest request)
+        {
+            return new ModelPromptCapability
+            {
+                ProviderId = provider.ProviderId,
+                ModelId = request.RequestedModelId ?? "gpt-test",
+                MessageFormat = PromptMessageFormat.ChatMessages,
+                MaxInputTokens = 128,
+                MaxOutputTokens = _maxOutputTokens,
+                SupportedRoles = [ModelMessageRoles.User],
+                SupportsSystemMessages = true,
+                SystemInstructionRole = ModelMessageRoles.System
+            };
+        }
+    }
+
     private sealed class UnusedPromptGenerator : IPromptGenerator
     {
         public Task<GeneratedPrompt> GenerateAsync(
@@ -98,8 +168,40 @@ public sealed class KernelExecutorTests
         }
     }
 
+    private sealed class FixedPromptGenerator : IPromptGenerator
+    {
+        public Task<GeneratedPrompt> GenerateAsync(
+            PromptGenerationRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return Task.FromResult(new GeneratedPrompt
+            {
+                PromptId = "prompt:executor",
+                PromptHash = "sha256:executor-prompt",
+                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
+                ContextHash = request.ContextSnapshot.ContextHash,
+                Capability = request.Capability,
+                Messages =
+                [
+                    new ModelMessage(ModelMessageRoles.User, request.UserInstruction)
+                ],
+                EstimatedInputTokens = 1,
+                Metadata = ImmutableDictionary<string, string>.Empty
+            });
+        }
+    }
+
     private sealed class FakeModelProvider : IModelProvider
     {
+        private readonly string _output;
+
+        public FakeModelProvider(string output = "contract output")
+        {
+            _output = output;
+        }
+
         public string ProviderId => "fake-provider";
 
         public string Name => "Fake Provider";
@@ -139,7 +241,7 @@ public sealed class KernelExecutorTests
             IReadOnlyList<IModelMessage> messages,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult("contract output");
+            return Task.FromResult(_output);
         }
 
         public Task StreamGenerateAsync(
@@ -217,5 +319,24 @@ public sealed class KernelExecutorTests
         public int? EmbeddingDimensions => null;
 
         public IReadOnlyList<string> SupportedEmbeddingModels => [];
+    }
+
+    private static KernelExecutionRequest CreateExecutionRequest()
+    {
+        IContextSnapshot snapshot = new AssembledContextSnapshot(
+            snapshotId: "snapshot:executor",
+            parentSnapshotId: null,
+            createdAtUtc: DateTimeOffset.UnixEpoch,
+            contextHash: "sha256:executor-context",
+            context: new ContextCollectionSnapshot([]));
+
+        return new KernelExecutionRequest
+        {
+            ContextSnapshot = snapshot,
+            UserInstruction = "hello",
+            PromptOptions = PromptGenerationOptions.Default,
+            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            RequestedModelId = "gpt-test"
+        };
     }
 }

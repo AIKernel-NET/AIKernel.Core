@@ -45,26 +45,26 @@ public sealed class KernelExecutionIdFactory
         DateTimeOffset startedAt,
         long executionSequence)
     {
-        return SemanticStateMaterial
-            .CreateKernelExecutionResult(
+        return
+            from material in SemanticStateMaterial.CreateKernelExecutionResult(
                 request,
                 status,
                 promptHash,
                 resultDiscriminator,
                 startedAt,
                 executionSequence)
-            .Map(_semanticStateHasher.ComputeHash)
-            .Map(hash => hash.ToExecutionId());
+            let hash = _semanticStateHasher.ComputeHash(material)
+            select hash.ToExecutionId();
     }
 
     internal Result<string> CreateFallbackExecutionIdResult(
         KernelRequest request,
         ExecutionStatus status)
     {
-        return SemanticStateMaterial
-            .CreateKernelFallbackResult(request, status)
-            .Map(_semanticStateHasher.ComputeHash)
-            .Map(hash => hash.ToExecutionId());
+        return
+            from material in SemanticStateMaterial.CreateKernelFallbackResult(request, status)
+            let hash = _semanticStateHasher.ComputeHash(material)
+            select hash.ToExecutionId();
     }
 
     private static string Unwrap(Result<string> result)

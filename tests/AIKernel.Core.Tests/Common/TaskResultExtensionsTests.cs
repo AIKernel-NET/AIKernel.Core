@@ -152,6 +152,44 @@ public sealed class TaskResultExtensionsTests
         Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
     }
 
+    [Fact]
+    public async Task LinqQuery_AppliesWhereToTaskResult()
+    {
+        var result = await (
+            from value in SuccessAsync(3)
+            where value > 1
+            select value * 2);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(6, result.Value);
+    }
+
+    [Fact]
+    public async Task LinqQuery_ReturnsFailure_WhenTaskResultPredicateFails()
+    {
+        var result = await (
+            from value in SuccessAsync(1)
+            where value > 1
+            select value);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("Predicate failed", result.Error!.Message);
+        Assert.Equal("PREDICATE_FAILED", result.Error.Code);
+    }
+
+    [Fact]
+    public async Task LinqQuery_CatchesTaskResultPredicateException()
+    {
+        var result = await (
+            from value in SuccessAsync(1)
+            where ThrowsPredicate(value)
+            select value);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("task-predicate-boom", result.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
+    }
+
     private static Task<Result<int>> SuccessAsync(int value)
     {
         return Task.FromResult(Result<int>.Success(value));
@@ -186,5 +224,10 @@ public sealed class TaskResultExtensionsTests
     private static Result<int> Throws()
     {
         throw new InvalidOperationException("sync-binder-boom");
+    }
+
+    private static bool ThrowsPredicate(int _)
+    {
+        throw new InvalidOperationException("task-predicate-boom");
     }
 }

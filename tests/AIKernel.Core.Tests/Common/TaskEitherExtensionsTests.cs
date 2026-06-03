@@ -57,6 +57,37 @@ public sealed class TaskEitherExtensionsTests
     }
 
     [Fact]
+    public async Task Bind_ComposesSynchronousEitherWithTaskEither()
+    {
+        var either = await Either<string, int>
+            .FromRight(3)
+            .Bind(value => RightAsync(value + 4));
+
+        Assert.True(either.IsRight);
+        Assert.Equal(7, either.Right);
+    }
+
+    [Fact]
+    public async Task Bind_ComposesTaskEitherWithTaskEither()
+    {
+        var either = await RightAsync(3)
+            .Bind(value => RightAsync(value + 4));
+
+        Assert.True(either.IsRight);
+        Assert.Equal(7, either.Right);
+    }
+
+    [Fact]
+    public async Task Bind_ComposesTaskEitherWithSynchronousEither()
+    {
+        var either = await RightAsync(3)
+            .Bind(value => Either<string, int>.FromRight(value + 4));
+
+        Assert.True(either.IsRight);
+        Assert.Equal(7, either.Right);
+    }
+
+    [Fact]
     public async Task LinqQuery_ShortCircuitsSynchronousLeftBeforeTaskEither()
     {
         var called = false;
@@ -65,6 +96,23 @@ public sealed class TaskEitherExtensionsTests
             from left in Either<string, int>.FromLeft("blocked")
             from right in TrackAsync(4, () => called = true)
             select left + right);
+
+        Assert.True(either.IsLeft);
+        Assert.False(called);
+        Assert.Equal("blocked", either.Left);
+    }
+
+    [Fact]
+    public async Task Bind_ShortCircuitsTaskLeftWithoutRunningBinder()
+    {
+        var called = false;
+
+        var either = await LeftAsync("blocked")
+            .Bind(value =>
+            {
+                called = true;
+                return RightAsync(value + 4);
+            });
 
         Assert.True(either.IsLeft);
         Assert.False(called);

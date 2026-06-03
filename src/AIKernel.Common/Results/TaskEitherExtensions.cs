@@ -26,16 +26,9 @@ public static class TaskEitherExtensions
         this Either<L, R> either,
         Func<R, Task<Either<L, U>>> binder,
         Func<R, U, V> projector)
-    {
-        if (either.IsLeft)
-            return Either<L, V>.FromLeft(either.Left!);
-
-        var next = await binder(either.Right!).ConfigureAwait(false);
-        if (next.IsLeft)
-            return Either<L, V>.FromLeft(next.Left!);
-
-        return Either<L, V>.FromRight(projector(either.Right!, next.Right!));
-    }
+        => await either
+            .Bind(value => binder(value).Select(bound => projector(value, bound)))
+            .ConfigureAwait(false);
 
     public static async Task<Either<L, U>> Select<L, R, U>(
         this Task<Either<L, R>> task,
@@ -47,35 +40,50 @@ public static class TaskEitherExtensions
             : Either<L, U>.FromLeft(e.Left!);
     }
 
+    public static async Task<Either<L, U>> Bind<L, R, U>(
+        this Either<L, R> either,
+        Func<R, Task<Either<L, U>>> binder)
+    {
+        if (either.IsLeft)
+            return Either<L, U>.FromLeft(either.Left!);
+
+        return await binder(either.Right!).ConfigureAwait(false);
+    }
+
+    public static async Task<Either<L, U>> Bind<L, R, U>(
+        this Task<Either<L, R>> task,
+        Func<R, Task<Either<L, U>>> binder)
+    {
+        var either = await task.ConfigureAwait(false);
+        if (either.IsLeft)
+            return Either<L, U>.FromLeft(either.Left!);
+
+        return await binder(either.Right!).ConfigureAwait(false);
+    }
+
+    public static async Task<Either<L, U>> Bind<L, R, U>(
+        this Task<Either<L, R>> task,
+        Func<R, Either<L, U>> binder)
+    {
+        var either = await task.ConfigureAwait(false);
+        return either.IsRight
+            ? binder(either.Right!)
+            : Either<L, U>.FromLeft(either.Left!);
+    }
+
     public static async Task<Either<L, V>> SelectMany<L, R, U, V>(
         this Task<Either<L, R>> task,
         Func<R, Task<Either<L, U>>> binder,
         Func<R, U, V> projector)
-    {
-        var e1 = await task.ConfigureAwait(false);
-        if (e1.IsLeft)
-            return Either<L, V>.FromLeft(e1.Left!);
-
-        var e2 = await binder(e1.Right!).ConfigureAwait(false);
-        if (e2.IsLeft)
-            return Either<L, V>.FromLeft(e2.Left!);
-
-        return Either<L, V>.FromRight(projector(e1.Right!, e2.Right!));
-    }
+        => await task
+            .Bind(value => binder(value).Select(bound => projector(value, bound)))
+            .ConfigureAwait(false);
 
     public static async Task<Either<L, V>> SelectMany<L, R, U, V>(
         this Task<Either<L, R>> task,
         Func<R, Either<L, U>> binder,
         Func<R, U, V> projector)
-    {
-        var e1 = await task.ConfigureAwait(false);
-        if (e1.IsLeft)
-            return Either<L, V>.FromLeft(e1.Left!);
-
-        var e2 = binder(e1.Right!);
-        if (e2.IsLeft)
-            return Either<L, V>.FromLeft(e2.Left!);
-
-        return Either<L, V>.FromRight(projector(e1.Right!, e2.Right!));
-    }
+        => await task
+            .Bind(value => binder(value).Map(bound => projector(value, bound)))
+            .ConfigureAwait(false);
 }

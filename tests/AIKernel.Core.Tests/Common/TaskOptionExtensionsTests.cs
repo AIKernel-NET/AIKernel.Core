@@ -56,6 +56,37 @@ public sealed class TaskOptionExtensionsTests
     }
 
     [Fact]
+    public async Task Bind_ComposesSynchronousOptionWithTaskOption()
+    {
+        var option = await Option<int>
+            .Some(3)
+            .Bind(value => SomeAsync(value + 4));
+
+        Assert.True(option.HasValue);
+        Assert.Equal(7, option.Value);
+    }
+
+    [Fact]
+    public async Task Bind_ComposesTaskOptionWithTaskOption()
+    {
+        var option = await SomeAsync(3)
+            .Bind(value => SomeAsync(value + 4));
+
+        Assert.True(option.HasValue);
+        Assert.Equal(7, option.Value);
+    }
+
+    [Fact]
+    public async Task Bind_ComposesTaskOptionWithSynchronousOption()
+    {
+        var option = await SomeAsync(3)
+            .Bind(value => Option<int>.Some(value + 4));
+
+        Assert.True(option.HasValue);
+        Assert.Equal(7, option.Value);
+    }
+
+    [Fact]
     public async Task LinqQuery_ShortCircuitsSynchronousNoneBeforeTaskOption()
     {
         var called = false;
@@ -64,6 +95,22 @@ public sealed class TaskOptionExtensionsTests
             from left in Option<int>.None()
             from right in TrackAsync(4, () => called = true)
             select left + right);
+
+        Assert.False(option.HasValue);
+        Assert.False(called);
+    }
+
+    [Fact]
+    public async Task Bind_ShortCircuitsTaskNoneWithoutRunningBinder()
+    {
+        var called = false;
+
+        var option = await NoneAsync<int>()
+            .Bind(value =>
+            {
+                called = true;
+                return SomeAsync(value + 4);
+            });
 
         Assert.False(option.HasValue);
         Assert.False(called);

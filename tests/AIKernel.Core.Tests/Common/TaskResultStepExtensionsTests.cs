@@ -172,6 +172,67 @@ public sealed class TaskResultStepExtensionsTests
     }
 
     [Fact]
+    public async Task LinqQuery_AppendsReplayLogWithDeterministicParentChain()
+    {
+        var capabilityDelta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+        var promptDelta = new SemanticDelta(
+            "kernel.prompt.generate",
+            OriginStep.Prompt,
+            SemanticSlot.T);
+        var providerDelta = new SemanticDelta(
+            "kernel.provider.generate",
+            OriginStep.Provider,
+            SemanticSlot.T);
+
+        var step = await (
+            from capability in Task.FromResult(ResultStep<string, int>
+                .Success("capability", 2)
+                .WithSemanticDelta(capabilityDelta))
+            from prompt in ResultStep<string, int>
+                .Success("prompt", capability + 3)
+                .WithSemanticDelta(promptDelta)
+            from output in Task.FromResult(ResultStep<string, int>
+                .Success("output", prompt + 4)
+                .WithSemanticDelta(providerDelta))
+            select output);
+
+        Assert.True(step.IsSuccess);
+        Assert.Equal(3, step.ReplayLog.Count);
+        Assert.Equal(capabilityDelta, step.ReplayLog[0].SemanticDelta);
+        Assert.Equal(promptDelta, step.ReplayLog[1].SemanticDelta);
+        Assert.Equal(providerDelta, step.ReplayLog[2].SemanticDelta);
+        Assert.Equal(step.ReplayLog[0].StepId, step.ReplayLog[1].ParentStepId);
+        Assert.Equal(step.ReplayLog[1].StepId, step.ReplayLog[2].ParentStepId);
+        Assert.Equal(step.StepId, step.ReplayLog[2].StepId);
+    }
+
+    [Fact]
+    public async Task LinqQuery_CatchesProjectorExceptionAndMarksCurrentReplayLogFailure()
+    {
+        var delta = new SemanticDelta(
+            "kernel.provider.generate",
+            OriginStep.Provider,
+            SemanticSlot.T);
+
+        var step = await (
+            from output in Task.FromResult(ResultStep<string, int>
+                .Success("output", 9)
+                .WithSemanticDelta(delta))
+            select ThrowProjector(output));
+
+        var entry = Assert.Single(step.ReplayLog);
+        Assert.True(step.IsFailure);
+        Assert.Equal("task-step-projector-boom", step.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", step.Error.Code);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("UNHANDLED_EXCEPTION", entry.ErrorCode);
+        Assert.Equal(delta, entry.SemanticDelta);
+    }
+
+    [Fact]
     public async Task LinqQuery_ReturnsBinderFailureWithLatestState()
     {
         var failure = new ErrorContext("missing", "MISSING", false);
@@ -206,5 +267,10 @@ public sealed class TaskResultStepExtensionsTests
     private static Task<ResultStep<string, int>> ThrowsAsync()
     {
         throw new InvalidOperationException("task-step-binder-boom");
+    }
+
+    private static int ThrowProjector(int value)
+    {
+        throw new InvalidOperationException("task-step-projector-boom");
     }
 }

@@ -21,7 +21,7 @@ public sealed class TryTests
 
         Assert.True(result.IsFailure);
         Assert.Equal("boom", result.Error!.Message);
-        Assert.Equal("ERROR", result.Error.Code);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public sealed class TryTests
 
         Assert.True(result.IsFailure);
         Assert.Equal("async-boom", result.Error!.Message);
-        Assert.Equal("ERROR", result.Error.Code);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
     }
 
     [Fact]

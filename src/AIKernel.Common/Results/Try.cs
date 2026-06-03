@@ -10,7 +10,7 @@ public static class Try
         }
         catch (Exception ex)
         {
-            return Result<T>.Fail(ex.Message);
+            return Result<T>.Fail(ErrorContext.FromException(ex));
         }
     }
 
@@ -22,7 +22,7 @@ public static class Try
         }
         catch (Exception ex)
         {
-            return Result<T>.Fail(ex.Message);
+            return Result<T>.Fail(ErrorContext.FromException(ex));
         }
     }
 

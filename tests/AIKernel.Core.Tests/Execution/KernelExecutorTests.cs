@@ -41,8 +41,9 @@ public sealed class KernelExecutorTests
         Assert.Equal("sha256:executor-prompt", result.PromptHash);
         Assert.Equal("contract output", result.OutputText);
         Assert.Null(result.Error);
-        Assert.Equal(OriginStep.Tokenizer.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(PromptMessageFormat.ChatMessages.ToString(), result.Metadata[ExecutionMetadataKeys.MessageFormat]);
+        Assert.Equal(OriginStep.Tokenizer.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         ReplayMetadataAssertions.AssertReplayMetadata(
             result.Metadata,
             "kernel.tokenizer.validate-output-budget",

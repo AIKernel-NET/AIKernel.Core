@@ -193,6 +193,11 @@ services.AddAIKernelBrowserVfsProviders();
 `AddAIKernelCoreVfsProviders` は、ローカルファイルシステムアクセスが想定される
 信頼済み Server / Desktop ホストでのみ使用してください。
 
+外部 Capability モジュールや Model Provider をホストへ登録する場合は、
+`KernelFacadeMetadataKeys.ProviderId` を使って request metadata から Provider を選択します。
+これにより、AIKernel.Tools、AIKernel.RH、その他 Provider パッケージ間で
+metadata 文字列を直書きせずに統合できます。
+
 ---
 
 ## 目標とする起動体験

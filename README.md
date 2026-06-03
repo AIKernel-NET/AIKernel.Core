@@ -193,6 +193,11 @@ services.AddAIKernelBrowserVfsProviders();
 Use `AddAIKernelCoreVfsProviders` only in trusted server or desktop hosts where
 local filesystem access is expected.
 
+When a host registers external capability modules or model providers, select the
+provider through request metadata using `KernelFacadeMetadataKeys.ProviderId`.
+This avoids hard-coded metadata strings across AIKernel.Tools, AIKernel.RH, and
+other provider packages.
+
 ---
 
 ## Target Boot Experience

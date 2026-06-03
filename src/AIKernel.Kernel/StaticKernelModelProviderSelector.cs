@@ -29,14 +29,14 @@ public sealed class StaticKernelModelProviderSelector : IKernelModelProviderSele
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var providerId = request.Metadata.TryGetValue("provider_id", out var value)
+        var providerId = request.Metadata.TryGetValue(KernelFacadeMetadataKeys.ProviderId, out var value)
             ? value
             : null;
 
         if (string.IsNullOrWhiteSpace(providerId))
         {
             throw new KernelRequestValidationException(
-                "provider_id metadata is required for static provider selection.");
+                $"{KernelFacadeMetadataKeys.ProviderId} metadata is required for static provider selection.");
         }
 
         if (!_providers.TryGetValue(providerId, out var provider))

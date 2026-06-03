@@ -173,6 +173,11 @@ public sealed class KernelExecutor : IKernelExecutor
 
         metadata[ReplayMetadataKeys.StepId] = stepId;
         metadata[ReplayMetadataKeys.SemanticDelta] = semanticDelta.Label;
+        if (!string.IsNullOrWhiteSpace(semanticDelta.Kind))
+        {
+            metadata[PipelineStepMetadataKeys.DeltaKind] = semanticDelta.Kind;
+        }
+
         metadata[ReplayMetadataKeys.ReplayLogCount] = replayLogCount.ToString(System.Globalization.CultureInfo.InvariantCulture);
         metadata[ReplayMetadataKeys.ReplayLogHash] = replayLogHash;
 

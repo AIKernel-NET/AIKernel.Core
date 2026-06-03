@@ -44,6 +44,7 @@ public sealed class KernelExecutorTests
         Assert.Equal(PromptMessageFormat.ChatMessages.ToString(), result.Metadata[ExecutionMetadataKeys.MessageFormat]);
         Assert.Equal(OriginStep.Tokenizer.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
+        Assert.Equal("execute", result.Metadata[PipelineStepMetadataKeys.DeltaKind]);
         ReplayMetadataAssertions.AssertReplayMetadata(
             result.Metadata,
             "kernel.tokenizer.validate-output-budget",
@@ -132,6 +133,7 @@ public sealed class KernelExecutorTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
         Assert.Equal(OriginStep.Provider.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
+        Assert.Equal("execute", result.Metadata[PipelineStepMetadataKeys.DeltaKind]);
         ReplayMetadataAssertions.AssertReplayMetadata(
             result.Metadata,
             "kernel.provider.validate-output",
@@ -213,6 +215,7 @@ public sealed class KernelExecutorTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
         Assert.Equal(OriginStep.Tokenizer.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
+        Assert.Equal("execute", result.Metadata[PipelineStepMetadataKeys.DeltaKind]);
         ReplayMetadataAssertions.AssertReplayMetadata(
             result.Metadata,
             "kernel.tokenizer.validate-output-budget",

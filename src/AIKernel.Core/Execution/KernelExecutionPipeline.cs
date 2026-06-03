@@ -214,32 +214,38 @@ internal sealed class KernelExecutionPipeline
     private static readonly SemanticDelta CapabilityDelta = new(
         "kernel.capability.resolve",
         OriginStep.Capability,
-        SemanticSlot.T);
+        SemanticSlot.T,
+        Kind: "execute");
 
     private static readonly SemanticDelta PromptDelta = new(
         "kernel.prompt.generate",
         OriginStep.Prompt,
-        SemanticSlot.T);
+        SemanticSlot.T,
+        Kind: "execute");
 
     private static readonly SemanticDelta ProviderDelta = new(
         "kernel.provider.generate",
         OriginStep.Provider,
-        SemanticSlot.T);
+        SemanticSlot.T,
+        Kind: "execute");
 
     private static readonly SemanticDelta ProviderValidationDelta = new(
         "kernel.provider.validate-output",
         OriginStep.Provider,
-        SemanticSlot.T);
+        SemanticSlot.T,
+        Kind: "execute");
 
     private static readonly SemanticDelta TokenizerDelta = new(
         "kernel.tokenizer.count-output",
         OriginStep.Tokenizer,
-        SemanticSlot.T);
+        SemanticSlot.T,
+        Kind: "execute");
 
     private static readonly SemanticDelta TokenBudgetDelta = new(
         "kernel.tokenizer.validate-output-budget",
         OriginStep.Tokenizer,
-        SemanticSlot.T);
+        SemanticSlot.T,
+        Kind: "execute");
 
     private sealed record PromptExecutionStep(
         ModelPromptCapability Capability,

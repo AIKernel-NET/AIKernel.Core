@@ -86,6 +86,11 @@ internal sealed class KernelExecutionSuccessResultFactory
             {
                 builder[ReplayMetadataKeys.SemanticSlot] = semanticSlot.ToString();
             }
+
+            if (!string.IsNullOrWhiteSpace(finalSemanticDelta.Kind))
+            {
+                builder[PipelineStepMetadataKeys.DeltaKind] = finalSemanticDelta.Kind;
+            }
         }
 
         if (replayLogCount is { } count)

@@ -48,6 +48,34 @@ public sealed class OptionTests
         Assert.Equal(9, Option<int>.None().OrElse(9));
     }
 
+    [Fact]
+    public void Bind_ComposesSomeValues()
+    {
+        var option = Option<int>
+            .Some(2)
+            .Bind(value => Option<string>.Some($"value:{value}"));
+
+        Assert.True(option.HasValue);
+        Assert.Equal("value:2", option.Value);
+    }
+
+    [Fact]
+    public void Bind_ShortCircuitsNone()
+    {
+        var called = false;
+
+        var option = Option<int>
+            .None()
+            .Bind(_ =>
+            {
+                called = true;
+                return Option<string>.Some("unexpected");
+            });
+
+        Assert.False(option.HasValue);
+        Assert.False(called);
+    }
+
     private static Option<int> Track(
         int value,
         Action onCall)

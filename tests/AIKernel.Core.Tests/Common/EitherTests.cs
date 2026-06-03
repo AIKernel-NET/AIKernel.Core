@@ -56,6 +56,46 @@ public sealed class EitherTests
         Assert.Equal(14, result);
     }
 
+    [Fact]
+    public void Map_TransformsRight()
+    {
+        var either = Either<string, int>
+            .FromRight(7)
+            .Map(value => value * 2);
+
+        Assert.True(either.IsRight);
+        Assert.Equal(14, either.Right);
+    }
+
+    [Fact]
+    public void Bind_ComposesRight()
+    {
+        var either = Either<string, int>
+            .FromRight(7)
+            .Bind(value => Either<string, string>.FromRight($"value:{value}"));
+
+        Assert.True(either.IsRight);
+        Assert.Equal("value:7", either.Right);
+    }
+
+    [Fact]
+    public void Bind_ShortCircuitsLeft()
+    {
+        var called = false;
+
+        var either = Either<string, int>
+            .FromLeft("blocked")
+            .Bind(_ =>
+            {
+                called = true;
+                return Either<string, string>.FromRight("unexpected");
+            });
+
+        Assert.True(either.IsLeft);
+        Assert.False(called);
+        Assert.Equal("blocked", either.Left);
+    }
+
     private static Either<string, int> Track(
         int value,
         Action onCall)

@@ -26,6 +26,11 @@ public readonly struct Option<T>
             ? Option<U>.Some(mapper(Value!))
             : Option<U>.None();
 
+    public Option<U> Bind<U>(Func<T, Option<U>> binder)
+        => HasValue
+            ? binder(Value!)
+            : Option<U>.None();
+
     public T OrElse(T fallback)
         => HasValue ? Value! : fallback;
 

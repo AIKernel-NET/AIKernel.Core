@@ -28,14 +28,22 @@ public readonly struct Either<L, R>
     public T Match<T>(Func<L, T> leftFunc, Func<R, T> rightFunc)
         => IsRight ? rightFunc(Right!) : leftFunc(Left!);
 
+    public Either<L, U> Map<U>(Func<R, U> mapper)
+        => IsRight
+            ? Either<L, U>.FromRight(mapper(Right!))
+            : Either<L, U>.FromLeft(Left!);
+
+    public Either<L, U> Bind<U>(Func<R, Either<L, U>> binder)
+        => IsRight
+            ? binder(Right!)
+            : Either<L, U>.FromLeft(Left!);
+
     // -------------------------
     // LINQ Support
     // -------------------------
 
     public Either<L, U> Select<U>(Func<R, U> selector)
-        => IsRight
-            ? Either<L, U>.FromRight(selector(Right!))
-            : Either<L, U>.FromLeft(Left!);
+        => Map(selector);
 
     public Either<L, V> SelectMany<U, V>(
         Func<R, Either<L, U>> binder,

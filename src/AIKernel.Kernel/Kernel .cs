@@ -1,5 +1,6 @@
 ﻿namespace AIKernel.Kernel;
 
+using System.Collections.Immutable;
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Kernel;
@@ -133,7 +134,11 @@ public sealed class Kernel : IKernel
                 .ExecuteAsync(provider, executionRequest, cancellationToken)
                 .ConfigureAwait(false);
 
-            return result;
+            return CompleteSuccessfulResult(
+                request,
+                transaction,
+                result,
+                provider.ProviderId);
         }
         catch (OperationCanceledException)
         {
@@ -296,6 +301,51 @@ public sealed class Kernel : IKernel
             or RomRequiredMetadataMissingException
             or PromptTokenBudgetExceededException
             or UnsupportedPromptCapabilityException;
+    }
+
+    private static KernelRequestExecutionResult CompleteSuccessfulResult(
+        KernelRequest request,
+        KernelTransactionSnapshot transaction,
+        KernelRequestExecutionResult result,
+        string providerId)
+    {
+        return result with
+        {
+            Metadata = BuildSuccessfulMetadata(
+                request,
+                transaction,
+                result,
+                providerId)
+        };
+    }
+
+    private static ImmutableDictionary<string, string> BuildSuccessfulMetadata(
+        KernelRequest request,
+        KernelTransactionSnapshot transaction,
+        KernelRequestExecutionResult result,
+        string providerId)
+    {
+        var builder = ImmutableDictionary.CreateBuilder<string, string>(
+            StringComparer.Ordinal);
+
+        foreach (var item in request.Metadata)
+        {
+            builder[item.Key] = item.Value;
+        }
+
+        foreach (var item in result.Metadata)
+        {
+            builder[item.Key] = item.Value;
+        }
+
+        builder[KernelFacadeMetadataKeys.RootRomId] = request.RootRomId.Value;
+        builder[KernelFacadeMetadataKeys.ProviderId] = providerId;
+        builder[KernelFacadeMetadataKeys.VfsProviderId] = request.VfsProviderId;
+        builder[KernelFacadeMetadataKeys.RequestedModelId] = request.RequestedModelId ?? string.Empty;
+        builder[KernelFacadeMetadataKeys.TransactionId] = transaction.TransactionId;
+        builder[KernelFacadeMetadataKeys.InputHash] = transaction.InputHash;
+
+        return builder.ToImmutable();
     }
 
 }

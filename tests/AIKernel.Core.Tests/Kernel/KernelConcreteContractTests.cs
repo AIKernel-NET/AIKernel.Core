@@ -107,6 +107,40 @@ public sealed class KernelConcreteContractTests : KernelContractTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_PreservesRoutingMetadata_WhenTransactionSucceeds()
+    {
+        var kernel = CreateKernel();
+        var request = CreateRequest(
+            "valid-rom",
+            ImmutableDictionary<string, string>.Empty
+                .Add(KernelFacadeMetadataKeys.ProviderId, "user-provider")
+                .Add(KernelFacadeMetadataKeys.ProviderTier, "capability")
+                .Add(KernelFacadeMetadataKeys.CapabilityModuleId, "AIKernel.Tools.Cli")
+                .Add(KernelFacadeMetadataKeys.RouteReason, "aik-prefix")
+                .Add("custom_key", "custom-value"));
+
+        var result = await kernel.ExecuteAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Succeeded, result.Status);
+        Assert.Equal("fake-provider", result.Metadata[KernelFacadeMetadataKeys.ProviderId]);
+        Assert.Equal("capability", result.Metadata[KernelFacadeMetadataKeys.ProviderTier]);
+        Assert.Equal("AIKernel.Tools.Cli", result.Metadata[KernelFacadeMetadataKeys.CapabilityModuleId]);
+        Assert.Equal("aik-prefix", result.Metadata[KernelFacadeMetadataKeys.RouteReason]);
+        Assert.Equal("custom-value", result.Metadata["custom_key"]);
+        Assert.Equal("valid-rom", result.Metadata[KernelFacadeMetadataKeys.RootRomId]);
+        Assert.Equal("memory-file", result.Metadata[KernelFacadeMetadataKeys.VfsProviderId]);
+        Assert.Equal("gpt-test", result.Metadata[KernelFacadeMetadataKeys.RequestedModelId]);
+        Assert.StartsWith("ktx:sha256:", result.Metadata[KernelFacadeMetadataKeys.TransactionId], StringComparison.Ordinal);
+        Assert.StartsWith("sha256:", result.Metadata[KernelFacadeMetadataKeys.InputHash], StringComparison.Ordinal);
+        ReplayMetadataAssertions.AssertReplayMetadata(
+            result.Metadata,
+            "kernel.executor.succeeded",
+            "3");
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsCanceledMetadata_WhenExecutorCancels()
     {
         var kernel = CreateKernel(new CanceledKernelExecutor());

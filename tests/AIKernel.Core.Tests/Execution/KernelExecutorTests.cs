@@ -159,7 +159,7 @@ public sealed class KernelExecutorTests
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         Assert.Equal(
             typeof(InvalidOperationException).FullName,
-            result.Metadata["exception_type"]);
+            result.Metadata[ResultMetadataKeys.ExceptionType]);
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public sealed class KernelExecutorTests
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         Assert.Equal(
             typeof(InvalidOperationException).FullName,
-            result.Metadata["exception_type"]);
+            result.Metadata[ResultMetadataKeys.ExceptionType]);
     }
 
     [Fact]
@@ -244,7 +244,7 @@ public sealed class KernelExecutorTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
         Assert.Equal(OriginStep.SemanticHash.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
         Assert.Equal(SemanticSlot.B.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
-        Assert.Equal("ERROR", result.Metadata["source_error_code"]);
+        Assert.Equal("ERROR", result.Metadata[ResultMetadataKeys.SourceErrorCode]);
     }
 
     private sealed class FailingCapabilityResolver : IModelPromptCapabilityResolver

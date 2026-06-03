@@ -38,6 +38,13 @@ public sealed class ResultTests
     }
 
     [Fact]
+    public void ResultMetadataKeys_ExposeStableContractNames()
+    {
+        Assert.Equal("exception_type", ResultMetadataKeys.ExceptionType);
+        Assert.Equal("source_error_code", ResultMetadataKeys.SourceErrorCode);
+    }
+
+    [Fact]
     public void Bind_PropagatesFailureWithoutRunningBinder()
     {
         var called = false;

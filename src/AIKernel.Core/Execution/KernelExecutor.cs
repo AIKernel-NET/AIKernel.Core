@@ -104,7 +104,7 @@ public sealed class KernelExecutor : IKernelExecutor
                 SemanticSlot = SemanticSlot.B,
                 Metadata = new Dictionary<string, string>(StringComparer.Ordinal)
                 {
-                    ["source_error_code"] = successResult.Error.Code
+                    [ResultMetadataKeys.SourceErrorCode] = successResult.Error.Code
                 }
             });
     }

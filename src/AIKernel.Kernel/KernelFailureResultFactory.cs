@@ -193,7 +193,7 @@ internal sealed class KernelFailureResultFactory
 
         if (exception is not null)
         {
-            builder["exception_type"] = exception.GetType().FullName ?? exception.GetType().Name;
+            builder[ResultMetadataKeys.ExceptionType] = exception.GetType().FullName ?? exception.GetType().Name;
         }
 
         if (transaction is not null)

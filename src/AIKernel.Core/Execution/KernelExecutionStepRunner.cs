@@ -133,7 +133,7 @@ internal sealed class KernelExecutionStepRunner
             SemanticSlot = SemanticSlot.T,
             Metadata = new Dictionary<string, string>(StringComparer.Ordinal)
             {
-                ["exception_type"] = exception.GetType().FullName ?? exception.GetType().Name
+                [ResultMetadataKeys.ExceptionType] = exception.GetType().FullName ?? exception.GetType().Name
             }
         };
     }

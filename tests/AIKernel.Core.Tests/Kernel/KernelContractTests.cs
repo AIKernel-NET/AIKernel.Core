@@ -4,6 +4,7 @@ using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Dtos.Rom;
 using AIKernel.Common.Results;
+using AIKernel.Core.Tests.Support;
 using Xunit;
 
 public abstract class KernelContractTests
@@ -34,10 +35,10 @@ public abstract class KernelContractTests
         Assert.False(string.IsNullOrWhiteSpace(result.PromptHash));
         Assert.False(string.IsNullOrWhiteSpace(result.OutputText));
         Assert.Null(result.Error);
-        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
-        Assert.Equal("kernel.executor.succeeded", result.Metadata["semantic_delta"]);
-        Assert.Equal("3", result.Metadata["replay_log_count"]);
-        Assert.StartsWith("replay:sha256:", result.Metadata["replay_log_hash"], StringComparison.Ordinal);
+        ReplayMetadataAssertions.AssertReplayMetadata(
+            result.Metadata,
+            "kernel.executor.succeeded",
+            "3");
     }
 
     [Fact]
@@ -58,10 +59,10 @@ public abstract class KernelContractTests
         Assert.Equal(FailureKind.Reject.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.G.ToString(), result.Metadata["semantic_slot"]);
-        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
-        Assert.Equal("kernel.facade.reject", result.Metadata["semantic_delta"]);
-        Assert.Equal("1", result.Metadata["replay_log_count"]);
-        Assert.StartsWith("replay:sha256:", result.Metadata["replay_log_hash"], StringComparison.Ordinal);
+        ReplayMetadataAssertions.AssertReplayMetadata(
+            result.Metadata,
+            "kernel.facade.reject",
+            "1");
     }
 
     [Fact]
@@ -82,10 +83,10 @@ public abstract class KernelContractTests
         Assert.Equal(FailureKind.Reject.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.G.ToString(), result.Metadata["semantic_slot"]);
-        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
-        Assert.Equal("kernel.facade.reject", result.Metadata["semantic_delta"]);
-        Assert.Equal("1", result.Metadata["replay_log_count"]);
-        Assert.StartsWith("replay:sha256:", result.Metadata["replay_log_hash"], StringComparison.Ordinal);
+        ReplayMetadataAssertions.AssertReplayMetadata(
+            result.Metadata,
+            "kernel.facade.reject",
+            "1");
     }
 
     [Fact]

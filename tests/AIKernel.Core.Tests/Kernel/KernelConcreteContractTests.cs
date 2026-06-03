@@ -9,6 +9,7 @@ using AIKernel.Abstractions.Providers;
 using AIKernel.Common.Results;
 using AIKernel.Core.Context;
 using AIKernel.Core.Rom;
+using AIKernel.Core.Tests.Support;
 using AIKernel.Dtos.Core;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
@@ -60,10 +61,10 @@ public sealed class KernelConcreteContractTests : KernelContractTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
-        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
-        Assert.Equal("kernel.facade.fail", result.Metadata["semantic_delta"]);
-        Assert.Equal("1", result.Metadata["replay_log_count"]);
-        Assert.StartsWith("replay:sha256:", result.Metadata["replay_log_hash"], StringComparison.Ordinal);
+        ReplayMetadataAssertions.AssertReplayMetadata(
+            result.Metadata,
+            "kernel.facade.fail",
+            "1");
     }
 
     [Fact]
@@ -104,10 +105,10 @@ public sealed class KernelConcreteContractTests : KernelContractTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
-        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
-        Assert.Equal("kernel.facade.cancel", result.Metadata["semantic_delta"]);
-        Assert.Equal("1", result.Metadata["replay_log_count"]);
-        Assert.StartsWith("replay:sha256:", result.Metadata["replay_log_hash"], StringComparison.Ordinal);
+        ReplayMetadataAssertions.AssertReplayMetadata(
+            result.Metadata,
+            "kernel.facade.cancel",
+            "1");
     }
 
     private static KernelRequest CreateRequest(

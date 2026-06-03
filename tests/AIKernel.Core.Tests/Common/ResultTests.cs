@@ -26,6 +26,18 @@ public sealed class ResultTests
     }
 
     [Fact]
+    public void ReplayMetadataKeys_ExposeStableContractNames()
+    {
+        Assert.Equal("step_id", ReplayMetadataKeys.StepId);
+        Assert.Equal("semantic_delta", ReplayMetadataKeys.SemanticDelta);
+        Assert.Equal("replay_log_count", ReplayMetadataKeys.ReplayLogCount);
+        Assert.Equal("replay_log_hash", ReplayMetadataKeys.ReplayLogHash);
+        Assert.Equal("origin_step", ReplayMetadataKeys.OriginStep);
+        Assert.Equal("semantic_slot", ReplayMetadataKeys.SemanticSlot);
+        Assert.Equal("failure_kind", ReplayMetadataKeys.FailureKind);
+    }
+
+    [Fact]
     public void Bind_PropagatesFailureWithoutRunningBinder()
     {
         var called = false;

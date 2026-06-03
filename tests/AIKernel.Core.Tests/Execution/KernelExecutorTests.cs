@@ -75,9 +75,9 @@ public sealed class KernelExecutorTests
         Assert.Equal("unknown", result.ContextSnapshotId);
         Assert.Equal("unknown", result.ContextHash);
         Assert.Equal("execution_failed", result.Error?.Code);
-        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.Capability.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.Capability.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
     }
 
     [Fact]
@@ -105,9 +105,9 @@ public sealed class KernelExecutorTests
         Assert.Equal("canceled", result.Error?.Code);
         Assert.Equal("unknown", result.ContextSnapshotId);
         Assert.Equal("unknown", result.ContextHash);
-        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.Capability.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.Capability.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
     }
 
     [Fact]
@@ -128,9 +128,9 @@ public sealed class KernelExecutorTests
         Assert.Equal("empty_output", result.Error?.Code);
         Assert.Equal("snapshot:executor", result.ContextSnapshotId);
         Assert.Equal("sha256:executor-context", result.ContextHash);
-        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.Provider.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.Provider.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         ReplayMetadataAssertions.AssertReplayMetadata(
             result.Metadata,
             "kernel.provider.validate-output",
@@ -154,9 +154,9 @@ public sealed class KernelExecutorTests
         Assert.Equal(ExecutionStatus.Failed, result.Status);
         Assert.Equal("execution_failed", result.Error?.Code);
         Assert.Equal("prompt failed", result.Error?.Message);
-        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.Prompt.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.Prompt.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         Assert.Equal(
             typeof(InvalidOperationException).FullName,
             result.Metadata["exception_type"]);
@@ -183,9 +183,9 @@ public sealed class KernelExecutorTests
         Assert.Equal("provider failed", result.Error?.Message);
         Assert.Equal("snapshot:executor", result.ContextSnapshotId);
         Assert.Equal("sha256:executor-context", result.ContextHash);
-        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.Provider.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.Provider.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         Assert.Equal(
             typeof(InvalidOperationException).FullName,
             result.Metadata["exception_type"]);
@@ -209,9 +209,9 @@ public sealed class KernelExecutorTests
         Assert.Equal("output_token_budget_exceeded", result.Error?.Code);
         Assert.Equal("snapshot:executor", result.ContextSnapshotId);
         Assert.Equal("sha256:executor-context", result.ContextHash);
-        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.Tokenizer.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.Tokenizer.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         ReplayMetadataAssertions.AssertReplayMetadata(
             result.Metadata,
             "kernel.tokenizer.validate-output-budget",
@@ -241,9 +241,9 @@ public sealed class KernelExecutorTests
 
         Assert.Equal(ExecutionStatus.Failed, result.Status);
         Assert.Equal("execution_id_generation_failed", result.Error?.Code);
-        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.SemanticHash.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.B.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.SemanticHash.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.B.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         Assert.Equal("ERROR", result.Metadata["source_error_code"]);
     }
 

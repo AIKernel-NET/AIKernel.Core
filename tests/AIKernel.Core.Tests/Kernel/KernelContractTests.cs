@@ -56,9 +56,9 @@ public abstract class KernelContractTests
         Assert.Null(result.OutputText);
         Assert.NotNull(result.Error);
         Assert.Equal("context_rejected", result.Error.Code);
-        Assert.Equal(FailureKind.Reject.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.G.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.Reject.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.G.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         ReplayMetadataAssertions.AssertReplayMetadata(
             result.Metadata,
             "kernel.facade.reject",
@@ -80,9 +80,9 @@ public abstract class KernelContractTests
         Assert.Null(result.OutputText);
         Assert.NotNull(result.Error);
         Assert.Equal("rom_signature_verification_failed", result.Error.Code);
-        Assert.Equal(FailureKind.Reject.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.G.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.Reject.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.G.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         ReplayMetadataAssertions.AssertReplayMetadata(
             result.Metadata,
             "kernel.facade.reject",

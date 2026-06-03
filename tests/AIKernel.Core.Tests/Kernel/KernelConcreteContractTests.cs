@@ -58,9 +58,9 @@ public sealed class KernelConcreteContractTests : KernelContractTests
 
         Assert.Equal(ExecutionStatus.Failed, result.Status);
         Assert.Equal("kernel_transaction_failed", result.Error?.Code);
-        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         ReplayMetadataAssertions.AssertReplayMetadata(
             result.Metadata,
             "kernel.facade.fail",
@@ -74,9 +74,9 @@ public sealed class KernelConcreteContractTests : KernelContractTests
         var request = CreateRequest(
             "valid-rom",
             ImmutableDictionary<string, string>.Empty
-                .Add("failure_kind", "user-value")
-                .Add("origin_step", "user-value")
-                .Add("semantic_slot", "user-value")
+                .Add(ReplayMetadataKeys.FailureKind, "user-value")
+                .Add(ReplayMetadataKeys.OriginStep, "user-value")
+                .Add(ReplayMetadataKeys.SemanticSlot, "user-value")
                 .Add("custom_key", "custom-value"));
 
         var result = await kernel.ExecuteAsync(
@@ -84,11 +84,11 @@ public sealed class KernelConcreteContractTests : KernelContractTests
             TestContext.Current.CancellationToken);
 
         Assert.Equal(ExecutionStatus.Failed, result.Status);
-        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         Assert.Equal("custom-value", result.Metadata["custom_key"]);
-        Assert.Equal("kernel.facade.fail", result.Metadata["semantic_delta"]);
+        Assert.Equal("kernel.facade.fail", result.Metadata[ReplayMetadataKeys.SemanticDelta]);
     }
 
     [Fact]
@@ -102,9 +102,9 @@ public sealed class KernelConcreteContractTests : KernelContractTests
 
         Assert.Equal(ExecutionStatus.Canceled, result.Status);
         Assert.Equal("canceled", result.Error?.Code);
-        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
-        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
-        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
+        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         ReplayMetadataAssertions.AssertReplayMetadata(
             result.Metadata,
             "kernel.facade.cancel",
@@ -237,10 +237,10 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 StartedAtUtc = DateTimeOffset.UnixEpoch,
                 CompletedAtUtc = DateTimeOffset.UnixEpoch,
                 Metadata = ImmutableDictionary<string, string>.Empty
-                    .Add("step_id", "step:sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-                    .Add("semantic_delta", "kernel.executor.succeeded")
-                    .Add("replay_log_count", "3")
-                    .Add("replay_log_hash", "replay:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+                    .Add(ReplayMetadataKeys.StepId, "step:sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+                    .Add(ReplayMetadataKeys.SemanticDelta, "kernel.executor.succeeded")
+                    .Add(ReplayMetadataKeys.ReplayLogCount, "3")
+                    .Add(ReplayMetadataKeys.ReplayLogHash, "replay:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
             });
         }
     }

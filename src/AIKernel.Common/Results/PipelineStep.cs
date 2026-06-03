@@ -1,0 +1,291 @@
+namespace AIKernel.Common.Results;
+
+using System.Collections.Immutable;
+using System.Globalization;
+
+public static class PipelineStep
+{
+    public const string SuspendErrorCode = "SUSPENDED";
+
+    public static ResultStep<TState, TValue> Loop<TState, TValue>(
+        ResultStep<TState, TValue> initial,
+        int maxIterations,
+        Func<int, TValue, ResultStep<TState, TValue>> stepFunc)
+    {
+        ArgumentNullException.ThrowIfNull(stepFunc);
+
+        if (maxIterations < 0)
+        {
+            return InvalidLoop<TState, TValue>(
+                initial.State,
+                "maxIterations must be greater than or equal to zero.");
+        }
+
+        var current = initial;
+        if (current.IsFailure)
+            return current;
+
+        if (maxIterations == 0)
+        {
+            return current.WithSemanticDelta(
+                CreateLoopDelta(
+                    iteration: 0,
+                    decision: "max_iterations_reached"));
+        }
+
+        for (var iteration = 0; iteration < maxIterations; iteration++)
+        {
+            var currentIteration = iteration;
+            current = ApplyLoopIteration(
+                current,
+                value => stepFunc(currentIteration, value),
+                CreateLoopDelta(
+                    currentIteration,
+                    currentIteration == maxIterations - 1
+                        ? "max_iterations_reached"
+                        : "continue"));
+
+            if (current.IsFailure)
+                return current;
+        }
+
+        return current;
+    }
+
+    public static ResultStep<TState, TValue> LoopUntil<TState, TValue>(
+        ResultStep<TState, TValue> initial,
+        TimeSpan timeout,
+        DateTimeOffset startedAtUtc,
+        Func<DateTimeOffset> nowProvider,
+        int maxIterations,
+        Func<int, DateTimeOffset, TValue, ResultStep<TState, TValue>> stepFunc)
+    {
+        ArgumentNullException.ThrowIfNull(nowProvider);
+        ArgumentNullException.ThrowIfNull(stepFunc);
+
+        if (timeout < TimeSpan.Zero)
+        {
+            return InvalidLoop<TState, TValue>(
+                initial.State,
+                "timeout must be greater than or equal to zero.");
+        }
+
+        if (maxIterations < 0)
+        {
+            return InvalidLoop<TState, TValue>(
+                initial.State,
+                "maxIterations must be greater than or equal to zero.");
+        }
+
+        var current = initial;
+        if (current.IsFailure)
+            return current;
+
+        for (var iteration = 0; iteration < maxIterations; iteration++)
+        {
+            DateTimeOffset now;
+            try
+            {
+                now = nowProvider();
+            }
+            catch (Exception ex)
+            {
+                return current
+                    .Bind<TValue>(_ => throw ex)
+                    .WithSemanticDelta(
+                        CreateLoopUntilDelta(
+                            iteration,
+                            timestamp: null,
+                            decision: "clock_failed"));
+            }
+
+            if (now - startedAtUtc >= timeout)
+            {
+                return current.WithSemanticDelta(
+                    CreateLoopUntilDelta(
+                        iteration,
+                        now,
+                        "timeout_reached"));
+            }
+
+            var currentIteration = iteration;
+            current = ApplyLoopIteration(
+                current,
+                value => stepFunc(currentIteration, now, value),
+                CreateLoopUntilDelta(
+                    currentIteration,
+                    now,
+                    currentIteration == maxIterations - 1
+                        ? "max_iterations_reached"
+                        : "continue"));
+
+            if (current.IsFailure)
+                return current;
+        }
+
+        return current.WithSemanticDelta(
+            CreateLoopUntilDelta(
+                maxIterations,
+                timestamp: null,
+                decision: "max_iterations_reached"));
+    }
+
+    public static ResultStep<TState, TValue> Suspend<TState, TValue>(
+        TState state,
+        string reason)
+    {
+        var normalizedReason = string.IsNullOrWhiteSpace(reason)
+            ? "Pipeline suspended."
+            : reason;
+        var metadata = ImmutableDictionary<string, string>.Empty
+            .Add("delta.kind", "suspend")
+            .Add("suspend_reason", normalizedReason);
+        var error = new ErrorContext(
+            normalizedReason,
+            SuspendErrorCode,
+            IsRetryable: true)
+        {
+            FailureKind = FailureKind.Quarantine,
+            OriginStep = OriginStep.KernelFacade,
+            SemanticSlot = SemanticSlot.T,
+            Metadata = metadata
+        };
+
+        return ResultStep<TState, TValue>
+            .Fail(state, error)
+            .WithSemanticDelta(new SemanticDelta(
+                "pipeline.suspend",
+                OriginStep.KernelFacade,
+                SemanticSlot.T,
+                metadata,
+                Kind: "suspend"));
+    }
+
+    public static ResultStep<TState, TValue> Resume<TState, TValue>(
+        IReadOnlyList<ResultStepReplayLogEntry> previousReplayLog,
+        TState state,
+        TValue value,
+        string reason)
+    {
+        ArgumentNullException.ThrowIfNull(previousReplayLog);
+
+        var normalizedReason = string.IsNullOrWhiteSpace(reason)
+            ? "Pipeline resumed."
+            : reason;
+        var metadata = ImmutableDictionary<string, string>.Empty
+            .Add("delta.kind", "resume")
+            .Add("resume_reason", normalizedReason)
+            .Add("previous_replay_log_count", previousReplayLog.Count.ToString(CultureInfo.InvariantCulture))
+            .Add("previous_replay_log_hash", ResultStepIdentity.CreateReplayLogHash(previousReplayLog));
+
+        return ResultStep<TState, TValue>
+            .Success(state, value)
+            .WithReplayLogPrefix(previousReplayLog)
+            .WithSemanticDelta(new SemanticDelta(
+                "pipeline.resume",
+                OriginStep.KernelFacade,
+                SemanticSlot.T,
+                metadata,
+                Kind: "resume"),
+                previousReplayLog.Count == 0
+                    ? null
+                    : previousReplayLog[^1].StepId);
+    }
+
+    private static ResultStep<TState, TValue> ApplyLoopIteration<TState, TValue>(
+        ResultStep<TState, TValue> current,
+        Func<TValue, ResultStep<TState, TValue>> stepFunc,
+        SemanticDelta loopDelta)
+    {
+        var replayLogPrefix = current.ReplayLog;
+
+        ResultStep<TState, TValue> next;
+        try
+        {
+            next = stepFunc(current.Value!);
+        }
+        catch (Exception ex)
+        {
+            next = current.Bind<TValue>(_ => throw ex);
+        }
+
+        var combined = next.WithReplayLogPrefix(replayLogPrefix);
+        var parentStepId = ResolveLoopDeltaParentStepId(
+            replayLogPrefix,
+            combined);
+
+        return combined.WithSemanticDelta(loopDelta, parentStepId);
+    }
+
+    private static string? ResolveLoopDeltaParentStepId<TState, TValue>(
+        IReadOnlyList<ResultStepReplayLogEntry> replayLogPrefix,
+        ResultStep<TState, TValue> combined)
+    {
+        return combined.ReplayLog.Count > replayLogPrefix.Count
+            ? combined.ReplayLog[^1].StepId
+            : replayLogPrefix.Count == 0
+                ? null
+                : replayLogPrefix[^1].StepId;
+    }
+
+    private static ResultStep<TState, TValue> InvalidLoop<TState, TValue>(
+        TState state,
+        string message)
+    {
+        return ResultStep<TState, TValue>
+            .Fail(
+                state,
+                new ErrorContext(message, "INVALID_PIPELINE_LOOP", false)
+                {
+                    FailureKind = FailureKind.Reject,
+                    OriginStep = OriginStep.KernelFacade,
+                    SemanticSlot = SemanticSlot.T
+                })
+            .WithSemanticDelta(new SemanticDelta(
+                "pipeline.loop.invalid",
+                OriginStep.KernelFacade,
+                SemanticSlot.T,
+                ImmutableDictionary<string, string>.Empty
+                    .Add("delta.kind", "loop")
+                    .Add("loop_decision", "invalid"),
+                Kind: "loop"));
+    }
+
+    private static SemanticDelta CreateLoopDelta(
+        int iteration,
+        string decision)
+    {
+        return new SemanticDelta(
+            "pipeline.loop.iteration",
+            OriginStep.KernelFacade,
+            SemanticSlot.T,
+            ImmutableDictionary<string, string>.Empty
+                .Add("delta.kind", "loop")
+                .Add("loop_iteration", iteration.ToString(CultureInfo.InvariantCulture))
+                .Add("loop_decision", decision),
+            Kind: "loop");
+    }
+
+    private static SemanticDelta CreateLoopUntilDelta(
+        int iteration,
+        DateTimeOffset? timestamp,
+        string decision)
+    {
+        var metadata = ImmutableDictionary<string, string>.Empty
+            .Add("delta.kind", "loop")
+            .Add("loop_iteration", iteration.ToString(CultureInfo.InvariantCulture))
+            .Add("loop_decision", decision);
+
+        if (timestamp is { } value)
+        {
+            metadata = metadata.Add("loop_timestamp", value.ToString("O", CultureInfo.InvariantCulture));
+        }
+
+        return new SemanticDelta(
+            "pipeline.loop_until.iteration",
+            OriginStep.KernelFacade,
+            SemanticSlot.T,
+            metadata,
+            Kind: "loop");
+    }
+}

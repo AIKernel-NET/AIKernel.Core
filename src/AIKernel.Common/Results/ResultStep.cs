@@ -6,6 +6,8 @@ public readonly struct ResultStep<TState, TValue>
 
     public bool IsFailure => !IsSuccess;
 
+    public bool IsSuspended => Error?.Code == PipelineStep.SuspendErrorCode;
+
     public TState State { get; }
 
     public TValue? Value { get; }
@@ -235,6 +237,16 @@ public readonly struct ResultStep<TState, TValue>
         => IsSuccess
             ? Result<TValue>.Success(Value!)
             : Result<TValue>.Fail(Error!);
+
+    public ResultStep<TState, TValue> WithReplayLogPrefix(
+        IReadOnlyList<ResultStepReplayLogEntry> replayLogPrefix)
+    {
+        ArgumentNullException.ThrowIfNull(replayLogPrefix);
+
+        return replayLogPrefix.Count == 0
+            ? this
+            : WithParentStepId(replayLogPrefix[^1].StepId, replayLogPrefix);
+    }
 
     public ResultStep<TState, TNext> Select<TNext>(
         Func<TValue, TNext> selector)

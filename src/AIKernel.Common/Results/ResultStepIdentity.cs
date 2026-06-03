@@ -43,6 +43,7 @@ internal static class ResultStepIdentity
         builder.AppendLine(isSuccess ? "success" : "failure");
         builder.AppendLine(errorCode ?? string.Empty);
         builder.AppendLine(delta.Label);
+        builder.AppendLine(delta.Kind ?? string.Empty);
         builder.AppendLine(delta.OriginStep?.ToString() ?? string.Empty);
         builder.AppendLine(delta.SemanticSlot?.ToString() ?? string.Empty);
 
@@ -78,6 +79,7 @@ internal static class ResultStepIdentity
             builder.AppendLine(entry.IsSuccess ? "success" : "failure");
             builder.AppendLine(entry.ErrorCode ?? string.Empty);
             builder.AppendLine(entry.SemanticDelta.Label);
+            builder.AppendLine(entry.SemanticDelta.Kind ?? string.Empty);
             builder.AppendLine(entry.SemanticDelta.OriginStep?.ToString() ?? string.Empty);
             builder.AppendLine(entry.SemanticDelta.SemanticSlot?.ToString() ?? string.Empty);
 

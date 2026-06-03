@@ -184,17 +184,17 @@ public sealed class KernelExecutor : IKernelExecutor
                 capability,
                 prompt,
                 startedAt,
-                executionSequence));
+                executionSequence,
+                error));
         }
 
-        return CreateFailedResult(
+        return _failureResultFactory.Resolve(_failureResultFactory.CreateFailedResult(
             request,
             capability,
             prompt,
             startedAt,
             executionSequence,
-            code: error.Code.ToLowerInvariant(),
-            message: error.Message);
+            error));
     }
 
     private static Result<string> ValidateOutput(string output)

@@ -32,11 +32,13 @@ internal sealed class KernelExecutionStepRunner
         }
         catch (OperationCanceledException)
         {
-            return Result<ModelPromptCapability>.Fail(CanceledError());
+            return Result<ModelPromptCapability>.Fail(CanceledError(OriginStep.Capability));
         }
         catch (Exception ex)
         {
-            return Result<ModelPromptCapability>.Fail(ExecutionFailedError(ex));
+            return Result<ModelPromptCapability>.Fail(ExecutionFailedError(
+                ex,
+                OriginStep.Capability));
         }
     }
 
@@ -61,11 +63,13 @@ internal sealed class KernelExecutionStepRunner
         }
         catch (OperationCanceledException)
         {
-            return Result<GeneratedPrompt>.Fail(CanceledError());
+            return Result<GeneratedPrompt>.Fail(CanceledError(OriginStep.Prompt));
         }
         catch (Exception ex)
         {
-            return Result<GeneratedPrompt>.Fail(ExecutionFailedError(ex));
+            return Result<GeneratedPrompt>.Fail(ExecutionFailedError(
+                ex,
+                OriginStep.Prompt));
         }
     }
 
@@ -84,11 +88,13 @@ internal sealed class KernelExecutionStepRunner
         }
         catch (OperationCanceledException)
         {
-            return Result<string>.Fail(CanceledError());
+            return Result<string>.Fail(CanceledError(OriginStep.Provider));
         }
         catch (Exception ex)
         {
-            return Result<string>.Fail(ExecutionFailedError(ex));
+            return Result<string>.Fail(ExecutionFailedError(
+                ex,
+                OriginStep.Provider));
         }
     }
 
@@ -100,17 +106,31 @@ internal sealed class KernelExecutionStepRunner
         }
         catch (Exception ex)
         {
-            return Result<int>.Fail(ExecutionFailedError(ex));
+            return Result<int>.Fail(ExecutionFailedError(
+                ex,
+                OriginStep.Tokenizer));
         }
     }
 
-    private static ErrorContext CanceledError()
+    private static ErrorContext CanceledError(OriginStep originStep)
     {
-        return new ErrorContext("Execution was canceled.", "canceled", false);
+        return new ErrorContext("Execution was canceled.", "canceled", false)
+        {
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = originStep,
+            SemanticSlot = SemanticSlot.T
+        };
     }
 
-    private static ErrorContext ExecutionFailedError(Exception exception)
+    private static ErrorContext ExecutionFailedError(
+        Exception exception,
+        OriginStep originStep)
     {
-        return new ErrorContext(exception.Message, "execution_failed", false);
+        return new ErrorContext(exception.Message, "execution_failed", false)
+        {
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = originStep,
+            SemanticSlot = SemanticSlot.T
+        };
     }
 }

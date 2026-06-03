@@ -15,6 +15,17 @@ public sealed class ResultTests
     }
 
     [Fact]
+    public void ErrorContext_OptionalFields_AreNullByDefault()
+    {
+        var error = new ErrorContext("blocked", "BLOCKED", false);
+
+        Assert.Null(error.FailureKind);
+        Assert.Null(error.OriginStep);
+        Assert.Null(error.SemanticSlot);
+        Assert.Null(error.Metadata);
+    }
+
+    [Fact]
     public void Bind_PropagatesFailureWithoutRunningBinder()
     {
         var called = false;

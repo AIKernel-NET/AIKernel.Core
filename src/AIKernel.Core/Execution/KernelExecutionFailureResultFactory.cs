@@ -38,6 +38,28 @@ internal sealed class KernelExecutionFailureResultFactory
             errorDetail: detail);
     }
 
+    public Result<KernelRequestExecutionResult> CreateFailedResult(
+        KernelExecutionRequest request,
+        ModelPromptCapability? capability,
+        GeneratedPrompt? prompt,
+        DateTimeOffset startedAt,
+        long executionSequence,
+        ErrorContext error)
+    {
+        return CreateFailureResult(
+            request,
+            capability,
+            prompt,
+            startedAt,
+            executionSequence,
+            ExecutionStatus.Failed,
+            resultDiscriminator: error.Code.ToLowerInvariant(),
+            errorCode: error.Code.ToLowerInvariant(),
+            errorMessage: error.Message,
+            errorDetail: null,
+            error);
+    }
+
     public Result<KernelRequestExecutionResult> CreateCanceledResult(
         KernelExecutionRequest request,
         ModelPromptCapability? capability,
@@ -56,6 +78,28 @@ internal sealed class KernelExecutionFailureResultFactory
             errorCode: "canceled",
             errorMessage: "Execution was canceled.",
             errorDetail: null);
+    }
+
+    public Result<KernelRequestExecutionResult> CreateCanceledResult(
+        KernelExecutionRequest request,
+        ModelPromptCapability? capability,
+        GeneratedPrompt? prompt,
+        DateTimeOffset startedAt,
+        long executionSequence,
+        ErrorContext error)
+    {
+        return CreateFailureResult(
+            request,
+            capability,
+            prompt,
+            startedAt,
+            executionSequence,
+            ExecutionStatus.Canceled,
+            resultDiscriminator: error.Code.ToLowerInvariant(),
+            errorCode: error.Code.ToLowerInvariant(),
+            errorMessage: error.Message,
+            errorDetail: null,
+            error);
     }
 
     public KernelRequestExecutionResult Resolve(
@@ -99,7 +143,8 @@ internal sealed class KernelExecutionFailureResultFactory
         string resultDiscriminator,
         string errorCode,
         string errorMessage,
-        string? errorDetail)
+        string? errorDetail,
+        ErrorContext? errorContext = null)
     {
         var executionId = _executionIdFactory.CreateExecutionIdResult(
             request,
@@ -129,8 +174,40 @@ internal sealed class KernelExecutionFailureResultFactory
                 Detail: errorDetail),
             StartedAtUtc = startedAt,
             CompletedAtUtc = _clock.Now,
-            Metadata = ImmutableDictionary<string, string>.Empty
+            Metadata = BuildFailureMetadata(errorContext)
         });
+    }
+
+    private static ImmutableDictionary<string, string> BuildFailureMetadata(
+        ErrorContext? errorContext)
+    {
+        var builder = ImmutableDictionary.CreateBuilder<string, string>(
+            StringComparer.Ordinal);
+
+        if (errorContext?.FailureKind is { } failureKind)
+        {
+            builder["failure_kind"] = failureKind.ToString();
+        }
+
+        if (errorContext?.OriginStep is { } originStep)
+        {
+            builder["origin_step"] = originStep.ToString();
+        }
+
+        if (errorContext?.SemanticSlot is { } semanticSlot)
+        {
+            builder["semantic_slot"] = semanticSlot.ToString();
+        }
+
+        if (errorContext?.Metadata is not null)
+        {
+            foreach (var item in errorContext.Metadata)
+            {
+                builder[item.Key] = item.Value;
+            }
+        }
+
+        return builder.ToImmutable();
     }
 
     private static string ResolveExecutionId(Result<string> executionId)

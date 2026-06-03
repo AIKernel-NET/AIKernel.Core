@@ -81,6 +81,8 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 .Add(KernelFacadeMetadataKeys.RootRomId, "user-value")
                 .Add(KernelFacadeMetadataKeys.VfsProviderId, "user-value")
                 .Add(KernelFacadeMetadataKeys.RequestedModelId, "user-value")
+                .Add(KernelFacadeMetadataKeys.TransactionId, "user-value")
+                .Add(KernelFacadeMetadataKeys.InputHash, "user-value")
                 .Add("custom_key", "custom-value"));
 
         var result = await kernel.ExecuteAsync(
@@ -94,6 +96,8 @@ public sealed class KernelConcreteContractTests : KernelContractTests
         Assert.Equal("valid-rom", result.Metadata[KernelFacadeMetadataKeys.RootRomId]);
         Assert.Equal("memory-file", result.Metadata[KernelFacadeMetadataKeys.VfsProviderId]);
         Assert.Equal("gpt-test", result.Metadata[KernelFacadeMetadataKeys.RequestedModelId]);
+        Assert.Equal(result.ExecutionId, result.Metadata[KernelFacadeMetadataKeys.TransactionId]);
+        Assert.StartsWith("sha256:", result.Metadata[KernelFacadeMetadataKeys.InputHash], StringComparison.Ordinal);
         Assert.Equal("custom-value", result.Metadata["custom_key"]);
         Assert.Equal("kernel.facade.fail", result.Metadata[ReplayMetadataKeys.SemanticDelta]);
     }

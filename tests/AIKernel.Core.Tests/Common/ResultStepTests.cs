@@ -1,6 +1,7 @@
 namespace AIKernel.Core.Tests.Common;
 
 using AIKernel.Common.Results;
+using AIKernel.Core.Tests.Support;
 using Xunit;
 
 public sealed class ResultStepTests
@@ -72,7 +73,7 @@ public sealed class ResultStepTests
             .WithSemanticDelta(delta);
 
         Assert.Equal(first.StepId, second.StepId);
-        Assert.StartsWith("step:sha256:", first.StepId, StringComparison.Ordinal);
+        ReplayMetadataAssertions.AssertStepId(first.StepId);
         Assert.Equal(delta, first.SemanticDelta);
     }
 
@@ -145,7 +146,7 @@ public sealed class ResultStepTests
         Assert.Equal(bound.StepId, bound.ReplayLog[1].StepId);
         Assert.Equal(first.StepId, bound.ReplayLog[1].ParentStepId);
         Assert.Equal(secondDelta, bound.ReplayLog[1].SemanticDelta);
-        Assert.StartsWith("replay:sha256:", bound.ReplayLogHash, StringComparison.Ordinal);
+        ReplayMetadataAssertions.AssertReplayLogHash(bound.ReplayLogHash);
 
         var repeated = ResultStep<string, int>
             .Success("capability", 2)

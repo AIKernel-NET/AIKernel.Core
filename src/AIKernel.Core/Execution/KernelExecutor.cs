@@ -143,9 +143,19 @@ public sealed class KernelExecutor : IKernelExecutor
             tokenStep.Prompt,
             startedAt,
             executionSequence,
-            code: "execution_id_generation_failed",
-            message: successResult.Error!.Message,
-            detail: successResult.Error.Code);
+            new ErrorContext(
+                successResult.Error!.Message,
+                "execution_id_generation_failed",
+                false)
+            {
+                FailureKind = FailureKind.FailClosed,
+                OriginStep = OriginStep.SemanticHash,
+                SemanticSlot = SemanticSlot.B,
+                Metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["source_error_code"] = successResult.Error.Code
+                }
+            });
     }
 
     private KernelRequestExecutionResult CreateFailedResult(
@@ -154,9 +164,7 @@ public sealed class KernelExecutor : IKernelExecutor
         GeneratedPrompt? prompt,
         DateTimeOffset startedAt,
         long executionSequence,
-        string code,
-        string message,
-        string? detail = null)
+        ErrorContext error)
     {
         return _failureResultFactory.Resolve(_failureResultFactory.CreateFailedResult(
             request,
@@ -164,9 +172,7 @@ public sealed class KernelExecutor : IKernelExecutor
             prompt,
             startedAt,
             executionSequence,
-            code,
-            message,
-            detail));
+            error));
     }
 
     private KernelRequestExecutionResult CreateStepFailureResult(

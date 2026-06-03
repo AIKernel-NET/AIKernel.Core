@@ -197,6 +197,35 @@ public sealed class KernelExecutorTests
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
     }
 
+    [Fact]
+    public async Task ExecuteAsync_ReturnsStructuredMetadata_WhenExecutionIdGenerationFails()
+    {
+        var executor = new KernelExecutor(
+            new NullContextPromptGenerator(),
+            new FixedCapabilityResolver(maxOutputTokens: 8),
+            new SimpleTokenizer(),
+            KernelClock.Replay(DateTimeOffset.UnixEpoch));
+
+        var result = await executor.ExecuteAsync(
+            new FakeModelProvider(output: "contract output"),
+            new KernelExecutionRequest
+            {
+                ContextSnapshot = null!,
+                UserInstruction = "hello",
+                PromptOptions = PromptGenerationOptions.Default,
+                ExecutionOptions = ExecutionOptions.DeterministicDefault,
+                RequestedModelId = "gpt-test"
+            },
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Failed, result.Status);
+        Assert.Equal("execution_id_generation_failed", result.Error?.Code);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
+        Assert.Equal(OriginStep.SemanticHash.ToString(), result.Metadata["origin_step"]);
+        Assert.Equal(SemanticSlot.B.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal("ERROR", result.Metadata["source_error_code"]);
+    }
+
     private sealed class FailingCapabilityResolver : IModelPromptCapabilityResolver
     {
         public ModelPromptCapability Resolve(
@@ -261,6 +290,29 @@ public sealed class KernelExecutorTests
             CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException("prompt failed");
+        }
+    }
+
+    private sealed class NullContextPromptGenerator : IPromptGenerator
+    {
+        public Task<GeneratedPrompt> GenerateAsync(
+            PromptGenerationRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new GeneratedPrompt
+            {
+                PromptId = "prompt:null-context",
+                PromptHash = "sha256:null-context-prompt",
+                ContextSnapshotId = "unknown",
+                ContextHash = "unknown",
+                Capability = request.Capability,
+                Messages =
+                [
+                    new ModelMessage(ModelMessageRoles.User, request.UserInstruction)
+                ],
+                EstimatedInputTokens = 1,
+                Metadata = ImmutableDictionary<string, string>.Empty
+            });
         }
     }
 

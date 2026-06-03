@@ -92,6 +92,48 @@ public sealed class TaskOptionExtensionsTests
         Assert.False(option.HasValue);
     }
 
+    [Fact]
+    public async Task Tap_RunsSynchronousActionForSomeAndPreservesValue()
+    {
+        var observed = 0;
+
+        var option = await SomeAsync(4)
+            .Tap(value => observed = value);
+
+        Assert.True(option.HasValue);
+        Assert.Equal(4, option.Value);
+        Assert.Equal(4, observed);
+    }
+
+    [Fact]
+    public async Task Tap_RunsAsyncActionForSomeAndPreservesValue()
+    {
+        var observed = 0;
+
+        var option = await SomeAsync(4)
+            .Tap(value =>
+            {
+                observed = value;
+                return Task.CompletedTask;
+            });
+
+        Assert.True(option.HasValue);
+        Assert.Equal(4, option.Value);
+        Assert.Equal(4, observed);
+    }
+
+    [Fact]
+    public async Task Tap_ShortCircuitsNoneWithoutRunningAction()
+    {
+        var called = false;
+
+        var option = await NoneAsync<int>()
+            .Tap(_ => called = true);
+
+        Assert.False(option.HasValue);
+        Assert.False(called);
+    }
+
     private static Task<Option<int>> SomeAsync(int value)
     {
         return Task.FromResult(Option<int>.Some(value));

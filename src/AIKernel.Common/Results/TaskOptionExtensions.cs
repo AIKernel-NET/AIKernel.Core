@@ -2,6 +2,26 @@
 
 public static class TaskOptionExtensions
 {
+    public static async Task<Option<T>> Tap<T>(
+        this Task<Option<T>> task,
+        Action<T> action)
+    {
+        var option = await task;
+        return option.Tap(action);
+    }
+
+    public static async Task<Option<T>> Tap<T>(
+        this Task<Option<T>> task,
+        Func<T, Task> action)
+    {
+        var option = await task;
+        if (!option.HasValue)
+            return option;
+
+        await action(option.Value!);
+        return option;
+    }
+
     public static async Task<Option<V>> SelectMany<T, U, V>(
         this Option<T> option,
         Func<T, Task<Option<U>>> binder,

@@ -83,6 +83,49 @@ public sealed class TaskEitherExtensionsTests
         Assert.Equal("missing", either.Left);
     }
 
+    [Fact]
+    public async Task Tap_RunsSynchronousActionForRightAndPreservesValue()
+    {
+        var observed = 0;
+
+        var either = await RightAsync(4)
+            .Tap(value => observed = value);
+
+        Assert.True(either.IsRight);
+        Assert.Equal(4, either.Right);
+        Assert.Equal(4, observed);
+    }
+
+    [Fact]
+    public async Task Tap_RunsAsyncActionForRightAndPreservesValue()
+    {
+        var observed = 0;
+
+        var either = await RightAsync(4)
+            .Tap(value =>
+            {
+                observed = value;
+                return Task.CompletedTask;
+            });
+
+        Assert.True(either.IsRight);
+        Assert.Equal(4, either.Right);
+        Assert.Equal(4, observed);
+    }
+
+    [Fact]
+    public async Task Tap_ShortCircuitsLeftWithoutRunningAction()
+    {
+        var called = false;
+
+        var either = await LeftAsync("blocked")
+            .Tap(_ => called = true);
+
+        Assert.True(either.IsLeft);
+        Assert.False(called);
+        Assert.Equal("blocked", either.Left);
+    }
+
     private static Task<Either<string, int>> RightAsync(int value)
     {
         return Task.FromResult(Either<string, int>.FromRight(value));

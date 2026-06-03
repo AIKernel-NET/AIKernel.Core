@@ -2,6 +2,26 @@
 
 public static class TaskEitherExtensions
 {
+    public static async Task<Either<L, R>> Tap<L, R>(
+        this Task<Either<L, R>> task,
+        Action<R> action)
+    {
+        var either = await task;
+        return either.Tap(action);
+    }
+
+    public static async Task<Either<L, R>> Tap<L, R>(
+        this Task<Either<L, R>> task,
+        Func<R, Task> action)
+    {
+        var either = await task;
+        if (either.IsLeft)
+            return either;
+
+        await action(either.Right!);
+        return either;
+    }
+
     public static async Task<Either<L, V>> SelectMany<L, R, U, V>(
         this Either<L, R> either,
         Func<R, Task<Either<L, U>>> binder,

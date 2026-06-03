@@ -245,6 +245,39 @@ public sealed class OpenAIHostingExtensionsTests
     }
 
     [Fact]
+    public async Task WithOpenAI_RegistersDefaultProviderCapabilities()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["AIKernel:Providers:OpenAI:ModelId"] = "gpt-demo",
+                    ["AIKernel:Providers:OpenAI:ApiKey"] = "sk-direct-123456"
+                })
+            .Build();
+
+        var services = new ServiceCollection();
+
+        services
+            .AddAIKernelCore()
+            .WithOpenAI(
+                configuration.GetSection("AIKernel:Providers:OpenAI"),
+                (_, _) => new StubChatClient("ok"));
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        var capabilities = provider.GetRequiredService<IProviderCapabilities>();
+        var modelProvider = provider.GetRequiredService<IModelProvider>();
+
+        await modelProvider.InitializeAsync();
+
+        Assert.IsType<OpenAICompatibleProviderCapabilities>(capabilities);
+        Assert.True(capabilities.SupportsOperation("chat"));
+        Assert.True(capabilities.SupportsDataType("text"));
+        Assert.True(await modelProvider.IsAvailableAsync());
+    }
+
+    [Fact]
     public void OpenAIOptionsValidator_FailsClosed_ForInvalidTokenLimits()
     {
         var validator = new OpenAICompatibleProviderOptionsValidator();

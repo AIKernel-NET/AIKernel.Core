@@ -131,9 +131,6 @@ Integration tests that pass through multiple runtime layers.
 
 ## Quick Start
 
-> This section describes the intended Draft API for v0.1.0.  
-> Names and signatures may be adjusted during the v0.0.x / v0.1.0 implementation phase.
-
 ### 1. Install Packages
 
 ```bash
@@ -142,34 +139,58 @@ dotnet add package AIKernel.Hosting
 dotnet add package AIKernel.Providers.MicrosoftAI
 ```
 
-### 2. Ignite the Kernel
+### 2. Register Core for an API Host
+
+Use the Server/API host to hold model credentials and execute OpenAI-compatible
+providers. Keep browser/WASM clients behind your own API boundary; do not place
+model API keys in a WebAssembly client.
 
 ```csharp
-// Configure the DI container
-services.AddAIKernelCore(options =>
-{
-    options.DefaultVfsProviderId = "local";
-});
+builder.Services
+    .AddAIKernelCore(builder.Configuration)
+    .WithOpenAI(
+        builder.Configuration.GetSection("AIKernel:Providers:OpenAI"),
+        (sp, options) =>
+        {
+            // Return an IChatClient from Microsoft.Extensions.AI.
+            // The provider package registers default capabilities and prompt
+            // capability metadata for the configured ProviderId and ModelId.
+            return CreateChatClient(options);
+        });
 
-// Register an OpenAI-compatible Provider through Microsoft.Extensions.AI
-services.AddOpenAICompatibleProvider(sp =>
-    new OpenAICompatibleClient(
-        new Uri("https://your-openai-compatible-endpoint.example.com"),
-        apiKey));
-
-// Execute through the Kernel Facade
-var kernel = serviceProvider.GetRequiredService<IKernel>();
-
-var result = await kernel.ExecuteAsync(new KernelRequest
-{
-    Input = "Explain the design philosophy of AIKernel.",
-    RootRomId = new RomId("rom://aikernel/docs/vision"),
-    VfsProviderId = "local"
-});
-
-Console.WriteLine(result.PrimaryText);
-Console.WriteLine(result.ContextHash);
+builder.Services.AddAIKernelKernel();
 ```
+
+Example configuration:
+
+```json
+{
+  "AIKernel": {
+    "Providers": {
+      "OpenAI": {
+        "ProviderId": "openai-compatible",
+        "ModelId": "gpt-4.1-mini",
+        "SecretKeyName": "OpenAI:ApiKey",
+        "MaxInputTokens": 8192,
+        "MaxOutputTokens": 1024
+      }
+    }
+  },
+  "OpenAI": {
+    "ApiKey": "<store this in user-secrets, Key Vault, or environment configuration>"
+  }
+}
+```
+
+For browser/WASM-oriented clients, register only browser-safe VFS providers in
+the client-side service collection:
+
+```csharp
+services.AddAIKernelBrowserVfsProviders();
+```
+
+Use `AddAIKernelCoreVfsProviders` only in trusted server or desktop hosts where
+local filesystem access is expected.
 
 ---
 

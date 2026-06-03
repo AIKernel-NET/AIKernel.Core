@@ -71,6 +71,7 @@ public static class OpenAIHostingExtensions
                 OpenAICompatibleProviderStartupValidator>());
 
         services.TryAddSingleton<IOpenAICompatibleResponseMapper, OpenAICompatibleResponseMapper>();
+        services.TryAddSingleton<IProviderCapabilities, OpenAICompatibleProviderCapabilities>();
 
         services.AddSingleton<IChatClient>(serviceProvider =>
         {

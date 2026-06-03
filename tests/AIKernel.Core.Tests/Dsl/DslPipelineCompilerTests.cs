@@ -140,6 +140,51 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void Compile_NullPipelineStepsReturnsFailClosedResult()
+    {
+        var compiler = new DslPipelineCompiler(new TestCapabilityRegistry());
+        var document = new DslDocument(new PipelineRootNode(null!));
+
+        var result = compiler.Compile(document);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_COMPILE_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+    }
+
+    [Fact]
+    public void Compile_NullLoopBodyReturnsFailClosedResult()
+    {
+        var compiler = new DslPipelineCompiler(new TestCapabilityRegistry());
+        var document = new DslDocument(new PipelineRootNode(
+        [
+            new LoopNode(1, null!)
+        ]));
+
+        var result = compiler.Compile(document);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_COMPILE_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+    }
+
+    [Fact]
+    public void Compile_NullCapabilityArgsReturnsFailClosedResult()
+    {
+        var compiler = new DslPipelineCompiler(new TestCapabilityRegistry());
+        var document = new DslDocument(new PipelineRootNode(
+        [
+            new CallCapabilityNode("Observe", null!)
+        ]));
+
+        var result = compiler.Compile(document);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_COMPILE_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+    }
+
+    [Fact]
     public void Execute_IsDeterministic_ForSameDslAndInput()
     {
         var pipeline = Compile("""

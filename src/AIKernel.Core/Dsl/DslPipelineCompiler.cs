@@ -38,7 +38,7 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
         {
             PipelineRootNode pipeline => ValidateNodes(pipeline.Steps),
             StepNode step => ValidateName(step.Name, "Step name"),
-            CallCapabilityNode call => ValidateCapability(call.Name),
+            CallCapabilityNode call => ValidateCapability(call),
             LoopNode loop => ValidateLoop(loop.MaxIterations, loop.BodyNodes),
             LoopUntilNode loopUntil => ValidateLoopUntil(loopUntil),
             SuspendNode suspend => ValidateName(suspend.Reason, "Suspend reason"),
@@ -49,6 +49,11 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
 
     private Result<bool> ValidateNodes(IReadOnlyList<PipelineNode> nodes)
     {
+        if (nodes is null)
+        {
+            return CompileBoundaryFailureResult("Pipeline node list is required.");
+        }
+
         foreach (var node in nodes)
         {
             var result = ValidateNode(node);
@@ -88,11 +93,18 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
             : Result<bool>.Success(true);
     }
 
-    private Result<bool> ValidateCapability(string name)
+    private Result<bool> ValidateCapability(CallCapabilityNode node)
     {
+        var name = node.Name;
         if (string.IsNullOrWhiteSpace(name))
         {
             return Invalid("Capability name must not be empty.");
+        }
+
+        var args = ValidateCapabilityArgs(node.Args);
+        if (args.IsFailure)
+        {
+            return args;
         }
 
         bool contains;
@@ -106,6 +118,30 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
         }
 
         return contains ? Result<bool>.Success(true) : Invalid($"Unknown capability: {name}.");
+    }
+
+    private static Result<bool> ValidateCapabilityArgs(
+        IReadOnlyDictionary<string, string> args)
+    {
+        if (args is null)
+        {
+            return CompileBoundaryFailureResult("Capability args are required.");
+        }
+
+        foreach (var item in args)
+        {
+            if (item.Key is null)
+            {
+                return CompileBoundaryFailureResult("Capability arg keys must not be null.");
+            }
+
+            if (item.Value is null)
+            {
+                return CompileBoundaryFailureResult("Capability arg values must not be null.");
+            }
+        }
+
+        return Result<bool>.Success(true);
     }
 
     private static Result<bool> Invalid(string message)

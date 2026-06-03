@@ -60,6 +60,10 @@ public sealed class KernelConcreteContractTests : KernelContractTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
+        Assert.Equal("kernel.facade.fail", result.Metadata["semantic_delta"]);
+        Assert.Equal("1", result.Metadata["replay_log_count"]);
+        Assert.StartsWith("replay:sha256:", result.Metadata["replay_log_hash"], StringComparison.Ordinal);
     }
 
     [Fact]
@@ -83,6 +87,7 @@ public sealed class KernelConcreteContractTests : KernelContractTests
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
         Assert.Equal("custom-value", result.Metadata["custom_key"]);
+        Assert.Equal("kernel.facade.fail", result.Metadata["semantic_delta"]);
     }
 
     [Fact]
@@ -99,6 +104,10 @@ public sealed class KernelConcreteContractTests : KernelContractTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
+        Assert.Equal("kernel.facade.cancel", result.Metadata["semantic_delta"]);
+        Assert.Equal("1", result.Metadata["replay_log_count"]);
+        Assert.StartsWith("replay:sha256:", result.Metadata["replay_log_hash"], StringComparison.Ordinal);
     }
 
     private static KernelRequest CreateRequest(

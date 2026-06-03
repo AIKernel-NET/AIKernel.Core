@@ -54,6 +54,10 @@ public abstract class KernelContractTests
         Assert.Equal(FailureKind.Reject.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.G.ToString(), result.Metadata["semantic_slot"]);
+        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
+        Assert.Equal("kernel.facade.reject", result.Metadata["semantic_delta"]);
+        Assert.Equal("1", result.Metadata["replay_log_count"]);
+        Assert.StartsWith("replay:sha256:", result.Metadata["replay_log_hash"], StringComparison.Ordinal);
     }
 
     [Fact]
@@ -74,6 +78,10 @@ public abstract class KernelContractTests
         Assert.Equal(FailureKind.Reject.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.G.ToString(), result.Metadata["semantic_slot"]);
+        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
+        Assert.Equal("kernel.facade.reject", result.Metadata["semantic_delta"]);
+        Assert.Equal("1", result.Metadata["replay_log_count"]);
+        Assert.StartsWith("replay:sha256:", result.Metadata["replay_log_hash"], StringComparison.Ordinal);
     }
 
     [Fact]

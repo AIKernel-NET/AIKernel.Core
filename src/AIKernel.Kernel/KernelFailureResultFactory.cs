@@ -44,7 +44,8 @@ internal sealed class KernelFailureResultFactory
                 exception,
                 FailureKind.Reject,
                 OriginStep.KernelFacade,
-                ResolveRejectedSemanticSlot(exception)));
+                ResolveRejectedSemanticSlot(exception),
+                semanticDeltaLabel: "kernel.facade.reject"));
     }
 
     public KernelRequestExecutionResult CreateFailedResult(
@@ -71,7 +72,8 @@ internal sealed class KernelFailureResultFactory
                 exception,
                 FailureKind.FailClosed,
                 OriginStep.KernelFacade,
-                SemanticSlot.T));
+                SemanticSlot.T,
+                semanticDeltaLabel: "kernel.facade.fail"));
     }
 
     public KernelRequestExecutionResult CreateCanceledResult(
@@ -97,7 +99,8 @@ internal sealed class KernelFailureResultFactory
                 exception: null,
                 FailureKind.FailClosed,
                 OriginStep.KernelFacade,
-                SemanticSlot.T));
+                SemanticSlot.T,
+                semanticDeltaLabel: "kernel.facade.cancel"));
     }
 
     private KernelRequestExecutionResult CreateFailureResult(
@@ -179,7 +182,8 @@ internal sealed class KernelFailureResultFactory
         Exception? exception,
         FailureKind failureKind,
         OriginStep originStep,
-        SemanticSlot semanticSlot)
+        SemanticSlot semanticSlot,
+        string semanticDeltaLabel)
     {
         var builder = ImmutableDictionary.CreateBuilder<string, string>(StringComparer.Ordinal);
 
@@ -207,7 +211,42 @@ internal sealed class KernelFailureResultFactory
         builder["origin_step"] = originStep.ToString();
         builder["semantic_slot"] = semanticSlot.ToString();
 
+        AddFailureObservationMetadata(
+            builder,
+            exception?.Message ?? "Kernel transaction was canceled.",
+            failureKind,
+            originStep,
+            semanticSlot,
+            semanticDeltaLabel);
+
         return builder.ToImmutable();
+    }
+
+    private static void AddFailureObservationMetadata(
+        ImmutableDictionary<string, string>.Builder builder,
+        string message,
+        FailureKind failureKind,
+        OriginStep originStep,
+        SemanticSlot semanticSlot,
+        string semanticDeltaLabel)
+    {
+        var error = new ErrorContext(message, semanticDeltaLabel, false)
+        {
+            FailureKind = failureKind,
+            OriginStep = originStep,
+            SemanticSlot = semanticSlot
+        };
+        var step = ResultStep<string, string>
+            .Fail("kernel.facade", error)
+            .WithSemanticDelta(new SemanticDelta(
+                semanticDeltaLabel,
+                originStep,
+                semanticSlot));
+
+        builder["step_id"] = step.StepId;
+        builder["semantic_delta"] = step.SemanticDelta.Label;
+        builder["replay_log_count"] = step.ReplayLog.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        builder["replay_log_hash"] = step.ReplayLogHash;
     }
 
     private static SemanticSlot ResolveRejectedSemanticSlot(Exception exception)

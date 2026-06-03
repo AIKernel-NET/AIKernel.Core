@@ -66,7 +66,7 @@ internal sealed class KernelExecutionSuccessResultFactory
         var builder = ImmutableDictionary.CreateBuilder<string, string>(
             StringComparer.Ordinal);
 
-        builder["message_format"] = capability.MessageFormat.ToString();
+        builder[ExecutionMetadataKeys.MessageFormat] = capability.MessageFormat.ToString();
 
         if (!string.IsNullOrWhiteSpace(finalStepId))
         {

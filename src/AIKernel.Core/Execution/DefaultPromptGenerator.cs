@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
+using AIKernel.Common.Results;
 using AIKernel.Dtos.Execution;
 
 public sealed class DefaultPromptGenerator : IPromptGenerator
@@ -80,8 +81,8 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
             Messages = messages.ToImmutableArray(),
             EstimatedInputTokens = estimatedTokens,
             Metadata = ImmutableDictionary<string, string>.Empty
-                .Add("message_format", request.Capability.MessageFormat.ToString())
-                .Add("overflow_policy", request.Options.OverflowPolicy.ToString())
+                .Add(ExecutionMetadataKeys.MessageFormat, request.Capability.MessageFormat.ToString())
+                .Add(ExecutionMetadataKeys.OverflowPolicy, request.Options.OverflowPolicy.ToString())
         };
 
         return Task.FromResult(generated);

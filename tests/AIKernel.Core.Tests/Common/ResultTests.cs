@@ -45,6 +45,13 @@ public sealed class ResultTests
     }
 
     [Fact]
+    public void ExecutionMetadataKeys_ExposeStableContractNames()
+    {
+        Assert.Equal("message_format", ExecutionMetadataKeys.MessageFormat);
+        Assert.Equal("overflow_policy", ExecutionMetadataKeys.OverflowPolicy);
+    }
+
+    [Fact]
     public void Bind_PropagatesFailureWithoutRunningBinder()
     {
         var called = false;

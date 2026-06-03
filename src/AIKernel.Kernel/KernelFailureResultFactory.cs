@@ -187,9 +187,9 @@ internal sealed class KernelFailureResultFactory
     {
         var builder = ImmutableDictionary.CreateBuilder<string, string>(StringComparer.Ordinal);
 
-        builder["root_rom_id"] = request.RootRomId?.Value ?? string.Empty;
-        builder["vfs_provider_id"] = request.VfsProviderId ?? string.Empty;
-        builder["requested_model_id"] = request.RequestedModelId ?? string.Empty;
+        builder[KernelFacadeMetadataKeys.RootRomId] = request.RootRomId?.Value ?? string.Empty;
+        builder[KernelFacadeMetadataKeys.VfsProviderId] = request.VfsProviderId ?? string.Empty;
+        builder[KernelFacadeMetadataKeys.RequestedModelId] = request.RequestedModelId ?? string.Empty;
 
         if (exception is not null)
         {
@@ -198,8 +198,8 @@ internal sealed class KernelFailureResultFactory
 
         if (transaction is not null)
         {
-            builder["transaction_id"] = transaction.TransactionId;
-            builder["input_hash"] = transaction.InputHash;
+            builder[KernelFacadeMetadataKeys.TransactionId] = transaction.TransactionId;
+            builder[KernelFacadeMetadataKeys.InputHash] = transaction.InputHash;
         }
 
         foreach (var item in request.Metadata)

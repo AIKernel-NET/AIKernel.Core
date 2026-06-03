@@ -115,6 +115,43 @@ public sealed class TaskResultExtensionsTests
         Assert.Equal("UNHANDLED_EXCEPTION", result.Error!.Code);
     }
 
+    [Fact]
+    public async Task Select_CatchesSelectorException()
+    {
+        var result = await SuccessAsync(3).Select<int, int>(
+            _ => throw new InvalidOperationException("selector-boom"));
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("selector-boom", result.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
+    }
+
+    [Fact]
+    public async Task LinqQuery_CatchesAsyncBinderException()
+    {
+        var result = await (
+            from left in SuccessAsync(3)
+            from right in ThrowsAsync()
+            select left + right);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("async-binder-boom", result.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
+    }
+
+    [Fact]
+    public async Task LinqQuery_CatchesSynchronousBinderException()
+    {
+        var result = await (
+            from left in SuccessAsync(3)
+            from right in Throws()
+            select left + right);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("sync-binder-boom", result.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
+    }
+
     private static Task<Result<int>> SuccessAsync(int value)
     {
         return Task.FromResult(Result<int>.Success(value));
@@ -139,5 +176,15 @@ public sealed class TaskResultExtensionsTests
     {
         onCall();
         return Result<int>.Success(value);
+    }
+
+    private static Task<Result<int>> ThrowsAsync()
+    {
+        throw new InvalidOperationException("async-binder-boom");
+    }
+
+    private static Result<int> Throws()
+    {
+        throw new InvalidOperationException("sync-binder-boom");
     }
 }

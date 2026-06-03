@@ -56,10 +56,12 @@ public sealed class KernelExecutor : IKernelExecutor
         }
 
         var capability = capabilityResult.Value!;
-        var promptResult = await _stepRunner.GeneratePromptAsync(
+        var promptResult = await (
+            from prompt in _stepRunner.GeneratePromptAsync(
                 request,
                 capability,
                 cancellationToken)
+            select new PromptExecutionStep(capability, prompt))
             .ConfigureAwait(false);
         if (promptResult.IsFailure)
         {
@@ -72,69 +74,60 @@ public sealed class KernelExecutor : IKernelExecutor
                 promptResult.Error!);
         }
 
-        var prompt = promptResult.Value!;
-        var outputResult = await _stepRunner.GenerateOutputAsync(
+        var promptStep = promptResult.Value!;
+        var outputResult = await (
+            from output in _stepRunner.GenerateOutputAsync(
                 provider,
-                prompt,
+                promptStep.Prompt,
                 cancellationToken)
+            from validatedOutput in ValidateOutput(output)
+            select new OutputExecutionStep(
+                promptStep.Capability,
+                promptStep.Prompt,
+                validatedOutput))
             .ConfigureAwait(false);
         if (outputResult.IsFailure)
         {
             return CreateStepFailureResult(
                 request,
-                capability,
-                prompt,
+                promptStep.Capability,
+                promptStep.Prompt,
                 startedAt,
                 executionSequence,
                 outputResult.Error!);
         }
 
-        var output = outputResult.Value!;
-        if (string.IsNullOrWhiteSpace(output))
-        {
-            return CreateFailedResult(
-                request,
-                capability,
-                prompt,
-                startedAt,
-                executionSequence,
-                code: "empty_output",
-                message: "Model provider returned empty output.");
-        }
-
-        var outputTokensResult = _stepRunner.CountOutputTokens(output);
+        var outputStep = outputResult.Value!;
+        var outputTokensResult =
+            from outputTokens in _stepRunner.CountOutputTokens(outputStep.Output)
+            from validatedOutputTokens in ValidateOutputTokenBudget(
+                outputTokens,
+                outputStep.Capability)
+            select new TokenExecutionStep(
+                outputStep.Capability,
+                outputStep.Prompt,
+                outputStep.Output,
+                validatedOutputTokens);
         if (outputTokensResult.IsFailure)
         {
             return CreateStepFailureResult(
                 request,
-                capability,
-                prompt,
+                outputStep.Capability,
+                outputStep.Prompt,
                 startedAt,
                 executionSequence,
                 outputTokensResult.Error!);
         }
 
-        var outputTokens = outputTokensResult.Value!;
-        if (outputTokens > capability.MaxOutputTokens)
-        {
-            return CreateFailedResult(
-                request,
-                capability,
-                prompt,
-                startedAt,
-                executionSequence,
-                code: "output_token_budget_exceeded",
-                message: $"Output token budget exceeded. Actual={outputTokens}, Max={capability.MaxOutputTokens}.");
-        }
-
+        var tokenStep = outputTokensResult.Value!;
         var completedAt = _clock.Now;
 
         var successResult = _successResultFactory.CreateSucceededResult(
             request,
-            capability,
-            prompt,
-            output,
-            outputTokens,
+            tokenStep.Capability,
+            tokenStep.Prompt,
+            tokenStep.Output,
+            tokenStep.OutputTokens,
             startedAt,
             completedAt,
             executionSequence);
@@ -146,8 +139,8 @@ public sealed class KernelExecutor : IKernelExecutor
 
         return CreateFailedResult(
             request,
-            capability,
-            prompt,
+            tokenStep.Capability,
+            tokenStep.Prompt,
             startedAt,
             executionSequence,
             code: "execution_id_generation_failed",
@@ -203,5 +196,42 @@ public sealed class KernelExecutor : IKernelExecutor
             code: error.Code.ToLowerInvariant(),
             message: error.Message);
     }
+
+    private static Result<string> ValidateOutput(string output)
+    {
+        return string.IsNullOrWhiteSpace(output)
+            ? Result<string>.Fail(new ErrorContext(
+                "Model provider returned empty output.",
+                "empty_output",
+                false))
+            : Result<string>.Success(output);
+    }
+
+    private static Result<int> ValidateOutputTokenBudget(
+        int outputTokens,
+        ModelPromptCapability capability)
+    {
+        return outputTokens > capability.MaxOutputTokens
+            ? Result<int>.Fail(new ErrorContext(
+                $"Output token budget exceeded. Actual={outputTokens}, Max={capability.MaxOutputTokens}.",
+                "output_token_budget_exceeded",
+                false))
+            : Result<int>.Success(outputTokens);
+    }
+
+    private sealed record PromptExecutionStep(
+        ModelPromptCapability Capability,
+        GeneratedPrompt Prompt);
+
+    private sealed record OutputExecutionStep(
+        ModelPromptCapability Capability,
+        GeneratedPrompt Prompt,
+        string Output);
+
+    private sealed record TokenExecutionStep(
+        ModelPromptCapability Capability,
+        GeneratedPrompt Prompt,
+        string Output,
+        int OutputTokens);
 
 }

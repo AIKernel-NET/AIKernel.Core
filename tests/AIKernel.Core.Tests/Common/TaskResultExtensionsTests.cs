@@ -48,6 +48,34 @@ public sealed class TaskResultExtensionsTests
     }
 
     [Fact]
+    public async Task LinqQuery_ComposesTaskResultWithSynchronousResult()
+    {
+        var result = await (
+            from left in SuccessAsync(3)
+            from right in Result<int>.Success(4)
+            select left + right);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(7, result.Value);
+    }
+
+    [Fact]
+    public async Task LinqQuery_ShortCircuitsBeforeSynchronousBinder()
+    {
+        var called = false;
+        var failure = new ErrorContext("blocked", "BLOCKED", false);
+
+        var result = await (
+            from left in FailAsync<int>(failure)
+            from right in Track(4, () => called = true)
+            select left + right);
+
+        Assert.True(result.IsFailure);
+        Assert.False(called);
+        Assert.Same(failure, result.Error);
+    }
+
+    [Fact]
     public async Task LinqQuery_CatchesProjectorException()
     {
         var result = await (
@@ -75,5 +103,13 @@ public sealed class TaskResultExtensionsTests
     {
         onCall();
         return SuccessAsync(value);
+    }
+
+    private static Result<int> Track(
+        int value,
+        Action onCall)
+    {
+        onCall();
+        return Result<int>.Success(value);
     }
 }

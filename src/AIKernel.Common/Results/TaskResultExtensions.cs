@@ -51,4 +51,27 @@ public static class TaskResultExtensions
             return Result<V>.Fail(ErrorContext.FromException(ex));
         }
     }
+
+    public static async Task<Result<V>> SelectMany<T, U, V>(
+        this Task<Result<T>> task,
+        Func<T, Result<U>> binder,
+        Func<T, U, V> projector)
+    {
+        try
+        {
+            var r1 = await task.ConfigureAwait(false);
+            if (r1.IsFailure)
+                return Result<V>.Fail(r1.Error!);
+
+            var r2 = binder(r1.Value!);
+            if (r2.IsFailure)
+                return Result<V>.Fail(r2.Error!);
+
+            return Result<V>.Success(projector(r1.Value!, r2.Value!));
+        }
+        catch (Exception ex)
+        {
+            return Result<V>.Fail(ErrorContext.FromException(ex));
+        }
+    }
 }

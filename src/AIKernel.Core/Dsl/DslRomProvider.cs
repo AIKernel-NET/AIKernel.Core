@@ -54,10 +54,29 @@ public sealed class DslRomProvider
             return Result<DslRomSnapshot>.Fail(document.Error!);
         }
 
-        var pipeline = _compiler.Compile(document.Value!);
+        Result<IKernelPipeline> pipeline;
+        try
+        {
+            pipeline = _compiler.Compile(document.Value!);
+        }
+        catch (Exception ex)
+        {
+            return Result<DslRomSnapshot>.Fail(ErrorContext.FromException(ex) with
+            {
+                FailureKind = FailureKind.FailClosed,
+                OriginStep = OriginStep.KernelFacade,
+                SemanticSlot = SemanticSlot.G
+            });
+        }
+
         if (pipeline.IsFailure)
         {
             return Result<DslRomSnapshot>.Fail(pipeline.Error!);
+        }
+
+        if (pipeline.Value is null)
+        {
+            return Result<DslRomSnapshot>.Fail(Error("DSL ROM compiler returned a successful null pipeline."));
         }
 
         var identity = DslRomPath.ParseCapabilityName(capabilityName.Value!);

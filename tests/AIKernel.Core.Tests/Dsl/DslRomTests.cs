@@ -94,6 +94,62 @@ public sealed class DslRomTests
     }
 
     [Fact]
+    public void DslRomProvider_ReturnsFailure_WhenCompilerThrows()
+    {
+        var provider = new DslRomProvider(new ThrowingCompiler());
+
+        var result = provider.CreateSnapshot(
+            "agent",
+            "plan1",
+            PlanDsl,
+            DateTimeOffset.UnixEpoch);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.KernelFacade, result.Error.OriginStep);
+    }
+
+    [Fact]
+    public void DslRomProvider_ReturnsFailure_WhenCompilerReturnsNullPipeline()
+    {
+        var provider = new DslRomProvider(new NullPipelineCompiler());
+
+        var result = provider.CreateSnapshot(
+            "agent",
+            "plan1",
+            PlanDsl,
+            DateTimeOffset.UnixEpoch);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Contains("null", result.Error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task SaveDslAsRomAsync_ReturnsFailure_WhenRegistryThrows()
+    {
+        await using var session = await OpenSessionAsync();
+        var compiler = CreateCompiler(new TestCapabilityRegistry());
+        var store = new DslRomStore(
+            new DslRomProvider(compiler),
+            new ThrowingRomRegistry());
+
+        var result = await store.SaveDslAsRomAsync(
+            session,
+            "agent",
+            "plan1",
+            PlanDsl,
+            DateTimeOffset.UnixEpoch);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.KernelFacade, result.Error.OriginStep);
+    }
+
+    [Fact]
     public void DslRomRegistry_RejectsSnapshotWithNullPipeline()
     {
         var registry = new DslRomRegistry();
@@ -504,6 +560,20 @@ public sealed class DslRomTests
         {
             throw new InvalidOperationException("Inner capability exploded.");
         }
+    }
+
+    private sealed class ThrowingCompiler : IDslPipelineCompiler
+    {
+        public Result<IKernelPipeline> Compile(DslDocument document)
+        {
+            throw new InvalidOperationException("Compiler exploded.");
+        }
+    }
+
+    private sealed class NullPipelineCompiler : IDslPipelineCompiler
+    {
+        public Result<IKernelPipeline> Compile(DslDocument document)
+            => Result<IKernelPipeline>.Success(null!);
     }
 
     private sealed class ThrowingRomRegistry : IDslRomRegistry

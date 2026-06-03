@@ -68,6 +68,8 @@ public sealed class DslRomStore
                         Encoding.UTF8.GetBytes(jsonDsl))
                     .ConfigureAwait(false);
             }
+
+            return _registry.Register(snapshot.Value);
         }
         catch (Exception ex)
         {
@@ -78,8 +80,6 @@ public sealed class DslRomStore
                 SemanticSlot = SemanticSlot.G
             });
         }
-
-        return _registry.Register(snapshot.Value);
     }
 
     public async Task<Result<DslRomMetadata>> LoadDslRomAsync(

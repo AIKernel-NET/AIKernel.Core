@@ -107,6 +107,22 @@ public sealed class TaskOptionExtensionsTests
     }
 
     [Fact]
+    public async Task Map_ShortCircuitsNoneWithoutRunningSelector()
+    {
+        var called = false;
+
+        var option = await NoneAsync<int>()
+            .Map(value =>
+            {
+                called = true;
+                return value + 1;
+            });
+
+        Assert.False(option.HasValue);
+        Assert.False(called);
+    }
+
+    [Fact]
     public async Task LinqQuery_ShortCircuitsSynchronousNoneBeforeTaskOption()
     {
         var called = false;

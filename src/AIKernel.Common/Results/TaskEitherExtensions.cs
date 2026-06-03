@@ -35,9 +35,7 @@ public static class TaskEitherExtensions
         Func<R, U> selector)
     {
         var e = await task.ConfigureAwait(false);
-        return e.IsRight
-            ? Either<L, U>.FromRight(selector(e.Right!))
-            : Either<L, U>.FromLeft(e.Left!);
+        return e.Map(selector);
     }
 
     public static Task<Either<L, U>> Select<L, R, U>(
@@ -71,9 +69,7 @@ public static class TaskEitherExtensions
         Func<R, Either<L, U>> binder)
     {
         var either = await task.ConfigureAwait(false);
-        return either.IsRight
-            ? binder(either.Right!)
-            : Either<L, U>.FromLeft(either.Left!);
+        return either.Bind(binder);
     }
 
     public static async Task<Either<L, V>> SelectMany<L, R, U, V>(

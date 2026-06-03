@@ -69,9 +69,7 @@ public static class TaskOptionExtensions
         Func<T, Option<U>> binder)
     {
         var option = await task.ConfigureAwait(false);
-        return option.HasValue
-            ? binder(option.Value!)
-            : Option<U>.None();
+        return option.Bind(binder);
     }
 
     public static async Task<Option<V>> SelectMany<T, U, V>(

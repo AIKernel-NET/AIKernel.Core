@@ -108,6 +108,23 @@ public sealed class TaskEitherExtensionsTests
     }
 
     [Fact]
+    public async Task Map_ShortCircuitsLeftWithoutRunningSelector()
+    {
+        var called = false;
+
+        var either = await LeftAsync("blocked")
+            .Map(value =>
+            {
+                called = true;
+                return value + 1;
+            });
+
+        Assert.True(either.IsLeft);
+        Assert.False(called);
+        Assert.Equal("blocked", either.Left);
+    }
+
+    [Fact]
     public async Task LinqQuery_ShortCircuitsSynchronousLeftBeforeTaskEither()
     {
         var called = false;

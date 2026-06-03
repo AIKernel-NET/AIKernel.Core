@@ -5,6 +5,40 @@ namespace AIKernel.Common.Results;
 
 public static class TaskResultExtensions
 {
+    public static async Task<Result<T>> Tap<T>(
+        this Task<Result<T>> task,
+        Action<T> action)
+    {
+        try
+        {
+            var result = await task.ConfigureAwait(false);
+            return result.Tap(action);
+        }
+        catch (Exception ex)
+        {
+            return Result<T>.Fail(ErrorContext.FromException(ex));
+        }
+    }
+
+    public static async Task<Result<T>> Tap<T>(
+        this Task<Result<T>> task,
+        Func<T, Task> action)
+    {
+        try
+        {
+            var result = await task.ConfigureAwait(false);
+            if (result.IsFailure)
+                return result;
+
+            await action(result.Value!).ConfigureAwait(false);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            return Result<T>.Fail(ErrorContext.FromException(ex));
+        }
+    }
+
     // -------------------------
     // Map（Select）
     // -------------------------

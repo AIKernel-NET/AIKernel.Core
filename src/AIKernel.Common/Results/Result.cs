@@ -77,6 +77,22 @@ public readonly struct Result<T>
         }
     }
 
+    public Result<T> Tap(Action<T> action)
+    {
+        if (IsFailure)
+            return this;
+
+        try
+        {
+            action(Value!);
+            return this;
+        }
+        catch (Exception ex)
+        {
+            return Fail(ErrorContext.FromException(ex));
+        }
+    }
+
     // -------------------------
     // LINQ Support
     // -------------------------

@@ -45,6 +45,47 @@ public sealed class ResultTests
     }
 
     [Fact]
+    public void Tap_RunsActionForSuccessAndPreservesValue()
+    {
+        var observed = 0;
+
+        var result = Result<int>
+            .Success(4)
+            .Tap(value => observed = value);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(4, result.Value);
+        Assert.Equal(4, observed);
+    }
+
+    [Fact]
+    public void Tap_ShortCircuitsFailureWithoutRunningAction()
+    {
+        var called = false;
+        var failure = new ErrorContext("blocked", "BLOCKED", false);
+
+        var result = Result<int>
+            .Fail(failure)
+            .Tap(_ => called = true);
+
+        Assert.True(result.IsFailure);
+        Assert.False(called);
+        Assert.Same(failure, result.Error);
+    }
+
+    [Fact]
+    public void Tap_CatchesActionException()
+    {
+        var result = Result<int>
+            .Success(4)
+            .Tap(_ => throw new InvalidOperationException("tap-boom"));
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("tap-boom", result.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
+    }
+
+    [Fact]
     public void LinqQuery_ComposesSuccessfulResults()
     {
         var result =

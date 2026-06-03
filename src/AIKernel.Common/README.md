@@ -7,7 +7,7 @@
 ## Overview / 概要
 
 **AIKernel.Common** provides foundational utility components shared across the entire AIKernel ecosystem.  
-This library contains cross-cutting features such as JSON serialization helpers, file and path utilities, logging primitives, and common exception types.
+This library contains cross-cutting features such as JSON serialization helpers, file and path utilities, logging primitives, common exception types, and functional result primitives.
 
 AIKernel.Common is designed as a lightweight, implementation-level support module used by:
 
@@ -22,6 +22,13 @@ Instead, it offers standardized behaviors and reusable helpers that ensure consi
 ---
 
 ## Features / 主な機能
+
+### Functional Results
+- `Result<T>` for fail-closed computation
+- `Option<T>` for pure optional values
+- `Either<L,R>` for pure left/right branching
+- `ResultStep<TState,TValue>` for deterministic step identity, semantic deltas, and replay logs
+- LINQ query syntax support through `Select`, `SelectMany`, `Bind`, `Map`, and `Tap`
 
 ###  JSON Utilities  
 - Unified `JsonSerializerOptions`  
@@ -42,7 +49,7 @@ Instead, it offers standardized behaviors and reusable helpers that ensure consi
 - Error handling helpers  
 
 ###  Shared Helpers  
-- Result / Option / Try patterns (future)  
+- Try helpers for exception-to-result conversion
 - Cross-module reusable utilities  
 
 ---
@@ -65,6 +72,12 @@ This ensures that all AIKernel modules behave consistently while keeping the arc
 
 ```text
 AIKernel.Common/ 
+├─ Results/
+│ ├─ Result.cs
+│ ├─ Option.cs
+│ ├─ Either.cs
+│ ├─ ResultStep.cs
+│ └─ ErrorContext.cs
 ├─ Json/ 
 │ ├─ JsonOptions.cs 
 │ ├─ JsonUtil.cs 

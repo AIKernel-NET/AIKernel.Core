@@ -158,6 +158,44 @@ public sealed class ResultStepTests
     }
 
     [Fact]
+    public void LinqQuery_AppendsReplayLogWithDeterministicParentChain()
+    {
+        var capabilityDelta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+        var promptDelta = new SemanticDelta(
+            "kernel.prompt.generate",
+            OriginStep.Prompt,
+            SemanticSlot.T);
+        var providerDelta = new SemanticDelta(
+            "kernel.provider.generate",
+            OriginStep.Provider,
+            SemanticSlot.T);
+
+        var step =
+            from capability in ResultStep<string, int>
+                .Success("capability", 2)
+                .WithSemanticDelta(capabilityDelta)
+            from prompt in ResultStep<string, int>
+                .Success("prompt", capability + 3)
+                .WithSemanticDelta(promptDelta)
+            from output in ResultStep<string, int>
+                .Success("output", prompt + 4)
+                .WithSemanticDelta(providerDelta)
+            select output;
+
+        Assert.True(step.IsSuccess);
+        Assert.Equal(3, step.ReplayLog.Count);
+        Assert.Equal(capabilityDelta, step.ReplayLog[0].SemanticDelta);
+        Assert.Equal(promptDelta, step.ReplayLog[1].SemanticDelta);
+        Assert.Equal(providerDelta, step.ReplayLog[2].SemanticDelta);
+        Assert.Equal(step.ReplayLog[0].StepId, step.ReplayLog[1].ParentStepId);
+        Assert.Equal(step.ReplayLog[1].StepId, step.ReplayLog[2].ParentStepId);
+        Assert.Equal(step.StepId, step.ReplayLog[2].StepId);
+    }
+
+    [Fact]
     public void Map_PreservesReplayLogWithoutAddingProjectionNode()
     {
         var delta = new SemanticDelta(
@@ -197,6 +235,21 @@ public sealed class ResultStepTests
         Assert.Equal("capability", step.State);
         Assert.Equal("state-boom", step.Error!.Message);
         Assert.Equal("UNHANDLED_EXCEPTION", step.Error.Code);
+    }
+
+    [Fact]
+    public void MapState_ExceptionBeforeSemanticDeltaCreatesFailureReplayLogEntry()
+    {
+        var step = ResultStep<string, int>
+            .Success("capability", 2)
+            .MapState((_, _) => throw new InvalidOperationException("state-boom"));
+
+        var entry = Assert.Single(step.ReplayLog);
+        Assert.True(step.IsFailure);
+        Assert.Equal(step.StepId, entry.StepId);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("UNHANDLED_EXCEPTION", entry.ErrorCode);
+        Assert.Equal(SemanticDelta.Empty, entry.SemanticDelta);
     }
 
     [Fact]

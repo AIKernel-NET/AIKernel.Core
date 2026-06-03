@@ -394,7 +394,22 @@ public readonly struct ResultStep<TState, TValue>
         ErrorContext error)
     {
         if (replayLog.Count == 0)
-            return replayLog;
+        {
+            var stepId = ResultStepIdentity.Create(
+                parentStepId: null,
+                SemanticDelta.Empty,
+                isSuccess: false,
+                error.Code);
+
+            return [
+                new ResultStepReplayLogEntry(
+                    stepId,
+                    ParentStepId: null,
+                    SemanticDelta.Empty,
+                    IsSuccess: false,
+                    error.Code)
+            ];
+        }
 
         var entries = new ResultStepReplayLogEntry[replayLog.Count];
 

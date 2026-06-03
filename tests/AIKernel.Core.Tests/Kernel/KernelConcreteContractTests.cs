@@ -183,6 +183,21 @@ public sealed class KernelConcreteContractTests : KernelContractTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_UsesAssembledContextIdentity_WhenExecutorResultDiffers()
+    {
+        var kernel = CreateKernel(new MismatchedContextKernelExecutor());
+        var request = CreateRequest("valid-rom");
+
+        var result = await kernel.ExecuteAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Succeeded, result.Status);
+        Assert.Equal("snapshot:contract", result.ContextSnapshotId);
+        Assert.Equal("sha256:context", result.ContextHash);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsCanceledMetadata_WhenExecutorCancels()
     {
         var kernel = CreateKernel(new CanceledKernelExecutor());
@@ -441,6 +456,37 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 Metadata = ImmutableDictionary<string, string>.Empty
                     .Add(KernelFacadeMetadataKeys.ProviderId, "executor-provider")
                     .Add(KernelFacadeMetadataKeys.RequestedModelId, "executor-model")
+            });
+        }
+    }
+
+    private sealed class MismatchedContextKernelExecutor : AIKernel.Abstractions.Execution.IKernelExecutor
+    {
+        public Task<KernelRequestExecutionResult> ExecuteAsync(
+            IModelProvider provider,
+            KernelExecutionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return Task.FromResult(new KernelRequestExecutionResult
+            {
+                ExecutionId = "exec:contract:mismatched-context",
+                Status = ExecutionStatus.Succeeded,
+                ProviderId = provider.ProviderId,
+                ModelId = request.RequestedModelId ?? "gpt-test",
+                ContextSnapshotId = "snapshot:executor",
+                ContextHash = "sha256:executor",
+                PromptHash = "sha256:prompt",
+                OutputText = "contract output",
+                Usage = new ExecutionUsage(
+                    InputTokens: 1,
+                    OutputTokens: 1,
+                    TotalTokens: 2),
+                Error = null,
+                StartedAtUtc = DateTimeOffset.UnixEpoch,
+                CompletedAtUtc = DateTimeOffset.UnixEpoch,
+                Metadata = ImmutableDictionary<string, string>.Empty
             });
         }
     }

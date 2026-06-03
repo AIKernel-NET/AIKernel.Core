@@ -137,6 +137,7 @@ public sealed class Kernel : IKernel
             return CompleteSuccessfulResult(
                 request,
                 transaction,
+                contextSnapshot,
                 result,
                 provider.ProviderId);
         }
@@ -306,6 +307,7 @@ public sealed class Kernel : IKernel
     private static KernelRequestExecutionResult CompleteSuccessfulResult(
         KernelRequest request,
         KernelTransactionSnapshot transaction,
+        IContextSnapshot contextSnapshot,
         KernelRequestExecutionResult result,
         string providerId)
     {
@@ -313,6 +315,8 @@ public sealed class Kernel : IKernel
         {
             ProviderId = providerId,
             ModelId = request.RequestedModelId ?? result.ModelId,
+            ContextSnapshotId = contextSnapshot.SnapshotId,
+            ContextHash = contextSnapshot.ContextHash,
             Metadata = BuildSuccessfulMetadata(
                 request,
                 transaction,

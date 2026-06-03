@@ -28,7 +28,13 @@ Instead, it offers standardized behaviors and reusable helpers that ensure consi
 - `Option<T>` for pure optional values
 - `Either<L,R>` for pure left/right branching
 - `ResultStep<TState,TValue>` for deterministic step identity, semantic deltas, and replay logs
+- `PipelineStep` for deterministic finite loops, timeout-style loops, suspend, and resume points
 - LINQ query syntax support through `Select`, `SelectMany`, `Bind`, `Map`, and `Tap`
+
+`PipelineStep` keeps agent-style user-land control flow finite and observable.
+Each loop iteration, suspend point, and resume point is represented as a
+`ResultStepReplayLogEntry`; `Map` remains a pure projection and does not add a
+replay node.
 
 ###  JSON Utilities  
 - Unified `JsonSerializerOptions`  
@@ -77,6 +83,7 @@ AIKernel.Common/
 │ ├─ Option.cs
 │ ├─ Either.cs
 │ ├─ ResultStep.cs
+│ ├─ PipelineStep.cs
 │ └─ ErrorContext.cs
 ├─ Json/ 
 │ ├─ JsonOptions.cs 
@@ -113,6 +120,27 @@ var loaded = await JsonFile.LoadAsync<MyType>("data.json");
 
 ```csharp
 var full = PathUtil.Normalize("~/data/output.txt");
+```
+
+### Deterministic Pipeline Control
+
+```csharp
+var suspended = PipelineStep.Suspend<string, int>(
+    "awaiting-approval",
+    "Needs user approval.");
+
+var resumed =
+    from approval in PipelineStep.Resume(
+        suspended.ReplayLog,
+        "approved",
+        1,
+        "User approved.")
+    from looped in PipelineStep.Loop(
+        ResultStep<string, int>.Success("agent", approval),
+        maxIterations: 2,
+        static (iteration, value) => ResultStep<string, int>
+            .Success($"agent:{iteration}", value + 1))
+    select looped;
 ```
 
 ## License / ライセンス

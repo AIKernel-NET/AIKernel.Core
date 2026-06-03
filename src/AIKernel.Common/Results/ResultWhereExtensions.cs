@@ -9,8 +9,20 @@ public static class ResultWhereExtensions
         if (result.IsFailure)
             return result;
 
-        return predicate(result.Value!)
-            ? result
-            : Result<T>.Fail("Predicate failed");
+        try
+        {
+            return predicate(result.Value!)
+                ? result
+                : Result<T>.Fail(PredicateFailedError());
+        }
+        catch (Exception ex)
+        {
+            return Result<T>.Fail(ErrorContext.FromException(ex));
+        }
+    }
+
+    private static ErrorContext PredicateFailedError()
+    {
+        return new ErrorContext("Predicate failed", "PREDICATE_FAILED", false);
     }
 }

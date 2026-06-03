@@ -92,5 +92,24 @@ public sealed class ResultTests
 
         Assert.True(result.IsFailure);
         Assert.Equal("Predicate failed", result.Error!.Message);
+        Assert.Equal("PREDICATE_FAILED", result.Error.Code);
+    }
+
+    [Fact]
+    public void Where_CatchesPredicateException()
+    {
+        var result =
+            from value in Result<int>.Success(1)
+            where Throws(value)
+            select value;
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("predicate-boom", result.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
+    }
+
+    private static bool Throws(int _)
+    {
+        throw new InvalidOperationException("predicate-boom");
     }
 }

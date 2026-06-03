@@ -44,6 +44,32 @@ public sealed class TaskOptionExtensionsTests
     }
 
     [Fact]
+    public async Task LinqQuery_ComposesSynchronousOptionWithTaskOption()
+    {
+        var option = await (
+            from left in Option<int>.Some(2)
+            from right in SomeAsync(4)
+            select left * right);
+
+        Assert.True(option.HasValue);
+        Assert.Equal(8, option.Value);
+    }
+
+    [Fact]
+    public async Task LinqQuery_ShortCircuitsSynchronousNoneBeforeTaskOption()
+    {
+        var called = false;
+
+        var option = await (
+            from left in Option<int>.None()
+            from right in TrackAsync(4, () => called = true)
+            select left + right);
+
+        Assert.False(option.HasValue);
+        Assert.False(called);
+    }
+
+    [Fact]
     public async Task LinqQuery_AppliesWhereToTaskOption()
     {
         var option = await (

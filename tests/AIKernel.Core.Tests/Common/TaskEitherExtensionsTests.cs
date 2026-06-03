@@ -45,6 +45,33 @@ public sealed class TaskEitherExtensionsTests
     }
 
     [Fact]
+    public async Task LinqQuery_ComposesSynchronousEitherWithTaskEither()
+    {
+        var either = await (
+            from left in Either<string, int>.FromRight(2)
+            from right in RightAsync(4)
+            select left * right);
+
+        Assert.True(either.IsRight);
+        Assert.Equal(8, either.Right);
+    }
+
+    [Fact]
+    public async Task LinqQuery_ShortCircuitsSynchronousLeftBeforeTaskEither()
+    {
+        var called = false;
+
+        var either = await (
+            from left in Either<string, int>.FromLeft("blocked")
+            from right in TrackAsync(4, () => called = true)
+            select left + right);
+
+        Assert.True(either.IsLeft);
+        Assert.False(called);
+        Assert.Equal("blocked", either.Left);
+    }
+
+    [Fact]
     public async Task LinqQuery_ReturnsSynchronousBinderLeft()
     {
         var either = await (

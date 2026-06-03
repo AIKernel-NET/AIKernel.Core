@@ -2,6 +2,21 @@
 
 public static class TaskOptionExtensions
 {
+    public static async Task<Option<V>> SelectMany<T, U, V>(
+        this Option<T> option,
+        Func<T, Task<Option<U>>> binder,
+        Func<T, U, V> projector)
+    {
+        if (!option.HasValue)
+            return Option<V>.None();
+
+        var next = await binder(option.Value!);
+        if (!next.HasValue)
+            return Option<V>.None();
+
+        return Option<V>.Some(projector(option.Value!, next.Value!));
+    }
+
     public static async Task<Option<U>> Select<T, U>(
         this Task<Option<T>> task,
         Func<T, U> selector)

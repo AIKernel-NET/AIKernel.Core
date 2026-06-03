@@ -2,6 +2,21 @@
 
 public static class TaskEitherExtensions
 {
+    public static async Task<Either<L, V>> SelectMany<L, R, U, V>(
+        this Either<L, R> either,
+        Func<R, Task<Either<L, U>>> binder,
+        Func<R, U, V> projector)
+    {
+        if (either.IsLeft)
+            return Either<L, V>.FromLeft(either.Left!);
+
+        var next = await binder(either.Right!);
+        if (next.IsLeft)
+            return Either<L, V>.FromLeft(next.Left!);
+
+        return Either<L, V>.FromRight(projector(either.Right!, next.Right!));
+    }
+
     public static async Task<Either<L, U>> Select<L, R, U>(
         this Task<Either<L, R>> task,
         Func<R, U> selector)

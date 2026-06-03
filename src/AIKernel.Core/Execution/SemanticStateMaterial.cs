@@ -50,12 +50,12 @@ public sealed record SemanticStateMaterial
     {
         if (request is null)
         {
-            return Result<SemanticStateMaterial>.Fail("KernelExecutionRequest is required.");
+            return Result<SemanticStateMaterial>.Fail(SemanticHashError("KernelExecutionRequest is required."));
         }
 
         if (request.ContextSnapshot is null)
         {
-            return Result<SemanticStateMaterial>.Fail("ContextSnapshot is required.");
+            return Result<SemanticStateMaterial>.Fail(SemanticHashError("ContextSnapshot is required."));
         }
 
         // Phase-2 SemanticStateHash boundary:
@@ -91,7 +91,7 @@ public sealed record SemanticStateMaterial
     {
         if (request is null)
         {
-            return Result<SemanticStateMaterial>.Fail("KernelRequest is required.");
+            return Result<SemanticStateMaterial>.Fail(SemanticHashError("KernelRequest is required."));
         }
 
         // Phase-2 SemanticStateHash boundary:
@@ -120,5 +120,15 @@ public sealed record SemanticStateMaterial
         }
 
         throw new InvalidOperationException(result.Error!.Message);
+    }
+
+    private static ErrorContext SemanticHashError(string message)
+    {
+        return new ErrorContext(message, "ERROR", IsRetryable: false)
+        {
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = OriginStep.SemanticHash,
+            SemanticSlot = SemanticSlot.B
+        };
     }
 }

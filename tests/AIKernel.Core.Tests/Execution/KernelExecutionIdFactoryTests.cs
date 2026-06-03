@@ -2,6 +2,7 @@ namespace AIKernel.Core.Tests.Execution;
 
 using System.Collections.Immutable;
 using AIKernel.Abstractions.Context;
+using AIKernel.Common.Results;
 using AIKernel.Core.Context;
 using AIKernel.Core.Execution;
 using AIKernel.Dtos.Execution;
@@ -65,6 +66,7 @@ public sealed class KernelExecutionIdFactoryTests
 
         Assert.True(result.IsFailure);
         Assert.Equal("KernelExecutionRequest is required.", result.Error!.Message);
+        AssertSemanticHashFailure(result.Error);
     }
 
     [Fact]
@@ -141,6 +143,7 @@ public sealed class KernelExecutionIdFactoryTests
 
         Assert.True(result.IsFailure);
         Assert.Equal("ContextSnapshot is required.", result.Error!.Message);
+        AssertSemanticHashFailure(result.Error);
     }
 
     [Fact]
@@ -171,6 +174,7 @@ public sealed class KernelExecutionIdFactoryTests
 
         Assert.True(result.IsFailure);
         Assert.Equal("KernelRequest is required.", result.Error!.Message);
+        AssertSemanticHashFailure(result.Error);
     }
 
     private static KernelExecutionRequest CreateExecutionRequest()
@@ -211,6 +215,15 @@ public sealed class KernelExecutionIdFactoryTests
             RequestedModelId = "gpt-test",
             Metadata = ImmutableDictionary<string, string>.Empty
         };
+    }
+
+    private static void AssertSemanticHashFailure(ErrorContext? error)
+    {
+        Assert.NotNull(error);
+        Assert.Equal("ERROR", error.Code);
+        Assert.Equal(FailureKind.FailClosed, error.FailureKind);
+        Assert.Equal(OriginStep.SemanticHash, error.OriginStep);
+        Assert.Equal(SemanticSlot.B, error.SemanticSlot);
     }
 
     private sealed class TestVfsCredentials : IVfsCredentials

@@ -79,6 +79,8 @@ public sealed class HistoryRomStore
             return Result<HistoryRomMetadata>.Fail(path.Error!);
         }
 
+        var wroteNewFile = false;
+
         try
         {
             if (await session.ExistsAsync(path.Value!).ConfigureAwait(false))
@@ -97,17 +99,30 @@ public sealed class HistoryRomStore
                         path.Value!,
                         Encoding.UTF8.GetBytes(markdown))
                     .ConfigureAwait(false);
+                wroteNewFile = true;
             }
 
-            return await LoadHistoryRomAsync(
+            var loaded = await LoadHistoryRomAsync(
                     session,
                     @namespace,
                     name,
                     createdAtUtc)
                 .ConfigureAwait(false);
+
+            if (loaded.IsFailure && wroteNewFile)
+            {
+                await TryDeleteAsync(session, path.Value!).ConfigureAwait(false);
+            }
+
+            return loaded;
         }
         catch (Exception ex)
         {
+            if (wroteNewFile)
+            {
+                await TryDeleteAsync(session, path.Value!).ConfigureAwait(false);
+            }
+
             return Result<HistoryRomMetadata>.Fail(ErrorContext.FromException(ex) with
             {
                 FailureKind = FailureKind.FailClosed,
@@ -177,5 +192,22 @@ public sealed class HistoryRomStore
         var file = await session.ReadFileAsync(path).ConfigureAwait(false);
         var content = await file.ReadAsync().ConfigureAwait(false);
         return Encoding.UTF8.GetString(content);
+    }
+
+    private static async Task TryDeleteAsync(
+        IVfsSession session,
+        string path)
+    {
+        try
+        {
+            if (await session.ExistsAsync(path).ConfigureAwait(false))
+            {
+                await session.DeleteAsync(path).ConfigureAwait(false);
+            }
+        }
+        catch
+        {
+            // Cleanup is best-effort; the original fail-closed error remains authoritative.
+        }
     }
 }

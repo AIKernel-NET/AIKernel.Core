@@ -126,6 +126,23 @@ public sealed class HistoryRomStoreTests
     }
 
     [Fact]
+    public async Task SaveMarkdownAsRomAsync_RemovesNewFileWhenSignatureVerificationFails()
+    {
+        var store = CreateStore(new HistoryRomRegistry());
+        await using var session = await OpenSessionAsync();
+
+        var saved = await store.SaveMarkdownAsRomAsync(
+            session,
+            "agent",
+            "invalid",
+            "# not signed history",
+            GeneratedAt);
+
+        Assert.True(saved.IsFailure);
+        Assert.False(await session.ExistsAsync("rom/history/agent/invalid.md"));
+    }
+
+    [Fact]
     public void HistoryRomPath_RejectsNestedRomId()
     {
         var parsed = HistoryRomPath.ParseRomId("history://agent/nested/demo");

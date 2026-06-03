@@ -182,6 +182,36 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void Execute_CapabilityExceptionReturnsFailClosedReplayEntry()
+    {
+        var pipeline = Compile(
+            """
+            {
+              "type": "Pipeline",
+              "steps": [
+                { "type": "CallCapability", "name": "Explode" }
+              ]
+            }
+            """,
+            new TestCapabilityRegistry("Explode"));
+
+        var result = pipeline.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
+        Assert.Equal(
+            typeof(InvalidOperationException).FullName,
+            result.Error.Metadata![ResultMetadataKeys.ExceptionType]);
+        Assert.Equal("Explode", result.Error.Metadata["dsl.capability_name"]);
+        var entry = Assert.Single(result.ReplayLog);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("UNHANDLED_EXCEPTION", entry.ErrorCode);
+        Assert.Equal("dsl.capability.call", entry.SemanticDelta.Label);
+    }
+
+    [Fact]
     public void Execute_LoopUntilStopsBeforeBodyWhenTimeoutReached()
     {
         var pipeline = Compile("""
@@ -299,6 +329,11 @@ public sealed class DslPipelineCompilerTests
             DslPipelineValue input,
             IReadOnlyDictionary<string, string> args)
         {
+            if (string.Equals(name, "Explode", StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException("Capability exploded.");
+            }
+
             if (string.Equals(name, "RejectPlan", StringComparison.Ordinal))
             {
                 return Result<DslPipelineValue>.Fail(new ErrorContext(

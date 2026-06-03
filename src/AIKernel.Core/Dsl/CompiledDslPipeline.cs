@@ -118,16 +118,29 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
         ResultStep<DslPipelineState, DslPipelineValue> current)
     {
         var nextState = current.State.Advance(node.Name);
-        var capabilityResult = _capabilityRegistry.Invoke(
-            node.Name,
-            current.Value!,
-            node.Args);
         var delta = DslSemanticDeltaFactory.CreateNodeDelta(
             "dsl.capability.call",
             "execute",
             "call_capability",
             node.Name,
             node.Args);
+
+        Result<DslPipelineValue> capabilityResult;
+        try
+        {
+            capabilityResult = _capabilityRegistry.Invoke(
+                node.Name,
+                current.Value!,
+                node.Args);
+        }
+        catch (Exception ex)
+        {
+            return DslResultStepAppender.AppendFailure(
+                current,
+                nextState,
+                DslExecutionErrors.CapabilityException(node.Name, ex),
+                delta);
+        }
 
         return capabilityResult.IsSuccess
             ? DslResultStepAppender.AppendSuccess(current, nextState, capabilityResult.Value!, delta)

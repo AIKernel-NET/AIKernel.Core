@@ -121,6 +121,9 @@ public sealed class KernelExecutorTests
         Assert.Equal("empty_output", result.Error?.Code);
         Assert.Equal("snapshot:executor", result.ContextSnapshotId);
         Assert.Equal("sha256:executor-context", result.ContextHash);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
+        Assert.Equal(OriginStep.Provider.ToString(), result.Metadata["origin_step"]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
     }
 
     [Fact]
@@ -167,6 +170,9 @@ public sealed class KernelExecutorTests
         Assert.Equal("output_token_budget_exceeded", result.Error?.Code);
         Assert.Equal("snapshot:executor", result.ContextSnapshotId);
         Assert.Equal("sha256:executor-context", result.ContextHash);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
+        Assert.Equal(OriginStep.Tokenizer.ToString(), result.Metadata["origin_step"]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
     }
 
     private sealed class FailingCapabilityResolver : IModelPromptCapabilityResolver

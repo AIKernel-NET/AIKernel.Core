@@ -203,7 +203,12 @@ public sealed class KernelExecutor : IKernelExecutor
             ? Result<string>.Fail(new ErrorContext(
                 "Model provider returned empty output.",
                 "empty_output",
-                false))
+                false)
+            {
+                FailureKind = FailureKind.FailClosed,
+                OriginStep = OriginStep.Provider,
+                SemanticSlot = SemanticSlot.T
+            })
             : Result<string>.Success(output);
     }
 
@@ -215,7 +220,12 @@ public sealed class KernelExecutor : IKernelExecutor
             ? Result<int>.Fail(new ErrorContext(
                 $"Output token budget exceeded. Actual={outputTokens}, Max={capability.MaxOutputTokens}.",
                 "output_token_budget_exceeded",
-                false))
+                false)
+            {
+                FailureKind = FailureKind.FailClosed,
+                OriginStep = OriginStep.Tokenizer,
+                SemanticSlot = SemanticSlot.T
+            })
             : Result<int>.Success(outputTokens);
     }
 

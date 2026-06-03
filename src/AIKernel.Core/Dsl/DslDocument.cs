@@ -41,11 +41,38 @@ public sealed record DslPipelineValue(
 
     public DslPipelineValue With(string key, string value)
     {
+        if (Data is null)
+        {
+            throw new InvalidOperationException(
+                "DSL pipeline value data is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            throw new ArgumentException(
+                "DSL pipeline value data keys must not be empty.",
+                nameof(key));
+        }
+
+        ArgumentNullException.ThrowIfNull(value);
+
         var builder = ImmutableDictionary.CreateBuilder<string, string>(
             StringComparer.Ordinal);
 
         foreach (var item in Data)
         {
+            if (string.IsNullOrWhiteSpace(item.Key))
+            {
+                throw new InvalidOperationException(
+                    "DSL pipeline value data keys must not be empty.");
+            }
+
+            if (item.Value is null)
+            {
+                throw new InvalidOperationException(
+                    "DSL pipeline value data values must not be null.");
+            }
+
             builder[item.Key] = item.Value;
         }
 

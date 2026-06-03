@@ -44,6 +44,28 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
             .AddWebGetFileProvider(section.GetSection("WebGetFile"));
     }
 
+    public static IServiceCollection AddAIKernelBrowserVfsProviders(
+        this IServiceCollection services,
+        Action<MemoryFileProviderOptions>? memory = null)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        return services.AddMemoryFileProvider(memory);
+    }
+
+    public static IServiceCollection AddAIKernelBrowserVfsProviders(
+        this IServiceCollection services,
+        Action<WebGetFileProviderOptions> webGet,
+        Action<MemoryFileProviderOptions>? memory = null)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(webGet);
+
+        return services
+            .AddMemoryFileProvider(memory)
+            .AddWebGetFileProvider(webGet);
+    }
+
     public static IServiceCollection AddMemoryFileProvider(
         this IServiceCollection services,
         Action<MemoryFileProviderOptions>? configure = null)
@@ -53,7 +75,9 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
 
         services.AddKernelClockDefaults();
         services.AddMemoryOptions(configure);
-        services.AddSingleton<IVfsProvider, MemoryFileProvider>();
+        services.AddSingleton<MemoryFileProvider>(CreateMemoryFileProvider);
+        services.AddSingleton<IVfsProvider>(serviceProvider =>
+            serviceProvider.GetRequiredService<MemoryFileProvider>());
 
         return services;
     }
@@ -68,7 +92,9 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
 
         services.AddKernelClockDefaults();
         services.AddMemoryOptions(configuration);
-        services.AddSingleton<IVfsProvider, MemoryFileProvider>();
+        services.AddSingleton<MemoryFileProvider>(CreateMemoryFileProvider);
+        services.AddSingleton<IVfsProvider>(serviceProvider =>
+            serviceProvider.GetRequiredService<MemoryFileProvider>());
 
         return services;
     }
@@ -114,16 +140,9 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         services.AddKernelClockDefaults();
         services.AddWebGetOptions(configure);
         services.AddWebGetHttpClient();
-        services.AddSingleton<IVfsProvider, WebGetFileProvider>(serviceProvider =>
-        {
-            var options = serviceProvider.GetRequiredService<IOptions<WebGetFileProviderOptions>>();
-            var factory = serviceProvider.GetRequiredService<IHttpClientFactory>();
-            var clock = serviceProvider.GetRequiredService<IKernelClock>();
-            return new WebGetFileProvider(
-                options,
-                factory.CreateClient(WebGetFileProviderDefaults.HttpClientName),
-                clock);
-        });
+        services.AddSingleton<WebGetFileProvider>(CreateWebGetFileProvider);
+        services.AddSingleton<IVfsProvider>(serviceProvider =>
+            serviceProvider.GetRequiredService<WebGetFileProvider>());
 
         return services;
     }
@@ -139,16 +158,9 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         services.AddKernelClockDefaults();
         services.AddWebGetOptions(configuration);
         services.AddWebGetHttpClient();
-        services.AddSingleton<IVfsProvider, WebGetFileProvider>(serviceProvider =>
-        {
-            var options = serviceProvider.GetRequiredService<IOptions<WebGetFileProviderOptions>>();
-            var factory = serviceProvider.GetRequiredService<IHttpClientFactory>();
-            var clock = serviceProvider.GetRequiredService<IKernelClock>();
-            return new WebGetFileProvider(
-                options,
-                factory.CreateClient(WebGetFileProviderDefaults.HttpClientName),
-                clock);
-        });
+        services.AddSingleton<WebGetFileProvider>(CreateWebGetFileProvider);
+        services.AddSingleton<IVfsProvider>(serviceProvider =>
+            serviceProvider.GetRequiredService<WebGetFileProvider>());
 
         return services;
     }
@@ -238,6 +250,28 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services;
     }
 
+    private static MemoryFileProvider CreateMemoryFileProvider(
+        IServiceProvider serviceProvider)
+    {
+        var options = serviceProvider.GetRequiredService<IOptions<MemoryFileProviderOptions>>();
+        var clock = serviceProvider.GetRequiredService<IKernelClock>();
+
+        return new MemoryFileProvider(options, clock);
+    }
+
+    private static WebGetFileProvider CreateWebGetFileProvider(
+        IServiceProvider serviceProvider)
+    {
+        var options = serviceProvider.GetRequiredService<IOptions<WebGetFileProviderOptions>>();
+        var factory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+        var clock = serviceProvider.GetRequiredService<IKernelClock>();
+
+        return new WebGetFileProvider(
+            options,
+            factory.CreateClient(WebGetFileProviderDefaults.HttpClientName),
+            clock);
+    }
+
     private static IServiceCollection AddKernelClockDefaults(
         this IServiceCollection services)
     {
@@ -254,8 +288,9 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         IServiceCollection services)
     {
         var alreadyRegistered = services.Any(descriptor =>
-            descriptor.ServiceType == typeof(IVfsProvider)
-            && descriptor.ImplementationType == typeof(TProvider));
+            descriptor.ServiceType == typeof(TProvider)
+            || (descriptor.ServiceType == typeof(IVfsProvider)
+                && descriptor.ImplementationType == typeof(TProvider)));
 
         if (alreadyRegistered)
         {

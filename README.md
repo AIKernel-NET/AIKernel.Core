@@ -201,8 +201,8 @@ other provider packages.
 External provider packages can attach either assembly-referenced providers or
 process-backed adapter providers through `WithModelProvider<TProvider>`. The
 extension registers the `IModelProvider` implementation and its
-`ModelPromptCapability` together, so the static resolver can bind the selected
-ProviderId and ModelId without provider-specific wiring in Core.
+`ModelPromptCapability` entries together, so the static resolver can bind the
+selected ProviderId and ModelId without provider-specific wiring in Core.
 
 ---
 

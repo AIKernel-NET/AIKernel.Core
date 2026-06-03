@@ -33,6 +33,27 @@ public static class ModelProviderHostingExtensions
 
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
         this AIKernelCoreBuilder builder,
+        IEnumerable<ModelPromptCapability> capabilities)
+        where TProvider : class, IModelProvider
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(capabilities);
+
+        var snapshot = capabilities
+            .Select(ValidateCapability)
+            .ToArray();
+
+        builder.Services.AddSingleton<IModelProvider, TProvider>();
+        foreach (var capability in snapshot)
+        {
+            builder.Services.AddSingleton(capability);
+        }
+
+        return builder;
+    }
+
+    public static AIKernelCoreBuilder WithModelProvider<TProvider>(
+        this AIKernelCoreBuilder builder,
         Func<IServiceProvider, TProvider> providerFactory,
         Func<IServiceProvider, ModelPromptCapability> capabilityFactory)
         where TProvider : class, IModelProvider
@@ -44,6 +65,29 @@ public static class ModelProviderHostingExtensions
         builder.Services.AddSingleton<IModelProvider>(providerFactory);
         builder.Services.AddSingleton(serviceProvider =>
             ValidateCapability(capabilityFactory(serviceProvider)));
+
+        return builder;
+    }
+
+    public static AIKernelCoreBuilder WithModelProvider<TProvider>(
+        this AIKernelCoreBuilder builder,
+        Func<IServiceProvider, TProvider> providerFactory,
+        IEnumerable<ModelPromptCapability> capabilities)
+        where TProvider : class, IModelProvider
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(providerFactory);
+        ArgumentNullException.ThrowIfNull(capabilities);
+
+        var snapshot = capabilities
+            .Select(ValidateCapability)
+            .ToArray();
+
+        builder.Services.AddSingleton<IModelProvider>(providerFactory);
+        foreach (var capability in snapshot)
+        {
+            builder.Services.AddSingleton(capability);
+        }
 
         return builder;
     }

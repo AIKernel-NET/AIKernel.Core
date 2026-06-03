@@ -65,6 +65,37 @@ public sealed class ModelProviderHostingExtensionsTests
     }
 
     [Fact]
+    public void WithModelProvider_RegistersMultipleCapabilitiesForOneProvider()
+    {
+        var services = new ServiceCollection();
+
+        services
+            .AddAIKernelCore()
+            .WithModelProvider<ExternalCapabilityProvider>(
+            [
+                CreateCapability("external-capability", "rh-prime-phase"),
+                CreateCapability("external-capability", "rh-interference-energy")
+            ]);
+
+        using var provider = services.BuildServiceProvider();
+
+        var modelProvider = Assert.Single(
+            provider.GetServices<IModelProvider>(),
+            x => x.ProviderId == "external-capability");
+        var resolver = provider.GetRequiredService<IModelPromptCapabilityResolver>();
+
+        var primePhase = resolver.Resolve(
+            modelProvider,
+            CreateExecutionRequest("rh-prime-phase"));
+        var interferenceEnergy = resolver.Resolve(
+            modelProvider,
+            CreateExecutionRequest("rh-interference-energy"));
+
+        Assert.Equal("rh-prime-phase", primePhase.ModelId);
+        Assert.Equal("rh-interference-energy", interferenceEnergy.ModelId);
+    }
+
+    [Fact]
     public void WithModelProvider_RejectsInvalidCapabilityAtResolution()
     {
         var services = new ServiceCollection();

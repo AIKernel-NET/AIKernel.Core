@@ -1,5 +1,6 @@
 namespace AIKernel.Core.Dsl;
 
+using System.Collections.Immutable;
 using AIKernel.Common.Results;
 using AIKernel.Core.Time;
 
@@ -18,7 +19,11 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
 
     public Result<IKernelPipeline> Compile(DslDocument document)
     {
-        ArgumentNullException.ThrowIfNull(document);
+        if (document is null)
+        {
+            return Result<IKernelPipeline>.Fail(CompileBoundaryFailure(
+                "DSL document is required."));
+        }
 
         return ValidateNode(document.Root)
             .Map<IKernelPipeline>(_ => new CompiledDslPipeline(
@@ -37,6 +42,7 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
             LoopNode loop => ValidateLoop(loop.MaxIterations, loop.BodyNodes),
             LoopUntilNode loopUntil => ValidateLoopUntil(loopUntil),
             SuspendNode suspend => ValidateName(suspend.Reason, "Suspend reason"),
+            null => CompileBoundaryFailureResult("Pipeline node is required."),
             _ => Invalid($"Unsupported pipeline node: {node.GetType().Name}.")
         };
     }
@@ -89,9 +95,17 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
             return Invalid("Capability name must not be empty.");
         }
 
-        return _capabilityRegistry.Contains(name)
-            ? Result<bool>.Success(true)
-            : Invalid($"Unknown capability: {name}.");
+        bool contains;
+        try
+        {
+            contains = _capabilityRegistry.Contains(name);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Fail(CapabilityResolutionException(name, ex));
+        }
+
+        return contains ? Result<bool>.Success(true) : Invalid($"Unknown capability: {name}.");
     }
 
     private static Result<bool> Invalid(string message)
@@ -101,4 +115,42 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
             OriginStep = OriginStep.KernelFacade,
             SemanticSlot = SemanticSlot.T
         });
+
+    private static Result<bool> CompileBoundaryFailureResult(string message)
+        => Result<bool>.Fail(CompileBoundaryFailure(message));
+
+    private static ErrorContext CompileBoundaryFailure(string message)
+        => new(message, "DSL_COMPILE_ERROR", false)
+        {
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = OriginStep.KernelFacade,
+            SemanticSlot = SemanticSlot.T
+        };
+
+    private static ErrorContext CapabilityResolutionException(
+        string capabilityName,
+        Exception exception)
+    {
+        var source = ErrorContext.FromException(exception);
+        var metadata = ImmutableDictionary.CreateBuilder<string, string>(
+            StringComparer.Ordinal);
+
+        if (source.Metadata is not null)
+        {
+            foreach (var item in source.Metadata)
+            {
+                metadata[item.Key] = item.Value;
+            }
+        }
+
+        metadata["dsl.capability_name"] = capabilityName;
+
+        return source with
+        {
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = OriginStep.Capability,
+            SemanticSlot = SemanticSlot.T,
+            Metadata = metadata.ToImmutable()
+        };
+    }
 }

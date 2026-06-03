@@ -101,6 +101,45 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void Compile_NullDocumentReturnsFailClosedResult()
+    {
+        var compiler = new DslPipelineCompiler(new TestCapabilityRegistry());
+
+        var result = compiler.Compile(null!);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_COMPILE_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.KernelFacade, result.Error.OriginStep);
+    }
+
+    [Fact]
+    public void Compile_CapabilityResolutionExceptionReturnsFailClosedResult()
+    {
+        var document = DslDocument.FromJson("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "CallCapability", "name": "ProbeFailure" }
+          ]
+        }
+        """).Value!;
+        var compiler = new DslPipelineCompiler(
+            new TestCapabilityRegistry("ProbeFailure"));
+
+        var result = compiler.Compile(document);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
+        Assert.Equal(
+            typeof(InvalidOperationException).FullName,
+            result.Error.Metadata![ResultMetadataKeys.ExceptionType]);
+        Assert.Equal("ProbeFailure", result.Error.Metadata["dsl.capability_name"]);
+    }
+
+    [Fact]
     public void Execute_IsDeterministic_ForSameDslAndInput()
     {
         var pipeline = Compile("""
@@ -377,6 +416,11 @@ public sealed class DslPipelineCompilerTests
 
         public bool Contains(string name)
         {
+            if (string.Equals(name, "ProbeFailure", StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException("Capability probe failed.");
+            }
+
             return _known.Contains(name);
         }
 

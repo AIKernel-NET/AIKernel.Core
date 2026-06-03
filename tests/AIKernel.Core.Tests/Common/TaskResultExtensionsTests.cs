@@ -72,6 +72,37 @@ public sealed class TaskResultExtensionsTests
     }
 
     [Fact]
+    public async Task Bind_ComposesSynchronousResultWithTaskResult()
+    {
+        var result = await Result<int>
+            .Success(3)
+            .Bind(value => SuccessAsync(value + 4));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(7, result.Value);
+    }
+
+    [Fact]
+    public async Task Bind_ComposesTaskResultWithTaskResult()
+    {
+        var result = await SuccessAsync(3)
+            .Bind(value => SuccessAsync(value + 4));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(7, result.Value);
+    }
+
+    [Fact]
+    public async Task Bind_ComposesTaskResultWithSynchronousResult()
+    {
+        var result = await SuccessAsync(3)
+            .Bind(value => Result<int>.Success(value + 4));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(7, result.Value);
+    }
+
+    [Fact]
     public async Task LinqQuery_ShortCircuitsBeforeSynchronousBinder()
     {
         var called = false;
@@ -101,6 +132,46 @@ public sealed class TaskResultExtensionsTests
         Assert.True(result.IsFailure);
         Assert.False(called);
         Assert.Same(failure, result.Error);
+    }
+
+    [Fact]
+    public async Task Bind_ShortCircuitsTaskFailureWithoutRunningBinder()
+    {
+        var called = false;
+        var failure = new ErrorContext("blocked", "BLOCKED", false);
+
+        var result = await FailAsync<int>(failure)
+            .Bind(_ =>
+            {
+                called = true;
+                return SuccessAsync(4);
+            });
+
+        Assert.True(result.IsFailure);
+        Assert.False(called);
+        Assert.Same(failure, result.Error);
+    }
+
+    [Fact]
+    public async Task Bind_CatchesAsyncBinderException()
+    {
+        var result = await SuccessAsync(3)
+            .Bind<int, int>(_ => ThrowsAsync());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("async-binder-boom", result.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
+    }
+
+    [Fact]
+    public async Task Bind_CatchesSynchronousBinderException()
+    {
+        var result = await SuccessAsync(3)
+            .Bind<int, int>(_ => Throws());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("sync-binder-boom", result.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
     }
 
     [Fact]

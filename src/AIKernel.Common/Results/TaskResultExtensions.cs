@@ -63,26 +63,68 @@ public static class TaskResultExtensions
     // -------------------------
     // Bind（SelectMany）
     // -------------------------
+    public static async Task<Result<U>> Bind<T, U>(
+        this Result<T> result,
+        Func<T, Task<Result<U>>> binder)
+    {
+        if (result.IsFailure)
+            return Result<U>.Fail(result.Error!);
+
+        try
+        {
+            return await binder(result.Value!).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            return Result<U>.Fail(ErrorContext.FromException(ex));
+        }
+    }
+
+    public static async Task<Result<U>> Bind<T, U>(
+        this Task<Result<T>> task,
+        Func<T, Task<Result<U>>> binder)
+    {
+        try
+        {
+            var result = await task.ConfigureAwait(false);
+            if (result.IsFailure)
+                return Result<U>.Fail(result.Error!);
+
+            return await binder(result.Value!).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            return Result<U>.Fail(ErrorContext.FromException(ex));
+        }
+    }
+
+    public static async Task<Result<U>> Bind<T, U>(
+        this Task<Result<T>> task,
+        Func<T, Result<U>> binder)
+    {
+        try
+        {
+            var result = await task.ConfigureAwait(false);
+            if (result.IsFailure)
+                return Result<U>.Fail(result.Error!);
+
+            return binder(result.Value!);
+        }
+        catch (Exception ex)
+        {
+            return Result<U>.Fail(ErrorContext.FromException(ex));
+        }
+    }
+
     public static async Task<Result<V>> SelectMany<T, U, V>(
         this Result<T> result,
         Func<T, Task<Result<U>>> binder,
         Func<T, U, V> projector)
     {
-        if (result.IsFailure)
-            return Result<V>.Fail(result.Error!);
-
-        try
-        {
-            var r = await binder(result.Value!).ConfigureAwait(false);
-            if (r.IsFailure)
-                return Result<V>.Fail(r.Error!);
-
-            return Result<V>.Success(projector(result.Value!, r.Value!));
-        }
-        catch (Exception ex)
-        {
-            return Result<V>.Fail(ErrorContext.FromException(ex));
-        }
+        return await result
+            .Bind(binder)
+            .Select(bound => projector(result.Value!, bound))
+            .ConfigureAwait(false);
     }
 
     public static async Task<Result<V>> SelectMany<T, U, V>(
@@ -90,22 +132,16 @@ public static class TaskResultExtensions
         Func<T, Task<Result<U>>> binder,
         Func<T, U, V> projector)
     {
-        try
-        {
-            var r1 = await task.ConfigureAwait(false);
-            if (r1.IsFailure)
-                return Result<V>.Fail(r1.Error!);
+        var captured = default(T);
 
-            var r2 = await binder(r1.Value!).ConfigureAwait(false);
-            if (r2.IsFailure)
-                return Result<V>.Fail(r2.Error!);
-
-            return Result<V>.Success(projector(r1.Value!, r2.Value!));
-        }
-        catch (Exception ex)
-        {
-            return Result<V>.Fail(ErrorContext.FromException(ex));
-        }
+        return await task
+            .Bind(value =>
+            {
+                captured = value;
+                return binder(value);
+            })
+            .Select(bound => projector(captured!, bound))
+            .ConfigureAwait(false);
     }
 
     public static async Task<Result<V>> SelectMany<T, U, V>(
@@ -113,21 +149,15 @@ public static class TaskResultExtensions
         Func<T, Result<U>> binder,
         Func<T, U, V> projector)
     {
-        try
-        {
-            var r1 = await task.ConfigureAwait(false);
-            if (r1.IsFailure)
-                return Result<V>.Fail(r1.Error!);
+        var captured = default(T);
 
-            var r2 = binder(r1.Value!);
-            if (r2.IsFailure)
-                return Result<V>.Fail(r2.Error!);
-
-            return Result<V>.Success(projector(r1.Value!, r2.Value!));
-        }
-        catch (Exception ex)
-        {
-            return Result<V>.Fail(ErrorContext.FromException(ex));
-        }
+        return await task
+            .Bind(value =>
+            {
+                captured = value;
+                return binder(value);
+            })
+            .Select(bound => projector(captured!, bound))
+            .ConfigureAwait(false);
     }
 }

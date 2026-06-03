@@ -103,23 +103,7 @@ public readonly struct Result<T>
     public Result<V> SelectMany<U, V>(
         Func<T, Result<U>> binder,
         Func<T, U, V> projector)
-    {
-        if (IsFailure)
-            return Result<V>.Fail(Error!);
-
-        try
-        {
-            var r = binder(Value!);
-            if (r.IsFailure)
-                return Result<V>.Fail(r.Error!);
-
-            return Result<V>.Success(projector(Value!, r.Value!));
-        }
-        catch (Exception ex)
-        {
-            return Result<V>.Fail(ErrorContext.FromException(ex));
-        }
-    }
+        => Bind(value => binder(value).Map(bound => projector(value, bound)));
 
     public override string ToString()
         => IsSuccess ? $"Success({Value})" : $"Fail({Error})";

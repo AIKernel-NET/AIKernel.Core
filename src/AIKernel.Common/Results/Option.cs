@@ -54,16 +54,7 @@ public readonly struct Option<T>
     public Option<V> SelectMany<U, V>(
         Func<T, Option<U>> binder,
         Func<T, U, V> projector)
-    {
-        if (!HasValue)
-            return Option<V>.None();
-
-        var r = binder(Value!);
-        if (!r.HasValue)
-            return Option<V>.None();
-
-        return Option<V>.Some(projector(Value!, r.Value!));
-    }
+        => Bind(value => binder(value).Map(bound => projector(value, bound)));
 
     public override string ToString()
         => HasValue ? $"Some({Value})" : "None";

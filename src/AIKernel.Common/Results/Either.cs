@@ -58,16 +58,7 @@ public readonly struct Either<L, R>
     public Either<L, V> SelectMany<U, V>(
         Func<R, Either<L, U>> binder,
         Func<R, U, V> projector)
-    {
-        if (IsLeft)
-            return Either<L, V>.FromLeft(Left!);
-
-        var r = binder(Right!);
-        if (r.IsLeft)
-            return Either<L, V>.FromLeft(r.Left!);
-
-        return Either<L, V>.FromRight(projector(Right!, r.Right!));
-    }
+        => Bind(value => binder(value).Map(bound => projector(value, bound)));
 
     public override string ToString()
         => IsRight ? $"Right({Right})" : $"Left({Left})";

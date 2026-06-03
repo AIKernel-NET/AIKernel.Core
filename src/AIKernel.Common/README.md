@@ -34,7 +34,8 @@ Instead, it offers standardized behaviors and reusable helpers that ensure consi
 `PipelineStep` keeps agent-style user-land control flow finite and observable.
 Each loop iteration, suspend point, and resume point is represented as a
 `ResultStepReplayLogEntry`; `Map` remains a pure projection and does not add a
-replay node.
+replay node. Use `PipelineStepMetadataKeys` when reading loop, suspend, and
+resume metadata from external capability modules.
 
 ###  JSON Utilities  
 - Unified `JsonSerializerOptions`  

@@ -18,12 +18,12 @@ public sealed class PipelineStepTests
         Assert.True(step.IsSuccess);
         Assert.Equal(3, step.Value);
         Assert.Equal(3, step.ReplayLog.Count);
-        Assert.Equal("max_iterations_reached", step.SemanticDelta.Metadata!["loop_decision"]);
-        Assert.Equal("2", step.SemanticDelta.Metadata!["loop_iteration"]);
+        Assert.Equal("max_iterations_reached", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopDecision]);
+        Assert.Equal("2", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopIteration]);
         Assert.All(step.ReplayLog, entry =>
         {
             Assert.Equal("loop", entry.SemanticDelta.Kind);
-            Assert.Equal("loop", entry.SemanticDelta.Metadata!["delta.kind"]);
+            Assert.Equal("loop", entry.SemanticDelta.Metadata![PipelineStepMetadataKeys.DeltaKind]);
             Assert.True(entry.IsSuccess);
         });
         Assert.Equal(step.ReplayLog[0].StepId, step.ReplayLog[1].ParentStepId);
@@ -48,7 +48,7 @@ public sealed class PipelineStepTests
         Assert.Equal(2, step.ReplayLog.Count);
         Assert.False(step.ReplayLog[^1].IsSuccess);
         Assert.Equal("BLOCKED", step.ReplayLog[^1].ErrorCode);
-        Assert.Equal("1", step.SemanticDelta.Metadata!["loop_iteration"]);
+        Assert.Equal("1", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopIteration]);
     }
 
     [Fact]
@@ -73,9 +73,9 @@ public sealed class PipelineStepTests
 
         Assert.True(step.IsSuccess);
         Assert.Equal(2, step.Value);
-        Assert.Equal("timeout_reached", step.SemanticDelta.Metadata!["loop_decision"]);
-        Assert.Equal("2", step.SemanticDelta.Metadata!["loop_iteration"]);
-        Assert.Equal(start.AddSeconds(3).ToString("O"), step.SemanticDelta.Metadata!["loop_timestamp"]);
+        Assert.Equal("timeout_reached", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopDecision]);
+        Assert.Equal("2", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopIteration]);
+        Assert.Equal(start.AddSeconds(3).ToString("O"), step.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopTimestamp]);
         Assert.Equal(3, step.ReplayLog.Count);
     }
 
@@ -91,8 +91,8 @@ public sealed class PipelineStepTests
         Assert.Equal(PipelineStep.SuspendErrorCode, step.Error!.Code);
         Assert.Equal(FailureKind.Quarantine, step.Error.FailureKind);
         Assert.Equal("suspend", step.SemanticDelta.Kind);
-        Assert.Equal("suspend", step.SemanticDelta.Metadata!["delta.kind"]);
-        Assert.Equal("Needs user approval.", step.SemanticDelta.Metadata!["suspend_reason"]);
+        Assert.Equal("suspend", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.DeltaKind]);
+        Assert.Equal("Needs user approval.", step.SemanticDelta.Metadata![PipelineStepMetadataKeys.SuspendReason]);
         var entry = Assert.Single(step.ReplayLog);
         Assert.False(entry.IsSuccess);
         Assert.Equal(PipelineStep.SuspendErrorCode, entry.ErrorCode);
@@ -114,7 +114,7 @@ public sealed class PipelineStepTests
         Assert.True(resumed.IsSuccess);
         Assert.Equal(42, resumed.Value);
         Assert.Equal(2, resumed.ReplayLog.Count);
-        Assert.Equal(suspended.ReplayLogHash, resumed.SemanticDelta.Metadata!["previous_replay_log_hash"]);
+        Assert.Equal(suspended.ReplayLogHash, resumed.SemanticDelta.Metadata![PipelineStepMetadataKeys.PreviousReplayLogHash]);
         Assert.Equal(suspended.StepId, resumed.ReplayLog[^1].ParentStepId);
         Assert.Equal("resume", resumed.SemanticDelta.Kind);
         ReplayMetadataAssertions.AssertReplayLogHash(resumed.ReplayLogHash);
@@ -146,5 +146,18 @@ public sealed class PipelineStepTests
         Assert.Equal("resume", resumed.ReplayLog[1].SemanticDelta.Kind);
         Assert.Equal("loop", resumed.ReplayLog[2].SemanticDelta.Kind);
         Assert.Equal(resumed.ReplayLog[2].StepId, resumed.ReplayLog[3].ParentStepId);
+    }
+
+    [Fact]
+    public void PipelineStepMetadataKeys_ExposeStableContractNames()
+    {
+        Assert.Equal("delta.kind", PipelineStepMetadataKeys.DeltaKind);
+        Assert.Equal("loop_iteration", PipelineStepMetadataKeys.LoopIteration);
+        Assert.Equal("loop_decision", PipelineStepMetadataKeys.LoopDecision);
+        Assert.Equal("loop_timestamp", PipelineStepMetadataKeys.LoopTimestamp);
+        Assert.Equal("suspend_reason", PipelineStepMetadataKeys.SuspendReason);
+        Assert.Equal("resume_reason", PipelineStepMetadataKeys.ResumeReason);
+        Assert.Equal("previous_replay_log_count", PipelineStepMetadataKeys.PreviousReplayLogCount);
+        Assert.Equal("previous_replay_log_hash", PipelineStepMetadataKeys.PreviousReplayLogHash);
     }
 }

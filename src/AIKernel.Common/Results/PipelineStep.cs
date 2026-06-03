@@ -138,8 +138,8 @@ public static class PipelineStep
             ? "Pipeline suspended."
             : reason;
         var metadata = ImmutableDictionary<string, string>.Empty
-            .Add("delta.kind", "suspend")
-            .Add("suspend_reason", normalizedReason);
+            .Add(PipelineStepMetadataKeys.DeltaKind, "suspend")
+            .Add(PipelineStepMetadataKeys.SuspendReason, normalizedReason);
         var error = new ErrorContext(
             normalizedReason,
             SuspendErrorCode,
@@ -173,10 +173,10 @@ public static class PipelineStep
             ? "Pipeline resumed."
             : reason;
         var metadata = ImmutableDictionary<string, string>.Empty
-            .Add("delta.kind", "resume")
-            .Add("resume_reason", normalizedReason)
-            .Add("previous_replay_log_count", previousReplayLog.Count.ToString(CultureInfo.InvariantCulture))
-            .Add("previous_replay_log_hash", ResultStepIdentity.CreateReplayLogHash(previousReplayLog));
+            .Add(PipelineStepMetadataKeys.DeltaKind, "resume")
+            .Add(PipelineStepMetadataKeys.ResumeReason, normalizedReason)
+            .Add(PipelineStepMetadataKeys.PreviousReplayLogCount, previousReplayLog.Count.ToString(CultureInfo.InvariantCulture))
+            .Add(PipelineStepMetadataKeys.PreviousReplayLogHash, ResultStepIdentity.CreateReplayLogHash(previousReplayLog));
 
         return ResultStep<TState, TValue>
             .Success(state, value)
@@ -246,8 +246,8 @@ public static class PipelineStep
                 OriginStep.KernelFacade,
                 SemanticSlot.T,
                 ImmutableDictionary<string, string>.Empty
-                    .Add("delta.kind", "loop")
-                    .Add("loop_decision", "invalid"),
+                    .Add(PipelineStepMetadataKeys.DeltaKind, "loop")
+                    .Add(PipelineStepMetadataKeys.LoopDecision, "invalid"),
                 Kind: "loop"));
     }
 
@@ -260,9 +260,9 @@ public static class PipelineStep
             OriginStep.KernelFacade,
             SemanticSlot.T,
             ImmutableDictionary<string, string>.Empty
-                .Add("delta.kind", "loop")
-                .Add("loop_iteration", iteration.ToString(CultureInfo.InvariantCulture))
-                .Add("loop_decision", decision),
+                .Add(PipelineStepMetadataKeys.DeltaKind, "loop")
+                .Add(PipelineStepMetadataKeys.LoopIteration, iteration.ToString(CultureInfo.InvariantCulture))
+                .Add(PipelineStepMetadataKeys.LoopDecision, decision),
             Kind: "loop");
     }
 
@@ -272,13 +272,13 @@ public static class PipelineStep
         string decision)
     {
         var metadata = ImmutableDictionary<string, string>.Empty
-            .Add("delta.kind", "loop")
-            .Add("loop_iteration", iteration.ToString(CultureInfo.InvariantCulture))
-            .Add("loop_decision", decision);
+            .Add(PipelineStepMetadataKeys.DeltaKind, "loop")
+            .Add(PipelineStepMetadataKeys.LoopIteration, iteration.ToString(CultureInfo.InvariantCulture))
+            .Add(PipelineStepMetadataKeys.LoopDecision, decision);
 
         if (timestamp is { } value)
         {
-            metadata = metadata.Add("loop_timestamp", value.ToString("O", CultureInfo.InvariantCulture));
+            metadata = metadata.Add(PipelineStepMetadataKeys.LoopTimestamp, value.ToString("O", CultureInfo.InvariantCulture));
         }
 
         return new SemanticDelta(

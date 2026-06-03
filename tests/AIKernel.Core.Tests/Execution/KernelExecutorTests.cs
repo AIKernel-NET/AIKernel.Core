@@ -127,6 +127,28 @@ public sealed class KernelExecutorTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_ReturnsFailedResult_WhenPromptGeneratorThrows()
+    {
+        var executor = new KernelExecutor(
+            new FailingPromptGenerator(),
+            new FixedCapabilityResolver(maxOutputTokens: 8),
+            new SimpleTokenizer(),
+            KernelClock.Replay(DateTimeOffset.UnixEpoch));
+
+        var result = await executor.ExecuteAsync(
+            new FakeModelProvider(output: "unused"),
+            CreateExecutionRequest(),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Failed, result.Status);
+        Assert.Equal("execution_failed", result.Error?.Code);
+        Assert.Equal("prompt failed", result.Error?.Message);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
+        Assert.Equal(OriginStep.Prompt.ToString(), result.Metadata["origin_step"]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsFailedResult_WhenProviderThrows()
     {
         var executor = new KernelExecutor(
@@ -229,6 +251,16 @@ public sealed class KernelExecutorTests
             CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException("Prompt generation should not run.");
+        }
+    }
+
+    private sealed class FailingPromptGenerator : IPromptGenerator
+    {
+        public Task<GeneratedPrompt> GenerateAsync(
+            PromptGenerationRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            throw new InvalidOperationException("prompt failed");
         }
     }
 

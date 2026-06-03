@@ -39,6 +39,14 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
             }
         }
 
+        var capabilityName = DslRomPath.ParseCapabilityName(name);
+        if (capabilityName.IsFailure)
+        {
+            return Result<DslPipelineValue>.Fail(CapabilityNameError(
+                name,
+                capabilityName.Error!.Message));
+        }
+
         Result<DslRomSnapshot> snapshot;
         try
         {
@@ -299,4 +307,13 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
             Metadata = builder.ToImmutable()
         };
     }
+
+    private static ErrorContext CapabilityNameError(
+        string capabilityName,
+        string message)
+        => Error(message) with
+        {
+            Metadata = ImmutableDictionary<string, string>.Empty
+                .Add("dsl.capability_name", capabilityName)
+        };
 }

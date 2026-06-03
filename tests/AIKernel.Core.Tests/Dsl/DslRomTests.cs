@@ -464,7 +464,7 @@ public sealed class DslRomTests
             romRegistry);
 
         var result = registry.Invoke(
-            metadata.CapabilityName,
+            "dsl://agent/plan1",
             DslPipelineValue.Empty,
             new Dictionary<string, string>());
 
@@ -490,7 +490,7 @@ public sealed class DslRomTests
             romRegistry);
 
         var result = registry.Invoke(
-            metadata.CapabilityName,
+            "dsl://agent/plan1",
             DslPipelineValue.Empty,
             new Dictionary<string, string>());
 
@@ -517,6 +517,26 @@ public sealed class DslRomTests
         Assert.Equal("UNHANDLED_EXCEPTION", result.Error!.Code);
         Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
         Assert.Equal("dsl://agent/plan1", result.Error.Metadata!["dsl.capability_name"]);
+    }
+
+    [Fact]
+    public void DslRomCapabilityRegistry_ReturnsFailure_WhenInvokedDslCapabilityIsMalformed()
+    {
+        var registry = new DslRomCapabilityRegistry(
+            new TestCapabilityRegistry(),
+            new DslRomRegistry());
+
+        var result = registry.Invoke(
+            "dsl://agent/nested/plan1",
+            DslPipelineValue.Empty,
+            new Dictionary<string, string>());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
+        Assert.Equal("dsl://agent/nested/plan1", result.Error.Metadata!["dsl.capability_name"]);
+        Assert.Contains("single path segments", result.Error.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -577,7 +597,7 @@ public sealed class DslRomTests
                 Compile(PlanDsl, new TestCapabilityRegistry()))));
 
         var result = registry.Invoke(
-            metadata.CapabilityName,
+            "dsl://agent/plan1",
             DslPipelineValue.Empty,
             new Dictionary<string, string>());
 

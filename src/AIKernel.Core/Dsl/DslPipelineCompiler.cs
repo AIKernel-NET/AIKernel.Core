@@ -155,6 +155,11 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
                 return CompileBoundaryFailureResult("Capability arg keys must not be null.");
             }
 
+            if (string.IsNullOrWhiteSpace(item.Key))
+            {
+                return Invalid("Capability arg keys must not be empty.");
+            }
+
             if (item.Value is null)
             {
                 return CompileBoundaryFailureResult("Capability arg values must not be null.");

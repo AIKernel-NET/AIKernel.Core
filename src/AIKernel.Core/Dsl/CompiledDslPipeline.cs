@@ -335,6 +335,15 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
                 return false;
             }
 
+            if (string.IsNullOrWhiteSpace(item.Key))
+            {
+                error = DslExecutionErrors.InvalidPipelineValue(
+                    "DSL pipeline value data keys must not be empty.",
+                    originStep,
+                    capabilityName);
+                return false;
+            }
+
             if (item.Value is null)
             {
                 error = DslExecutionErrors.InvalidPipelineValue(

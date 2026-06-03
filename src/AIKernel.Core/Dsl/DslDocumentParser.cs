@@ -252,6 +252,12 @@ public static class DslDocumentParser
 
         foreach (var item in args.EnumerateObject())
         {
+            if (string.IsNullOrWhiteSpace(item.Name))
+            {
+                return Invalid<IReadOnlyDictionary<string, string>>(
+                    "args keys must not be empty.");
+            }
+
             builder[item.Name] = item.Value.ValueKind == JsonValueKind.String
                 ? item.Value.GetString() ?? string.Empty
                 : item.Value.GetRawText();

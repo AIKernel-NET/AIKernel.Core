@@ -59,6 +59,23 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void FromJson_RejectsEmptyArgKey()
+    {
+        var document = DslDocument.FromJson("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "CallCapability", "name": "Observe", "args": { "": "bad" } }
+          ]
+        }
+        """);
+
+        Assert.True(document.IsFailure);
+        Assert.Equal("INVALID_DSL", document.Error!.Code);
+        Assert.Equal(FailureKind.Reject, document.Error.FailureKind);
+    }
+
+    [Fact]
     public void FromJson_RejectsOutOfRangeNumericTimeout()
     {
         var document = DslDocument.FromJson("""
@@ -209,6 +226,27 @@ public sealed class DslPipelineCompilerTests
         Assert.True(result.IsFailure);
         Assert.Equal("DSL_COMPILE_ERROR", result.Error!.Code);
         Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+    }
+
+    [Fact]
+    public void Compile_RejectsEmptyCapabilityArgKey()
+    {
+        var compiler = new DslPipelineCompiler(new TestCapabilityRegistry());
+        var document = new DslDocument(new PipelineRootNode(
+        [
+            new CallCapabilityNode(
+                "Observe",
+                new Dictionary<string, string>
+                {
+                    [""] = "bad"
+                })
+        ]));
+
+        var result = compiler.Compile(document);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_COMPILE_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.Reject, result.Error.FailureKind);
     }
 
     [Fact]
@@ -396,6 +434,32 @@ public sealed class DslPipelineCompilerTests
         Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
         Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
         Assert.Equal("NullDataValue", result.Error.Metadata!["dsl.capability_name"]);
+        var entry = Assert.Single(result.ReplayLog);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("DSL_RUNTIME_ERROR", entry.ErrorCode);
+    }
+
+    [Fact]
+    public void Execute_CapabilityEmptyDataKeyReturnsFailClosedReplayEntry()
+    {
+        var pipeline = Compile(
+            """
+            {
+              "type": "Pipeline",
+              "steps": [
+                { "type": "CallCapability", "name": "EmptyDataKey" }
+              ]
+            }
+            """,
+            new TestCapabilityRegistry("EmptyDataKey"));
+
+        var result = pipeline.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_RUNTIME_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
+        Assert.Equal("EmptyDataKey", result.Error.Metadata!["dsl.capability_name"]);
         var entry = Assert.Single(result.ReplayLog);
         Assert.False(entry.IsSuccess);
         Assert.Equal("DSL_RUNTIME_ERROR", entry.ErrorCode);
@@ -640,6 +704,15 @@ public sealed class DslPipelineCompilerTests
                     new DslPipelineValue(new Dictionary<string, string>
                     {
                         ["bad"] = null!
+                    }));
+            }
+
+            if (string.Equals(name, "EmptyDataKey", StringComparison.Ordinal))
+            {
+                return Result<DslPipelineValue>.Success(
+                    new DslPipelineValue(new Dictionary<string, string>
+                    {
+                        [""] = "bad"
                     }));
             }
 

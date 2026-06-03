@@ -30,6 +30,28 @@ public static class TaskResultExtensions
     // Bind（SelectMany）
     // -------------------------
     public static async Task<Result<V>> SelectMany<T, U, V>(
+        this Result<T> result,
+        Func<T, Task<Result<U>>> binder,
+        Func<T, U, V> projector)
+    {
+        if (result.IsFailure)
+            return Result<V>.Fail(result.Error!);
+
+        try
+        {
+            var r = await binder(result.Value!).ConfigureAwait(false);
+            if (r.IsFailure)
+                return Result<V>.Fail(r.Error!);
+
+            return Result<V>.Success(projector(result.Value!, r.Value!));
+        }
+        catch (Exception ex)
+        {
+            return Result<V>.Fail(ErrorContext.FromException(ex));
+        }
+    }
+
+    public static async Task<Result<V>> SelectMany<T, U, V>(
         this Task<Result<T>> task,
         Func<T, Task<Result<U>>> binder,
         Func<T, U, V> projector)

@@ -142,9 +142,26 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
                 delta);
         }
 
-        return capabilityResult.IsSuccess
-            ? DslResultStepAppender.AppendSuccess(current, nextState, capabilityResult.Value!, delta)
-            : DslResultStepAppender.AppendFailure(current, nextState, capabilityResult.Error!, delta);
+        if (capabilityResult.IsFailure)
+        {
+            return DslResultStepAppender.AppendFailure(
+                current,
+                nextState,
+                capabilityResult.Error!,
+                delta);
+        }
+
+        return capabilityResult.Value is null
+            ? DslResultStepAppender.AppendFailure(
+                current,
+                nextState,
+                DslExecutionErrors.CapabilityReturnedNull(node.Name),
+                delta)
+            : DslResultStepAppender.AppendSuccess(
+                current,
+                nextState,
+                capabilityResult.Value,
+                delta);
     }
 
     private ResultStep<DslPipelineState, DslPipelineValue> ExecuteLoop(

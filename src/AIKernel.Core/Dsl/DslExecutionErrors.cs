@@ -40,6 +40,22 @@ internal static class DslExecutionErrors
         };
     }
 
+    public static ErrorContext CapabilityReturnedNull(
+        string capabilityName)
+    {
+        return new ErrorContext(
+            "Capability returned a successful null DSL value.",
+            "DSL_RUNTIME_ERROR",
+            false)
+        {
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = OriginStep.Capability,
+            SemanticSlot = SemanticSlot.T,
+            Metadata = ImmutableDictionary<string, string>.Empty
+                .Add("dsl.capability_name", capabilityName)
+        };
+    }
+
     public static ErrorContext ClockException(
         Exception exception,
         SemanticDelta loopDelta)

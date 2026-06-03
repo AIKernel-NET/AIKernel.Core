@@ -251,6 +251,33 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void Execute_CapabilitySuccessNullReturnsFailClosedReplayEntry()
+    {
+        var pipeline = Compile(
+            """
+            {
+              "type": "Pipeline",
+              "steps": [
+                { "type": "CallCapability", "name": "NullSuccess" }
+              ]
+            }
+            """,
+            new TestCapabilityRegistry("NullSuccess"));
+
+        var result = pipeline.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_RUNTIME_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
+        Assert.Equal("NullSuccess", result.Error.Metadata!["dsl.capability_name"]);
+        var entry = Assert.Single(result.ReplayLog);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("DSL_RUNTIME_ERROR", entry.ErrorCode);
+        Assert.Equal("dsl.capability.call", entry.SemanticDelta.Label);
+    }
+
+    [Fact]
     public void Execute_LoopUntilStopsBeforeBodyWhenTimeoutReached()
     {
         var pipeline = Compile("""
@@ -445,6 +472,11 @@ public sealed class DslPipelineCompilerTests
                     OriginStep = OriginStep.Capability,
                     SemanticSlot = SemanticSlot.T
                 });
+            }
+
+            if (string.Equals(name, "NullSuccess", StringComparison.Ordinal))
+            {
+                return Result<DslPipelineValue>.Success(null!);
             }
 
             return Contains(name)

@@ -16,7 +16,9 @@ internal sealed class KernelExecutionSuccessResultFactory
         int outputTokens,
         DateTimeOffset startedAt,
         DateTimeOffset completedAt,
-        long executionSequence)
+        long executionSequence,
+        string? finalStepId = null,
+        SemanticDelta? finalSemanticDelta = null)
     {
         return
             from executionId in _executionIdFactory.CreateExecutionIdResult(
@@ -43,8 +45,43 @@ internal sealed class KernelExecutionSuccessResultFactory
                 Error = null,
                 StartedAtUtc = startedAt,
                 CompletedAtUtc = completedAt,
-                Metadata = ImmutableDictionary<string, string>.Empty
-                    .Add("message_format", capability.MessageFormat.ToString())
+                Metadata = BuildMetadata(
+                    capability,
+                    finalStepId,
+                    finalSemanticDelta)
             };
+    }
+
+    private static ImmutableDictionary<string, string> BuildMetadata(
+        ModelPromptCapability capability,
+        string? finalStepId,
+        SemanticDelta? finalSemanticDelta)
+    {
+        var builder = ImmutableDictionary.CreateBuilder<string, string>(
+            StringComparer.Ordinal);
+
+        builder["message_format"] = capability.MessageFormat.ToString();
+
+        if (!string.IsNullOrWhiteSpace(finalStepId))
+        {
+            builder["step_id"] = finalStepId;
+        }
+
+        if (finalSemanticDelta is not null)
+        {
+            builder["semantic_delta"] = finalSemanticDelta.Label;
+
+            if (finalSemanticDelta.OriginStep is { } originStep)
+            {
+                builder["origin_step"] = originStep.ToString();
+            }
+
+            if (finalSemanticDelta.SemanticSlot is { } semanticSlot)
+            {
+                builder["semantic_slot"] = semanticSlot.ToString();
+            }
+        }
+
+        return builder.ToImmutable();
     }
 }

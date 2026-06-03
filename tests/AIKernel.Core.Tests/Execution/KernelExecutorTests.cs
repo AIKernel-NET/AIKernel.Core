@@ -40,6 +40,10 @@ public sealed class KernelExecutorTests
         Assert.Equal("sha256:executor-prompt", result.PromptHash);
         Assert.Equal("contract output", result.OutputText);
         Assert.Null(result.Error);
+        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
+        Assert.Equal("kernel.tokenizer.validate-output-budget", result.Metadata["semantic_delta"]);
+        Assert.Equal(OriginStep.Tokenizer.ToString(), result.Metadata["origin_step"]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
     }
 
     [Fact]
@@ -124,6 +128,8 @@ public sealed class KernelExecutorTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.Provider.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
+        Assert.Equal("kernel.provider.validate-output", result.Metadata["semantic_delta"]);
     }
 
     [Fact]
@@ -201,6 +207,8 @@ public sealed class KernelExecutorTests
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
         Assert.Equal(OriginStep.Tokenizer.ToString(), result.Metadata["origin_step"]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
+        Assert.Equal("kernel.tokenizer.validate-output-budget", result.Metadata["semantic_delta"]);
     }
 
     [Fact]

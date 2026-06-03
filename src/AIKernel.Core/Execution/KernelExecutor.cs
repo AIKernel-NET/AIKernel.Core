@@ -58,7 +58,10 @@ public sealed class KernelExecutor : IKernelExecutor
                 pipelineResult.State.Prompt,
                 pipelineResult.State.StartedAt,
                 pipelineResult.State.ExecutionSequence,
-                pipelineResult.Error!);
+                WithStepMetadata(
+                    pipelineResult.Error!,
+                    pipelineResult.StepId,
+                    pipelineResult.SemanticDelta));
         }
 
         var tokenStep = pipelineResult.Value!;
@@ -72,7 +75,9 @@ public sealed class KernelExecutor : IKernelExecutor
             tokenStep.OutputTokens,
             startedAt,
             completedAt,
-            executionSequence);
+            executionSequence,
+            pipelineResult.StepId,
+            pipelineResult.SemanticDelta);
 
         if (successResult.IsSuccess)
         {
@@ -145,4 +150,29 @@ public sealed class KernelExecutor : IKernelExecutor
             error));
     }
 
+    private static ErrorContext WithStepMetadata(
+        ErrorContext error,
+        string stepId,
+        SemanticDelta semanticDelta)
+    {
+        var metadata = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        if (error.Metadata is not null)
+        {
+            foreach (var item in error.Metadata)
+            {
+                metadata[item.Key] = item.Value;
+            }
+        }
+
+        metadata["step_id"] = stepId;
+        metadata["semantic_delta"] = semanticDelta.Label;
+
+        return error with
+        {
+            Metadata = metadata,
+            OriginStep = error.OriginStep ?? semanticDelta.OriginStep,
+            SemanticSlot = error.SemanticSlot ?? semanticDelta.SemanticSlot
+        };
+    }
 }

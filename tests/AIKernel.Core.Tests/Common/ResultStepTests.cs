@@ -57,6 +57,70 @@ public sealed class ResultStepTests
     }
 
     [Fact]
+    public void StepId_IsDeterministic_ForSameSemanticDelta()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var first = ResultStep<string, int>
+            .Success("capability", 2)
+            .WithSemanticDelta(delta);
+        var second = ResultStep<string, int>
+            .Success("capability", 2)
+            .WithSemanticDelta(delta);
+
+        Assert.Equal(first.StepId, second.StepId);
+        Assert.StartsWith("step:sha256:", first.StepId, StringComparison.Ordinal);
+        Assert.Equal(delta, first.SemanticDelta);
+    }
+
+    [Fact]
+    public void StepId_Changes_WhenParentStepIdChanges()
+    {
+        var delta = new SemanticDelta(
+            "kernel.prompt.generate",
+            OriginStep.Prompt,
+            SemanticSlot.T);
+
+        var first = ResultStep<string, int>
+            .Success("prompt", 2)
+            .WithSemanticDelta(delta, parentStepId: "step:sha256:parent-a");
+        var second = ResultStep<string, int>
+            .Success("prompt", 2)
+            .WithSemanticDelta(delta, parentStepId: "step:sha256:parent-b");
+
+        Assert.NotEqual(first.StepId, second.StepId);
+    }
+
+    [Fact]
+    public void Bind_ReparentsNextStepToCurrentStepId()
+    {
+        var firstDelta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+        var secondDelta = new SemanticDelta(
+            "kernel.prompt.generate",
+            OriginStep.Prompt,
+            SemanticSlot.T);
+
+        var first = ResultStep<string, int>
+            .Success("capability", 2)
+            .WithSemanticDelta(firstDelta);
+        var bound = first.Bind(value => ResultStep<string, string>
+            .Success("prompt", $"value:{value}")
+            .WithSemanticDelta(secondDelta));
+        var expected = ResultStep<string, string>
+            .Success("prompt", "value:2")
+            .WithSemanticDelta(secondDelta, first.StepId);
+
+        Assert.Equal(expected.StepId, bound.StepId);
+        Assert.Equal(secondDelta, bound.SemanticDelta);
+    }
+
+    [Fact]
     public void MapState_UpdatesStateOnlyOnSuccess()
     {
         var step = ResultStep<string, int>

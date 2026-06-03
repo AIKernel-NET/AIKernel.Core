@@ -63,6 +63,7 @@ internal sealed class KernelExecutionPipeline
             .FromResult(
                 state,
                 _stepRunner.ResolveCapability(provider, request))
+            .WithSemanticDelta(CapabilityDelta)
             .MapState((currentState, capability) => currentState with
             {
                 Capability = capability
@@ -90,6 +91,7 @@ internal sealed class KernelExecutionPipeline
 
         return ResultStep<KernelExecutionPipelineState, GeneratedPrompt>
             .FromResult(state, prompt)
+            .WithSemanticDelta(PromptDelta)
             .MapState((currentState, generatedPrompt) => currentState with
             {
                 Prompt = generatedPrompt
@@ -122,8 +124,10 @@ internal sealed class KernelExecutionPipeline
 
         return ResultStep<KernelExecutionPipelineState, string>
             .FromResult(state, output)
+            .WithSemanticDelta(ProviderDelta)
             .Bind(value => ResultStep<KernelExecutionPipelineState, string>
-                .FromResult(state, ValidateOutput(value)))
+                .FromResult(state, ValidateOutput(value))
+                .WithSemanticDelta(ProviderValidationDelta))
             .Map(value => new OutputExecutionStep(
                 promptStep.Capability,
                 promptStep.Prompt,
@@ -147,12 +151,14 @@ internal sealed class KernelExecutionPipeline
             .FromResult(
                 state,
                 _stepRunner.CountOutputTokens(outputStep.Output))
+            .WithSemanticDelta(TokenizerDelta)
             .Bind(outputTokens => ResultStep<KernelExecutionPipelineState, int>
                 .FromResult(
                     state,
                     ValidateOutputTokenBudget(
                         outputTokens,
-                        outputStep.Capability)))
+                        outputStep.Capability))
+                .WithSemanticDelta(TokenBudgetDelta))
             .Map(outputTokens => new KernelExecutionPipelineOutput(
                 outputStep.Capability,
                 outputStep.Prompt,
@@ -204,6 +210,36 @@ internal sealed class KernelExecutionPipeline
             })
             : Result<int>.Success(outputTokens);
     }
+
+    private static readonly SemanticDelta CapabilityDelta = new(
+        "kernel.capability.resolve",
+        OriginStep.Capability,
+        SemanticSlot.T);
+
+    private static readonly SemanticDelta PromptDelta = new(
+        "kernel.prompt.generate",
+        OriginStep.Prompt,
+        SemanticSlot.T);
+
+    private static readonly SemanticDelta ProviderDelta = new(
+        "kernel.provider.generate",
+        OriginStep.Provider,
+        SemanticSlot.T);
+
+    private static readonly SemanticDelta ProviderValidationDelta = new(
+        "kernel.provider.validate-output",
+        OriginStep.Provider,
+        SemanticSlot.T);
+
+    private static readonly SemanticDelta TokenizerDelta = new(
+        "kernel.tokenizer.count-output",
+        OriginStep.Tokenizer,
+        SemanticSlot.T);
+
+    private static readonly SemanticDelta TokenBudgetDelta = new(
+        "kernel.tokenizer.validate-output-budget",
+        OriginStep.Tokenizer,
+        SemanticSlot.T);
 
     private sealed record PromptExecutionStep(
         ModelPromptCapability Capability,

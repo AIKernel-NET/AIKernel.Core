@@ -39,4 +39,37 @@ internal static class DslExecutionErrors
             Metadata = metadata.ToImmutable()
         };
     }
+
+    public static ErrorContext ClockException(
+        Exception exception,
+        SemanticDelta loopDelta)
+    {
+        var source = ErrorContext.FromException(exception);
+        var metadata = ImmutableDictionary.CreateBuilder<string, string>(
+            StringComparer.Ordinal);
+
+        if (source.Metadata is not null)
+        {
+            foreach (var item in source.Metadata)
+            {
+                metadata[item.Key] = item.Value;
+            }
+        }
+
+        if (loopDelta.Metadata is not null)
+        {
+            foreach (var item in loopDelta.Metadata)
+            {
+                metadata[item.Key] = item.Value;
+            }
+        }
+
+        return source with
+        {
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = OriginStep.KernelFacade,
+            SemanticSlot = SemanticSlot.T,
+            Metadata = metadata.ToImmutable()
+        };
+    }
 }

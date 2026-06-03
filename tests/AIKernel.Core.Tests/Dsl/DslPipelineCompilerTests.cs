@@ -240,6 +240,41 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void Execute_LoopUntilClockExceptionReturnsFailClosedReplayEntry()
+    {
+        var pipeline = Compile(
+            """
+            {
+              "type": "Pipeline",
+              "steps": [
+                {
+                  "type": "LoopUntil",
+                  "timeout": "00:00:10",
+                  "maxIterations": 1,
+                  "body": [
+                    { "type": "CallCapability", "name": "Observe" }
+                  ]
+                }
+              ]
+            }
+            """,
+            clock: new ThrowingClock());
+
+        var result = pipeline.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal("clock_failed", result.Error.Metadata![PipelineStepMetadataKeys.LoopDecision]);
+        Assert.Equal("0", result.Error.Metadata[PipelineStepMetadataKeys.LoopIteration]);
+        var entry = Assert.Single(result.ReplayLog);
+        Assert.False(entry.IsSuccess);
+        Assert.Equal("UNHANDLED_EXCEPTION", entry.ErrorCode);
+        Assert.Equal("loop", entry.SemanticDelta.Kind);
+        Assert.Equal("clock_failed", entry.SemanticDelta.Metadata![PipelineStepMetadataKeys.LoopDecision]);
+    }
+
+    [Fact]
     public void Execute_NullContextReturnsFailClosedReplayEntry()
     {
         var pipeline = Compile("""
@@ -288,18 +323,39 @@ public sealed class DslPipelineCompilerTests
 
     private static IKernelPipeline Compile(
         string json,
-        IDslCapabilityRegistry? registry = null)
+        IDslCapabilityRegistry? registry = null,
+        IKernelClock? clock = null)
     {
         var document = DslDocument.FromJson(json);
         Assert.True(document.IsSuccess, document.Error?.Message);
 
         var compiler = new DslPipelineCompiler(
             registry ?? new TestCapabilityRegistry(),
-            KernelClock.Replay(DateTimeOffset.UnixEpoch));
+            clock ?? KernelClock.Replay(DateTimeOffset.UnixEpoch));
         var pipeline = compiler.Compile(document.Value!);
         Assert.True(pipeline.IsSuccess, pipeline.Error?.Message);
 
         return pipeline.Value!;
+    }
+
+    private sealed class ThrowingClock : IKernelClock
+    {
+        public TimeProvider Physical => TimeProvider.System;
+
+        public KernelTimeProvider Logical { get; } =
+            new ReplayKernelTimeProvider(DateTimeOffset.UnixEpoch, TimeProvider.System);
+
+        public DateTimeOffset Now =>
+            throw new InvalidOperationException("Clock failed.");
+
+        public bool IsReplaying => true;
+
+        public double ReliabilityScore => 1.0;
+
+        public KernelTimestamp GetLogicalTimestamp()
+        {
+            return KernelTimestamp.FromUtc(DateTimeOffset.UnixEpoch, "test");
+        }
     }
 
     private sealed class TestCapabilityRegistry : IDslCapabilityRegistry

@@ -204,7 +204,25 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
         var result = current;
         for (var iteration = 0; iteration < node.MaxIterations; iteration++)
         {
-            var now = _clock.Now;
+            DateTimeOffset now;
+            try
+            {
+                now = _clock.Now;
+            }
+            catch (Exception ex)
+            {
+                var delta = DslSemanticDeltaFactory.CreateLoopUntilDelta(
+                    iteration,
+                    timestamp: null,
+                    "clock_failed");
+
+                return DslResultStepAppender.AppendFailure(
+                    result,
+                    result.State,
+                    DslExecutionErrors.ClockException(ex, delta),
+                    delta);
+            }
+
             if (now - context.StartedAtUtc >= node.Timeout)
             {
                 return DslResultStepAppender.AppendLoopTransition(

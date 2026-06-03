@@ -1,76 +1,46 @@
-namespace AIKernel.Core.Tests.Kernel;
+namespace AIKernel.Core.Tests.Execution;
 
 using System.Collections.Immutable;
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Models;
 using AIKernel.Abstractions.Providers;
 using AIKernel.Core.Context;
+using AIKernel.Core.Execution;
 using AIKernel.Dtos.Core;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
-using AIKernel.Dtos.Rom;
 using AIKernel.Dtos.Routing;
-using AIKernel.Kernel;
-using AIKernel.Vfs;
 
-public sealed class StaticKernelModelProviderSelectorTests
+public sealed class StaticModelPromptCapabilityResolverTests
 {
     [Fact]
-    public async Task SelectAsync_UsesPublicProviderIdMetadataKey()
+    public void Resolve_ReturnsCapabilityForProviderAndModel()
     {
-        var expected = new FakeModelProvider("external-capability");
-        var selector = new StaticKernelModelProviderSelector(
+        var resolver = new StaticModelPromptCapabilityResolver(
         [
-            new FakeModelProvider("openai-compatible"),
-            expected
+            CreateCapability("external-capability", "rh-prime-phase")
         ]);
 
-        var provider = await selector.SelectAsync(
-            CreateRequest(ImmutableDictionary<string, string>.Empty
-                .Add(KernelFacadeMetadataKeys.ProviderId, "external-capability")),
-            CreateContextSnapshot(),
-            TestContext.Current.CancellationToken);
+        var capability = resolver.Resolve(
+            new FakeModelProvider("external-capability"),
+            CreateExecutionRequest("rh-prime-phase"));
 
-        Assert.Same(expected, provider);
+        Assert.Equal("external-capability", capability.ProviderId);
+        Assert.Equal("rh-prime-phase", capability.ModelId);
     }
 
     [Fact]
-    public async Task SelectAsync_RejectsMissingProviderIdMetadata()
-    {
-        var selector = new StaticKernelModelProviderSelector(
-        [
-            new FakeModelProvider("external-capability")
-        ]);
-
-        var exception = await Assert.ThrowsAsync<KernelRequestValidationException>(
-            () => selector.SelectAsync(
-                CreateRequest(ImmutableDictionary<string, string>.Empty),
-                CreateContextSnapshot(),
-                TestContext.Current.CancellationToken));
-
-        Assert.Equal(
-            "provider_id metadata is required for static provider selection.",
-            exception.Message);
-    }
-
-    [Fact]
-    public void KernelFacadeMetadataKeys_ExposeProviderSelectionKey()
-    {
-        Assert.Equal("provider_id", KernelFacadeMetadataKeys.ProviderId);
-    }
-
-    [Fact]
-    public void Constructor_RejectsDuplicateProviderIds()
+    public void Constructor_RejectsDuplicateProviderModelPair()
     {
         var exception = Assert.Throws<ArgumentException>(
-            () => new StaticKernelModelProviderSelector(
+            () => new StaticModelPromptCapabilityResolver(
             [
-                new FakeModelProvider("external-capability"),
-                new FakeModelProvider("external-capability")
+                CreateCapability("external-capability", "rh-prime-phase"),
+                CreateCapability("external-capability", "rh-prime-phase")
             ]));
 
         Assert.Equal(
-            "Duplicate model provider registration. ProviderId='external-capability'. (Parameter 'providers')",
+            "Duplicate prompt capability registration. ProviderId='external-capability', ModelId='rh-prime-phase'. (Parameter 'capabilities')",
             exception.Message);
     }
 
@@ -78,46 +48,62 @@ public sealed class StaticKernelModelProviderSelectorTests
     public void Constructor_RejectsBlankProviderId()
     {
         var exception = Assert.Throws<ArgumentException>(
-            () => new StaticKernelModelProviderSelector(
+            () => new StaticModelPromptCapabilityResolver(
             [
-                new FakeModelProvider("")
+                CreateCapability("", "rh-prime-phase")
             ]));
 
         Assert.Equal(
-            "IModelProvider.ProviderId is required. (Parameter 'provider')",
+            "ModelPromptCapability.ProviderId is required. (Parameter 'capability')",
             exception.Message);
     }
 
-    private static KernelRequest CreateRequest(
-        ImmutableDictionary<string, string> metadata)
+    [Fact]
+    public void Constructor_RejectsBlankModelId()
     {
-        return new KernelRequest
+        var exception = Assert.Throws<ArgumentException>(
+            () => new StaticModelPromptCapabilityResolver(
+            [
+                CreateCapability("external-capability", "")
+            ]));
+
+        Assert.Equal(
+            "ModelPromptCapability.ModelId is required. (Parameter 'capability')",
+            exception.Message);
+    }
+
+    private static ModelPromptCapability CreateCapability(
+        string providerId,
+        string modelId)
+    {
+        return new ModelPromptCapability
         {
-            Input = "run external capability",
-            RootRomId = new RomId("rom://external/capability"),
-            VfsProviderId = "memory-file",
-            VfsCredentials = new FakeVfsCredentials(),
-            Scope = new ContextAssemblyScope
-            {
-                Purpose = "external-capability-test",
-                Capabilities = ["external"],
-                Metadata = ImmutableDictionary<string, string>.Empty
-            },
-            PromptOptions = PromptGenerationOptions.Default,
-            ExecutionOptions = ExecutionOptions.DeterministicDefault,
-            RequestedModelId = "gpt-test",
-            Metadata = metadata
+            ProviderId = providerId,
+            ModelId = modelId,
+            MessageFormat = PromptMessageFormat.ChatMessages,
+            MaxInputTokens = 2048,
+            MaxOutputTokens = 512,
+            SupportedRoles = [ModelMessageRoles.User],
+            SystemInstructionRole = ModelMessageRoles.User
         };
     }
 
-    private static IContextSnapshot CreateContextSnapshot()
+    private static KernelExecutionRequest CreateExecutionRequest(
+        string modelId)
     {
-        return new AssembledContextSnapshot(
-            snapshotId: "snapshot:selector",
-            parentSnapshotId: null,
-            createdAtUtc: DateTimeOffset.UnixEpoch,
-            contextHash: "sha256:selector",
-            context: new ContextCollectionSnapshot([]));
+        return new KernelExecutionRequest
+        {
+            ContextSnapshot = new AssembledContextSnapshot(
+                snapshotId: "snapshot:capability",
+                parentSnapshotId: null,
+                createdAtUtc: DateTimeOffset.UnixEpoch,
+                contextHash: "sha256:capability",
+                context: new ContextCollectionSnapshot([])),
+            UserInstruction = "run capability",
+            PromptOptions = PromptGenerationOptions.Default,
+            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            RequestedModelId = modelId
+        };
     }
 
     private sealed class FakeModelProvider(
@@ -162,7 +148,7 @@ public sealed class StaticKernelModelProviderSelectorTests
             IReadOnlyList<IModelMessage> messages,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult("contract output");
+            return Task.FromResult("external output");
         }
 
         public Task StreamGenerateAsync(
@@ -170,7 +156,7 @@ public sealed class StaticKernelModelProviderSelectorTests
             Func<string, Task> onChunk,
             CancellationToken cancellationToken = default)
         {
-            return onChunk("contract output");
+            return onChunk("external output");
         }
 
         public Task<string> AnswerAsync(
@@ -178,7 +164,7 @@ public sealed class StaticKernelModelProviderSelectorTests
             string? context = null,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult("contract output");
+            return Task.FromResult("external output");
         }
     }
 
@@ -244,17 +230,5 @@ public sealed class StaticKernelModelProviderSelectorTests
         public int? EmbeddingDimensions => null;
 
         public IReadOnlyList<string> SupportedEmbeddingModels => [];
-    }
-
-    private sealed class FakeVfsCredentials : IVfsCredentials
-    {
-        public string? Username => null;
-
-        public string? ApiKey => null;
-
-        public string? Token => null;
-
-        public IReadOnlyDictionary<string, object> Parameters =>
-            ImmutableDictionary<string, object>.Empty;
     }
 }

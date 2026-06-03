@@ -14,9 +14,7 @@ public sealed class StaticKernelModelProviderSelector : IKernelModelProviderSele
     {
         ArgumentNullException.ThrowIfNull(providers);
 
-        _providers = providers.ToDictionary(
-            provider => provider.ProviderId,
-            StringComparer.Ordinal);
+        _providers = BuildProviderMap(providers);
     }
 
     public Task<IModelProvider> SelectAsync(
@@ -46,5 +44,37 @@ public sealed class StaticKernelModelProviderSelector : IKernelModelProviderSele
         }
 
         return Task.FromResult(provider);
+    }
+
+    private static IReadOnlyDictionary<string, IModelProvider> BuildProviderMap(
+        IEnumerable<IModelProvider> providers)
+    {
+        var map = new Dictionary<string, IModelProvider>(StringComparer.Ordinal);
+
+        foreach (var provider in providers)
+        {
+            ValidateProvider(provider);
+
+            if (!map.TryAdd(provider.ProviderId, provider))
+            {
+                throw new ArgumentException(
+                    $"Duplicate model provider registration. ProviderId='{provider.ProviderId}'.",
+                    nameof(providers));
+            }
+        }
+
+        return map;
+    }
+
+    private static void ValidateProvider(IModelProvider provider)
+    {
+        ArgumentNullException.ThrowIfNull(provider);
+
+        if (string.IsNullOrWhiteSpace(provider.ProviderId))
+        {
+            throw new ArgumentException(
+                "IModelProvider.ProviderId is required.",
+                nameof(provider));
+        }
     }
 }

@@ -12,9 +12,7 @@ public sealed class StaticModelPromptCapabilityResolver : IModelPromptCapability
     {
         ArgumentNullException.ThrowIfNull(capabilities);
 
-        _capabilities = capabilities.ToDictionary(
-            x => CreateKey(x.ProviderId, x.ModelId),
-            StringComparer.Ordinal);
+        _capabilities = BuildCapabilityMap(capabilities);
     }
 
     public ModelPromptCapability Resolve(
@@ -46,5 +44,45 @@ public sealed class StaticModelPromptCapabilityResolver : IModelPromptCapability
     private static string CreateKey(string providerId, string modelId)
     {
         return providerId + "::" + modelId;
+    }
+
+    private static IReadOnlyDictionary<string, ModelPromptCapability> BuildCapabilityMap(
+        IEnumerable<ModelPromptCapability> capabilities)
+    {
+        var map = new Dictionary<string, ModelPromptCapability>(StringComparer.Ordinal);
+
+        foreach (var capability in capabilities)
+        {
+            ValidateCapability(capability);
+
+            var key = CreateKey(capability.ProviderId, capability.ModelId);
+            if (!map.TryAdd(key, capability))
+            {
+                throw new ArgumentException(
+                    $"Duplicate prompt capability registration. ProviderId='{capability.ProviderId}', ModelId='{capability.ModelId}'.",
+                    nameof(capabilities));
+            }
+        }
+
+        return map;
+    }
+
+    private static void ValidateCapability(ModelPromptCapability capability)
+    {
+        ArgumentNullException.ThrowIfNull(capability);
+
+        if (string.IsNullOrWhiteSpace(capability.ProviderId))
+        {
+            throw new ArgumentException(
+                "ModelPromptCapability.ProviderId is required.",
+                nameof(capability));
+        }
+
+        if (string.IsNullOrWhiteSpace(capability.ModelId))
+        {
+            throw new ArgumentException(
+                "ModelPromptCapability.ModelId is required.",
+                nameof(capability));
+        }
     }
 }

@@ -233,9 +233,10 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
             return Error("DSL ROM capability name is required.");
         }
 
-        if (!DslRomPath.IsDslCapability(metadata.CapabilityName))
+        var parsed = DslRomPath.ParseCapabilityName(metadata.CapabilityName);
+        if (parsed.IsFailure)
         {
-            return Error("DSL ROM capability name must use the dsl:// scheme.");
+            return AttachRomMetadata(Error(parsed.Error!.Message), metadata);
         }
 
         if (string.IsNullOrWhiteSpace(metadata.RomHash))
@@ -256,6 +257,40 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
         if (string.IsNullOrWhiteSpace(metadata.Name))
         {
             return AttachRomMetadata(Error("DSL ROM name is required."), metadata);
+        }
+
+        var expectedCapabilityName = DslRomPath.CreateCapabilityName(
+            metadata.Namespace,
+            metadata.Name);
+        if (expectedCapabilityName.IsFailure)
+        {
+            return AttachRomMetadata(Error(expectedCapabilityName.Error!.Message), metadata);
+        }
+
+        if (!string.Equals(
+                expectedCapabilityName.Value,
+                metadata.CapabilityName,
+                StringComparison.Ordinal))
+        {
+            return AttachRomMetadata(
+                Error("DSL ROM capability name must match dsl://{namespace}/{name}."),
+                metadata);
+        }
+
+        var expectedPath = DslRomPath.Create(metadata.Namespace, metadata.Name);
+        if (expectedPath.IsFailure)
+        {
+            return AttachRomMetadata(Error(expectedPath.Error!.Message), metadata);
+        }
+
+        if (!string.Equals(
+                expectedPath.Value,
+                metadata.Path,
+                StringComparison.Ordinal))
+        {
+            return AttachRomMetadata(
+                Error("DSL ROM path must match rom/dsl/{namespace}/{name}.json."),
+                metadata);
         }
 
         return null;

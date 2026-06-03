@@ -298,6 +298,50 @@ public sealed class DslRomTests
     }
 
     [Fact]
+    public void DslRomRegistry_RejectsSnapshotWithMalformedDslCapabilityName()
+    {
+        var registry = new DslRomRegistry();
+        var pipeline = Compile(PlanDsl, new TestCapabilityRegistry());
+        var snapshot = new DslRomSnapshot(
+            CreateMetadata(PlanDsl) with
+            {
+                CapabilityName = "dsl://agent/nested/plan1"
+            },
+            PlanDsl,
+            pipeline);
+
+        var result = registry.Register(snapshot);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.KernelFacade, result.Error.OriginStep);
+        Assert.Contains("single path segments", result.Error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void DslRomRegistry_RejectsSnapshotWithNonCanonicalPath()
+    {
+        var registry = new DslRomRegistry();
+        var pipeline = Compile(PlanDsl, new TestCapabilityRegistry());
+        var snapshot = new DslRomSnapshot(
+            CreateMetadata(PlanDsl) with
+            {
+                Path = "rom/dsl/agent/other.json"
+            },
+            PlanDsl,
+            pipeline);
+
+        var result = registry.Register(snapshot);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.KernelFacade, result.Error.OriginStep);
+        Assert.Contains("rom/dsl", result.Error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task DslRomCapabilityRegistry_ExecutesRegisteredRomDeterministically()
     {
         await using var session = await OpenSessionAsync();
@@ -516,6 +560,60 @@ public sealed class DslRomTests
         Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
         Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
         Assert.Contains("hash", result.Error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void DslRomCapabilityRegistry_ReturnsFailure_WhenResolvedSnapshotHasMalformedCapabilityName()
+    {
+        var metadata = CreateMetadata(PlanDsl) with
+        {
+            CapabilityName = "dsl://agent/nested/plan1"
+        };
+        var registry = new DslRomCapabilityRegistry(
+            new TestCapabilityRegistry(),
+            new FixedRomRegistry(new DslRomSnapshot(
+                metadata,
+                PlanDsl,
+                Compile(PlanDsl, new TestCapabilityRegistry()))));
+
+        var result = registry.Invoke(
+            metadata.CapabilityName,
+            DslPipelineValue.Empty,
+            new Dictionary<string, string>());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
+        Assert.Equal(metadata.CapabilityName, result.Error.Metadata![DslRomMetadataKeys.RomCall]);
+        Assert.Contains("single path segments", result.Error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void DslRomCapabilityRegistry_ReturnsFailure_WhenResolvedSnapshotHasNonCanonicalPath()
+    {
+        var metadata = CreateMetadata(PlanDsl) with
+        {
+            Path = "rom/dsl/agent/other.json"
+        };
+        var registry = new DslRomCapabilityRegistry(
+            new TestCapabilityRegistry(),
+            new FixedRomRegistry(new DslRomSnapshot(
+                metadata,
+                PlanDsl,
+                Compile(PlanDsl, new TestCapabilityRegistry()))));
+
+        var result = registry.Invoke(
+            metadata.CapabilityName,
+            DslPipelineValue.Empty,
+            new Dictionary<string, string>());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
+        Assert.Equal(metadata.Path, result.Error.Metadata![DslRomMetadataKeys.RomPath]);
+        Assert.Contains("rom/dsl", result.Error.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     private static async Task<IVfsSession> OpenSessionAsync()

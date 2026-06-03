@@ -55,9 +55,10 @@ public sealed class DslRomRegistry : IDslRomRegistry
             return Result<DslRomMetadata>.Fail(Error("DSL ROM path is required."));
         }
 
-        if (!DslRomPath.IsDslCapability(snapshot.Metadata.CapabilityName))
+        var metadataError = ValidateMetadataIdentity(snapshot.Metadata);
+        if (metadataError is not null)
         {
-            return Result<DslRomMetadata>.Fail(Error("DSL ROM capability name must use the dsl:// scheme."));
+            return Result<DslRomMetadata>.Fail(metadataError);
         }
 
         if (string.IsNullOrWhiteSpace(snapshot.JsonDsl))
@@ -129,4 +130,42 @@ public sealed class DslRomRegistry : IDslRomRegistry
             OriginStep = OriginStep.KernelFacade,
             SemanticSlot = SemanticSlot.G
         };
+
+    private static ErrorContext? ValidateMetadataIdentity(DslRomMetadata metadata)
+    {
+        var parsed = DslRomPath.ParseCapabilityName(metadata.CapabilityName);
+        if (parsed.IsFailure)
+        {
+            return parsed.Error!;
+        }
+
+        var expectedCapabilityName = DslRomPath.CreateCapabilityName(
+            metadata.Namespace,
+            metadata.Name);
+        if (expectedCapabilityName.IsFailure)
+        {
+            return expectedCapabilityName.Error!;
+        }
+
+        if (!string.Equals(
+                expectedCapabilityName.Value,
+                metadata.CapabilityName,
+                StringComparison.Ordinal))
+        {
+            return Error("DSL ROM capability name must match dsl://{namespace}/{name}.");
+        }
+
+        var expectedPath = DslRomPath.Create(metadata.Namespace, metadata.Name);
+        if (expectedPath.IsFailure)
+        {
+            return expectedPath.Error!;
+        }
+
+        return string.Equals(
+            expectedPath.Value,
+            metadata.Path,
+            StringComparison.Ordinal)
+            ? null
+            : Error("DSL ROM path must match rom/dsl/{namespace}/{name}.json.");
+    }
 }

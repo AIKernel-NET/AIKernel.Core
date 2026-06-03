@@ -6,7 +6,7 @@ public static class TaskEitherExtensions
         this Task<Either<L, R>> task,
         Action<R> action)
     {
-        var either = await task;
+        var either = await task.ConfigureAwait(false);
         return either.Tap(action);
     }
 
@@ -14,11 +14,11 @@ public static class TaskEitherExtensions
         this Task<Either<L, R>> task,
         Func<R, Task> action)
     {
-        var either = await task;
+        var either = await task.ConfigureAwait(false);
         if (either.IsLeft)
             return either;
 
-        await action(either.Right!);
+        await action(either.Right!).ConfigureAwait(false);
         return either;
     }
 
@@ -30,7 +30,7 @@ public static class TaskEitherExtensions
         if (either.IsLeft)
             return Either<L, V>.FromLeft(either.Left!);
 
-        var next = await binder(either.Right!);
+        var next = await binder(either.Right!).ConfigureAwait(false);
         if (next.IsLeft)
             return Either<L, V>.FromLeft(next.Left!);
 
@@ -41,7 +41,7 @@ public static class TaskEitherExtensions
         this Task<Either<L, R>> task,
         Func<R, U> selector)
     {
-        var e = await task;
+        var e = await task.ConfigureAwait(false);
         return e.IsRight
             ? Either<L, U>.FromRight(selector(e.Right!))
             : Either<L, U>.FromLeft(e.Left!);
@@ -52,11 +52,11 @@ public static class TaskEitherExtensions
         Func<R, Task<Either<L, U>>> binder,
         Func<R, U, V> projector)
     {
-        var e1 = await task;
+        var e1 = await task.ConfigureAwait(false);
         if (e1.IsLeft)
             return Either<L, V>.FromLeft(e1.Left!);
 
-        var e2 = await binder(e1.Right!);
+        var e2 = await binder(e1.Right!).ConfigureAwait(false);
         if (e2.IsLeft)
             return Either<L, V>.FromLeft(e2.Left!);
 
@@ -68,7 +68,7 @@ public static class TaskEitherExtensions
         Func<R, Either<L, U>> binder,
         Func<R, U, V> projector)
     {
-        var e1 = await task;
+        var e1 = await task.ConfigureAwait(false);
         if (e1.IsLeft)
             return Either<L, V>.FromLeft(e1.Left!);
 

@@ -18,7 +18,7 @@ public static class Try
     {
         try
         {
-            return Result<T>.Success(await func());
+            return Result<T>.Success(await func().ConfigureAwait(false));
         }
         catch (Exception ex)
         {

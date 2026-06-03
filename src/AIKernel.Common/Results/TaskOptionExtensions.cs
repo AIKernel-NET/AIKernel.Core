@@ -6,7 +6,7 @@ public static class TaskOptionExtensions
         this Task<Option<T>> task,
         Action<T> action)
     {
-        var option = await task;
+        var option = await task.ConfigureAwait(false);
         return option.Tap(action);
     }
 
@@ -14,11 +14,11 @@ public static class TaskOptionExtensions
         this Task<Option<T>> task,
         Func<T, Task> action)
     {
-        var option = await task;
+        var option = await task.ConfigureAwait(false);
         if (!option.HasValue)
             return option;
 
-        await action(option.Value!);
+        await action(option.Value!).ConfigureAwait(false);
         return option;
     }
 
@@ -30,7 +30,7 @@ public static class TaskOptionExtensions
         if (!option.HasValue)
             return Option<V>.None();
 
-        var next = await binder(option.Value!);
+        var next = await binder(option.Value!).ConfigureAwait(false);
         if (!next.HasValue)
             return Option<V>.None();
 
@@ -41,7 +41,7 @@ public static class TaskOptionExtensions
         this Task<Option<T>> task,
         Func<T, U> selector)
     {
-        var opt = await task;
+        var opt = await task.ConfigureAwait(false);
         return opt.Map(selector);
     }
 
@@ -50,11 +50,11 @@ public static class TaskOptionExtensions
         Func<T, Task<Option<U>>> binder,
         Func<T, U, V> projector)
     {
-        var o1 = await task;
+        var o1 = await task.ConfigureAwait(false);
         if (!o1.HasValue)
             return Option<V>.None();
 
-        var o2 = await binder(o1.Value!);
+        var o2 = await binder(o1.Value!).ConfigureAwait(false);
         if (!o2.HasValue)
             return Option<V>.None();
 
@@ -66,7 +66,7 @@ public static class TaskOptionExtensions
         Func<T, Option<U>> binder,
         Func<T, U, V> projector)
     {
-        var o1 = await task;
+        var o1 = await task.ConfigureAwait(false);
         if (!o1.HasValue)
             return Option<V>.None();
 
@@ -81,7 +81,7 @@ public static class TaskOptionExtensions
         this Task<Option<T>> task,
         Func<T, bool> predicate)
     {
-        var option = await task;
+        var option = await task.ConfigureAwait(false);
         if (!option.HasValue)
             return option;
 

@@ -96,14 +96,15 @@ public sealed class DslRomRegistry : IDslRomRegistry
     }
 
     public bool Contains(string capabilityName)
-        => DslRomPath.IsDslCapability(capabilityName) &&
+        => DslRomPath.ParseCapabilityName(capabilityName).IsSuccess &&
            _snapshots.ContainsKey(capabilityName);
 
     public Result<DslRomSnapshot> Resolve(string capabilityName)
     {
-        if (!DslRomPath.IsDslCapability(capabilityName))
+        var parsed = DslRomPath.ParseCapabilityName(capabilityName);
+        if (parsed.IsFailure)
         {
-            return Result<DslRomSnapshot>.Fail(Error("Capability is not a DSL ROM capability."));
+            return Result<DslRomSnapshot>.Fail(parsed.Error!);
         }
 
         return _snapshots.TryGetValue(capabilityName, out var snapshot)

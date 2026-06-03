@@ -165,6 +165,26 @@ public sealed class DslRomTests
     }
 
     [Fact]
+    public void DslRomRegistry_RejectsMalformedDslCapabilityOnResolve()
+    {
+        var registry = new DslRomRegistry();
+
+        var result = registry.Resolve("dsl://agent/nested/plan1");
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+    }
+
+    [Fact]
+    public void DslRomRegistry_ContainsReturnsFalseForMalformedDslCapability()
+    {
+        var registry = new DslRomRegistry();
+
+        Assert.False(registry.Contains("dsl://agent/nested/plan1"));
+    }
+
+    [Fact]
     public void DslRomProvider_ReturnsFailure_WhenCompilerThrows()
     {
         var provider = new DslRomProvider(new ThrowingCompiler());

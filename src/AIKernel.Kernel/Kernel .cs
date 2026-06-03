@@ -333,7 +333,7 @@ public sealed class Kernel : IKernel
             builder[item.Key] = item.Value;
         }
 
-        foreach (var item in result.Metadata)
+        foreach (var item in result.Metadata ?? Enumerable.Empty<KeyValuePair<string, string>>())
         {
             builder[item.Key] = item.Value;
         }

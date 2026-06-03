@@ -141,6 +141,31 @@ public sealed class KernelConcreteContractTests : KernelContractTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_AddsCanonicalMetadata_WhenExecutorMetadataIsNull()
+    {
+        var kernel = CreateKernel(new NullMetadataKernelExecutor());
+        var request = CreateRequest(
+            "valid-rom",
+            ImmutableDictionary<string, string>.Empty
+                .Add(KernelFacadeMetadataKeys.ProviderTier, "capability")
+                .Add(KernelFacadeMetadataKeys.RouteReason, "aik-prefix"));
+
+        var result = await kernel.ExecuteAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Succeeded, result.Status);
+        Assert.Equal("capability", result.Metadata[KernelFacadeMetadataKeys.ProviderTier]);
+        Assert.Equal("aik-prefix", result.Metadata[KernelFacadeMetadataKeys.RouteReason]);
+        Assert.Equal("valid-rom", result.Metadata[KernelFacadeMetadataKeys.RootRomId]);
+        Assert.Equal("fake-provider", result.Metadata[KernelFacadeMetadataKeys.ProviderId]);
+        Assert.Equal("memory-file", result.Metadata[KernelFacadeMetadataKeys.VfsProviderId]);
+        Assert.Equal("gpt-test", result.Metadata[KernelFacadeMetadataKeys.RequestedModelId]);
+        Assert.StartsWith("ktx:sha256:", result.Metadata[KernelFacadeMetadataKeys.TransactionId], StringComparison.Ordinal);
+        Assert.StartsWith("sha256:", result.Metadata[KernelFacadeMetadataKeys.InputHash], StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsCanceledMetadata_WhenExecutorCancels()
     {
         var kernel = CreateKernel(new CanceledKernelExecutor());
@@ -335,6 +360,37 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                     .Add(ReplayMetadataKeys.SemanticDelta, "kernel.executor.succeeded")
                     .Add(ReplayMetadataKeys.ReplayLogCount, "3")
                     .Add(ReplayMetadataKeys.ReplayLogHash, "replay:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+            });
+        }
+    }
+
+    private sealed class NullMetadataKernelExecutor : AIKernel.Abstractions.Execution.IKernelExecutor
+    {
+        public Task<KernelRequestExecutionResult> ExecuteAsync(
+            IModelProvider provider,
+            KernelExecutionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return Task.FromResult(new KernelRequestExecutionResult
+            {
+                ExecutionId = "exec:contract:null-metadata",
+                Status = ExecutionStatus.Succeeded,
+                ProviderId = provider.ProviderId,
+                ModelId = request.RequestedModelId ?? "gpt-test",
+                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
+                ContextHash = request.ContextSnapshot.ContextHash,
+                PromptHash = "sha256:prompt",
+                OutputText = "contract output",
+                Usage = new ExecutionUsage(
+                    InputTokens: 1,
+                    OutputTokens: 1,
+                    TotalTokens: 2),
+                Error = null,
+                StartedAtUtc = DateTimeOffset.UnixEpoch,
+                CompletedAtUtc = DateTimeOffset.UnixEpoch,
+                Metadata = null!
             });
         }
     }

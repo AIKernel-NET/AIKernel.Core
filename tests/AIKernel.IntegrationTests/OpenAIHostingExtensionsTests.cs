@@ -3,6 +3,7 @@
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
+using AIKernel.Core.ChatHistory;
 using AIKernel.Core.Context;
 using AIKernel.Core.Security;
 using AIKernel.Dtos.Context;
@@ -35,6 +36,20 @@ public sealed class OpenAIHostingExtensionsTests
         Assert.NotNull(kernel.GetProviderRouter());
         Assert.NotNull(kernel.GetGuard());
         Assert.NotNull(kernel.GetPdp());
+    }
+
+    [Fact]
+    public void AddAIKernelCore_RegistersHistoryRomServices()
+    {
+        var services = new ServiceCollection();
+
+        services.AddAIKernelCore();
+
+        using var provider = services.BuildServiceProvider();
+
+        Assert.NotNull(provider.GetRequiredService<IHistoryRomRegistry>());
+        Assert.NotNull(provider.GetRequiredService<HistoryRomProvider>());
+        Assert.NotNull(provider.GetRequiredService<HistoryRomStore>());
     }
 
     [Fact]

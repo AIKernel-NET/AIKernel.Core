@@ -1,20 +1,20 @@
 namespace AIKernel.Core.ChatHistory;
 
 using System.Text;
+using AIKernel.Abstractions.Rom;
 using AIKernel.Common.Results;
-using AIKernel.Core.Rom;
 using AIKernel.Vfs;
 
 public sealed class HistoryRomStore
 {
     private readonly HistoryRomProvider _provider;
     private readonly IHistoryRomRegistry _registry;
-    private readonly RomLoader _loader;
+    private readonly IRomLoader _loader;
 
     public HistoryRomStore(
         HistoryRomProvider provider,
         IHistoryRomRegistry registry,
-        RomLoader loader)
+        IRomLoader loader)
     {
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));

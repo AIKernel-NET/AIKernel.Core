@@ -217,6 +217,14 @@ ROM under `rom/dsl/{namespace}/{name}.json` for later invocation through
 `dsl://{namespace}/{name}`. The canonical schema and operational rules are
 documented in AIKernel.NET as `docs/architecture/18.DSL_PIPELINE_AND_ROM_SPEC.md`.
 
+Chat histories can also be fixed as immutable HistoryROM assets. Use
+`HistoryRomStore.SaveHistoryAsRomAsync` to convert ordered chat records into a
+signed Markdown ROM, store it in VFS under `rom/history/{namespace}/{name}.md`,
+and register it as `history://{namespace}/{name}`. Loading a HistoryROM uses the
+same ROM signature verification path as other Core ROM assets and rejects hash
+mismatches or attempts to overwrite an existing history path with different
+content.
+
 ---
 
 ## Target Boot Experience

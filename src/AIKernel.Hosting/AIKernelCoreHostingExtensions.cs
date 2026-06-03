@@ -4,6 +4,7 @@ using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Rom;
 using AIKernel.Abstractions.Security;
+using AIKernel.Core.ChatHistory;
 using AIKernel.Core.Context;
 using AIKernel.Core.Execution;
 using AIKernel.Core.Rom;
@@ -87,6 +88,9 @@ public static class AIKernelCoreHostingExtensions
         services.TryAddSingleton<ISemanticHasher, Sha256SemanticHasher>();
         services.TryAddSingleton<IRomSignatureVerifier, RomSignatureVerifier>();
         services.TryAddSingleton<IRomLoader, RomLoader>();
+        services.TryAddSingleton<IHistoryRomRegistry, HistoryRomRegistry>();
+        services.TryAddSingleton<HistoryRomProvider>();
+        services.TryAddSingleton<HistoryRomStore>();
 
         services.TryAddSingleton<IContextCollectionFactory, DefaultContextCollectionFactory>();
         services.TryAddSingleton<IContextHashCalculator, DefaultContextHashCalculator>();

@@ -25,7 +25,8 @@ internal sealed class KernelFailureResultFactory
         KernelTransactionSnapshot? transaction,
         IContextSnapshot? contextSnapshot,
         DateTimeOffset startedAtUtc,
-        Exception exception)
+        Exception exception,
+        string? providerId = null)
     {
         return CreateFailureResult(
             request,
@@ -33,7 +34,7 @@ internal sealed class KernelFailureResultFactory
             contextSnapshot,
             startedAtUtc,
             ExecutionStatus.Rejected,
-            providerId: "none",
+            providerId: ResolveFailureProviderId(request, providerId, "none"),
             modelIdFallback: "none",
             errorCode: ResolveRejectedCode(exception),
             errorMessage: exception.Message,
@@ -45,7 +46,8 @@ internal sealed class KernelFailureResultFactory
                 FailureKind.Reject,
                 OriginStep.KernelFacade,
                 ResolveRejectedSemanticSlot(exception),
-                semanticDeltaLabel: "kernel.facade.reject"));
+                semanticDeltaLabel: "kernel.facade.reject",
+                providerId: providerId));
     }
 
     public KernelRequestExecutionResult CreateFailedResult(
@@ -53,7 +55,8 @@ internal sealed class KernelFailureResultFactory
         KernelTransactionSnapshot? transaction,
         IContextSnapshot? contextSnapshot,
         DateTimeOffset startedAtUtc,
-        Exception exception)
+        Exception exception,
+        string? providerId = null)
     {
         return CreateFailureResult(
             request,
@@ -61,7 +64,7 @@ internal sealed class KernelFailureResultFactory
             contextSnapshot,
             startedAtUtc,
             ExecutionStatus.Failed,
-            providerId: "unknown",
+            providerId: ResolveFailureProviderId(request, providerId, "unknown"),
             modelIdFallback: "unknown",
             errorCode: "kernel_transaction_failed",
             errorMessage: exception.Message,
@@ -73,14 +76,16 @@ internal sealed class KernelFailureResultFactory
                 FailureKind.FailClosed,
                 OriginStep.KernelFacade,
                 SemanticSlot.T,
-                semanticDeltaLabel: "kernel.facade.fail"));
+                semanticDeltaLabel: "kernel.facade.fail",
+                providerId: providerId));
     }
 
     public KernelRequestExecutionResult CreateCanceledResult(
         KernelRequest request,
         KernelTransactionSnapshot? transaction,
         IContextSnapshot? contextSnapshot,
-        DateTimeOffset startedAtUtc)
+        DateTimeOffset startedAtUtc,
+        string? providerId = null)
     {
         return CreateFailureResult(
             request,
@@ -88,7 +93,7 @@ internal sealed class KernelFailureResultFactory
             contextSnapshot,
             startedAtUtc,
             ExecutionStatus.Canceled,
-            providerId: "none",
+            providerId: ResolveFailureProviderId(request, providerId, "none"),
             modelIdFallback: "none",
             errorCode: "canceled",
             errorMessage: "Kernel transaction was canceled.",
@@ -100,7 +105,8 @@ internal sealed class KernelFailureResultFactory
                 FailureKind.FailClosed,
                 OriginStep.KernelFacade,
                 SemanticSlot.T,
-                semanticDeltaLabel: "kernel.facade.cancel"));
+                semanticDeltaLabel: "kernel.facade.cancel",
+                providerId: providerId));
     }
 
     private KernelRequestExecutionResult CreateFailureResult(
@@ -183,7 +189,8 @@ internal sealed class KernelFailureResultFactory
         FailureKind failureKind,
         OriginStep originStep,
         SemanticSlot semanticSlot,
-        string semanticDeltaLabel)
+        string semanticDeltaLabel,
+        string? providerId)
     {
         var builder = ImmutableDictionary.CreateBuilder<string, string>(StringComparer.Ordinal);
 
@@ -193,6 +200,7 @@ internal sealed class KernelFailureResultFactory
         }
 
         builder[KernelFacadeMetadataKeys.RootRomId] = request.RootRomId?.Value ?? string.Empty;
+        builder[KernelFacadeMetadataKeys.ProviderId] = ResolveFailureProviderId(request, providerId, string.Empty);
         builder[KernelFacadeMetadataKeys.VfsProviderId] = request.VfsProviderId ?? string.Empty;
         builder[KernelFacadeMetadataKeys.RequestedModelId] = request.RequestedModelId ?? string.Empty;
 
@@ -258,6 +266,25 @@ internal sealed class KernelFailureResultFactory
                 or RomRequiredMetadataMissingException => SemanticSlot.G,
             _ => SemanticSlot.T
         };
+    }
+
+    private static string ResolveFailureProviderId(
+        KernelRequest request,
+        string? providerId,
+        string fallback)
+    {
+        if (!string.IsNullOrWhiteSpace(providerId))
+        {
+            return providerId;
+        }
+
+        if (request.Metadata.TryGetValue(KernelFacadeMetadataKeys.ProviderId, out var requestedProviderId)
+            && !string.IsNullOrWhiteSpace(requestedProviderId))
+        {
+            return requestedProviderId;
+        }
+
+        return fallback;
     }
 
 }

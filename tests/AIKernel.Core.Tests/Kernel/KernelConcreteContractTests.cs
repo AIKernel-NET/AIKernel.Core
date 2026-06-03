@@ -59,6 +59,8 @@ public sealed class KernelConcreteContractTests : KernelContractTests
 
         Assert.Equal(ExecutionStatus.Failed, result.Status);
         Assert.Equal("kernel_transaction_failed", result.Error?.Code);
+        Assert.Equal("fake-provider", result.ProviderId);
+        Assert.Equal("fake-provider", result.Metadata[KernelFacadeMetadataKeys.ProviderId]);
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
@@ -79,6 +81,7 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 .Add(ReplayMetadataKeys.OriginStep, "user-value")
                 .Add(ReplayMetadataKeys.SemanticSlot, "user-value")
                 .Add(KernelFacadeMetadataKeys.RootRomId, "user-value")
+                .Add(KernelFacadeMetadataKeys.ProviderId, "user-value")
                 .Add(KernelFacadeMetadataKeys.VfsProviderId, "user-value")
                 .Add(KernelFacadeMetadataKeys.RequestedModelId, "user-value")
                 .Add(KernelFacadeMetadataKeys.TransactionId, "user-value")
@@ -94,6 +97,7 @@ public sealed class KernelConcreteContractTests : KernelContractTests
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);
         Assert.Equal("valid-rom", result.Metadata[KernelFacadeMetadataKeys.RootRomId]);
+        Assert.Equal("fake-provider", result.Metadata[KernelFacadeMetadataKeys.ProviderId]);
         Assert.Equal("memory-file", result.Metadata[KernelFacadeMetadataKeys.VfsProviderId]);
         Assert.Equal("gpt-test", result.Metadata[KernelFacadeMetadataKeys.RequestedModelId]);
         Assert.Equal(result.ExecutionId, result.Metadata[KernelFacadeMetadataKeys.TransactionId]);
@@ -113,6 +117,8 @@ public sealed class KernelConcreteContractTests : KernelContractTests
 
         Assert.Equal(ExecutionStatus.Canceled, result.Status);
         Assert.Equal("canceled", result.Error?.Code);
+        Assert.Equal("fake-provider", result.ProviderId);
+        Assert.Equal("fake-provider", result.Metadata[KernelFacadeMetadataKeys.ProviderId]);
         Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata[ReplayMetadataKeys.FailureKind]);
         Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata[ReplayMetadataKeys.OriginStep]);
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata[ReplayMetadataKeys.SemanticSlot]);

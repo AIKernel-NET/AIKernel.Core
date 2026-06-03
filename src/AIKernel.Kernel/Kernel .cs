@@ -73,6 +73,7 @@ public sealed class Kernel : IKernel
 
         KernelTransactionSnapshot? transaction = null;
         IContextSnapshot? contextSnapshot = null;
+        string? selectedProviderId = null;
 
         try
         {
@@ -115,6 +116,7 @@ public sealed class Kernel : IKernel
             var provider = await _modelProviderSelector
                 .SelectAsync(request, contextSnapshot, cancellationToken)
                 .ConfigureAwait(false);
+            selectedProviderId = provider.ProviderId;
 
             var executionRequest = new KernelExecutionRequest
             {
@@ -139,7 +141,8 @@ public sealed class Kernel : IKernel
                 request,
                 transaction,
                 contextSnapshot,
-                startedAtUtc);
+                startedAtUtc,
+                selectedProviderId);
         }
         catch (Exception ex) when (IsRejectedException(ex))
         {
@@ -148,7 +151,8 @@ public sealed class Kernel : IKernel
                 transaction,
                 contextSnapshot,
                 startedAtUtc,
-                ex);
+                ex,
+                selectedProviderId);
         }
         catch (Exception ex)
         {
@@ -157,7 +161,8 @@ public sealed class Kernel : IKernel
                 transaction,
                 contextSnapshot,
                 startedAtUtc,
-                ex);
+                ex,
+                selectedProviderId);
         }
     }
 

@@ -34,6 +34,10 @@ public abstract class KernelContractTests
         Assert.False(string.IsNullOrWhiteSpace(result.PromptHash));
         Assert.False(string.IsNullOrWhiteSpace(result.OutputText));
         Assert.Null(result.Error);
+        Assert.StartsWith("step:sha256:", result.Metadata["step_id"], StringComparison.Ordinal);
+        Assert.Equal("kernel.executor.succeeded", result.Metadata["semantic_delta"]);
+        Assert.Equal("3", result.Metadata["replay_log_count"]);
+        Assert.StartsWith("replay:sha256:", result.Metadata["replay_log_hash"], StringComparison.Ordinal);
     }
 
     [Fact]

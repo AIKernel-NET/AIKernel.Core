@@ -236,6 +236,10 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 StartedAtUtc = DateTimeOffset.UnixEpoch,
                 CompletedAtUtc = DateTimeOffset.UnixEpoch,
                 Metadata = ImmutableDictionary<string, string>.Empty
+                    .Add("step_id", "step:sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+                    .Add("semantic_delta", "kernel.executor.succeeded")
+                    .Add("replay_log_count", "3")
+                    .Add("replay_log_hash", "replay:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
             });
         }
     }

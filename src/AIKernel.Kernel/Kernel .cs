@@ -317,6 +317,9 @@ public sealed class Kernel : IKernel
             ModelId = request.RequestedModelId ?? result.ModelId,
             ContextSnapshotId = contextSnapshot.SnapshotId,
             ContextHash = contextSnapshot.ContextHash,
+            Error = result.Status == ExecutionStatus.Succeeded
+                ? null
+                : result.Error,
             Metadata = BuildSuccessfulMetadata(
                 request,
                 transaction,

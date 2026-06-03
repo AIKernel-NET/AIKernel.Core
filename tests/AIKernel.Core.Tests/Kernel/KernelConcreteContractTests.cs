@@ -198,6 +198,21 @@ public sealed class KernelConcreteContractTests : KernelContractTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_ClearsExecutorError_WhenTransactionSucceeds()
+    {
+        var kernel = CreateKernel(new SuccessfulResultWithErrorKernelExecutor());
+        var request = CreateRequest("valid-rom");
+
+        var result = await kernel.ExecuteAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Succeeded, result.Status);
+        Assert.Null(result.Error);
+        Assert.Equal("contract output", result.OutputText);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsCanceledMetadata_WhenExecutorCancels()
     {
         var kernel = CreateKernel(new CanceledKernelExecutor());
@@ -484,6 +499,40 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                     OutputTokens: 1,
                     TotalTokens: 2),
                 Error = null,
+                StartedAtUtc = DateTimeOffset.UnixEpoch,
+                CompletedAtUtc = DateTimeOffset.UnixEpoch,
+                Metadata = ImmutableDictionary<string, string>.Empty
+            });
+        }
+    }
+
+    private sealed class SuccessfulResultWithErrorKernelExecutor : AIKernel.Abstractions.Execution.IKernelExecutor
+    {
+        public Task<KernelRequestExecutionResult> ExecuteAsync(
+            IModelProvider provider,
+            KernelExecutionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return Task.FromResult(new KernelRequestExecutionResult
+            {
+                ExecutionId = "exec:contract:success-with-error",
+                Status = ExecutionStatus.Succeeded,
+                ProviderId = provider.ProviderId,
+                ModelId = request.RequestedModelId ?? "gpt-test",
+                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
+                ContextHash = request.ContextSnapshot.ContextHash,
+                PromptHash = "sha256:prompt",
+                OutputText = "contract output",
+                Usage = new ExecutionUsage(
+                    InputTokens: 1,
+                    OutputTokens: 1,
+                    TotalTokens: 2),
+                Error = new ExecutionError(
+                    Code: "executor_error",
+                    Message: "Executor returned a stale error.",
+                    Detail: null),
                 StartedAtUtc = DateTimeOffset.UnixEpoch,
                 CompletedAtUtc = DateTimeOffset.UnixEpoch,
                 Metadata = ImmutableDictionary<string, string>.Empty

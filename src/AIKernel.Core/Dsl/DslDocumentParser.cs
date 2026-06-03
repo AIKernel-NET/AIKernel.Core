@@ -197,7 +197,20 @@ public static class DslDocumentParser
         if (property.ValueKind == JsonValueKind.Number &&
             property.TryGetDouble(out var seconds))
         {
-            return Result<TimeSpan>.Success(TimeSpan.FromSeconds(seconds));
+            try
+            {
+                return Result<TimeSpan>.Success(TimeSpan.FromSeconds(seconds));
+            }
+            catch (ArgumentException)
+            {
+                return Invalid<TimeSpan>(
+                    $"{propertyName} must be a finite TimeSpan value.");
+            }
+            catch (OverflowException)
+            {
+                return Invalid<TimeSpan>(
+                    $"{propertyName} must be within the TimeSpan range.");
+            }
         }
 
         if (property.ValueKind == JsonValueKind.String &&

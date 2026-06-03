@@ -59,6 +59,28 @@ public sealed class DslPipelineCompilerTests
     }
 
     [Fact]
+    public void FromJson_RejectsOutOfRangeNumericTimeout()
+    {
+        var document = DslDocument.FromJson("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            {
+              "type": "LoopUntil",
+              "timeout": 1000000000000000,
+              "maxIterations": 1,
+              "body": []
+            }
+          ]
+        }
+        """);
+
+        Assert.True(document.IsFailure);
+        Assert.Equal("INVALID_DSL", document.Error!.Code);
+        Assert.Equal(FailureKind.Reject, document.Error.FailureKind);
+    }
+
+    [Fact]
     public void Compile_RejectsUnknownCapability()
     {
         var document = DslDocument.FromJson("""

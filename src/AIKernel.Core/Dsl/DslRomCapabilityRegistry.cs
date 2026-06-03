@@ -38,18 +38,44 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
             return Result<DslPipelineValue>.Fail(snapshot.Error!);
         }
 
-        var result = snapshot.Value!.Pipeline.Execute(
-            DslPipelineExecutionContext.Create(input));
+        ResultStep<DslPipelineState, DslPipelineValue> result;
+        try
+        {
+            result = snapshot.Value!.Pipeline.Execute(
+                DslPipelineExecutionContext.Create(input));
+        }
+        catch (Exception ex)
+        {
+            return Result<DslPipelineValue>.Fail(AttachRomMetadata(
+                ErrorContext.FromException(ex) with
+                {
+                    FailureKind = FailureKind.FailClosed,
+                    OriginStep = OriginStep.Capability,
+                    SemanticSlot = SemanticSlot.T
+                },
+                snapshot.Value!.Metadata));
+        }
 
         if (result.IsFailure)
         {
             return Result<DslPipelineValue>.Fail(AttachRomMetadata(
                 result.Error!,
-                snapshot.Value.Metadata));
+                snapshot.Value.Metadata,
+                result.ReplayLog.Count,
+                result.ReplayLogHash));
+        }
+
+        if (result.Value is null)
+        {
+            return Result<DslPipelineValue>.Fail(AttachRomMetadata(
+                Error("DSL ROM pipeline returned a successful null value."),
+                snapshot.Value.Metadata,
+                result.ReplayLog.Count,
+                result.ReplayLogHash));
         }
 
         return Result<DslPipelineValue>.Success(AttachRomData(
-            result.Value!,
+            result.Value,
             snapshot.Value.Metadata,
             result.ReplayLog.Count,
             result.ReplayLogHash));
@@ -75,7 +101,9 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
 
     private static ErrorContext AttachRomMetadata(
         ErrorContext error,
-        DslRomMetadata metadata)
+        DslRomMetadata metadata,
+        int? replayLogCount = null,
+        string? replayLogHash = null)
     {
         var builder = ImmutableDictionary.CreateBuilder<string, string>(
             StringComparer.Ordinal);
@@ -93,10 +121,28 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
         builder[DslRomMetadataKeys.RomPath] = metadata.Path;
         builder[DslRomMetadataKeys.RomNamespace] = metadata.Namespace;
         builder[DslRomMetadataKeys.RomName] = metadata.Name;
+        if (replayLogCount is { } count)
+        {
+            builder[DslRomMetadataKeys.RomReplayLogCount] =
+                count.ToString(CultureInfo.InvariantCulture);
+        }
+
+        if (!string.IsNullOrWhiteSpace(replayLogHash))
+        {
+            builder[DslRomMetadataKeys.RomReplayLogHash] = replayLogHash;
+        }
 
         return error with
         {
             Metadata = builder.ToImmutable()
         };
     }
+
+    private static ErrorContext Error(string message)
+        => new(message, "DSL_ROM_ERROR", false)
+        {
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = OriginStep.Capability,
+            SemanticSlot = SemanticSlot.T
+        };
 }

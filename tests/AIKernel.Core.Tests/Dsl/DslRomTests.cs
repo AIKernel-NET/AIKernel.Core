@@ -238,8 +238,14 @@ public sealed class DslRomTests
         Assert.True(result.IsFailure);
         Assert.True(result.IsSuspended);
         Assert.Equal(saved.Value!.RomHash, result.Error!.Metadata![DslRomMetadataKeys.RomHash]);
+        Assert.Equal("1", result.Error.Metadata[DslRomMetadataKeys.RomReplayLogCount]);
+        Assert.True(result.Error.Metadata.ContainsKey(DslRomMetadataKeys.RomReplayLogHash));
         var entry = Assert.Single(result.ReplayLog);
         Assert.Equal(saved.Value.RomHash, entry.SemanticDelta.Metadata![DslRomMetadataKeys.RomHash]);
+        Assert.Equal("1", entry.SemanticDelta.Metadata[DslRomMetadataKeys.RomReplayLogCount]);
+        Assert.Equal(
+            result.Error.Metadata[DslRomMetadataKeys.RomReplayLogHash],
+            entry.SemanticDelta.Metadata[DslRomMetadataKeys.RomReplayLogHash]);
     }
 
     [Fact]
@@ -250,6 +256,58 @@ public sealed class DslRomTests
         Assert.True(path.IsFailure);
         Assert.Equal("DSL_ROM_ERROR", path.Error!.Code);
         Assert.Equal(FailureKind.FailClosed, path.Error.FailureKind);
+    }
+
+    [Fact]
+    public void DslRomCapabilityRegistry_ReturnsFailure_WhenRomPipelineThrows()
+    {
+        var romRegistry = new DslRomRegistry();
+        var metadata = CreateMetadata(PlanDsl);
+        var registered = romRegistry.Register(new DslRomSnapshot(
+            metadata,
+            PlanDsl,
+            new ThrowingPipeline()));
+        Assert.True(registered.IsSuccess, registered.Error?.Message);
+        var registry = new DslRomCapabilityRegistry(
+            new TestCapabilityRegistry(),
+            romRegistry);
+
+        var result = registry.Invoke(
+            metadata.CapabilityName,
+            DslPipelineValue.Empty,
+            new Dictionary<string, string>());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(metadata.RomHash, result.Error.Metadata![DslRomMetadataKeys.RomHash]);
+        Assert.Equal(metadata.CapabilityName, result.Error.Metadata[DslRomMetadataKeys.RomCall]);
+    }
+
+    [Fact]
+    public void DslRomCapabilityRegistry_ReturnsFailure_WhenRomPipelineReturnsNullSuccess()
+    {
+        var romRegistry = new DslRomRegistry();
+        var metadata = CreateMetadata(PlanDsl);
+        var registered = romRegistry.Register(new DslRomSnapshot(
+            metadata,
+            PlanDsl,
+            new NullSuccessPipeline()));
+        Assert.True(registered.IsSuccess, registered.Error?.Message);
+        var registry = new DslRomCapabilityRegistry(
+            new TestCapabilityRegistry(),
+            romRegistry);
+
+        var result = registry.Invoke(
+            metadata.CapabilityName,
+            DslPipelineValue.Empty,
+            new Dictionary<string, string>());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_ROM_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(metadata.RomHash, result.Error.Metadata![DslRomMetadataKeys.RomHash]);
+        Assert.Contains("null", result.Error.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     private static async Task<IVfsSession> OpenSessionAsync()
@@ -353,6 +411,25 @@ public sealed class DslRomTests
                     SemanticSlot = SemanticSlot.T
                 });
         }
+    }
+
+    private sealed class ThrowingPipeline : IKernelPipeline
+    {
+        public ResultStep<DslPipelineState, DslPipelineValue> Execute(
+            DslPipelineExecutionContext context)
+        {
+            throw new InvalidOperationException("ROM pipeline exploded.");
+        }
+    }
+
+    private sealed class NullSuccessPipeline : IKernelPipeline
+    {
+        public ResultStep<DslPipelineState, DslPipelineValue> Execute(
+            DslPipelineExecutionContext context)
+            => ResultStep<DslPipelineState, DslPipelineValue>
+                .Success(
+                    DslPipelineState.Initial("dsl.pipeline"),
+                    null!);
     }
 
     private sealed class TestVfsCredentials : IVfsCredentials

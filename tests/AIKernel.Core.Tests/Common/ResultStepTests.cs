@@ -149,6 +149,31 @@ public sealed class ResultStepTests
     }
 
     [Fact]
+    public void StepId_Changes_WhenSemanticDeltaKindChanges()
+    {
+        var firstDelta = new SemanticDelta(
+            "pipeline.transition",
+            OriginStep.KernelFacade,
+            SemanticSlot.T,
+            Kind: "loop");
+        var secondDelta = new SemanticDelta(
+            "pipeline.transition",
+            OriginStep.KernelFacade,
+            SemanticSlot.T,
+            Kind: "suspend");
+
+        var first = ResultStep<string, int>
+            .Success("pipeline", 2)
+            .WithSemanticDelta(firstDelta);
+        var second = ResultStep<string, int>
+            .Success("pipeline", 2)
+            .WithSemanticDelta(secondDelta);
+
+        Assert.NotEqual(first.StepId, second.StepId);
+        Assert.NotEqual(first.ReplayLogHash, second.ReplayLogHash);
+    }
+
+    [Fact]
     public void Bind_ReparentsNextStepToCurrentStepId()
     {
         var firstDelta = new SemanticDelta(

@@ -11,9 +11,14 @@ public static class ModelProviderHostingExtensions
         ModelPromptCapability capability)
         where TProvider : class, IModelProvider
     {
-        ArgumentNullException.ThrowIfNull(capability);
+        ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.WithModelProvider<TProvider>(_ => capability);
+        var validated = ValidateCapability(capability);
+
+        builder.Services.AddSingleton<IModelProvider, TProvider>();
+        builder.Services.AddSingleton(validated);
+
+        return builder;
     }
 
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
@@ -48,6 +53,23 @@ public static class ModelProviderHostingExtensions
         {
             builder.Services.AddSingleton(capability);
         }
+
+        return builder;
+    }
+
+    public static AIKernelCoreBuilder WithModelProvider<TProvider>(
+        this AIKernelCoreBuilder builder,
+        Func<IServiceProvider, TProvider> providerFactory,
+        ModelPromptCapability capability)
+        where TProvider : class, IModelProvider
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(providerFactory);
+
+        var validated = ValidateCapability(capability);
+
+        builder.Services.AddSingleton<IModelProvider>(providerFactory);
+        builder.Services.AddSingleton(validated);
 
         return builder;
     }

@@ -49,7 +49,7 @@ public sealed class ModelProviderHostingExtensionsTests
             .AddAIKernelCore()
             .WithModelProvider(
                 _ => new ExternalCapabilityProvider("tools-process-adapter"),
-                _ => CreateCapability("tools-process-adapter", "tools-cli"));
+                CreateCapability("tools-process-adapter", "tools-cli"));
 
         using var provider = services.BuildServiceProvider();
 
@@ -96,14 +96,34 @@ public sealed class ModelProviderHostingExtensionsTests
     }
 
     [Fact]
-    public void WithModelProvider_RejectsInvalidCapabilityAtResolution()
+    public void WithModelProvider_RejectsInvalidCapabilityAtRegistration()
+    {
+        var services = new ServiceCollection();
+
+        var exception = Assert.Throws<ArgumentException>(
+            () => services
+                .AddAIKernelCore()
+                .WithModelProvider<ExternalCapabilityProvider>(
+                    new ModelPromptCapability
+                    {
+                        ProviderId = "",
+                        ModelId = "model"
+                    }));
+
+        Assert.Equal(
+            "ModelPromptCapability.ProviderId is required. (Parameter 'capability')",
+            exception.Message);
+    }
+
+    [Fact]
+    public void WithModelProvider_FactoryRejectsInvalidCapabilityAtResolution()
     {
         var services = new ServiceCollection();
 
         services
             .AddAIKernelCore()
             .WithModelProvider<ExternalCapabilityProvider>(
-                new ModelPromptCapability
+                _ => new ModelPromptCapability
                 {
                     ProviderId = "",
                     ModelId = "model"

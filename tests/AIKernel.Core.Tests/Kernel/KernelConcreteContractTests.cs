@@ -166,6 +166,23 @@ public sealed class KernelConcreteContractTests : KernelContractTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_UsesSelectedProviderAndRequestedModel_WhenExecutorResultDiffers()
+    {
+        var kernel = CreateKernel(new MismatchedIdentityKernelExecutor());
+        var request = CreateRequest("valid-rom");
+
+        var result = await kernel.ExecuteAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Succeeded, result.Status);
+        Assert.Equal("fake-provider", result.ProviderId);
+        Assert.Equal("gpt-test", result.ModelId);
+        Assert.Equal("fake-provider", result.Metadata[KernelFacadeMetadataKeys.ProviderId]);
+        Assert.Equal("gpt-test", result.Metadata[KernelFacadeMetadataKeys.RequestedModelId]);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsCanceledMetadata_WhenExecutorCancels()
     {
         var kernel = CreateKernel(new CanceledKernelExecutor());
@@ -391,6 +408,39 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 StartedAtUtc = DateTimeOffset.UnixEpoch,
                 CompletedAtUtc = DateTimeOffset.UnixEpoch,
                 Metadata = null!
+            });
+        }
+    }
+
+    private sealed class MismatchedIdentityKernelExecutor : AIKernel.Abstractions.Execution.IKernelExecutor
+    {
+        public Task<KernelRequestExecutionResult> ExecuteAsync(
+            IModelProvider provider,
+            KernelExecutionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return Task.FromResult(new KernelRequestExecutionResult
+            {
+                ExecutionId = "exec:contract:mismatched-identity",
+                Status = ExecutionStatus.Succeeded,
+                ProviderId = "executor-provider",
+                ModelId = "executor-model",
+                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
+                ContextHash = request.ContextSnapshot.ContextHash,
+                PromptHash = "sha256:prompt",
+                OutputText = "contract output",
+                Usage = new ExecutionUsage(
+                    InputTokens: 1,
+                    OutputTokens: 1,
+                    TotalTokens: 2),
+                Error = null,
+                StartedAtUtc = DateTimeOffset.UnixEpoch,
+                CompletedAtUtc = DateTimeOffset.UnixEpoch,
+                Metadata = ImmutableDictionary<string, string>.Empty
+                    .Add(KernelFacadeMetadataKeys.ProviderId, "executor-provider")
+                    .Add(KernelFacadeMetadataKeys.RequestedModelId, "executor-model")
             });
         }
     }

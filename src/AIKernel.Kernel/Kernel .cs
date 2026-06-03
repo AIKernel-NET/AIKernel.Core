@@ -311,6 +311,8 @@ public sealed class Kernel : IKernel
     {
         return result with
         {
+            ProviderId = providerId,
+            ModelId = request.RequestedModelId ?? result.ModelId,
             Metadata = BuildSuccessfulMetadata(
                 request,
                 transaction,

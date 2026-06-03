@@ -41,6 +41,33 @@ public sealed class KernelExecutorTests
         Assert.Equal("execution_failed", result.Error?.Code);
     }
 
+    [Fact]
+    public async Task ExecuteAsync_ReturnsCanceledResult_WhenCapabilityResolutionIsCanceled()
+    {
+        var executor = new KernelExecutor(
+            new UnusedPromptGenerator(),
+            new CanceledCapabilityResolver(),
+            new SimpleTokenizer(),
+            KernelClock.Replay(DateTimeOffset.UnixEpoch));
+
+        var result = await executor.ExecuteAsync(
+            new FakeModelProvider(),
+            new KernelExecutionRequest
+            {
+                ContextSnapshot = null!,
+                UserInstruction = "hello",
+                PromptOptions = PromptGenerationOptions.Default,
+                ExecutionOptions = ExecutionOptions.DeterministicDefault,
+                RequestedModelId = "gpt-test"
+            },
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Canceled, result.Status);
+        Assert.Equal("canceled", result.Error?.Code);
+        Assert.Equal("unknown", result.ContextSnapshotId);
+        Assert.Equal("unknown", result.ContextHash);
+    }
+
     private sealed class FailingCapabilityResolver : IModelPromptCapabilityResolver
     {
         public ModelPromptCapability Resolve(
@@ -48,6 +75,16 @@ public sealed class KernelExecutorTests
             KernelExecutionRequest request)
         {
             throw new UnsupportedPromptCapabilityException("Capability resolution failed.");
+        }
+    }
+
+    private sealed class CanceledCapabilityResolver : IModelPromptCapabilityResolver
+    {
+        public ModelPromptCapability Resolve(
+            IModelProvider provider,
+            KernelExecutionRequest request)
+        {
+            throw new OperationCanceledException();
         }
     }
 

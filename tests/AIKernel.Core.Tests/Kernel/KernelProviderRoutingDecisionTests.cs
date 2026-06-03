@@ -1,8 +1,14 @@
 namespace AIKernel.Core.Tests.Kernel;
 
 using System.Collections.Immutable;
+using AIKernel.Abstractions.Context;
 using AIKernel.Common.Results;
+using AIKernel.Dtos.Core;
+using AIKernel.Dtos.Execution;
+using AIKernel.Dtos.Kernel;
+using AIKernel.Dtos.Rom;
 using AIKernel.Kernel;
+using AIKernel.Vfs;
 
 public sealed class KernelProviderRoutingDecisionTests
 {
@@ -43,6 +49,29 @@ public sealed class KernelProviderRoutingDecisionTests
         Assert.Equal("capability", metadata[KernelFacadeMetadataKeys.ProviderTier]);
         Assert.Equal("AIKernel.Tools.Cli", metadata[KernelFacadeMetadataKeys.CapabilityModuleId]);
         Assert.Equal("aik-prefix", metadata[KernelFacadeMetadataKeys.RouteReason]);
+    }
+
+    [Fact]
+    public void ApplyToRequest_UpdatesModelIdAndMetadata()
+    {
+        var request = CreateRequest("gpt-original");
+        var decision = KernelProviderRoutingDecision.ForCapabilityModule(
+            providerId: "tools-cli-adapter",
+            requestedModelId: "aik-cli",
+            capabilityModuleId: "AIKernel.Tools.Cli",
+            routeReason: "aik-prefix",
+            metadata: ImmutableDictionary<string, string>.Empty
+                .Add("route_score", "1.0"));
+
+        var routed = decision.ApplyToRequest(request);
+
+        Assert.Equal("gpt-original", request.RequestedModelId);
+        Assert.Equal("aik-cli", routed.RequestedModelId);
+        Assert.Equal("tools-cli-adapter", routed.Metadata[KernelFacadeMetadataKeys.ProviderId]);
+        Assert.Equal("aik-cli", routed.Metadata[KernelFacadeMetadataKeys.RequestedModelId]);
+        Assert.Equal("AIKernel.Tools.Cli", routed.Metadata[KernelFacadeMetadataKeys.CapabilityModuleId]);
+        Assert.Equal("1.0", routed.Metadata["route_score"]);
+        Assert.Equal("user-value", routed.Metadata["user_key"]);
     }
 
     [Theory]
@@ -127,5 +156,40 @@ public sealed class KernelProviderRoutingDecisionTests
         return ResultStep<string, KernelProviderRoutingDecision>
             .Success("routing:decision", decision)
             .WithSemanticDelta(new SemanticDelta("user.routing.provider", OriginStep.Capability, SemanticSlot.T));
+    }
+
+    private static KernelRequest CreateRequest(
+        string requestedModelId)
+    {
+        return new KernelRequest
+        {
+            Input = "aik://tools/run",
+            RootRomId = new RomId("rom://routing/test"),
+            VfsProviderId = "memory-file",
+            VfsCredentials = new TestVfsCredentials(),
+            Scope = new ContextAssemblyScope
+            {
+                Purpose = "routing-test",
+                Capabilities = ["external"],
+                Metadata = ImmutableDictionary<string, string>.Empty
+            },
+            PromptOptions = PromptGenerationOptions.Default,
+            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            RequestedModelId = requestedModelId,
+            Metadata = ImmutableDictionary<string, string>.Empty
+                .Add("user_key", "user-value")
+        };
+    }
+
+    private sealed class TestVfsCredentials : IVfsCredentials
+    {
+        public string? Username => null;
+
+        public string? ApiKey => null;
+
+        public string? Token => null;
+
+        public IReadOnlyDictionary<string, object> Parameters =>
+            ImmutableDictionary<string, object>.Empty;
     }
 }

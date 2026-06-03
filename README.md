@@ -205,10 +205,10 @@ extension registers the `IModelProvider` implementation and its
 selected ProviderId and ModelId without provider-specific wiring in Core.
 
 User-land routing pipelines can return a `KernelProviderRoutingDecision` from a
-`ResultStep`/LINQ chain, then apply it to request metadata. This supports
-policies such as low-tier versus high-tier LLM selection, or routing `aik...`
-contexts to a CLI-backed capability adapter, while keeping Kernel execution
-driven by the same ProviderId / ModelId contract.
+`ResultStep`/LINQ chain, then apply it to a `KernelRequest` and its metadata.
+This supports policies such as low-tier versus high-tier LLM selection, or
+routing `aik...` contexts to a CLI-backed capability adapter, while keeping
+Kernel execution driven by the same ProviderId / ModelId contract.
 
 ---
 

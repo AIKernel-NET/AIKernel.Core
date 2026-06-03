@@ -1,6 +1,7 @@
 namespace AIKernel.Kernel;
 
 using System.Collections.Immutable;
+using AIKernel.Dtos.Kernel;
 
 public sealed record KernelProviderRoutingDecision
 {
@@ -62,6 +63,18 @@ public sealed record KernelProviderRoutingDecision
 
     public ImmutableDictionary<string, string> ToMetadata()
         => ApplyTo(ImmutableDictionary<string, string>.Empty);
+
+    public KernelRequest ApplyToRequest(
+        KernelRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        return request with
+        {
+            RequestedModelId = RequestedModelId,
+            Metadata = ApplyTo(request.Metadata)
+        };
+    }
 
     public ImmutableDictionary<string, string> ApplyTo(
         IReadOnlyDictionary<string, string>? metadata)

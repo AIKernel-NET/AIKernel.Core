@@ -129,7 +129,7 @@ internal sealed class KernelExecutionFailureResultFactory
                 Message: result.Error.Message),
             StartedAtUtc = _clock.Now,
             CompletedAtUtc = _clock.Now,
-            Metadata = ImmutableDictionary<string, string>.Empty
+            Metadata = BuildFailureMetadata(result.Error)
         };
     }
 
@@ -184,6 +184,14 @@ internal sealed class KernelExecutionFailureResultFactory
         var builder = ImmutableDictionary.CreateBuilder<string, string>(
             StringComparer.Ordinal);
 
+        if (errorContext?.Metadata is not null)
+        {
+            foreach (var item in errorContext.Metadata)
+            {
+                builder[item.Key] = item.Value;
+            }
+        }
+
         if (errorContext?.FailureKind is { } failureKind)
         {
             builder["failure_kind"] = failureKind.ToString();
@@ -197,14 +205,6 @@ internal sealed class KernelExecutionFailureResultFactory
         if (errorContext?.SemanticSlot is { } semanticSlot)
         {
             builder["semantic_slot"] = semanticSlot.ToString();
-        }
-
-        if (errorContext?.Metadata is not null)
-        {
-            foreach (var item in errorContext.Metadata)
-            {
-                builder[item.Key] = item.Value;
-            }
         }
 
         return builder.ToImmutable();

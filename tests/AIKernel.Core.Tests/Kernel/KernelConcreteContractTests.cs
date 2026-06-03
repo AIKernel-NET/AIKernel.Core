@@ -63,6 +63,29 @@ public sealed class KernelConcreteContractTests : KernelContractTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_PreservesStructuredFailureMetadata_WhenRequestMetadataConflicts()
+    {
+        var kernel = CreateKernel(new FailingKernelExecutor());
+        var request = CreateRequest(
+            "valid-rom",
+            ImmutableDictionary<string, string>.Empty
+                .Add("failure_kind", "user-value")
+                .Add("origin_step", "user-value")
+                .Add("semantic_slot", "user-value")
+                .Add("custom_key", "custom-value"));
+
+        var result = await kernel.ExecuteAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(ExecutionStatus.Failed, result.Status);
+        Assert.Equal(FailureKind.FailClosed.ToString(), result.Metadata["failure_kind"]);
+        Assert.Equal(OriginStep.KernelFacade.ToString(), result.Metadata["origin_step"]);
+        Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
+        Assert.Equal("custom-value", result.Metadata["custom_key"]);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsCanceledMetadata_WhenExecutorCancels()
     {
         var kernel = CreateKernel(new CanceledKernelExecutor());
@@ -78,7 +101,9 @@ public sealed class KernelConcreteContractTests : KernelContractTests
         Assert.Equal(SemanticSlot.T.ToString(), result.Metadata["semantic_slot"]);
     }
 
-    private static KernelRequest CreateRequest(string rootRomId)
+    private static KernelRequest CreateRequest(
+        string rootRomId,
+        ImmutableDictionary<string, string>? metadata = null)
     {
         return new KernelRequest
         {
@@ -95,7 +120,7 @@ public sealed class KernelConcreteContractTests : KernelContractTests
             PromptOptions = PromptGenerationOptions.Default,
             ExecutionOptions = ExecutionOptions.DeterministicDefault,
             RequestedModelId = "gpt-test",
-            Metadata = ImmutableDictionary<string, string>.Empty
+            Metadata = metadata ?? ImmutableDictionary<string, string>.Empty
         };
     }
 

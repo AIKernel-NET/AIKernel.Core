@@ -186,9 +186,6 @@ internal sealed class KernelFailureResultFactory
         builder["root_rom_id"] = request.RootRomId?.Value ?? string.Empty;
         builder["vfs_provider_id"] = request.VfsProviderId ?? string.Empty;
         builder["requested_model_id"] = request.RequestedModelId ?? string.Empty;
-        builder["failure_kind"] = failureKind.ToString();
-        builder["origin_step"] = originStep.ToString();
-        builder["semantic_slot"] = semanticSlot.ToString();
 
         if (exception is not null)
         {
@@ -205,6 +202,10 @@ internal sealed class KernelFailureResultFactory
         {
             builder[item.Key] = item.Value;
         }
+
+        builder["failure_kind"] = failureKind.ToString();
+        builder["origin_step"] = originStep.ToString();
+        builder["semantic_slot"] = semanticSlot.ToString();
 
         return builder.ToImmutable();
     }

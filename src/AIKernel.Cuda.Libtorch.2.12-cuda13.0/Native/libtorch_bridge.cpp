@@ -103,7 +103,7 @@ Tensor execute_forward(
   return Tensor{session.module->forward(inputs).toTensor()};
 }
 
-void copy_logits_to_result(
+int32_t copy_logits_to_result(
     const Tensor& output,
     ForwardResultNative* out_result) {
   auto logits = output.value
@@ -115,7 +115,7 @@ void copy_logits_to_result(
   const auto total_elements = logits.numel();
   if (total_elements <= 0) {
     out_result->status = kForwardFailed;
-    return;
+    return kForwardFailed;
   }
 
   const auto capped_total = std::min<int64_t>(
@@ -139,6 +139,8 @@ void copy_logits_to_result(
     auto top_index = std::max_element(logits_data, logits_data + logit_count) - logits_data;
     out_result->output_token_ids[0] = static_cast<int32_t>(top_index);
   }
+
+  return kSuccess;
 }
 
 }  // namespace
@@ -203,9 +205,7 @@ AIKERNEL_EXPORT int32_t forward(
   try {
     const auto input = create_input_tensor(input_ids, length, session->device);
     const auto output = execute_forward(*session, input);
-    copy_logits_to_result(output, out_result);
-
-    return kSuccess;
+    return copy_logits_to_result(output, out_result);
   } catch (...) {
     out_result->status = kForwardFailed;
     return kForwardFailed;

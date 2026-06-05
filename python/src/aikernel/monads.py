@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Generator, Mapping
+import inspect
+from collections.abc import Awaitable, Callable, Generator, Mapping
 from dataclasses import dataclass
 from functools import wraps
 from typing import Generic, TypeVar
@@ -356,6 +357,246 @@ class Either(Generic[L, R]):
         raise ValueError(f"Cannot unwrap Left either: {self._left}")
 
 
+class AsyncResult(Generic[T]):
+    __slots__ = ("_awaitable",)
+
+    def __init__(self, awaitable: Awaitable[Result[T]]) -> None:
+        self._awaitable = awaitable
+
+    def __await__(self):
+        return self._awaitable.__await__()
+
+    def map(self, func: Callable[[T], U]) -> AsyncResult[U]:
+        async def run() -> Result[U]:
+            try:
+                return (await self._awaitable).map(func)
+            except Exception as ex:  # noqa: BLE001 - AsyncResult intentionally captures exceptions.
+                return Failure(ex)
+
+        return AsyncResult(run())
+
+    def Map(self, func: Callable[[T], U]) -> AsyncResult[U]:
+        return self.map(func)
+
+    def select(self, selector: Callable[[T], U]) -> AsyncResult[U]:
+        return self.map(selector)
+
+    def Select(self, selector: Callable[[T], U]) -> AsyncResult[U]:
+        return self.select(selector)
+
+    def bind(self, func: Callable[[T], Result[U] | Awaitable[Result[U]] | AsyncResult[U]]) -> AsyncResult[U]:
+        async def run() -> Result[U]:
+            try:
+                result = await self._awaitable
+                if result.is_err:
+                    return Failure(result.error, metadata=result.metadata)
+                return await _resolve_result(func(result.unwrap()), metadata=result.metadata)
+            except Exception as ex:  # noqa: BLE001 - AsyncResult intentionally captures exceptions.
+                return Failure(ex)
+
+        return AsyncResult(run())
+
+    def Bind(self, func: Callable[[T], Result[U] | Awaitable[Result[U]] | AsyncResult[U]]) -> AsyncResult[U]:
+        return self.bind(func)
+
+    def select_many(
+        self,
+        binder: Callable[[T], Result[U] | Awaitable[Result[U]] | AsyncResult[U]],
+        projector: Callable[[T, U], V] | None = None,
+    ) -> AsyncResult[V] | AsyncResult[U]:
+        if projector is None:
+            return self.bind(binder)
+
+        return self.bind(lambda value: async_result(binder(value)).map(lambda bound: projector(value, bound)))
+
+    def SelectMany(
+        self,
+        binder: Callable[[T], Result[U] | Awaitable[Result[U]] | AsyncResult[U]],
+        projector: Callable[[T, U], V] | None = None,
+    ) -> AsyncResult[V] | AsyncResult[U]:
+        return self.select_many(binder, projector)
+
+    def tap(self, action: Callable[[T], object | Awaitable[object]]) -> AsyncResult[T]:
+        async def run() -> Result[T]:
+            result = await self._awaitable
+            if result.is_err:
+                return Failure(result.error, metadata=result.metadata)
+            try:
+                observed = action(result.unwrap())
+                if inspect.isawaitable(observed):
+                    await observed
+                return result
+            except Exception as ex:  # noqa: BLE001 - AsyncResult intentionally captures exceptions.
+                return Failure(ex, metadata=result.metadata)
+
+        return AsyncResult(run())
+
+    def Tap(self, action: Callable[[T], object | Awaitable[object]]) -> AsyncResult[T]:
+        return self.tap(action)
+
+    def where(self, predicate: Callable[[T], bool]) -> AsyncResult[T]:
+        return self.bind(lambda value: Success(value).where(predicate))
+
+    def Where(self, predicate: Callable[[T], bool]) -> AsyncResult[T]:
+        return self.where(predicate)
+
+
+class AsyncOption(Generic[T]):
+    __slots__ = ("_awaitable",)
+
+    def __init__(self, awaitable: Awaitable[Option[T]]) -> None:
+        self._awaitable = awaitable
+
+    def __await__(self):
+        return self._awaitable.__await__()
+
+    def map(self, func: Callable[[T], U]) -> AsyncOption[U]:
+        async def run() -> Option[U]:
+            return (await self._awaitable).map(func)
+
+        return AsyncOption(run())
+
+    def Map(self, func: Callable[[T], U]) -> AsyncOption[U]:
+        return self.map(func)
+
+    def select(self, selector: Callable[[T], U]) -> AsyncOption[U]:
+        return self.map(selector)
+
+    def Select(self, selector: Callable[[T], U]) -> AsyncOption[U]:
+        return self.select(selector)
+
+    def bind(self, func: Callable[[T], Option[U] | Awaitable[Option[U]] | AsyncOption[U]]) -> AsyncOption[U]:
+        async def run() -> Option[U]:
+            option = await self._awaitable
+            if option.is_none:
+                return Nothing()
+            return await _resolve_option(func(option.unwrap()))
+
+        return AsyncOption(run())
+
+    def Bind(self, func: Callable[[T], Option[U] | Awaitable[Option[U]] | AsyncOption[U]]) -> AsyncOption[U]:
+        return self.bind(func)
+
+    def select_many(
+        self,
+        binder: Callable[[T], Option[U] | Awaitable[Option[U]] | AsyncOption[U]],
+        projector: Callable[[T, U], V] | None = None,
+    ) -> AsyncOption[V] | AsyncOption[U]:
+        if projector is None:
+            return self.bind(binder)
+
+        return self.bind(lambda value: async_option(binder(value)).map(lambda bound: projector(value, bound)))
+
+    def SelectMany(
+        self,
+        binder: Callable[[T], Option[U] | Awaitable[Option[U]] | AsyncOption[U]],
+        projector: Callable[[T, U], V] | None = None,
+    ) -> AsyncOption[V] | AsyncOption[U]:
+        return self.select_many(binder, projector)
+
+    def tap(self, action: Callable[[T], object | Awaitable[object]]) -> AsyncOption[T]:
+        async def run() -> Option[T]:
+            option = await self._awaitable
+            if option.is_some:
+                observed = action(option.unwrap())
+                if inspect.isawaitable(observed):
+                    await observed
+            return option
+
+        return AsyncOption(run())
+
+    def Tap(self, action: Callable[[T], object | Awaitable[object]]) -> AsyncOption[T]:
+        return self.tap(action)
+
+    def where(self, predicate: Callable[[T], bool]) -> AsyncOption[T]:
+        async def run() -> Option[T]:
+            option = await self._awaitable
+            return option.where(predicate)
+
+        return AsyncOption(run())
+
+    def Where(self, predicate: Callable[[T], bool]) -> AsyncOption[T]:
+        return self.where(predicate)
+
+
+class AsyncEither(Generic[L, R]):
+    __slots__ = ("_awaitable",)
+
+    def __init__(self, awaitable: Awaitable[Either[L, R]]) -> None:
+        self._awaitable = awaitable
+
+    def __await__(self):
+        return self._awaitable.__await__()
+
+    def map(self, func: Callable[[R], U]) -> AsyncEither[L, U]:
+        async def run() -> Either[L, U]:
+            return (await self._awaitable).map(func)
+
+        return AsyncEither(run())
+
+    def Map(self, func: Callable[[R], U]) -> AsyncEither[L, U]:
+        return self.map(func)
+
+    def select(self, selector: Callable[[R], U]) -> AsyncEither[L, U]:
+        return self.map(selector)
+
+    def Select(self, selector: Callable[[R], U]) -> AsyncEither[L, U]:
+        return self.select(selector)
+
+    def bind(self, func: Callable[[R], Either[L, U] | Awaitable[Either[L, U]] | AsyncEither[L, U]]) -> AsyncEither[L, U]:
+        async def run() -> Either[L, U]:
+            either = await self._awaitable
+            if either.is_left:
+                return Left(either.left_value)  # type: ignore[arg-type]
+            return await _resolve_either(func(either.unwrap()))
+
+        return AsyncEither(run())
+
+    def Bind(self, func: Callable[[R], Either[L, U] | Awaitable[Either[L, U]] | AsyncEither[L, U]]) -> AsyncEither[L, U]:
+        return self.bind(func)
+
+    def select_many(
+        self,
+        binder: Callable[[R], Either[L, U] | Awaitable[Either[L, U]] | AsyncEither[L, U]],
+        projector: Callable[[R, U], V] | None = None,
+    ) -> AsyncEither[L, V] | AsyncEither[L, U]:
+        if projector is None:
+            return self.bind(binder)
+
+        return self.bind(lambda value: async_either(binder(value)).map(lambda bound: projector(value, bound)))
+
+    def SelectMany(
+        self,
+        binder: Callable[[R], Either[L, U] | Awaitable[Either[L, U]] | AsyncEither[L, U]],
+        projector: Callable[[R, U], V] | None = None,
+    ) -> AsyncEither[L, V] | AsyncEither[L, U]:
+        return self.select_many(binder, projector)
+
+    def tap(self, action: Callable[[R], object | Awaitable[object]]) -> AsyncEither[L, R]:
+        async def run() -> Either[L, R]:
+            either = await self._awaitable
+            if either.is_right:
+                observed = action(either.unwrap())
+                if inspect.isawaitable(observed):
+                    await observed
+            return either
+
+        return AsyncEither(run())
+
+    def Tap(self, action: Callable[[R], object | Awaitable[object]]) -> AsyncEither[L, R]:
+        return self.tap(action)
+
+    def where(self, predicate: Callable[[R], bool], left_factory: Callable[[], L]) -> AsyncEither[L, R]:
+        async def run() -> Either[L, R]:
+            either = await self._awaitable
+            return either.where(predicate, left_factory)
+
+        return AsyncEither(run())
+
+    def Where(self, predicate: Callable[[R], bool], left_factory: Callable[[], L]) -> AsyncEither[L, R]:
+        return self.where(predicate, left_factory)
+
+
 @dataclass(frozen=True)
 class _DoState:
     kind: type[Result] | type[Option] | type[Either]
@@ -383,6 +624,36 @@ def Right(value: R) -> Either[L, R]:
 
 def Left(value: L) -> Either[L, R]:
     return Either.left(value)
+
+
+def async_result(value: Result[T] | Awaitable[Result[T]] | AsyncResult[T]) -> AsyncResult[T]:
+    if isinstance(value, AsyncResult):
+        return value
+
+    async def run() -> Result[T]:
+        return await _resolve_result(value)
+
+    return AsyncResult(run())
+
+
+def async_option(value: Option[T] | Awaitable[Option[T]] | AsyncOption[T]) -> AsyncOption[T]:
+    if isinstance(value, AsyncOption):
+        return value
+
+    async def run() -> Option[T]:
+        return await _resolve_option(value)
+
+    return AsyncOption(run())
+
+
+def async_either(value: Either[L, R] | Awaitable[Either[L, R]] | AsyncEither[L, R]) -> AsyncEither[L, R]:
+    if isinstance(value, AsyncEither):
+        return value
+
+    async def run() -> Either[L, R]:
+        return await _resolve_either(value)
+
+    return AsyncEither(run())
 
 
 class _Try:
@@ -469,3 +740,33 @@ def _short_circuit(state: _DoState, monad, metadata: Mapping[str, object] | None
     if monad.is_none:
         return monad
     return None
+
+
+async def _resolve_result(
+    value: Result[T] | Awaitable[Result[T]] | AsyncResult[T],
+    metadata: Mapping[str, object] | None = None,
+) -> Result[T]:
+    try:
+        result = await value if inspect.isawaitable(value) else value
+    except Exception as ex:  # noqa: BLE001 - AsyncResult intentionally captures exceptions.
+        return Failure(ex, metadata=metadata)
+
+    if not isinstance(result, Result):
+        return Failure(TypeError("AsyncResult callback must return Result."), metadata=metadata)
+
+    merged = {**dict(metadata or {}), **result.metadata}
+    return result.with_metadata(merged)
+
+
+async def _resolve_option(value: Option[T] | Awaitable[Option[T]] | AsyncOption[T]) -> Option[T]:
+    option = await value if inspect.isawaitable(value) else value
+    if not isinstance(option, Option):
+        raise TypeError("AsyncOption callback must return Option.")
+    return option
+
+
+async def _resolve_either(value: Either[L, R] | Awaitable[Either[L, R]] | AsyncEither[L, R]) -> Either[L, R]:
+    either = await value if inspect.isawaitable(value) else value
+    if not isinstance(either, Either):
+        raise TypeError("AsyncEither callback must return Either.")
+    return either

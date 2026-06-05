@@ -172,6 +172,31 @@ For users porting C# examples directly, PascalCase aliases are also available:
 `Map`, `Bind`, `Tap`, `Where`, `Select`, `SelectMany`, `Match`, and
 `Option.OrElse`.
 
+Async pipelines are available through `async_result`, `async_option`, and
+`async_either`, matching the C# `Task<Result<T>>`, `Task<Option<T>>`, and
+`Task<Either<L,R>>` extension style:
+
+```python
+from aikernel import Success, async_result
+
+async def load_context_result():
+    return Success(await load_context_async())
+
+async def route_provider(context):
+    return Success("cli" if context.startswith("aik") else "llm")
+
+route = await (
+    async_result(load_context_result())
+    .Select(lambda context: context.strip())
+    .Where(lambda context: len(context) > 0)
+    .SelectMany(route_provider, lambda context, provider: {
+        "context": context,
+        "provider": provider,
+    })
+    .Tap(lambda decision: audit_async(decision))
+)
+```
+
 Decorator-based do notation:
 
 ```python

@@ -18,6 +18,9 @@ from .managed import (
     runtime_layout,
 )
 from .monads import (
+    AsyncEither,
+    AsyncOption,
+    AsyncResult,
     Either,
     Failure,
     Left,
@@ -28,11 +31,17 @@ from .monads import (
     Some,
     Success,
     Try,
+    async_either,
+    async_option,
+    async_result,
     do,
 )
 
 __all__ = [
     "AIKernelNativeError",
+    "AsyncEither",
+    "AsyncOption",
+    "AsyncResult",
     "Either",
     "Failure",
     "ForwardResult",
@@ -46,6 +55,9 @@ __all__ = [
     "Some",
     "Success",
     "Try",
+    "async_either",
+    "async_option",
+    "async_result",
     "do",
     "forward",
     "forward_result",

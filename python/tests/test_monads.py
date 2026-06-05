@@ -2,7 +2,24 @@ from __future__ import annotations
 
 import pytest
 
-from aikernel import Either, Failure, Left, Nothing, Option, Result, Right, Some, Success, Try, do
+import asyncio
+
+from aikernel import (
+    Either,
+    Failure,
+    Left,
+    Nothing,
+    Option,
+    Result,
+    Right,
+    Some,
+    Success,
+    Try,
+    async_either,
+    async_option,
+    async_result,
+    do,
+)
 
 
 def test_result_map_bind_success_path() -> None:
@@ -56,6 +73,35 @@ def test_result_csharp_linq_aliases_are_available() -> None:
 
     assert result.is_ok
     assert result.Match(lambda value: value, lambda _: 0) == 9
+
+
+def test_async_result_linq_aliases_compose_and_capture_exceptions() -> None:
+    observed: list[int] = []
+
+    async def start():
+        return Success(2, metadata={"step": "start"})
+
+    async def next_value(value: int):
+        return Success(value * 2, metadata={"step2": "next"})
+
+    async def observe(value: int) -> None:
+        observed.append(value)
+
+    result = _run_async(
+        async_result(start())
+        .Select(lambda value: value + 1)
+        .SelectMany(next_value, lambda left, right: left + right)
+        .Tap(observe)
+        .Where(lambda value: value == 9)
+    )
+    exception = _run_async(async_result(Success(1)).Tap(lambda _: int("not-an-int")))
+
+    assert result.is_ok
+    assert result.unwrap() == 9
+    assert result.metadata == {"step": "start", "step2": "next"}
+    assert observed == [9]
+    assert exception.is_err
+    assert isinstance(exception.error, ValueError)
 
 
 def test_result_bind_short_circuits_failure() -> None:
@@ -144,6 +190,31 @@ def test_option_csharp_linq_aliases_are_available() -> None:
     assert option.Match(lambda value: value, lambda: 0) == 9
 
 
+def test_async_option_linq_aliases_compose_and_propagate_exceptions() -> None:
+    observed: list[int] = []
+
+    async def start():
+        return Some(2)
+
+    async def next_value(value: int):
+        return Some(value * 2)
+
+    option = _run_async(
+        async_option(start())
+        .Select(lambda value: value + 1)
+        .SelectMany(next_value, lambda left, right: left + right)
+        .Tap(lambda value: observed.append(value))
+        .Where(lambda value: value == 9)
+    )
+
+    assert option.is_some
+    assert option.unwrap() == 9
+    assert observed == [9]
+
+    with pytest.raises(ValueError):
+        _run_async(async_option(Some(1)).Tap(lambda _: int("not-an-int")))
+
+
 def test_option_bind_short_circuits_none() -> None:
     called = False
 
@@ -200,6 +271,31 @@ def test_either_csharp_linq_aliases_are_available() -> None:
 
     assert either.is_right
     assert either.Match(lambda _: 0, lambda value: value) == 9
+
+
+def test_async_either_linq_aliases_compose_and_propagate_exceptions() -> None:
+    observed: list[int] = []
+
+    async def start():
+        return Right(2)
+
+    async def next_value(value: int):
+        return Right(value * 2)
+
+    either = _run_async(
+        async_either(start())
+        .Select(lambda value: value + 1)
+        .SelectMany(next_value, lambda left, right: left + right)
+        .Tap(lambda value: observed.append(value))
+        .Where(lambda value: value == 9, lambda: "blocked")
+    )
+
+    assert either.is_right
+    assert either.unwrap() == 9
+    assert observed == [9]
+
+    with pytest.raises(ValueError):
+        _run_async(async_either(Right(1)).Tap(lambda _: int("not-an-int")))
 
 
 def test_either_bind_short_circuits_left() -> None:
@@ -362,3 +458,10 @@ def test_do_either_propagates_exceptions() -> None:
 
     with pytest.raises(ValueError, match="boom"):
         pipeline()
+
+
+def _run_async(awaitable):
+    async def runner():
+        return await awaitable
+
+    return asyncio.run(runner())

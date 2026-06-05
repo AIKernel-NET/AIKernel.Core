@@ -15,7 +15,8 @@ public static class ModelProviderHostingExtensions
 
         var validated = ValidateCapability(capability);
 
-        builder.Services.AddSingleton<IModelProvider, TProvider>();
+        builder.Services.AddSingleton<TProvider>();
+        AddProviderAliases<TProvider>(builder.Services);
         builder.Services.AddSingleton(validated);
 
         return builder;
@@ -29,7 +30,8 @@ public static class ModelProviderHostingExtensions
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(capabilityFactory);
 
-        builder.Services.AddSingleton<IModelProvider, TProvider>();
+        builder.Services.AddSingleton<TProvider>();
+        AddProviderAliases<TProvider>(builder.Services);
         builder.Services.AddSingleton(serviceProvider =>
             ValidateCapability(capabilityFactory(serviceProvider)));
 
@@ -48,7 +50,8 @@ public static class ModelProviderHostingExtensions
             .Select(ValidateCapability)
             .ToArray();
 
-        builder.Services.AddSingleton<IModelProvider, TProvider>();
+        builder.Services.AddSingleton<TProvider>();
+        AddProviderAliases<TProvider>(builder.Services);
         foreach (var capability in snapshot)
         {
             builder.Services.AddSingleton(capability);
@@ -68,7 +71,8 @@ public static class ModelProviderHostingExtensions
 
         var validated = ValidateCapability(capability);
 
-        builder.Services.AddSingleton<IModelProvider>(providerFactory);
+        builder.Services.AddSingleton<TProvider>(providerFactory);
+        AddProviderAliases<TProvider>(builder.Services);
         builder.Services.AddSingleton(validated);
 
         return builder;
@@ -84,7 +88,8 @@ public static class ModelProviderHostingExtensions
         ArgumentNullException.ThrowIfNull(providerFactory);
         ArgumentNullException.ThrowIfNull(capabilityFactory);
 
-        builder.Services.AddSingleton<IModelProvider>(providerFactory);
+        builder.Services.AddSingleton<TProvider>(providerFactory);
+        AddProviderAliases<TProvider>(builder.Services);
         builder.Services.AddSingleton(serviceProvider =>
             ValidateCapability(capabilityFactory(serviceProvider)));
 
@@ -105,7 +110,8 @@ public static class ModelProviderHostingExtensions
             .Select(ValidateCapability)
             .ToArray();
 
-        builder.Services.AddSingleton<IModelProvider>(providerFactory);
+        builder.Services.AddSingleton<TProvider>(providerFactory);
+        AddProviderAliases<TProvider>(builder.Services);
         foreach (var capability in snapshot)
         {
             builder.Services.AddSingleton(capability);
@@ -134,5 +140,24 @@ public static class ModelProviderHostingExtensions
         }
 
         return capability;
+    }
+
+    private static void AddProviderAliases<TProvider>(IServiceCollection services)
+        where TProvider : class, IModelProvider
+    {
+        services.AddSingleton<IModelProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<TProvider>());
+        services.AddSingleton<IProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<TProvider>());
+        services.AddSingleton<IProviderIdentity>(
+            serviceProvider => serviceProvider.GetRequiredService<TProvider>());
+        services.AddSingleton<IProviderCapabilitySource>(
+            serviceProvider => serviceProvider.GetRequiredService<TProvider>());
+        services.AddSingleton<IProviderAvailabilityProbe>(
+            serviceProvider => serviceProvider.GetRequiredService<TProvider>());
+        services.AddSingleton<IProviderLifecycle>(
+            serviceProvider => serviceProvider.GetRequiredService<TProvider>());
+        services.AddSingleton<IProviderHealthProbe>(
+            serviceProvider => serviceProvider.GetRequiredService<TProvider>());
     }
 }

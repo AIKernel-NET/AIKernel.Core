@@ -2,6 +2,7 @@ namespace AIKernel.Core.Routing;
 
 using System.Collections.Concurrent;
 using AIKernel.Abstractions.Routing;
+using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Routing;
 using AIKernel.Dtos.Rules;
 
@@ -9,6 +10,23 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
 {
     private readonly ConcurrentDictionary<string, ModelCapacityVector> _capabilities =
         new(StringComparer.Ordinal);
+
+    public InMemoryCapabilityRegistry()
+    {
+    }
+
+    public InMemoryCapabilityRegistry(IEnumerable<ModelPromptCapability> capabilities)
+    {
+        ArgumentNullException.ThrowIfNull(capabilities);
+
+        foreach (var capability in capabilities)
+        {
+            RegisterCapabilityAsync(
+                capability.ProviderId,
+                CreateCapacityVector(capability),
+                CancellationToken.None).GetAwaiter().GetResult();
+        }
+    }
 
     public ValueTask RegisterCapabilityAsync(
         string providerId,
@@ -59,5 +77,20 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
     private static string NormalizeProviderId(string providerId)
     {
         return providerId.Trim();
+    }
+
+    private static ModelCapacityVector CreateCapacityVector(ModelPromptCapability capability)
+    {
+        ArgumentNullException.ThrowIfNull(capability);
+
+        var tokenCapacity = Math.Max(1, capability.MaxInputTokens + capability.MaxOutputTokens);
+        var latencyScore = 1f / tokenCapacity;
+
+        return new ModelCapacityVector(
+            structuralIntegrity: 1,
+            linguisticFluidity: 1,
+            reasoningDepth: 1,
+            fidelity: 1,
+            latencyPerformance: latencyScore);
     }
 }

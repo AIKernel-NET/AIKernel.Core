@@ -23,11 +23,23 @@ public sealed class InMemoryProviderRegistryTests
     }
 
     [Fact]
+    public void Constructor_LoadsProviderSnapshot()
+    {
+        var registry = new InMemoryProviderRegistry(
+        [
+            new TestProvider("provider-z"),
+            new TestProvider("provider-a")
+        ]);
+
+        Assert.Equal(["provider-a", "provider-z"], registry.GetRegisteredProviders());
+    }
+
+    [Fact]
     public void RegisterProvider_ReplacesExistingProvider()
     {
         var registry = new InMemoryProviderRegistry();
-        var first = new TestProvider();
-        var second = new TestProvider();
+        var first = new TestProvider("provider");
+        var second = new TestProvider("provider");
 
         registry.RegisterProvider("provider", first);
         registry.RegisterProvider("provider", second);
@@ -44,9 +56,9 @@ public sealed class InMemoryProviderRegistryTests
         Assert.False(registry.UnregisterProvider(" "));
     }
 
-    private sealed class TestProvider : IProvider
+    private sealed class TestProvider(string providerId = "test-provider") : IProvider
     {
-        public string ProviderId => "test-provider";
+        public string ProviderId => providerId;
 
         public string Name => "Test Provider";
 

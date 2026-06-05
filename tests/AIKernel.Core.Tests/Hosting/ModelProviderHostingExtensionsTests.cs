@@ -4,6 +4,7 @@ using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Models;
 using AIKernel.Abstractions.Providers;
+using AIKernel.Abstractions.Routing;
 using AIKernel.Core.Context;
 using AIKernel.Core.Execution;
 using AIKernel.Dtos.Core;
@@ -38,6 +39,12 @@ public sealed class ModelProviderHostingExtensionsTests
 
         Assert.Equal("external-capability", capability.ProviderId);
         Assert.Equal("rh-prime-phase", capability.ModelId);
+        Assert.Same(
+            modelProvider,
+            provider.GetRequiredService<IProvider>());
+        Assert.Contains(
+            "external-capability",
+            provider.GetRequiredService<IProviderRegistry>().GetRegisteredProviders());
     }
 
     [Fact]
@@ -62,6 +69,9 @@ public sealed class ModelProviderHostingExtensionsTests
 
         Assert.Equal("tools-process-adapter", capability.ProviderId);
         Assert.Equal("tools-cli", capability.ModelId);
+        Assert.Contains(
+            "tools-process-adapter",
+            provider.GetRequiredService<IProviderRegistry>().GetRegisteredProviders());
     }
 
     [Fact]
@@ -93,6 +103,33 @@ public sealed class ModelProviderHostingExtensionsTests
 
         Assert.Equal("rh-prime-phase", primePhase.ModelId);
         Assert.Equal("rh-interference-energy", interferenceEnergy.ModelId);
+    }
+
+    [Fact]
+    public async Task WithModelProvider_RegistersCapabilityRegistrySnapshot()
+    {
+        var services = new ServiceCollection();
+
+        services
+            .AddAIKernelCore()
+            .WithModelProvider<ExternalCapabilityProvider>(
+                CreateCapability("external-capability", "rh-prime-phase"));
+
+        using var provider = services.BuildServiceProvider();
+
+        var registry = provider.GetRequiredService<ICapabilityRegistry>();
+        var capacity = await registry.GetCapabilityAsync(
+            "external-capability",
+            TestContext.Current.CancellationToken);
+        var candidates = await registry.ResolveCandidatesAsync(
+            new AIKernel.Dtos.Rules.RuleEvaluationContext(
+                "context",
+                "routing",
+                new Dictionary<string, string>()),
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(capacity);
+        Assert.Equal(["external-capability"], candidates);
     }
 
     [Fact]

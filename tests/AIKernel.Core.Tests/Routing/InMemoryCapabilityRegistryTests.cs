@@ -29,6 +29,22 @@ public sealed class InMemoryCapabilityRegistryTests
     }
 
     [Fact]
+    public async Task Constructor_LoadsCapabilitySnapshot()
+    {
+        var registry = new InMemoryCapabilityRegistry(
+        [
+            CreateCapability("provider-z"),
+            CreateCapability("provider-a")
+        ]);
+
+        var candidates = await registry.ResolveCandidatesAsync(
+            new RuleEvaluationContext("context", "phase", new Dictionary<string, string>()),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(["provider-a", "provider-z"], candidates);
+    }
+
+    [Fact]
     public async Task GetCapabilityAsync_ReturnsRegisteredVector()
     {
         var registry = new InMemoryCapabilityRegistry();
@@ -66,5 +82,19 @@ public sealed class InMemoryCapabilityRegistryTests
             reasoningDepth: 1,
             fidelity: 1,
             latencyPerformance: 1);
+    }
+
+    private static AIKernel.Dtos.Execution.ModelPromptCapability CreateCapability(
+        string providerId)
+    {
+        return new AIKernel.Dtos.Execution.ModelPromptCapability
+        {
+            ProviderId = providerId,
+            ModelId = "model",
+            MaxInputTokens = 10,
+            MaxOutputTokens = 10,
+            SupportedRoles = ["user"],
+            SystemInstructionRole = "user"
+        };
     }
 }

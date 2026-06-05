@@ -8,6 +8,20 @@ public sealed class InMemoryProviderRegistry : IProviderRegistry
     private readonly ConcurrentDictionary<string, IProvider> _providers =
         new(StringComparer.Ordinal);
 
+    public InMemoryProviderRegistry()
+    {
+    }
+
+    public InMemoryProviderRegistry(IEnumerable<IProvider> providers)
+    {
+        ArgumentNullException.ThrowIfNull(providers);
+
+        foreach (var provider in providers)
+        {
+            RegisterProvider(provider.ProviderId, provider);
+        }
+    }
+
     public void RegisterProvider(string name, IProvider provider)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);

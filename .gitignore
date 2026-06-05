@@ -51,6 +51,9 @@ CodeCoverage/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
+# Native CMake build trees
+**/Native/build/
+
 # NUnit
 *.VisualState.xml
 TestResult.xml

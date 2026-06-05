@@ -75,6 +75,9 @@ tests/
   AIKernel.TestKit
   AIKernel.Core.Tests
   AIKernel.IntegrationTests
+
+python/
+  AIKernel.Python
 ```
 
 ### `src/` — Runtime Implementation
@@ -149,6 +152,16 @@ Unit tests for internal runtime logic.
 
 Integration tests that pass through multiple runtime layers.
 
+### `python/` — Language Binding
+
+#### `AIKernel.Python`
+
+A thin Python binding for the AIKernel Native ABI capability bridge.
+
+It is installed directly from GitHub and wraps the existing C ABI with `ctypes`.
+The Python package does not reimplement OS-specific memory mapping, Kernel
+internals, or Capability internals.
+
 ---
 
 ## Quick Start
@@ -173,6 +186,13 @@ For the optional LibTorch 2.12.0 / CUDA 13.0 Native ABI reference capability:
 
 ```bash
 dotnet add package AIKernel.Cuda.Libtorch.2.12-cuda13.0 --version 0.0.5
+```
+
+For the optional Python language binding, install from the repository
+subdirectory:
+
+```bash
+pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
 The v0.0.5 package family is aligned with the AIKernel.NET contract packages

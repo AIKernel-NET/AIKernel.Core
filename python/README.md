@@ -31,6 +31,12 @@ AIKernel assemblies under `aikernel/managed`:
 - `AIKernel.Core.dll`
 - `AIKernel.Kernel.dll`
 - `AIKernel.Cuda.Libtorch.Cuda13.dll`
+- `AIKernel.Abstractions.dll`
+- `AIKernel.Dtos.dll`
+- `AIKernel.Enums.dll`
+
+The publish output also carries required transitive runtime DLLs such as
+`Microsoft.Extensions.*` and `YamlDotNet`.
 
 Python exposes only discovery helpers for these assemblies. It does not
 reimplement Kernel internals, `Win32MemoryMapper`, `PosixMemoryMapper`,

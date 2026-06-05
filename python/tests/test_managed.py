@@ -11,10 +11,13 @@ def test_managed_assembly_manifest_is_stable() -> None:
 
     assert assemblies.root.name == "managed"
     assert tuple(path.name for path in assemblies.assemblies) == (
+        "AIKernel.Abstractions.dll",
         "AIKernel.Common.dll",
         "AIKernel.Core.dll",
         "AIKernel.Kernel.dll",
         "AIKernel.Cuda.Libtorch.Cuda13.dll",
+        "AIKernel.Dtos.dll",
+        "AIKernel.Enums.dll",
     )
 
 

@@ -5,10 +5,13 @@ from pathlib import Path
 
 
 _MANAGED_ASSEMBLIES = (
+    "AIKernel.Abstractions.dll",
     "AIKernel.Common.dll",
     "AIKernel.Core.dll",
     "AIKernel.Kernel.dll",
     "AIKernel.Cuda.Libtorch.Cuda13.dll",
+    "AIKernel.Dtos.dll",
+    "AIKernel.Enums.dll",
 )
 
 

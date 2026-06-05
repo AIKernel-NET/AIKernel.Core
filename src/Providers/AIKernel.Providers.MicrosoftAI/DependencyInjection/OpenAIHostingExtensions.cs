@@ -91,7 +91,27 @@ public static class OpenAIHostingExtensions
         });
 
         services.AddSingleton(CreateModelPromptCapability);
-        services.AddSingleton<IModelProvider, OpenAICompatibleProvider>();
+        services.AddSingleton<OpenAICompatibleProvider>();
+        services.AddSingleton<IModelProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<OpenAICompatibleProvider>());
+        services.AddSingleton<IProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<OpenAICompatibleProvider>());
+        services.AddSingleton<IProviderIdentity>(
+            serviceProvider => serviceProvider.GetRequiredService<OpenAICompatibleProvider>());
+        services.AddSingleton<IProviderCapabilitySource>(
+            serviceProvider => serviceProvider.GetRequiredService<OpenAICompatibleProvider>());
+        services.AddSingleton<IProviderAvailabilityProbe>(
+            serviceProvider => serviceProvider.GetRequiredService<OpenAICompatibleProvider>());
+        services.AddSingleton<IProviderLifecycle>(
+            serviceProvider => serviceProvider.GetRequiredService<OpenAICompatibleProvider>());
+        services.AddSingleton<IProviderHealthProbe>(
+            serviceProvider => serviceProvider.GetRequiredService<OpenAICompatibleProvider>());
+        services.AddSingleton<ITextGenerationProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<OpenAICompatibleProvider>());
+        services.AddSingleton<IStreamingGenerationProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<OpenAICompatibleProvider>());
+        services.AddSingleton<IQuestionAnsweringProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<OpenAICompatibleProvider>());
     }
 
     private static ModelPromptCapability CreateModelPromptCapability(

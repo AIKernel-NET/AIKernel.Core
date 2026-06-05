@@ -352,6 +352,59 @@ public sealed class OpenAIHostingExtensionsTests
     }
 
     [Fact]
+    public void WithOpenAI_RegistersProviderCapabilityInterfaces()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["AIKernel:Providers:OpenAI:ModelId"] = "gpt-demo",
+                    ["AIKernel:Providers:OpenAI:ApiKey"] = "sk-direct-123456"
+                })
+            .Build();
+
+        var services = new ServiceCollection();
+
+        services
+            .AddAIKernelCore()
+            .WithOpenAI(
+                configuration.GetSection("AIKernel:Providers:OpenAI"),
+                (_, _) => new StubChatClient("ok"));
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        var modelProvider = provider.GetRequiredService<IModelProvider>();
+
+        Assert.Same(
+            modelProvider,
+            provider.GetRequiredService<IProvider>());
+        Assert.Same(
+            modelProvider,
+            provider.GetRequiredService<IProviderIdentity>());
+        Assert.Same(
+            modelProvider,
+            provider.GetRequiredService<IProviderCapabilitySource>());
+        Assert.Same(
+            modelProvider,
+            provider.GetRequiredService<IProviderAvailabilityProbe>());
+        Assert.Same(
+            modelProvider,
+            provider.GetRequiredService<IProviderLifecycle>());
+        Assert.Same(
+            modelProvider,
+            provider.GetRequiredService<IProviderHealthProbe>());
+        Assert.Same(
+            modelProvider,
+            provider.GetRequiredService<ITextGenerationProvider>());
+        Assert.Same(
+            modelProvider,
+            provider.GetRequiredService<IStreamingGenerationProvider>());
+        Assert.Same(
+            modelProvider,
+            provider.GetRequiredService<IQuestionAnsweringProvider>());
+    }
+
+    [Fact]
     public async Task WithOpenAI_RegistersDefaultProviderCapabilities()
     {
         var configuration = new ConfigurationBuilder()

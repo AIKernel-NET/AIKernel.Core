@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+from .monads import Result, Try
+
 
 class AIKernelNativeError(RuntimeError):
     """Raised when the AIKernel Native ABI returns a fail-closed status."""
@@ -45,6 +47,10 @@ def load_model(path: str | os.PathLike[str]) -> int:
     return int(handle)
 
 
+def load_model_result(path: str | os.PathLike[str]) -> Result[int]:
+    return Try(lambda: load_model(path))
+
+
 def unload_model(handle: int) -> None:
     global _active_handle
 
@@ -56,6 +62,10 @@ def unload_model(handle: int) -> None:
 
     if _active_handle == parsed_handle:
         _active_handle = None
+
+
+def unload_model_result(handle: int) -> Result[None]:
+    return Try(lambda: unload_model(handle))
 
 
 def forward(
@@ -91,6 +101,14 @@ def forward(
         output_token_ids=tuple(int(result.output_token_ids[i]) for i in range(output_count)),
         logits=tuple(float(result.logits[i]) for i in range(logit_count)),
     )
+
+
+def forward_result(
+    input_ids: Iterable[int],
+    *,
+    handle: int | None = None,
+) -> Result[ForwardResult]:
+    return Try(lambda: forward(input_ids, handle=handle))
 
 
 def _native() -> ctypes.CDLL:

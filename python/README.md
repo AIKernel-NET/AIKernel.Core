@@ -47,5 +47,42 @@ The wrapper is intentionally thin:
 - `load_model(path) -> int`
 - `forward(input_ids, handle=None) -> ForwardResult`
 - `unload_model(handle) -> None`
+- `load_model_result(path) -> Result[int]`
+- `forward_result(input_ids, handle=None) -> Result[ForwardResult]`
+- `unload_model_result(handle) -> Result[None]`
 
 MemoryRegion / MemoryMapper internals are not exposed to Python.
+
+## Monad Syntax
+
+`AIKernel.Python` includes lightweight `Result`, `Option`, and `Try` helpers so
+Python user-land pipelines can mirror the C# `AIKernel.Common` monad style
+without copying Kernel or Capability internals.
+
+Method-chain style:
+
+```python
+from aikernel import Try
+
+result = (
+    Try(lambda: load_history())
+    .bind(lambda history: Try(lambda: parse_json(history)))
+    .bind(lambda document: Try(lambda: validate(document)))
+)
+```
+
+Decorator-based do notation:
+
+```python
+import aikernel
+from aikernel import Result, Try, do
+
+@do(Result)
+def pipeline():
+    handle = yield Try(lambda: aikernel.load_model("model.pt"))
+    output = yield aikernel.forward_result([1, 2, 3], handle=handle)
+    return output
+```
+
+`Result` captures exceptions as failures. `Option` is a pure short-circuit
+container and propagates exceptions normally.

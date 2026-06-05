@@ -1,0 +1,194 @@
+from __future__ import annotations
+
+from collections.abc import Callable, Generator
+from dataclasses import dataclass
+from functools import wraps
+from typing import Generic, TypeVar
+
+
+T = TypeVar("T")
+U = TypeVar("U")
+
+
+class Result(Generic[T]):
+    __slots__ = ("_error", "_is_ok", "_value")
+
+    def __init__(self, is_ok: bool, value: T | None = None, error: object | None = None) -> None:
+        self._is_ok = is_ok
+        self._value = value
+        self._error = error
+
+    @classmethod
+    def success(cls, value: T) -> Result[T]:
+        return cls(True, value=value)
+
+    @classmethod
+    def failure(cls, error: object) -> Result[T]:
+        return cls(False, error=error)
+
+    @property
+    def is_ok(self) -> bool:
+        return self._is_ok
+
+    @property
+    def is_err(self) -> bool:
+        return not self._is_ok
+
+    @property
+    def error(self) -> object | None:
+        return self._error
+
+    def map(self, func: Callable[[T], U]) -> Result[U]:
+        return self.bind(lambda value: Success(func(value)))
+
+    def bind(self, func: Callable[[T], Result[U]]) -> Result[U]:
+        if self.is_err:
+            return Failure(self._error)
+
+        try:
+            next_result = func(self._value)  # type: ignore[arg-type]
+        except Exception as ex:  # noqa: BLE001 - Result intentionally captures exceptions.
+            return Failure(ex)
+
+        if not isinstance(next_result, Result):
+            return Failure(TypeError("Result.bind callback must return Result."))
+
+        return next_result
+
+    def unwrap(self) -> T:
+        if self.is_ok:
+            return self._value  # type: ignore[return-value]
+
+        if isinstance(self._error, BaseException):
+            raise self._error
+
+        raise RuntimeError(str(self._error))
+
+
+class Option(Generic[T]):
+    __slots__ = ("_is_some", "_value")
+
+    def __init__(self, is_some: bool, value: T | None = None) -> None:
+        self._is_some = is_some
+        self._value = value
+
+    @classmethod
+    def some(cls, value: T) -> Option[T]:
+        return cls(True, value=value)
+
+    @classmethod
+    def none(cls) -> Option[T]:
+        return cls(False)
+
+    @property
+    def is_some(self) -> bool:
+        return self._is_some
+
+    @property
+    def is_none(self) -> bool:
+        return not self._is_some
+
+    def map(self, func: Callable[[T], U]) -> Option[U]:
+        return self.bind(lambda value: Some(func(value)))
+
+    def bind(self, func: Callable[[T], Option[U]]) -> Option[U]:
+        if self.is_none:
+            return Nothing()
+
+        next_option = func(self._value)  # type: ignore[arg-type]
+        if not isinstance(next_option, Option):
+            raise TypeError("Option.bind callback must return Option.")
+
+        return next_option
+
+    def unwrap(self) -> T:
+        if self.is_some:
+            return self._value  # type: ignore[return-value]
+
+        raise ValueError("Cannot unwrap None option.")
+
+
+@dataclass(frozen=True)
+class _DoState:
+    kind: type[Result] | type[Option]
+
+
+def Success(value: T) -> Result[T]:
+    return Result.success(value)
+
+
+def Failure(error: object) -> Result[T]:
+    return Result.failure(error)
+
+
+def Some(value: T) -> Option[T]:
+    return Option.some(value)
+
+
+def Nothing() -> Option[T]:
+    return Option.none()
+
+
+def Try(thunk: Callable[[], T]) -> Result[T]:
+    try:
+        return Success(thunk())
+    except Exception as ex:  # noqa: BLE001 - Try converts exceptions to Failure.
+        return Failure(ex)
+
+
+def do(monad_type: type[Result] | type[Option]):
+    if monad_type not in (Result, Option):
+        raise TypeError("do currently supports Result and Option.")
+
+    state = _DoState(kind=monad_type)
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                yielded = func(*args, **kwargs)
+                if not isinstance(yielded, Generator):
+                    return _pure(state, yielded)
+
+                current = None
+                while True:
+                    try:
+                        monad = yielded.send(current)
+                    except StopIteration as stop:
+                        return _pure(state, stop.value)
+
+                    short = _short_circuit(state, monad)
+                    if short is not None:
+                        return short
+
+                    current = monad.unwrap()
+            except Exception as ex:  # noqa: BLE001 - Result do notation is fail-closed.
+                if state.kind is Result:
+                    return Failure(ex)
+                raise
+
+        return wrapper
+
+    return decorator
+
+
+def _pure(state: _DoState, value):
+    if state.kind is Result:
+        return Success(value)
+
+    return Some(value)
+
+
+def _short_circuit(state: _DoState, monad):
+    if state.kind is Result:
+        if not isinstance(monad, Result):
+            return Failure(TypeError("Result do blocks must yield Result."))
+        if monad.is_err:
+            return monad
+        return None
+
+    if not isinstance(monad, Option):
+        raise TypeError("Option do blocks must yield Option.")
+    if monad.is_none:
+        return monad
+    return None

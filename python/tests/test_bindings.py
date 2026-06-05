@@ -11,6 +11,9 @@ from aikernel import bindings
 
 def test_package_exports_version() -> None:
     assert aikernel.__version__ == "0.0.5"
+    assert "Result" in aikernel.__all__
+    assert "Try" in aikernel.__all__
+    assert "load_model_result" in aikernel.__all__
 
 
 def test_forward_rejects_empty_input_ids(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -25,6 +28,15 @@ def test_forward_requires_active_handle(monkeypatch: pytest.MonkeyPatch) -> None
 
     with pytest.raises(ValueError, match="No active model handle"):
         bindings.forward([1, 2, 3])
+
+
+def test_forward_result_wraps_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(bindings, "_active_handle", None)
+
+    result = bindings.forward_result([1, 2, 3])
+
+    assert result.is_err
+    assert isinstance(result.error, ValueError)
 
 
 def test_load_model_skips_when_native_bridge_missing(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -55,6 +67,7 @@ def test_active_handle_is_used_by_forward_and_cleared_on_unload(
 
     handle = bindings.load_model("model.pt")
     result = bindings.forward([10, 20])
+    result_wrapped = bindings.forward_result([10, 20])
     bindings.unload_model(handle)
 
     assert handle == 7
@@ -63,6 +76,21 @@ def test_active_handle_is_used_by_forward_and_cleared_on_unload(
     assert native.forward_length == 2
     assert result.output_token_ids == (42,)
     assert result.logits == (0.25, 0.75)
+    assert result_wrapped.is_ok
+    assert result_wrapped.unwrap().output_token_ids == (42,)
+    assert bindings._active_handle is None
+
+
+def test_load_and_unload_result_wrappers(monkeypatch: pytest.MonkeyPatch) -> None:
+    native = _FakeNative()
+    monkeypatch.setattr(bindings, "_native", lambda: native)
+    monkeypatch.setattr(bindings, "_active_handle", None)
+
+    loaded = bindings.load_model_result("model.pt")
+    unloaded = bindings.unload_model_result(loaded.unwrap())
+
+    assert loaded.is_ok
+    assert unloaded.is_ok
     assert bindings._active_handle is None
 
 

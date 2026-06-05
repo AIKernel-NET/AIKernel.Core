@@ -15,11 +15,22 @@ PyPI publication is intentionally disabled for the current phase.
 `AIKernel.Python` uses `scikit-build-core` and CMake to build the existing
 `libtorch_bridge` C ABI. The C ABI header is not modified.
 
+The native bridge currently targets Windows/MSVC only. Linux and macOS native
+builds will be added after the native Linux server environment is prepared.
+
 Set `AIKERNEL_LIBTORCH_PATH` to a LibTorch 2.12.0 + CUDA 13.0 distribution before
 installing when the repository-local `ref/` folder is not present.
 
 On Windows, the repository development environment can also read `ref/env.txt`
 for `CUDA_PATH`.
+
+For wrapper-only development or CI tests without LibTorch, disable the native
+build explicitly:
+
+```bash
+pip install -e . --config-settings=cmake.define.AIKERNEL_PYTHON_BUILD_NATIVE=OFF
+pytest
+```
 
 ## API
 

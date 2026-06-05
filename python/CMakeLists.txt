@@ -12,6 +12,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+if(NOT WIN32)
+  message(FATAL_ERROR "AIKernel.Python native bridge currently supports Windows/MSVC only.")
+endif()
+
+if(NOT MSVC)
+  message(FATAL_ERROR "AIKernel.Python native bridge currently requires MSVC.")
+endif()
+
 set(AIKERNEL_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/..")
 set(AIKERNEL_NATIVE_ROOT "${AIKERNEL_REPO_ROOT}/src/AIKernel.Cuda.Libtorch.2.12-cuda13.0/Native")
 
@@ -73,21 +81,14 @@ target_link_libraries(libtorch_bridge PRIVATE
 
 target_compile_definitions(libtorch_bridge PRIVATE AIKERNEL_LIBTORCH_BRIDGE_EXPORTS)
 
-if(MSVC)
-  target_compile_options(libtorch_bridge PRIVATE
-    /W4
-    /permissive-
-    /wd4251
-    /wd4275
-    /wd4267
-    /wd4100
-    /wd4702)
-else()
-  target_compile_options(libtorch_bridge PRIVATE
-    -Wall
-    -Wextra
-    -Wno-unused-parameter)
-endif()
+target_compile_options(libtorch_bridge PRIVATE
+  /W4
+  /permissive-
+  /wd4251
+  /wd4275
+  /wd4267
+  /wd4100
+  /wd4702)
 
 install(TARGETS libtorch_bridge
   RUNTIME DESTINATION aikernel/native

@@ -17,6 +17,8 @@ public sealed class LibTorchCapabilityModuleTests
         Assert.Equal(CapabilityModuleKind.NativeLibrary, descriptor.Kind);
         Assert.Equal(CapabilityInvocationMode.NativeAbi, descriptor.InvocationMode);
         Assert.Equal(["forward", "load_model", "unload_model"], descriptor.ProvidedOperations.Order().ToArray());
+        Assert.Equal("cdecl", descriptor.Metadata["abi.calling_convention"]);
+        Assert.Equal("libtorch_bridge", descriptor.Metadata["abi.library"]);
         Assert.Equal("13.0", descriptor.Metadata["cuda.version"]);
         Assert.Equal("AIKERNEL_LIBTORCH_PATH", descriptor.Metadata["runtime.env"]);
     }

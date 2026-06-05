@@ -6,6 +6,7 @@ Reference AIKernel external Capability module for LibTorch 2.12.0 with CUDA
 This package keeps AIKernel.Core clean. It depends only on the standard
 AIKernel.NET external Capability module contracts and calls a small native C ABI
 bridge by P/Invoke. LibTorch and CUDA types never cross the managed boundary.
+The native bridge uses the Cdecl calling convention.
 
 ## Operations
 

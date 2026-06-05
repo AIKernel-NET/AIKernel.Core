@@ -9,7 +9,7 @@
     <RootNamespace>AIKernel.Cuda.Libtorch.Cuda13</RootNamespace>
     <PackageId>AIKernel.Cuda.Libtorch.2.12-cuda13.0</PackageId>
     <Title>AIKernel.Cuda.Libtorch.2.12-cuda13.0</Title>
-    <Description>Reference Native ABI capability module for LibTorch 2.12.0 with CUDA 13.0. Exposes load_model and forward operations to AIKernel.NET without adding LibTorch or CUDA dependencies to AIKernel.Core.</Description>
+    <Description>Reference Native ABI capability module for LibTorch 2.12.0 with CUDA 13.0. Exposes load_model, unload_model, and forward operations to AIKernel.NET without adding LibTorch or CUDA dependencies to AIKernel.Core.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>aikernel-logo128x128.png</PackageIcon>
   </PropertyGroup>

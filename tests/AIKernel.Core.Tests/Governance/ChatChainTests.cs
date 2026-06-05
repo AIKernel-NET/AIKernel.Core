@@ -50,7 +50,7 @@ public sealed class ChatChainTests
         var canonicalizer = new DefaultChatTurnCanonicalizer();
         var hasher = new Sha256ChatTurnSemanticHasher();
         var signer = new AlgorithmTaggedChatTurnSignatureProvider();
-        var verifier = new ChatTurnChainVerifier(canonicalizer, hasher);
+        var verifier = new ChatTurnChainVerifier(canonicalizer, hasher, signer);
 
         var first = await CreateNodeAsync(
             canonicalizer,
@@ -77,7 +77,7 @@ public sealed class ChatChainTests
         var canonicalizer = new DefaultChatTurnCanonicalizer();
         var hasher = new Sha256ChatTurnSemanticHasher();
         var signer = new AlgorithmTaggedChatTurnSignatureProvider();
-        var verifier = new ChatTurnChainVerifier(canonicalizer, hasher);
+        var verifier = new ChatTurnChainVerifier(canonicalizer, hasher, signer);
         var node = await CreateNodeAsync(
             canonicalizer,
             hasher,
@@ -97,7 +97,7 @@ public sealed class ChatChainTests
         var canonicalizer = new DefaultChatTurnCanonicalizer();
         var hasher = new Sha256ChatTurnSemanticHasher();
         var signer = new AlgorithmTaggedChatTurnSignatureProvider();
-        var verifier = new ChatTurnChainVerifier(canonicalizer, hasher);
+        var verifier = new ChatTurnChainVerifier(canonicalizer, hasher, signer);
         var node = await CreateNodeAsync(
             canonicalizer,
             hasher,
@@ -111,6 +111,31 @@ public sealed class ChatChainTests
 
         Assert.False(result.IsSuccess);
         Assert.Equal("HASH_CHAIN_SIGNATURE_MISSING_ALGORITHM_TAG", result.Error);
+    }
+
+    [Fact]
+    public async Task VerifyNextTurn_FailsClosed_WhenSignatureValueDoesNotMatch()
+    {
+        var canonicalizer = new DefaultChatTurnCanonicalizer();
+        var hasher = new Sha256ChatTurnSemanticHasher();
+        var signer = new AlgorithmTaggedChatTurnSignatureProvider();
+        var verifier = new ChatTurnChainVerifier(canonicalizer, hasher, signer);
+        var node = await CreateNodeAsync(
+            canonicalizer,
+            hasher,
+            signer,
+            new ChatTurn("user", "hello", new DateTime(2026, 6, 5, 1, 0, 0, DateTimeKind.Utc)),
+            string.Empty);
+
+        var result = verifier.VerifyNextTurn(
+            node with
+            {
+                Signature = AlgorithmTaggedChatTurnSignatureProvider.Algorithm + ":tampered"
+            },
+            string.Empty);
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal("HASH_CHAIN_SIGNATURE_MISMATCH", result.Error);
     }
 
     private static async Task<HashChainNode> CreateNodeAsync(

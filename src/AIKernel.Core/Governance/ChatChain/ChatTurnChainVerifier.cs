@@ -4,13 +4,17 @@ using AIKernel.Abstractions.Governance.ChatChain;
 
 public sealed class ChatTurnChainVerifier(
     IChatTurnCanonicalizer canonicalizer,
-    IChatTurnSemanticHasher hasher) : IChatTurnChainVerifier
+    IChatTurnSemanticHasher hasher,
+    IChatTurnSignatureProvider signatureProvider) : IChatTurnChainVerifier
 {
     private readonly IChatTurnCanonicalizer _canonicalizer =
         canonicalizer ?? throw new ArgumentNullException(nameof(canonicalizer));
 
     private readonly IChatTurnSemanticHasher _hasher =
         hasher ?? throw new ArgumentNullException(nameof(hasher));
+
+    private readonly IChatTurnSignatureProvider _signatureProvider =
+        signatureProvider ?? throw new ArgumentNullException(nameof(signatureProvider));
 
     public IChatTurnVerificationResult VerifyChain(IEnumerable<IHashChainNode> turns)
     {
@@ -54,12 +58,28 @@ public sealed class ChatTurnChainVerifier(
             return ChatTurnVerificationResult.Fail("HASH_CHAIN_HASH_MISMATCH");
         }
 
-        if (!IsAlgorithmTagged(nextTurn.Signature))
+        var signature = nextTurn.Signature ?? string.Empty;
+
+        if (!IsAlgorithmTagged(signature))
         {
             return ChatTurnVerificationResult.Fail("HASH_CHAIN_SIGNATURE_MISSING_ALGORITHM_TAG");
         }
 
+        if (!VerifySignature(expectedHash, signature))
+        {
+            return ChatTurnVerificationResult.Fail("HASH_CHAIN_SIGNATURE_MISMATCH");
+        }
+
         return ChatTurnVerificationResult.Success;
+    }
+
+    private bool VerifySignature(string expectedHash, string signature)
+    {
+        return _signatureProvider
+            .VerifyAsync(expectedHash, signature, CancellationToken.None)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
     }
 
     private static bool IsAlgorithmTagged(string? signature)

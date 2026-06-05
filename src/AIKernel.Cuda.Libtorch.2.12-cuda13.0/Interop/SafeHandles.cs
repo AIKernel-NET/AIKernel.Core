@@ -20,6 +20,21 @@ public sealed class SafeLlamaModelHandle : SafeHandleZeroOrMinusOneIsInvalid
 
     protected override bool ReleaseHandle()
     {
-        return NativeMethods.UnloadModel(ModelHandle) == NativeStatus.Success;
+        try
+        {
+            return NativeMethods.UnloadModel(ModelHandle) == NativeStatus.Success;
+        }
+        catch (DllNotFoundException)
+        {
+            return false;
+        }
+        catch (EntryPointNotFoundException)
+        {
+            return false;
+        }
+        catch (BadImageFormatException)
+        {
+            return false;
+        }
     }
 }

@@ -45,6 +45,32 @@ public sealed class LibTorchCapabilityModuleTests
     }
 
     [Fact]
+    public async Task InvokeAsync_ReturnsFailClosedWhenNativeLoadCannotExecute()
+    {
+        var invoker = new LibTorchCapabilityInvoker();
+        var request = new CapabilityInvocationRequest(
+            InvocationId: "invoke-load-missing-native",
+            CapabilityId: LibTorchCapabilityDescriptor.CapabilityId,
+            Operation: "load_model",
+            Arguments: new Dictionary<string, string>
+            {
+                ["path"] = "missing-model.pt"
+            },
+            InputHash: null,
+            ReplayLogHash: "sha256:replay",
+            Metadata: new Dictionary<string, string>());
+
+        var result = await invoker.InvokeAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.Succeeded);
+        Assert.Equal("sha256:replay", result.ReplayLogHash);
+        Assert.Equal("true", result.Metadata["fail_closed"]);
+        Assert.Equal("libtorch_native_abi", result.Metadata["failure_origin"]);
+    }
+
+    [Fact]
     public void TryCreate_ParsesForwardRequestArguments()
     {
         var result = LlamaForwardRequest.TryCreate(

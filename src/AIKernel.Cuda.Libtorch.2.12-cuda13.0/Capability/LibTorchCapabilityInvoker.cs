@@ -1,6 +1,7 @@
 namespace AIKernel.Cuda.Libtorch.Cuda13.Capability;
 
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using AIKernel.Abstractions.Capabilities;
@@ -43,7 +44,16 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
                 "Argument 'path' is required for load_model."));
         }
 
-        var statusOrHandle = NativeMethods.LoadModel(path);
+        int statusOrHandle;
+
+        try
+        {
+            statusOrHandle = NativeMethods.LoadModel(path);
+        }
+        catch (Exception ex) when (IsNativeBoundaryException(ex))
+        {
+            return ValueTask.FromResult(NativeBoundaryFail(request, ex));
+        }
 
         if (statusOrHandle <= 0)
         {
@@ -81,11 +91,20 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
 
         var forwardRequest = parse.Value;
         var nativeResult = new ForwardResultNative();
-        var status = NativeMethods.Forward(
-            forwardRequest.ModelHandle,
-            forwardRequest.InputIds,
-            forwardRequest.InputIds.Length,
-            out nativeResult);
+        int status;
+
+        try
+        {
+            status = NativeMethods.Forward(
+                forwardRequest.ModelHandle,
+                forwardRequest.InputIds,
+                forwardRequest.InputIds.Length,
+                out nativeResult);
+        }
+        catch (Exception ex) when (IsNativeBoundaryException(ex))
+        {
+            return ValueTask.FromResult(NativeBoundaryFail(request, ex));
+        }
 
         if (status != NativeStatus.Success)
         {
@@ -140,6 +159,35 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
             ErrorMessage: errorMessage,
             ReplayLogHash: request.ReplayLogHash,
             Metadata: metadata);
+    }
+
+    private static CapabilityInvocationResult NativeBoundaryFail(
+        CapabilityInvocationRequest request,
+        Exception exception)
+    {
+        var metadata = CreateMetadata(request);
+        metadata["fail_closed"] = "true";
+        metadata["failure_origin"] = "libtorch_native_abi";
+        metadata["native_exception"] = exception.GetType().Name;
+
+        return new CapabilityInvocationResult(
+            request.InvocationId,
+            request.CapabilityId,
+            Succeeded: false,
+            OutputHash: null,
+            ErrorCode: "LIBTORCH_NATIVE_ABI_UNAVAILABLE",
+            ErrorMessage: "LibTorch native ABI invocation failed before execution.",
+            ReplayLogHash: request.ReplayLogHash,
+            Metadata: metadata);
+    }
+
+    private static bool IsNativeBoundaryException(
+        Exception exception)
+    {
+        return exception is DllNotFoundException or
+            EntryPointNotFoundException or
+            BadImageFormatException or
+            SEHException;
     }
 
     private static Dictionary<string, string> CreateMetadata(

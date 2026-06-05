@@ -59,6 +59,21 @@ public sealed class MemoryMapperTests
     }
 
     [Fact]
+    public void AddAIKernelKernel_DoesNotReplaceHostMemoryMapper()
+    {
+        var services = new ServiceCollection();
+        var mapper = new CountingMemoryMapper();
+        services.AddSingleton<IMemoryMapper>(mapper);
+
+        services.AddAIKernelKernel();
+
+        using var provider = services.BuildServiceProvider();
+        var resolved = provider.GetRequiredService<IMemoryMapper>();
+
+        Assert.Same(mapper, resolved);
+    }
+
+    [Fact]
     public void Win32MemoryMapper_MapsAndUnmapsFileOnWindows()
     {
         if (!OperatingSystem.IsWindows())

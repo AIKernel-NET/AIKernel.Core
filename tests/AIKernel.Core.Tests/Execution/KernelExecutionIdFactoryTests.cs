@@ -97,7 +97,7 @@ public sealed class KernelExecutionIdFactoryTests
     }
 
     [Fact]
-    public void CreateExecutionId_Changes_WhenExecutionSequenceChanges()
+    public void CreateExecutionId_IgnoresExecutionSequence_ForSameSemanticState()
     {
         var factory = new KernelExecutionIdFactory();
         var request = CreateExecutionRequest();
@@ -117,6 +117,56 @@ public sealed class KernelExecutionIdFactoryTests
             resultDiscriminator: "output",
             DateTimeOffset.UnixEpoch,
             executionSequence: 2);
+
+        Assert.Equal(first, second);
+    }
+
+    [Fact]
+    public void CreateExecutionId_IgnoresStartedAt_ForSameSemanticState()
+    {
+        var factory = new KernelExecutionIdFactory();
+        var request = CreateExecutionRequest();
+
+        var first = factory.CreateExecutionId(
+            request,
+            ExecutionStatus.Succeeded,
+            promptHash: "sha256:prompt",
+            resultDiscriminator: "output",
+            DateTimeOffset.UnixEpoch,
+            executionSequence: 1);
+
+        var second = factory.CreateExecutionId(
+            request,
+            ExecutionStatus.Succeeded,
+            promptHash: "sha256:prompt",
+            resultDiscriminator: "output",
+            DateTimeOffset.UnixEpoch.AddMinutes(1),
+            executionSequence: 1);
+
+        Assert.Equal(first, second);
+    }
+
+    [Fact]
+    public void CreateExecutionId_Changes_WhenResultDiscriminatorChanges()
+    {
+        var factory = new KernelExecutionIdFactory();
+        var request = CreateExecutionRequest();
+
+        var first = factory.CreateExecutionId(
+            request,
+            ExecutionStatus.Succeeded,
+            promptHash: "sha256:prompt",
+            resultDiscriminator: "output-a",
+            DateTimeOffset.UnixEpoch,
+            executionSequence: 1);
+
+        var second = factory.CreateExecutionId(
+            request,
+            ExecutionStatus.Succeeded,
+            promptHash: "sha256:prompt",
+            resultDiscriminator: "output-b",
+            DateTimeOffset.UnixEpoch,
+            executionSequence: 1);
 
         Assert.NotEqual(first, second);
     }

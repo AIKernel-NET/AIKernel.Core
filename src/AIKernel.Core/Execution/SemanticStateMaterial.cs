@@ -75,9 +75,7 @@ public sealed record SemanticStateMaterial
             request.RequestedModelId ?? string.Empty,
             promptHash,
             status.ToString(),
-            resultDiscriminator,
-            startedAt.Ticks.ToString("D20"),
-            executionSequence.ToString("D16"));
+            resultDiscriminator);
 
         return Result<SemanticStateMaterial>.Success(new SemanticStateMaterial(
             "kernel.execution",

@@ -12,7 +12,6 @@ public sealed class KernelExecutor : IKernelExecutor
     private readonly KernelExecutionPipeline _pipeline;
     private readonly KernelExecutionSuccessResultFactory _successResultFactory = new();
     private readonly KernelExecutionFailureResultFactory _failureResultFactory;
-    private long _executionSequence;
 
     public KernelExecutor(
         IPromptGenerator promptGenerator,
@@ -42,7 +41,7 @@ public sealed class KernelExecutor : IKernelExecutor
         ArgumentNullException.ThrowIfNull(request);
 
         var startedAt = _clock.Now;
-        var executionSequence = Interlocked.Increment(ref _executionSequence);
+        const long executionSequence = 0;
 
         var pipelineResult = await _pipeline.ExecuteAsync(
             provider,

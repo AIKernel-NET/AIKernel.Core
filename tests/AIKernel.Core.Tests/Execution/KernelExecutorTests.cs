@@ -52,6 +52,27 @@ public sealed class KernelExecutorTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_ReturnsSameExecutionId_ForSameSemanticState()
+    {
+        var executor = new KernelExecutor(
+            new FixedPromptGenerator(),
+            new FixedCapabilityResolver(maxOutputTokens: 8),
+            new SimpleTokenizer(),
+            KernelClock.Replay(DateTimeOffset.UnixEpoch));
+
+        var first = await executor.ExecuteAsync(
+            new FakeModelProvider(output: "contract output"),
+            CreateExecutionRequest(),
+            TestContext.Current.CancellationToken);
+        var second = await executor.ExecuteAsync(
+            new FakeModelProvider(output: "contract output"),
+            CreateExecutionRequest(),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(first.ExecutionId, second.ExecutionId);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsFailedResult_WhenContextSnapshotIsMissing()
     {
         var executor = new KernelExecutor(

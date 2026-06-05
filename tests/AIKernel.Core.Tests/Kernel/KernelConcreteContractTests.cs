@@ -169,6 +169,22 @@ public sealed class KernelConcreteContractTests : KernelContractTests
     }
 
     [Fact]
+    public void KernelTransactionIdFactory_ReturnsDeterministicId_ForSameRequest()
+    {
+        var requestHasher = new AIKernel.Kernel.KernelRequestHasher();
+        var factory = new AIKernel.Kernel.KernelTransactionIdFactory(requestHasher);
+        var request = CreateRequest("valid-rom");
+
+        var first = factory.CreateTransactionId(request);
+        var second = factory.CreateTransactionId(request);
+
+        Assert.Equal(first, second);
+        Assert.Equal(
+            $"ktx:{requestHasher.ComputeHash(request)}",
+            first);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_UsesSelectedProviderAndRequestedModel_WhenExecutorResultDiffers()
     {
         var kernel = CreateKernel(new MismatchedIdentityKernelExecutor());

@@ -62,7 +62,7 @@ public sealed class InMemoryProviderRegistryTests
 
         public string Name => "Test Provider";
 
-        public string Version => "0.0.4";
+        public string Version => "0.0.5";
 
         public IProviderCapabilities GetCapabilities()
         {

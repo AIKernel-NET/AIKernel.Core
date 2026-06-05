@@ -10,7 +10,7 @@ public sealed record OpenAICompatibleProviderOptions : ISecureOptions
 
     public string Name { get; init; } = "OpenAI Compatible Provider";
 
-    public string Version { get; init; } = "0.0.4";
+    public string Version { get; init; } = "0.0.5";
 
     public string ModelId { get; init; } = "";
 

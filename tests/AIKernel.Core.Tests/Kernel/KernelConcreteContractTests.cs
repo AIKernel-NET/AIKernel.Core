@@ -587,7 +587,7 @@ public sealed class KernelConcreteContractTests : KernelContractTests
 
         public string Name => "Fake Provider";
 
-        public string Version => "0.0.4";
+        public string Version => "0.0.5";
 
         public IProviderCapabilities GetCapabilities()
         {

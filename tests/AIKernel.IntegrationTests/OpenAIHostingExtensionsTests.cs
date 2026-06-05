@@ -5,6 +5,7 @@ using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
 using AIKernel.Core.ChatHistory;
 using AIKernel.Core.Context;
+using AIKernel.Core.Dsl;
 using AIKernel.Core.Security;
 using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Execution;
@@ -54,6 +55,26 @@ public sealed class OpenAIHostingExtensionsTests
         Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.History.IChatHistoryRomExporter>());
         Assert.NotNull(provider.GetRequiredService<HistoryRomStore>());
         Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.History.IHistoryRomStore>());
+    }
+
+    [Fact]
+    public void AddAIKernelCore_RegistersDslRomServices()
+    {
+        var services = new ServiceCollection();
+
+        services.AddAIKernelCore();
+
+        using var provider = services.BuildServiceProvider();
+
+        Assert.NotNull(provider.GetRequiredService<IDslRomRegistry>());
+        Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Dsl.IDslRomRegistry>());
+        Assert.NotNull(provider.GetRequiredService<IDslCapabilityRegistry>());
+        Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Dsl.IDslCapabilityRegistry>());
+        Assert.NotNull(provider.GetRequiredService<IDslPipelineCompiler>());
+        Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Dsl.IDslPipelineCompiler>());
+        Assert.NotNull(provider.GetRequiredService<DslRomProvider>());
+        Assert.NotNull(provider.GetRequiredService<DslRomStore>());
+        Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Dsl.IDslRomStore>());
     }
 
     [Fact]

@@ -6,6 +6,7 @@ using AIKernel.Abstractions.Rom;
 using AIKernel.Abstractions.Security;
 using AIKernel.Core.ChatHistory;
 using AIKernel.Core.Context;
+using AIKernel.Core.Dsl;
 using AIKernel.Core.Execution;
 using AIKernel.Core.Rom;
 using AIKernel.Core.Security;
@@ -102,6 +103,27 @@ public static class AIKernelCoreHostingExtensions
         services.TryAddSingleton<HistoryRomStore>();
         services.TryAddSingleton<AIKernel.Abstractions.History.IHistoryRomStore>(
             serviceProvider => serviceProvider.GetRequiredService<HistoryRomStore>());
+
+        services.TryAddSingleton<IDslRomRegistry, DslRomRegistry>();
+        services.TryAddSingleton<FailClosedDslCapabilityRegistry>();
+        services.TryAddSingleton<IDslCapabilityRegistry>(
+            serviceProvider => new DslRomCapabilityRegistry(
+                serviceProvider.GetRequiredService<FailClosedDslCapabilityRegistry>(),
+                serviceProvider.GetRequiredService<IDslRomRegistry>()));
+        services.TryAddSingleton<IDslPipelineCompiler, DslPipelineCompiler>();
+        services.TryAddSingleton<DslRomProvider>();
+        services.TryAddSingleton<DslRomStore>();
+        services.TryAddSingleton<AIKernel.Abstractions.Dsl.IDslRomRegistry>(
+            serviceProvider => (AIKernel.Abstractions.Dsl.IDslRomRegistry)
+                serviceProvider.GetRequiredService<IDslRomRegistry>());
+        services.TryAddSingleton<AIKernel.Abstractions.Dsl.IDslCapabilityRegistry>(
+            serviceProvider => (AIKernel.Abstractions.Dsl.IDslCapabilityRegistry)
+                serviceProvider.GetRequiredService<IDslCapabilityRegistry>());
+        services.TryAddSingleton<AIKernel.Abstractions.Dsl.IDslPipelineCompiler>(
+            serviceProvider => (AIKernel.Abstractions.Dsl.IDslPipelineCompiler)
+                serviceProvider.GetRequiredService<IDslPipelineCompiler>());
+        services.TryAddSingleton<AIKernel.Abstractions.Dsl.IDslRomStore>(
+            serviceProvider => serviceProvider.GetRequiredService<DslRomStore>());
 
         services.TryAddSingleton<IContextCollectionFactory, DefaultContextCollectionFactory>();
         services.TryAddSingleton<IContextHashCalculator, DefaultContextHashCalculator>();

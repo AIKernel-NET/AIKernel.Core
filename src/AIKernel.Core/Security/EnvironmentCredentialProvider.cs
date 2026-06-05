@@ -1,9 +1,7 @@
-using AIKernel.Core.Security;
-using AIKernel.Core.Time;
+namespace AIKernel.Core.Security;
 
-#pragma warning disable IDE0130 // Namespace がフォルダー構造と一致しません
-namespace AIKernel.Abstractions.Security;
-#pragma warning restore IDE0130 // Namespace がフォルダー構造と一致しません
+using AIKernel.Abstractions.Security;
+using AIKernel.Core.Time;
 
 public sealed class EnvironmentCredentialProvider(IKernelClock? clock = null) : ISecureCredentialProvider
 {

@@ -38,10 +38,10 @@ JA: AIKernel.NET の Core ランタイムエンジンです。決定論的な Kn
     <PackageReference Include="AIKernel.Abstractions" Version="0.0.4" />
     <PackageReference Include="AIKernel.Dtos" Version="0.0.4" />
     <PackageReference Include="AIKernel.Enums" Version="0.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.7" />
-    <PackageReference Include="YamlDotNet" Version="17.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.8" />
+    <PackageReference Include="YamlDotNet" Version="18.0.0" />
   </ItemGroup>
 
 </Project>

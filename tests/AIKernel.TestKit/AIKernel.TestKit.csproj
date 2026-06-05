@@ -32,7 +32,7 @@ JA: AIKernel.NET 実装向けの Contract Test ツールキットです。Provid
     <PackageReference Include="AIKernel.Abstractions" Version="0.0.4" />
     <PackageReference Include="AIKernel.Dtos" Version="0.0.4" />
     <PackageReference Include="AIKernel.Enums" Version="0.0.4" />
-    <PackageReference Include="YamlDotNet" Version="17.1.0" />
+    <PackageReference Include="YamlDotNet" Version="18.0.0" />
   </ItemGroup>
 
 </Project>

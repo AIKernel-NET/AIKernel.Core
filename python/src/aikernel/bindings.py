@@ -141,6 +141,7 @@ def _native() -> ctypes.CDLL:
         return cached
 
     library_path = _resolve_library_path()
+    _configure_windows_dll_search(library_path)
     native = ctypes.CDLL(str(library_path))
     native.load_model.argtypes = [ctypes.c_char_p]
     native.load_model.restype = ctypes.c_int32
@@ -155,6 +156,51 @@ def _native() -> ctypes.CDLL:
     native.forward.restype = ctypes.c_int32
     setattr(_native, "_cached", native)
     return native
+
+
+def _configure_windows_dll_search(library_path: Path) -> None:
+    if not sys.platform.startswith("win") or not hasattr(os, "add_dll_directory"):
+        return
+
+    handles = getattr(_native, "_dll_directory_handles", [])
+    paths = getattr(_native, "_dll_directory_paths", set())
+
+    for directory in _windows_dll_search_directories(library_path):
+        resolved = str(directory.resolve())
+        if resolved in paths:
+            continue
+        handles.append(os.add_dll_directory(resolved))
+        paths.add(resolved)
+
+    setattr(_native, "_dll_directory_handles", handles)
+    setattr(_native, "_dll_directory_paths", paths)
+
+
+def _windows_dll_search_directories(library_path: Path) -> tuple[Path, ...]:
+    directories = [library_path.parent]
+
+    libtorch_root = os.environ.get("AIKERNEL_LIBTORCH_PATH")
+    if libtorch_root:
+        root = Path(libtorch_root)
+        directories.append(root / "lib" if (root / "lib").exists() else root)
+
+    cuda_root = os.environ.get("CUDA_PATH")
+    if cuda_root:
+        root = Path(cuda_root)
+        directories.append(root / "bin" if (root / "bin").exists() else root)
+
+    unique: list[Path] = []
+    seen: set[str] = set()
+    for directory in directories:
+        if not directory.exists():
+            continue
+        resolved = str(directory.resolve())
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        unique.append(directory)
+
+    return tuple(unique)
 
 
 def _resolve_library_path() -> Path:

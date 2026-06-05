@@ -60,6 +60,55 @@ def test_load_model_uses_explicit_native_bridge_path(monkeypatch: pytest.MonkeyP
     assert resolved == path
 
 
+def test_windows_dll_search_directories_include_native_libtorch_and_cuda(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    native_dir = tmp_path / "native"
+    torch_lib = tmp_path / "libtorch" / "lib"
+    cuda_bin = tmp_path / "cuda" / "bin"
+    native_dir.mkdir()
+    torch_lib.mkdir(parents=True)
+    cuda_bin.mkdir(parents=True)
+
+    monkeypatch.setenv("AIKERNEL_LIBTORCH_PATH", str(torch_lib.parent))
+    monkeypatch.setenv("CUDA_PATH", str(cuda_bin.parent))
+
+    directories = bindings._windows_dll_search_directories(native_dir / "libtorch_bridge.dll")
+
+    assert directories == (native_dir, torch_lib, cuda_bin)
+
+
+def test_windows_dll_search_registration_is_idempotent(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    calls: list[str] = []
+
+    class _DllDirectoryHandle:
+        pass
+
+    def add_dll_directory(path: str):
+        calls.append(path)
+        return _DllDirectoryHandle()
+
+    monkeypatch.setattr(bindings.sys, "platform", "win32")
+    monkeypatch.setattr(bindings.os, "add_dll_directory", add_dll_directory, raising=False)
+    monkeypatch.delattr(bindings._native, "_dll_directory_handles", raising=False)
+    monkeypatch.delattr(bindings._native, "_dll_directory_paths", raising=False)
+    monkeypatch.delenv("AIKERNEL_LIBTORCH_PATH", raising=False)
+    monkeypatch.delenv("CUDA_PATH", raising=False)
+
+    native_dir = tmp_path / "native"
+    native_dir.mkdir()
+    library_path = native_dir / "libtorch_bridge.dll"
+
+    bindings._configure_windows_dll_search(library_path)
+    bindings._configure_windows_dll_search(library_path)
+
+    assert calls == [str(native_dir.resolve())]
+
+
 def test_active_handle_is_used_by_forward_and_cleared_on_unload(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

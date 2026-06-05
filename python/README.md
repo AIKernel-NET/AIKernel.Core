@@ -24,6 +24,11 @@ installing when the repository-local `ref/` folder is not present.
 On Windows, the repository development environment can also read `ref/env.txt`
 for `CUDA_PATH`.
 
+At runtime, the wrapper adds the native bridge directory, `AIKERNEL_LIBTORCH_PATH`
+(`lib` when present), and `CUDA_PATH/bin` to the Windows DLL search path before
+loading the bridge. This keeps dependent LibTorch and CUDA DLL resolution local
+to the package process without copying those runtimes into the Python wrapper.
+
 By default, the package build also runs `dotnet publish` and bundles the managed
 AIKernel assemblies under `aikernel/managed`:
 

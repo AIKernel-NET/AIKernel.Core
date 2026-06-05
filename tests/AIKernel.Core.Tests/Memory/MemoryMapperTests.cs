@@ -22,6 +22,23 @@ public sealed class MemoryMapperTests
     }
 
     [Fact]
+    public void MemoryMapperBase_CatchesOpenCoreExceptionAsFailClosed()
+    {
+        var mapper = new ThrowingMemoryMapper();
+
+        var result = mapper.Open("mapped.bin");
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("MEMORY_MAPPING_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(OriginStep.Capability, result.Error.OriginStep);
+        Assert.Equal(SemanticSlot.B, result.Error.SemanticSlot);
+        Assert.Equal(
+            typeof(InvalidOperationException).FullName,
+            result.Error.Metadata![ResultMetadataKeys.ExceptionType]);
+    }
+
+    [Fact]
     public void AddAIKernelKernel_RegistersOperatingSystemMemoryMapper()
     {
         var services = new ServiceCollection();
@@ -92,5 +109,13 @@ public sealed class MemoryMapperTests
                 "UNEXPECTED",
                 false));
         }
+    }
+
+    private sealed class ThrowingMemoryMapper : MemoryMapperBase
+    {
+        protected override Result<IMemoryRegion> OpenCore(
+            string path,
+            MemoryAccessMode accessMode)
+            => throw new InvalidOperationException("mapper exploded");
     }
 }

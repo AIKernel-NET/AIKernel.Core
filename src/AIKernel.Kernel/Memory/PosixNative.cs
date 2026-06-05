@@ -10,8 +10,9 @@ internal static class PosixNative
     public const int ProtWrite = 0x2;
     public const int MapShared = 0x01;
 
-    [DllImport("libc", EntryPoint = "open", SetLastError = true, CharSet = CharSet.Ansi)]
+    [DllImport("libc", EntryPoint = "open", SetLastError = true)]
     internal static extern int Open(
+        [MarshalAs(UnmanagedType.LPUTF8Str)]
         string path,
         int flags,
         int mode);

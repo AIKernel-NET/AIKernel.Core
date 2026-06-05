@@ -28,6 +28,14 @@ class ManagedAssemblySet:
     def missing(self) -> tuple[str, ...]:
         return tuple(path.name for path in self.assemblies if not path.exists())
 
+    @property
+    def dlls(self) -> tuple[Path, ...]:
+        return tuple(sorted(self.root.glob("*.dll")))
+
+    @property
+    def dependency_manifests(self) -> tuple[Path, ...]:
+        return tuple(sorted(self.root.glob("*.deps.json")))
+
 
 def managed_assemblies() -> ManagedAssemblySet:
     root = Path(__file__).resolve().parent / "managed"

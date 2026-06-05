@@ -30,6 +30,13 @@ def test_require_managed_assemblies_fails_closed_when_not_bundled() -> None:
         managed.require_managed_assemblies()
 
 
+def test_managed_runtime_file_lists_are_safe_when_empty() -> None:
+    assemblies = managed.managed_assemblies()
+
+    assert isinstance(assemblies.dlls, tuple)
+    assert isinstance(assemblies.dependency_manifests, tuple)
+
+
 def test_managed_api_is_exported() -> None:
     assert "managed_assemblies" in aikernel.__all__
     assert "require_managed_assemblies" in aikernel.__all__

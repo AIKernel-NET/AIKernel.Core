@@ -18,10 +18,13 @@ from .managed import (
     runtime_layout,
 )
 from .monads import (
+    Either,
     Failure,
+    Left,
     Nothing,
     Option,
     Result,
+    Right,
     Some,
     Success,
     Try,
@@ -30,13 +33,16 @@ from .monads import (
 
 __all__ = [
     "AIKernelNativeError",
+    "Either",
     "Failure",
     "ForwardResult",
+    "Left",
     "ManagedAssemblySet",
     "Nothing",
     "Option",
     "Result",
     "RuntimeLayout",
+    "Right",
     "Some",
     "Success",
     "Try",

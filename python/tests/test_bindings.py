@@ -11,7 +11,10 @@ from aikernel import bindings
 
 def test_package_exports_version() -> None:
     assert aikernel.__version__ == "0.0.5"
+    assert "Either" in aikernel.__all__
+    assert "Left" in aikernel.__all__
     assert "Result" in aikernel.__all__
+    assert "Right" in aikernel.__all__
     assert "Try" in aikernel.__all__
     assert "load_model_result" in aikernel.__all__
 

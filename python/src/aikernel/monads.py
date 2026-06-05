@@ -8,6 +8,8 @@ from typing import Generic, TypeVar
 
 T = TypeVar("T")
 U = TypeVar("U")
+L = TypeVar("L")
+R = TypeVar("R")
 
 
 class Result(Generic[T]):
@@ -126,6 +128,63 @@ class Option(Generic[T]):
         raise ValueError("Cannot unwrap None option.")
 
 
+class Either(Generic[L, R]):
+    __slots__ = ("_is_right", "_left", "_right")
+
+    def __init__(
+        self,
+        is_right: bool,
+        left: L | None = None,
+        right: R | None = None,
+    ) -> None:
+        self._is_right = is_right
+        self._left = left
+        self._right = right
+
+    @classmethod
+    def right(cls, value: R) -> Either[L, R]:
+        return cls(True, right=value)
+
+    @classmethod
+    def left(cls, value: L) -> Either[L, R]:
+        return cls(False, left=value)
+
+    @property
+    def is_right(self) -> bool:
+        return self._is_right
+
+    @property
+    def is_left(self) -> bool:
+        return not self._is_right
+
+    @property
+    def left_value(self) -> L | None:
+        return self._left
+
+    @property
+    def right_value(self) -> R | None:
+        return self._right
+
+    def map(self, func: Callable[[R], U]) -> Either[L, U]:
+        return self.bind(lambda value: Right(func(value)))
+
+    def bind(self, func: Callable[[R], Either[L, U]]) -> Either[L, U]:
+        if self.is_left:
+            return Left(self._left)  # type: ignore[arg-type]
+
+        next_either = func(self._right)  # type: ignore[arg-type]
+        if not isinstance(next_either, Either):
+            raise TypeError("Either.bind callback must return Either.")
+
+        return next_either
+
+    def unwrap(self) -> R:
+        if self.is_right:
+            return self._right  # type: ignore[return-value]
+
+        raise ValueError(f"Cannot unwrap Left either: {self._left}")
+
+
 @dataclass(frozen=True)
 class _DoState:
     kind: type[Result] | type[Option]
@@ -145,6 +204,14 @@ def Some(value: T) -> Option[T]:
 
 def Nothing() -> Option[T]:
     return Option.none()
+
+
+def Right(value: R) -> Either[L, R]:
+    return Either.right(value)
+
+
+def Left(value: L) -> Either[L, R]:
+    return Either.left(value)
 
 
 class _Try:

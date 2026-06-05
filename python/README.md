@@ -118,9 +118,9 @@ KernelContext or OS-specific mapper internals.
 
 ## Monad Syntax
 
-`AIKernel.Python` includes lightweight `Result`, `Option`, and `Try` helpers so
-Python user-land pipelines can mirror the C# `AIKernel.Common` monad style
-without copying Kernel or Capability internals.
+`AIKernel.Python` includes lightweight `Result`, `Option`, `Either`, and `Try`
+helpers so Python user-land pipelines can mirror the C# `AIKernel.Common`
+monad style without copying Kernel or Capability internals.
 
 Method-chain style:
 
@@ -150,7 +150,9 @@ def pipeline():
 ```
 
 `Result` captures exceptions as failures. `Option` is a pure short-circuit
-container and propagates exceptions normally.
+container and propagates exceptions normally. `Either` is also pure:
+`Right(value)` flows through `bind` / `map`, while `Left(value)` short-circuits
+without capturing exceptions.
 
 Native wrapper result APIs attach capability lifecycle feedback to
 `Result.metadata`. With the current stable C ABI, asynchronous page-in,

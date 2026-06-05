@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from aikernel import Failure, Nothing, Option, Result, Some, Success, Try, do
+from aikernel import Failure, Left, Nothing, Option, Result, Right, Some, Success, Try, do
 
 
 def test_result_map_bind_success_path() -> None:
@@ -92,6 +92,43 @@ def test_option_bind_short_circuits_none() -> None:
 def test_option_propagates_exceptions() -> None:
     with pytest.raises(ValueError):
         Some(1).map(lambda _: int("not-an-int"))
+
+
+def test_either_map_bind_success_path() -> None:
+    either = Right(3).map(lambda value: value + 1).bind(lambda value: Right(value * 2))
+
+    assert either.is_right
+    assert either.unwrap() == 8
+
+
+def test_either_bind_short_circuits_left() -> None:
+    called = False
+
+    def binder(value: int):
+        nonlocal called
+        called = True
+        return Right(value)
+
+    either = Left("fail-closed").bind(binder)
+
+    assert either.is_left
+    assert either.left_value == "fail-closed"
+    assert called is False
+
+
+def test_either_propagates_exceptions() -> None:
+    with pytest.raises(ValueError):
+        Right(1).map(lambda _: int("not-an-int"))
+
+
+def test_either_bind_rejects_non_either_return() -> None:
+    with pytest.raises(TypeError, match="Either.bind"):
+        Right(1).bind(lambda _: "not-either")
+
+
+def test_either_unwrap_rejects_left() -> None:
+    with pytest.raises(ValueError, match="Cannot unwrap Left"):
+        Left("stop").unwrap()
 
 
 def test_do_result_success_path() -> None:

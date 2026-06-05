@@ -24,11 +24,25 @@ installing when the repository-local `ref/` folder is not present.
 On Windows, the repository development environment can also read `ref/env.txt`
 for `CUDA_PATH`.
 
+By default, the package build also runs `dotnet publish` and bundles the managed
+AIKernel assemblies under `aikernel/managed`:
+
+- `AIKernel.Common.dll`
+- `AIKernel.Core.dll`
+- `AIKernel.Kernel.dll`
+- `AIKernel.Cuda.Libtorch.Cuda13.dll`
+
+Python exposes only discovery helpers for these assemblies. It does not
+reimplement Kernel internals, `Win32MemoryMapper`, `PosixMemoryMapper`,
+`KernelContext`, or OS memory APIs.
+
 For wrapper-only development or CI tests without LibTorch, disable the native
-build explicitly:
+and managed builds explicitly:
 
 ```bash
-pip install -e . --config-settings=cmake.define.AIKERNEL_PYTHON_BUILD_NATIVE=OFF
+pip install -e . \
+  --config-settings=cmake.define.AIKERNEL_PYTHON_BUILD_NATIVE=OFF \
+  --config-settings=cmake.define.AIKERNEL_PYTHON_INCLUDE_MANAGED=OFF
 pytest
 ```
 
@@ -50,6 +64,8 @@ The wrapper is intentionally thin:
 - `load_model_result(path) -> Result[int]`
 - `forward_result(input_ids, handle=None) -> Result[ForwardResult]`
 - `unload_model_result(handle) -> Result[None]`
+- `managed_assemblies() -> ManagedAssemblySet`
+- `require_managed_assemblies() -> ManagedAssemblySet`
 
 MemoryRegion / MemoryMapper internals are not exposed to Python.
 

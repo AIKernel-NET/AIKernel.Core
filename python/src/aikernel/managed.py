@@ -1,0 +1,47 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from pathlib import Path
+
+
+_MANAGED_ASSEMBLIES = (
+    "AIKernel.Common.dll",
+    "AIKernel.Core.dll",
+    "AIKernel.Kernel.dll",
+    "AIKernel.Cuda.Libtorch.Cuda13.dll",
+)
+
+
+@dataclass(frozen=True)
+class ManagedAssemblySet:
+    root: Path
+    assemblies: tuple[Path, ...]
+
+    @property
+    def is_complete(self) -> bool:
+        return all(path.exists() for path in self.assemblies)
+
+    @property
+    def missing(self) -> tuple[str, ...]:
+        return tuple(path.name for path in self.assemblies if not path.exists())
+
+
+def managed_assemblies() -> ManagedAssemblySet:
+    root = Path(__file__).resolve().parent / "managed"
+    return ManagedAssemblySet(
+        root=root,
+        assemblies=tuple(root / name for name in _MANAGED_ASSEMBLIES),
+    )
+
+
+def require_managed_assemblies() -> ManagedAssemblySet:
+    assemblies = managed_assemblies()
+    if not assemblies.is_complete:
+        missing = ", ".join(assemblies.missing)
+        raise FileNotFoundError(
+            "AIKernel managed assemblies are not bundled in this Python package: "
+            f"{missing}. Build with AIKERNEL_PYTHON_INCLUDE_MANAGED=ON or use the "
+            "repository .NET packages directly."
+        )
+
+    return assemblies

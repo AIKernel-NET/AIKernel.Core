@@ -10,6 +10,7 @@ from .bindings import (
     unload_model,
     unload_model_result,
 )
+from .managed import ManagedAssemblySet, managed_assemblies, require_managed_assemblies
 from .monads import (
     Failure,
     Nothing,
@@ -25,6 +26,7 @@ __all__ = [
     "AIKernelNativeError",
     "Failure",
     "ForwardResult",
+    "ManagedAssemblySet",
     "Nothing",
     "Option",
     "Result",
@@ -36,6 +38,8 @@ __all__ = [
     "forward_result",
     "load_model",
     "load_model_result",
+    "managed_assemblies",
+    "require_managed_assemblies",
     "unload_model",
     "unload_model_result",
 ]

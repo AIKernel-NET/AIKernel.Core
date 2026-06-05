@@ -141,6 +141,7 @@ public sealed class OpenAIHostingExtensionsTests
         Assert.NotNull(provider.GetRequiredService<IModelPromptCapabilityResolver>());
         Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Execution.IKernelExecutor>());
         Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Execution.IKernelReplayer>());
+        Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Execution.IPipelineOrchestrator>());
         Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Execution.IOutputPolisher>());
         Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Execution.IPolisherValidator>());
         Assert.NotNull(provider.GetRequiredService<

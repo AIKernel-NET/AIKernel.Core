@@ -128,6 +128,37 @@ public sealed class LibTorchCapabilityModuleTests
     }
 
     [Fact]
+    public async Task InvokeAsync_UsesMappedModelPathBeforeNativeLoad()
+    {
+        var mapper = new SuccessfulMemoryMapper(
+            "mapped-model.pt",
+            1234);
+        var invoker = new LibTorchCapabilityInvoker(mapper);
+        var request = new CapabilityInvocationRequest(
+            InvocationId: "invoke-load-mapped-native-missing",
+            CapabilityId: LibTorchCapabilityDescriptor.CapabilityId,
+            Operation: "load_model",
+            Arguments: new Dictionary<string, string>
+            {
+                ["path"] = "logical-model.pt"
+            },
+            InputHash: null,
+            ReplayLogHash: "sha256:replay",
+            Metadata: new Dictionary<string, string>());
+
+        var result = await invoker.InvokeAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("logical-model.pt", mapper.OpenedPath);
+        Assert.Equal(MemoryAccessMode.Read, mapper.OpenedAccessMode);
+        Assert.False(result.Succeeded);
+        Assert.Equal("LIBTORCH_NATIVE_ABI_UNAVAILABLE", result.ErrorCode);
+        Assert.Equal("sha256:replay", result.ReplayLogHash);
+        Assert.Equal("true", result.Metadata["fail_closed"]);
+    }
+
+    [Fact]
     public async Task InvokeAsync_RejectsInvalidUnloadModelHandle()
     {
         var invoker = new LibTorchCapabilityInvoker();
@@ -252,5 +283,51 @@ public sealed class LibTorchCapabilityModuleTests
                 "mapped model unavailable",
                 "MAPPED_MODEL_UNAVAILABLE",
                 false));
+    }
+
+    private sealed class SuccessfulMemoryMapper(
+        string mappedPath,
+        long length) : IMemoryMapper
+    {
+        public string? OpenedPath { get; private set; }
+
+        public MemoryAccessMode? OpenedAccessMode { get; private set; }
+
+        public Result<IMemoryRegion> Open(
+            string path,
+            MemoryAccessMode accessMode = MemoryAccessMode.Read)
+        {
+            OpenedPath = path;
+            OpenedAccessMode = accessMode;
+
+            return Result<IMemoryRegion>.Success(new FakeMemoryRegion(
+                new MemoryRegionInfo(
+                    mappedPath,
+                    length,
+                    accessMode)));
+        }
+    }
+
+    private sealed class FakeMemoryRegion(
+        MemoryRegionInfo info) : IMemoryRegion
+    {
+        public MemoryRegionInfo Info { get; } = info;
+
+        public IntPtr Pointer { get; } = new(1);
+
+        public long Length => Info.Length;
+
+        public bool IsMapped { get; private set; } = true;
+
+        public Result<bool> Unmap()
+        {
+            IsMapped = false;
+            return Result<bool>.Success(true);
+        }
+
+        public void Dispose()
+        {
+            _ = Unmap();
+        }
     }
 }

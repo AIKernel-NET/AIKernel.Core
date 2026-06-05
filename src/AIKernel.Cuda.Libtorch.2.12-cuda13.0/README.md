@@ -1,10 +1,11 @@
 # AIKernel.Cuda.Libtorch.2.12-cuda13.0
 
-Reference AIKernel external Capability module for LibTorch 2.12.0 with CUDA 13.0.
+Reference AIKernel external Capability module for LibTorch 2.12.0 with CUDA
+13.0 on Windows/MSVC.
 
-This package keeps AIKernel.Core clean. It depends only on the standard AIKernel.NET
-external Capability module contracts and calls a small native C ABI bridge by
-P/Invoke. LibTorch and CUDA types never cross the managed boundary.
+This package keeps AIKernel.Core clean. It depends only on the standard
+AIKernel.NET external Capability module contracts and calls a small native C ABI
+bridge by P/Invoke. LibTorch and CUDA types never cross the managed boundary.
 
 ## Operations
 
@@ -18,42 +19,33 @@ P/Invoke. LibTorch and CUDA types never cross the managed boundary.
 
 ## Runtime Layout
 
-LibTorch is not bundled in this NuGet package. Download LibTorch 2.12.0 + CUDA
-13.0 manually and place it in one of these locations:
+LibTorch is not bundled in this NuGet package. Download the Windows LibTorch
+2.12.0 + CUDA 13.0 distribution manually and place it in one of these locations:
 
-- Windows: `Runtime/win-x64/libtorch/`
-- Linux: `Runtime/linux-x64/libtorch/`
+- Windows runtime folder: `Runtime/win-x64/libtorch/`
 - Environment override: `AIKERNEL_LIBTORCH_PATH`
-- System loader path: `PATH` on Windows, `LD_LIBRARY_PATH` on Linux
+- System loader path: `PATH`
 
-For this workspace, the CMake defaults also look for:
+For this workspace, CMake also uses:
 
 - `ref/libtorch-win-shared-with-deps-2.12.0+cu130/libtorch`
-- `ref/libtorch-shared-with-deps-2.12.0+cu130/libtorch`
+- `ref/env.txt` for `VS2026_PATH` and `CUDA_PATH`
 
 ## Build Native Bridge
 
-Install Visual Studio C++ tools or an equivalent C++17 compiler, CMake, and
-CUDA Toolkit 13.0 before configuring the bridge. If CUDA is installed outside
-the default location, set `CUDA_PATH` or `CUDAToolkit_ROOT`.
-
-Windows:
+Install Visual Studio 2026 C++ tools, the VS CMake component, and CUDA Toolkit
+13.0 before configuring the bridge. If CUDA is installed outside the default
+location, set `CUDA_PATH` or `CUDAToolkit_ROOT`. In this workspace, CMake reads
+`ref/env.txt`; if `CUDA_PATH` points to the `bin` directory, CMake uses its
+parent as `CUDAToolkit_ROOT`.
 
 ```powershell
-cmake -S Native -B Native/build/win-x64 -A x64
-cmake --build Native/build/win-x64 --config Release
+& "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -S Native -B Native/build/win-x64 -A x64
+& "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --build Native/build/win-x64 --config Release
 ```
 
-Linux:
-
-```bash
-cmake -S Native -B Native/build/linux-x64 -DCMAKE_BUILD_TYPE=Release
-cmake --build Native/build/linux-x64
-```
-
-The native build emits `libtorch_bridge.dll` on Windows and `libtorch_bridge.so`
-on Linux. Make the library discoverable by the application before invoking the
-Capability module.
+The native build emits `libtorch_bridge.dll`. Make the library discoverable by
+the application before invoking the Capability module.
 
 ## Register Descriptor
 

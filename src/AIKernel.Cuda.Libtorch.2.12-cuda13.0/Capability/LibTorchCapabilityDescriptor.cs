@@ -32,7 +32,6 @@ public static class LibTorchCapabilityDescriptor
                 ["libtorch.version"] = "2.12.0",
                 ["cuda.version"] = "13.0",
                 ["runtime.win-x64"] = "Runtime/win-x64/libtorch",
-                ["runtime.linux-x64"] = "Runtime/linux-x64/libtorch",
                 ["runtime.env"] = "AIKERNEL_LIBTORCH_PATH"
             });
     }

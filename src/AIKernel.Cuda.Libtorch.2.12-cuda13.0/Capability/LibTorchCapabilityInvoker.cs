@@ -21,6 +21,7 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
         return request.Operation switch
         {
             "load_model" => LoadModel(request, cancellationToken),
+            "unload_model" => UnloadModel(request, cancellationToken),
             "forward" => Forward(request, cancellationToken),
             _ => ValueTask.FromResult(Fail(
                 request,
@@ -70,6 +71,48 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
         return ValueTask.FromResult(Success(
             request,
             outputHash: Hash($"load_model:{statusOrHandle}:{path}"),
+            metadata));
+    }
+
+    private static ValueTask<CapabilityInvocationResult> UnloadModel(
+        CapabilityInvocationRequest request,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (!TryParsePositiveModelHandle(request, out var modelHandle, out var errorMessage))
+        {
+            return ValueTask.FromResult(Fail(
+                request,
+                "LIBTORCH_MODEL_HANDLE_INVALID",
+                errorMessage));
+        }
+
+        int status;
+
+        try
+        {
+            status = NativeMethods.UnloadModel(modelHandle);
+        }
+        catch (Exception ex) when (IsNativeBoundaryException(ex))
+        {
+            return ValueTask.FromResult(NativeBoundaryFail(request, ex));
+        }
+
+        if (status != NativeStatus.Success)
+        {
+            return ValueTask.FromResult(Fail(
+                request,
+                "LIBTORCH_UNLOAD_MODEL_FAILED",
+                $"Native unload_model failed with status {status}."));
+        }
+
+        var metadata = CreateMetadata(request);
+        metadata["model_handle"] = modelHandle.ToString(CultureInfo.InvariantCulture);
+
+        return ValueTask.FromResult(Success(
+            request,
+            outputHash: Hash($"unload_model:{modelHandle}"),
             metadata));
     }
 
@@ -188,6 +231,28 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
             EntryPointNotFoundException or
             BadImageFormatException or
             SEHException;
+    }
+
+    private static bool TryParsePositiveModelHandle(
+        CapabilityInvocationRequest request,
+        out int modelHandle,
+        out string errorMessage)
+    {
+        if (request.Arguments.TryGetValue("model_handle", out var modelHandleText) &&
+            int.TryParse(
+                modelHandleText,
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out modelHandle) &&
+            modelHandle > 0)
+        {
+            errorMessage = string.Empty;
+            return true;
+        }
+
+        modelHandle = 0;
+        errorMessage = "Argument 'model_handle' must be a positive integer.";
+        return false;
     }
 
     private static Dictionary<string, string> CreateMetadata(

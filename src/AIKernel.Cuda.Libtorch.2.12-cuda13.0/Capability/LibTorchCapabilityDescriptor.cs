@@ -20,7 +20,7 @@ public static class LibTorchCapabilityDescriptor
             EntryPoint: "libtorch_bridge",
             ArtifactUri: null,
             ArtifactHash: null,
-            ProvidedOperations: ["load_model", "forward"],
+            ProvidedOperations: ["load_model", "unload_model", "forward"],
             RequiredPermissions:
             [
                 "native-abi",

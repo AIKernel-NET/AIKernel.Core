@@ -12,6 +12,9 @@ bridge by P/Invoke. LibTorch and CUDA types never cross the managed boundary.
 - `load_model`
   - Arguments: `path`
   - Returns metadata containing `model_handle`.
+- `unload_model`
+  - Arguments: `model_handle`
+  - Releases a loaded native session.
 - `forward`
   - Arguments: `model_handle`, `input_ids`
   - `input_ids` is a comma-separated list of integer token ids.

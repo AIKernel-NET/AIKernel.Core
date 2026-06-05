@@ -77,6 +77,9 @@ The wrapper is intentionally thin:
 - `require_managed_assemblies() -> ManagedAssemblySet`
 - `runtime_layout() -> RuntimeLayout`
 
+The package includes inline type hints and a `py.typed` marker for PEP 561
+compatible type checkers.
+
 MemoryRegion / MemoryMapper internals are not exposed to Python.
 `runtime_layout()` reports package file locations only; it does not expose
 KernelContext or OS-specific mapper internals.

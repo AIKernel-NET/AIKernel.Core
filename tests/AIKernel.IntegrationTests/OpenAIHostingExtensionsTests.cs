@@ -148,6 +148,10 @@ public sealed class OpenAIHostingExtensionsTests
             AIKernel.Abstractions.Governance.ChatChain.IChatTurnSignatureProvider>());
         Assert.NotNull(provider.GetRequiredService<
             AIKernel.Abstractions.Governance.ChatChain.IChatTurnChainVerifier>());
+        Assert.NotNull(provider.GetRequiredService<
+            AIKernel.Abstractions.Providers.IProviderRegistry>());
+        Assert.NotNull(provider.GetRequiredService<
+            AIKernel.Abstractions.Routing.ICapabilityRegistry>());
     }
 
     [Fact]

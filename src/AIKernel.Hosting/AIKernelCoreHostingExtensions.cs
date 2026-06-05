@@ -9,7 +9,9 @@ using AIKernel.Core.Context;
 using AIKernel.Core.Dsl;
 using AIKernel.Core.Execution;
 using AIKernel.Core.Governance.ChatChain;
+using AIKernel.Core.Providers;
 using AIKernel.Core.Rom;
+using AIKernel.Core.Routing;
 using AIKernel.Core.Security;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Rom;
@@ -148,6 +150,10 @@ public static class AIKernelCoreHostingExtensions
             AlgorithmTaggedChatTurnSignatureProvider>();
         services.TryAddSingleton<AIKernel.Abstractions.Governance.ChatChain.IChatTurnChainVerifier,
             ChatTurnChainVerifier>();
+        services.TryAddSingleton<AIKernel.Abstractions.Providers.IProviderRegistry,
+            InMemoryProviderRegistry>();
+        services.TryAddSingleton<AIKernel.Abstractions.Routing.ICapabilityRegistry,
+            InMemoryCapabilityRegistry>();
 
         return services;
     }

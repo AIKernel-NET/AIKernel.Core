@@ -96,11 +96,17 @@ VFS → ROM → Context → Execution
 
 This layer owns the Core runtime logic and separates implementation concerns from external Hosting and Provider boundaries.
 
+It also defines OS-independent `IMemoryRegion` / `IMemoryMapper`
+abstractions for Native Capability modules. The abstractions live in Core while
+the concrete Win32/POSIX mapping implementations live in Kernel.
+
 #### `AIKernel.Kernel`
 
 The governance and orchestration layer of the OS.
 
 It exposes the `IKernel` Facade and integrates all runtime layers.
+It also supplies the default OS-specific `IMemoryMapper` implementation used by
+trusted hosts.
 
 #### `AIKernel.Hosting`
 
@@ -116,7 +122,8 @@ Provider implementations that connect AIKernel to external models and external s
 
 A Windows/MSVC Native ABI reference Capability module for LibTorch 2.12.0 with
 CUDA 13.0. It keeps CUDA and LibTorch runtime files outside the Core runtime and
-outside the NuGet payload.
+outside the NuGet payload. It may consume Core's OS-independent memory mapping
+abstractions, but it does not reference Kernel or any OS-specific mapper.
 
 ##### `AIKernel.Providers.MicrosoftAI`
 
@@ -246,6 +253,10 @@ host package that replaces the default invoker.
 `AIKernel.Cuda.Libtorch.2.12-cuda13.0` is the first Native ABI reference module:
 it wraps LibTorch through a small C API bridge and intentionally keeps all CUDA
 and LibTorch runtime files outside AIKernel.Core and outside the NuGet payload.
+For trusted hosts, `AddAIKernelKernel()` registers an OS-specific
+`IMemoryMapper` (`Win32MemoryMapper` on Windows, `PosixMemoryMapper` elsewhere)
+behind the Core memory abstraction. Native Capability packages consume only the
+Core abstraction and never reference Kernel directly.
 
 User-land routing pipelines can return a `KernelProviderRoutingDecision` from a
 `ResultStep`/LINQ chain, then apply it to a `KernelRequest` and its metadata.

@@ -3,10 +3,11 @@
 Reference AIKernel external Capability module for LibTorch 2.12.0 with CUDA
 13.0 on Windows/MSVC.
 
-This package keeps AIKernel.Core clean. It depends only on the standard
-AIKernel.NET external Capability module contracts and calls a small native C ABI
-bridge by P/Invoke. LibTorch and CUDA types never cross the managed boundary.
-The native bridge uses the Cdecl calling convention.
+This package keeps the LibTorch/CUDA implementation outside AIKernel.Core. It
+depends on the standard AIKernel.NET external Capability module contracts and
+the OS-independent `AIKernel.Core.Memory` abstractions, then calls a small
+native C ABI bridge by P/Invoke. LibTorch and CUDA types never cross the managed
+boundary. The native bridge uses the Cdecl calling convention.
 
 ## Operations
 
@@ -61,7 +62,10 @@ only in trusted GPU hosts.
 
 ## Boundary Rules
 
-- Do not reference AIKernel.Core from this package.
+- Reference AIKernel.Core only for OS-independent MemoryRegion/MemoryMapper
+  abstractions.
+- Do not reference AIKernel.Kernel or any OS-specific memory mapper from this
+  package.
 - Do not expose LibTorch or CUDA types to managed code.
 - Keep all GPU execution inside `libtorch_bridge`.
 - Treat missing native libraries as host configuration failures.

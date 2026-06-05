@@ -25,11 +25,19 @@ constexpr int32_t kForwardFailed = -4;
 constexpr int32_t kMaxOutputTokens = 64;
 constexpr int32_t kMaxLogits = 4096;
 
-struct VmRegion {
-  explicit VmRegion(std::string model_path) : path(std::move(model_path)) {}
+struct MemoryRegion {
+  explicit MemoryRegion(std::string model_path) : path(std::move(model_path)) {}
 
   std::string path;
+  const void* pointer = nullptr;
+  size_t length = 0;
   // Reserved for a future mmap / CreateFileMapping backed implementation.
+};
+
+struct VmRegion {
+  explicit VmRegion(std::string model_path) : memory(std::move(model_path)) {}
+
+  MemoryRegion memory;
 };
 
 struct Session {
@@ -70,7 +78,7 @@ std::shared_ptr<Session> create_session(const char* path) {
   auto region = std::make_shared<VmRegion>(std::string(path));
   auto device = select_device();
   auto module = std::make_shared<torch::jit::script::Module>(
-      torch::jit::load(region->path, device));
+      torch::jit::load(region->memory.path, device));
   module->eval();
 
   return std::make_shared<Session>(

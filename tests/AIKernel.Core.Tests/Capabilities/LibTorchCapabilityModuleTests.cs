@@ -2,6 +2,8 @@ namespace AIKernel.Core.Tests.Capabilities;
 
 using AIKernel.Cuda.Libtorch.Cuda13.Capability;
 using AIKernel.Cuda.Libtorch.Cuda13.Model;
+using AIKernel.Common.Results;
+using AIKernel.Core.Memory;
 using AIKernel.Dtos.Capabilities;
 using AIKernel.Enums;
 
@@ -93,6 +95,33 @@ public sealed class LibTorchCapabilityModuleTests
             TestContext.Current.CancellationToken);
 
         Assert.False(result.Succeeded);
+        Assert.Equal("sha256:replay", result.ReplayLogHash);
+        Assert.Equal("true", result.Metadata["fail_closed"]);
+        Assert.Equal("libtorch_native_abi", result.Metadata["failure_origin"]);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_ReturnsFailClosedWhenMemoryMapperCannotOpenModel()
+    {
+        var invoker = new LibTorchCapabilityInvoker(new FailingMemoryMapper());
+        var request = new CapabilityInvocationRequest(
+            InvocationId: "invoke-load-memory-map-failed",
+            CapabilityId: LibTorchCapabilityDescriptor.CapabilityId,
+            Operation: "load_model",
+            Arguments: new Dictionary<string, string>
+            {
+                ["path"] = "missing-model.pt"
+            },
+            InputHash: null,
+            ReplayLogHash: "sha256:replay",
+            Metadata: new Dictionary<string, string>());
+
+        var result = await invoker.InvokeAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.Succeeded);
+        Assert.Equal("LIBTORCH_MEMORY_MAP_FAILED", result.ErrorCode);
         Assert.Equal("sha256:replay", result.ReplayLogHash);
         Assert.Equal("true", result.Metadata["fail_closed"]);
         Assert.Equal("libtorch_native_abi", result.Metadata["failure_origin"]);
@@ -212,5 +241,16 @@ public sealed class LibTorchCapabilityModuleTests
         Assert.False(result.Succeeded);
         Assert.Null(result.Value);
         Assert.Contains("at most", result.ErrorMessage);
+    }
+
+    private sealed class FailingMemoryMapper : IMemoryMapper
+    {
+        public Result<IMemoryRegion> Open(
+            string path,
+            MemoryAccessMode accessMode = MemoryAccessMode.Read)
+            => Result<IMemoryRegion>.Fail(new ErrorContext(
+                "mapped model unavailable",
+                "MAPPED_MODEL_UNAVAILABLE",
+                false));
     }
 }

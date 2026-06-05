@@ -5,12 +5,21 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using AIKernel.Abstractions.Capabilities;
+using AIKernel.Core.Memory;
 using AIKernel.Cuda.Libtorch.Cuda13.Interop;
 using AIKernel.Cuda.Libtorch.Cuda13.Model;
 using AIKernel.Dtos.Capabilities;
 
 public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
 {
+    private readonly IMemoryMapper? _memoryMapper;
+
+    public LibTorchCapabilityInvoker(
+        IMemoryMapper? memoryMapper = null)
+    {
+        _memoryMapper = memoryMapper;
+    }
+
     public ValueTask<CapabilityInvocationResult> InvokeAsync(
         CapabilityInvocationRequest request,
         CancellationToken cancellationToken = default)
@@ -41,7 +50,7 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
         };
     }
 
-    private static ValueTask<CapabilityInvocationResult> LoadModel(
+    private ValueTask<CapabilityInvocationResult> LoadModel(
         CapabilityInvocationRequest request,
         CancellationToken cancellationToken)
     {
@@ -56,11 +65,15 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
                 "Argument 'path' is required for load_model."));
         }
 
+        var mappedPath = ResolveMappedModelPath(request, path);
+        if (!mappedPath.Succeeded)
+            return ValueTask.FromResult(mappedPath.Result!);
+
         int statusOrHandle;
 
         try
         {
-            statusOrHandle = NativeMethods.LoadModel(path);
+            statusOrHandle = NativeMethods.LoadModel(mappedPath.Path!);
         }
         catch (Exception ex) when (IsNativeBoundaryException(ex))
         {
@@ -77,11 +90,16 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
 
         var metadata = CreateMetadata(request);
         metadata["model_handle"] = statusOrHandle.ToString(CultureInfo.InvariantCulture);
-        metadata["model_path_hash"] = Hash(path);
+        metadata["model_path_hash"] = Hash(mappedPath.Path!);
+        if (mappedPath.RegionLength is { } regionLength)
+        {
+            metadata["memory_region_length"] =
+                regionLength.ToString(CultureInfo.InvariantCulture);
+        }
 
         return ValueTask.FromResult(Success(
             request,
-            outputHash: Hash($"load_model:{statusOrHandle}:{path}"),
+            outputHash: Hash($"load_model:{statusOrHandle}:{mappedPath.Path}"),
             metadata));
     }
 
@@ -235,6 +253,36 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
             Metadata: metadata);
     }
 
+    private MappedModelPath ResolveMappedModelPath(
+        CapabilityInvocationRequest request,
+        string path)
+    {
+        if (_memoryMapper is null)
+            return MappedModelPath.Success(path, regionLength: null);
+
+        var mapped = _memoryMapper.Open(path, MemoryAccessMode.Read);
+        if (mapped.IsFailure)
+        {
+            return MappedModelPath.Fail(Fail(
+                request,
+                "LIBTORCH_MEMORY_MAP_FAILED",
+                mapped.Error!.Message));
+        }
+
+        using var region = mapped.Value!;
+        if (!region.IsMapped || region.Pointer == IntPtr.Zero)
+        {
+            return MappedModelPath.Fail(Fail(
+                request,
+                "LIBTORCH_MEMORY_MAP_FAILED",
+                "Memory mapper returned an unmapped model region."));
+        }
+
+        return MappedModelPath.Success(
+            region.Info.Path,
+            region.Length);
+    }
+
     private static bool IsNativeBoundaryException(
         Exception exception)
     {
@@ -286,5 +334,21 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
     {
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(value));
         return "sha256:" + Convert.ToHexString(bytes).ToLowerInvariant();
+    }
+
+    private sealed record MappedModelPath(
+        bool Succeeded,
+        string? Path,
+        long? RegionLength,
+        CapabilityInvocationResult? Result)
+    {
+        public static MappedModelPath Success(
+            string path,
+            long? regionLength)
+            => new(true, path, regionLength, null);
+
+        public static MappedModelPath Fail(
+            CapabilityInvocationResult result)
+            => new(false, null, null, result);
     }
 }

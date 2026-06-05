@@ -1,6 +1,8 @@
 namespace AIKernel.Kernel;
 
 using AIKernel.Abstractions.Kernel;
+using AIKernel.Core.Memory;
+using AIKernel.Kernel.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -15,6 +17,10 @@ public static class KernelHostingExtensions
         services.TryAddSingleton<IKernelModelProviderSelector, StaticKernelModelProviderSelector>();
         services.TryAddSingleton<IKernelRequestHasher, KernelRequestHasher>();
         services.TryAddSingleton<IKernelTransactionIdFactory, KernelTransactionIdFactory>();
+        services.TryAddSingleton<IMemoryMapper>(
+            _ => OperatingSystem.IsWindows()
+                ? new Win32MemoryMapper()
+                : new PosixMemoryMapper());
         services.TryAddSingleton<IKernel, Kernel>();
         services.TryAddSingleton<IKernelVersionProvider>(
             serviceProvider => serviceProvider.GetRequiredService<IKernel>());

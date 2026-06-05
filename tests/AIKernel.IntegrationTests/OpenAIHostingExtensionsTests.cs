@@ -140,6 +140,14 @@ public sealed class OpenAIHostingExtensionsTests
         Assert.NotNull(provider.GetRequiredService<IPromptGenerator>());
         Assert.NotNull(provider.GetRequiredService<IModelPromptCapabilityResolver>());
         Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Execution.IKernelExecutor>());
+        Assert.NotNull(provider.GetRequiredService<
+            AIKernel.Abstractions.Governance.ChatChain.IChatTurnCanonicalizer>());
+        Assert.NotNull(provider.GetRequiredService<
+            AIKernel.Abstractions.Governance.ChatChain.IChatTurnSemanticHasher>());
+        Assert.NotNull(provider.GetRequiredService<
+            AIKernel.Abstractions.Governance.ChatChain.IChatTurnSignatureProvider>());
+        Assert.NotNull(provider.GetRequiredService<
+            AIKernel.Abstractions.Governance.ChatChain.IChatTurnChainVerifier>());
     }
 
     [Fact]

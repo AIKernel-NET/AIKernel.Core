@@ -8,6 +8,7 @@ using AIKernel.Core.ChatHistory;
 using AIKernel.Core.Context;
 using AIKernel.Core.Dsl;
 using AIKernel.Core.Execution;
+using AIKernel.Core.Governance.ChatChain;
 using AIKernel.Core.Rom;
 using AIKernel.Core.Security;
 using AIKernel.Core.Time;
@@ -138,6 +139,15 @@ public static class AIKernelCoreHostingExtensions
         services.TryAddSingleton<IPromptGenerator, DefaultPromptGenerator>();
         services.TryAddSingleton<IModelPromptCapabilityResolver, StaticModelPromptCapabilityResolver>();
         services.TryAddSingleton<AIKernel.Abstractions.Execution.IKernelExecutor, KernelExecutor>();
+
+        services.TryAddSingleton<AIKernel.Abstractions.Governance.ChatChain.IChatTurnCanonicalizer,
+            DefaultChatTurnCanonicalizer>();
+        services.TryAddSingleton<AIKernel.Abstractions.Governance.ChatChain.IChatTurnSemanticHasher,
+            Sha256ChatTurnSemanticHasher>();
+        services.TryAddSingleton<AIKernel.Abstractions.Governance.ChatChain.IChatTurnSignatureProvider,
+            AlgorithmTaggedChatTurnSignatureProvider>();
+        services.TryAddSingleton<AIKernel.Abstractions.Governance.ChatChain.IChatTurnChainVerifier,
+            ChatTurnChainVerifier>();
 
         return services;
     }

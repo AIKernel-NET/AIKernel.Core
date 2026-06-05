@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from aikernel import Failure, Left, Nothing, Option, Result, Right, Some, Success, Try, do
+from aikernel import Either, Failure, Left, Nothing, Option, Result, Right, Some, Success, Try, do
 
 
 def test_result_map_bind_success_path() -> None:
@@ -219,4 +219,45 @@ def test_do_option_rejects_non_option_yield() -> None:
         return "unreachable"
 
     with pytest.raises(TypeError):
+        pipeline()
+
+
+def test_do_either_success_and_left_paths() -> None:
+    @do(Either)
+    def success_pipeline():
+        first = yield Right(2)
+        second = yield Right(first + 3)
+        return second
+
+    @do(Either)
+    def left_pipeline():
+        _ = yield Left("blocked")
+        return "unreachable"
+
+    success = success_pipeline()
+    blocked = left_pipeline()
+
+    assert success.is_right
+    assert success.unwrap() == 5
+    assert blocked.is_left
+    assert blocked.left_value == "blocked"
+
+
+def test_do_either_rejects_non_either_yield() -> None:
+    @do(Either)
+    def pipeline():
+        _ = yield Success("wrong-monad")
+        return "unreachable"
+
+    with pytest.raises(TypeError, match="Either do blocks"):
+        pipeline()
+
+
+def test_do_either_propagates_exceptions() -> None:
+    @do(Either)
+    def pipeline():
+        _ = yield Right("started")
+        raise ValueError("boom")
+
+    with pytest.raises(ValueError, match="boom"):
         pipeline()

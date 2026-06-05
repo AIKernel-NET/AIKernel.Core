@@ -187,7 +187,7 @@ class Either(Generic[L, R]):
 
 @dataclass(frozen=True)
 class _DoState:
-    kind: type[Result] | type[Option]
+    kind: type[Result] | type[Option] | type[Either]
 
 
 def Success(value: T, metadata: Mapping[str, object] | None = None) -> Result[T]:
@@ -229,9 +229,9 @@ class _Try:
 Try = _Try()
 
 
-def do(monad_type: type[Result] | type[Option]):
-    if monad_type not in (Result, Option):
-        raise TypeError("do currently supports Result and Option.")
+def do(monad_type: type[Result] | type[Option] | type[Either]):
+    if monad_type not in (Result, Option, Either):
+        raise TypeError("do currently supports Result, Option, and Either.")
 
     state = _DoState(kind=monad_type)
 
@@ -271,6 +271,8 @@ def do(monad_type: type[Result] | type[Option]):
 def _pure(state: _DoState, value, metadata: Mapping[str, object] | None = None):
     if state.kind is Result:
         return Success(value, metadata=metadata)
+    if state.kind is Either:
+        return Right(value)
 
     return Some(value)
 
@@ -282,6 +284,13 @@ def _short_circuit(state: _DoState, monad, metadata: Mapping[str, object] | None
         if monad.is_err:
             merged = {**dict(metadata or {}), **monad.metadata}
             return monad.with_metadata(merged)
+        return None
+
+    if state.kind is Either:
+        if not isinstance(monad, Either):
+            raise TypeError("Either do blocks must yield Either.")
+        if monad.is_left:
+            return monad
         return None
 
     if not isinstance(monad, Option):

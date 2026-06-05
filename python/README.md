@@ -152,7 +152,8 @@ def pipeline():
 `Result` captures exceptions as failures. `Option` is a pure short-circuit
 container and propagates exceptions normally. `Either` is also pure:
 `Right(value)` flows through `bind` / `map`, while `Left(value)` short-circuits
-without capturing exceptions.
+without capturing exceptions. `do(Result)`, `do(Option)`, and `do(Either)` are
+supported; only the `Result` form converts exceptions into failures.
 
 Native wrapper result APIs attach capability lifecycle feedback to
 `Result.metadata`. With the current stable C ABI, asynchronous page-in,

@@ -134,21 +134,21 @@ ABI と振る舞いの規律を検証するための Contract Test Framework で
 ### 1. パッケージのインストール
 
 ```bash
-dotnet add package AIKernel.Core --version 0.0.4
-dotnet add package AIKernel.Hosting --version 0.0.4
-dotnet add package AIKernel.Kernel --version 0.0.4
-dotnet add package AIKernel.Providers.MicrosoftAI --version 0.0.4
+dotnet add package AIKernel.Core --version 0.0.5
+dotnet add package AIKernel.Hosting --version 0.0.5
+dotnet add package AIKernel.Kernel --version 0.0.5
+dotnet add package AIKernel.Providers.MicrosoftAI --version 0.0.5
 ```
 
 関数型プリミティブや Contract Test helper を直接利用する場合:
 
 ```bash
-dotnet add package AIKernel.Common --version 0.0.4
-dotnet add package AIKernel.TestKit --version 0.0.4
+dotnet add package AIKernel.Common --version 0.0.5
+dotnet add package AIKernel.TestKit --version 0.0.5
 ```
 
-v0.0.4 package family は、AIKernel.NET の契約パッケージ
-`AIKernel.Abstractions`、`AIKernel.Dtos`、`AIKernel.Enums` v0.0.4 と同期しています。
+v0.0.5 package family は、AIKernel.NET の契約パッケージ
+`AIKernel.Abstractions`、`AIKernel.Dtos`、`AIKernel.Enums` v0.0.5 と同期しています。
 `AIKernel.Vfs` は独立した NuGet 依存ではなくなり、VFS 契約は
 `AIKernel.Abstractions` から提供されます。
 

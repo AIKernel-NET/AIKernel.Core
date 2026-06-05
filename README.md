@@ -134,21 +134,21 @@ Integration tests that pass through multiple runtime layers.
 ### 1. Install Packages
 
 ```bash
-dotnet add package AIKernel.Core --version 0.0.4
-dotnet add package AIKernel.Hosting --version 0.0.4
-dotnet add package AIKernel.Kernel --version 0.0.4
-dotnet add package AIKernel.Providers.MicrosoftAI --version 0.0.4
+dotnet add package AIKernel.Core --version 0.0.5
+dotnet add package AIKernel.Hosting --version 0.0.5
+dotnet add package AIKernel.Kernel --version 0.0.5
+dotnet add package AIKernel.Providers.MicrosoftAI --version 0.0.5
 ```
 
 For direct use of functional primitives and contract testing helpers:
 
 ```bash
-dotnet add package AIKernel.Common --version 0.0.4
-dotnet add package AIKernel.TestKit --version 0.0.4
+dotnet add package AIKernel.Common --version 0.0.5
+dotnet add package AIKernel.TestKit --version 0.0.5
 ```
 
-The v0.0.4 package family is aligned with the AIKernel.NET contract packages
-`AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.0.4.
+The v0.0.5 package family is aligned with the AIKernel.NET contract packages
+`AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.0.5.
 `AIKernel.Vfs` is no longer a separate package dependency; the VFS contracts are
 provided by `AIKernel.Abstractions`.
 

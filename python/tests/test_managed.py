@@ -37,6 +37,46 @@ def test_managed_runtime_file_lists_are_safe_when_empty() -> None:
     assert isinstance(assemblies.dependency_manifests, tuple)
 
 
+def test_managed_assemblies_resolve_from_env_override(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    _write_required_assemblies(tmp_path)
+    monkeypatch.setenv("AIKERNEL_MANAGED_ASSEMBLY_PATH", str(tmp_path))
+    monkeypatch.setenv("NUGET_PACKAGES", str(tmp_path / "empty-nuget"))
+
+    assemblies = managed.managed_assemblies()
+
+    assert assemblies.is_complete
+    assert all(path.parent == tmp_path for path in assemblies.assemblies)
+
+
+def test_managed_assemblies_resolve_from_nuget_cache(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    nuget_root = tmp_path / "nuget"
+    for assembly_name, package_name in {
+        "AIKernel.Abstractions.dll": "AIKernel.Abstractions",
+        "AIKernel.Common.dll": "AIKernel.Common",
+        "AIKernel.Core.dll": "AIKernel.Core",
+        "AIKernel.Kernel.dll": "AIKernel.Kernel",
+        "AIKernel.Cuda.Libtorch.Cuda13.dll": "AIKernel.Cuda.Libtorch.2.12-cuda13.0",
+        "AIKernel.Dtos.dll": "AIKernel.Dtos",
+        "AIKernel.Enums.dll": "AIKernel.Enums",
+    }.items():
+        assembly_path = nuget_root / package_name.lower() / "0.0.5" / "lib" / "net10.0" / assembly_name
+        assembly_path.parent.mkdir(parents=True, exist_ok=True)
+        assembly_path.write_text("", encoding="utf-8")
+
+    monkeypatch.setenv("NUGET_PACKAGES", str(nuget_root))
+
+    assemblies = managed.managed_assemblies()
+
+    assert assemblies.is_complete
+    assert all(str(path).startswith(str(nuget_root)) for path in assemblies.assemblies)
+
+
 def test_runtime_layout_reports_managed_and_native_roots() -> None:
     layout = managed.runtime_layout()
 
@@ -50,3 +90,16 @@ def test_managed_api_is_exported() -> None:
     assert "require_managed_assemblies" in aikernel.__all__
     assert "runtime_layout" in aikernel.__all__
     assert aikernel.managed_assemblies().root.name == "managed"
+
+
+def _write_required_assemblies(root) -> None:
+    for assembly_name in (
+        "AIKernel.Abstractions.dll",
+        "AIKernel.Common.dll",
+        "AIKernel.Core.dll",
+        "AIKernel.Kernel.dll",
+        "AIKernel.Cuda.Libtorch.Cuda13.dll",
+        "AIKernel.Dtos.dll",
+        "AIKernel.Enums.dll",
+    ):
+        (root / assembly_name).write_text("", encoding="utf-8")

@@ -41,6 +41,9 @@ The publish output also carries required transitive runtime DLLs such as
 Python exposes only discovery helpers for these assemblies. It does not
 reimplement Kernel internals, `Win32MemoryMapper`, `PosixMemoryMapper`,
 `KernelContext`, or OS memory APIs.
+`managed_assemblies()` resolves bundled assemblies first, then paths from
+`AIKERNEL_MANAGED_ASSEMBLY_PATH`, then matching packages from the NuGet
+global-packages cache (`NUGET_PACKAGES` or `~/.nuget/packages`).
 
 For wrapper-only development or CI tests without LibTorch, disable the native
 and managed builds explicitly:
@@ -111,3 +114,9 @@ def pipeline():
 
 `Result` captures exceptions as failures. `Option` is a pure short-circuit
 container and propagates exceptions normally.
+
+Native wrapper result APIs attach capability lifecycle feedback to
+`Result.metadata`. With the current stable C ABI, asynchronous page-in,
+page-out, and defragmentation events are reported as
+`not_observable_from_current_abi`; future managed Capability feedback can be
+carried through the same metadata channel without changing the wrapper API.

@@ -12,6 +12,16 @@ def test_result_map_bind_success_path() -> None:
     assert result.unwrap() == 10
 
 
+def test_result_metadata_flows_through_bind() -> None:
+    result = Success(2, metadata={"step": "load"}).bind(
+        lambda value: Success(value + 1, metadata={"next": "forward"})
+    )
+
+    assert result.is_ok
+    assert result.unwrap() == 3
+    assert result.metadata == {"step": "load", "next": "forward"}
+
+
 def test_result_bind_short_circuits_failure() -> None:
     called = False
 
@@ -20,10 +30,11 @@ def test_result_bind_short_circuits_failure() -> None:
         called = True
         return Success(value)
 
-    result = Failure("fail-closed").bind(binder)
+    result = Failure("fail-closed", metadata={"failure_kind": "fail_closed"}).bind(binder)
 
     assert result.is_err
     assert result.error == "fail-closed"
+    assert result.metadata == {"failure_kind": "fail_closed"}
     assert called is False
 
 

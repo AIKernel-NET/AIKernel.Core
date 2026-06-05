@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Generator
+from collections.abc import Callable, Generator, Mapping
 from dataclasses import dataclass
 from functools import wraps
 from typing import Generic, TypeVar
@@ -11,20 +11,27 @@ U = TypeVar("U")
 
 
 class Result(Generic[T]):
-    __slots__ = ("_error", "_is_ok", "_value")
+    __slots__ = ("_error", "_is_ok", "_metadata", "_value")
 
-    def __init__(self, is_ok: bool, value: T | None = None, error: object | None = None) -> None:
+    def __init__(
+        self,
+        is_ok: bool,
+        value: T | None = None,
+        error: object | None = None,
+        metadata: Mapping[str, object] | None = None,
+    ) -> None:
         self._is_ok = is_ok
         self._value = value
         self._error = error
+        self._metadata = dict(metadata or {})
 
     @classmethod
-    def success(cls, value: T) -> Result[T]:
-        return cls(True, value=value)
+    def success(cls, value: T, metadata: Mapping[str, object] | None = None) -> Result[T]:
+        return cls(True, value=value, metadata=metadata)
 
     @classmethod
-    def failure(cls, error: object) -> Result[T]:
-        return cls(False, error=error)
+    def failure(cls, error: object, metadata: Mapping[str, object] | None = None) -> Result[T]:
+        return cls(False, error=error, metadata=metadata)
 
     @property
     def is_ok(self) -> bool:
@@ -38,22 +45,33 @@ class Result(Generic[T]):
     def error(self) -> object | None:
         return self._error
 
+    @property
+    def metadata(self) -> Mapping[str, object]:
+        return dict(self._metadata)
+
     def map(self, func: Callable[[T], U]) -> Result[U]:
         return self.bind(lambda value: Success(func(value)))
 
     def bind(self, func: Callable[[T], Result[U]]) -> Result[U]:
         if self.is_err:
-            return Failure(self._error)
+            return Failure(self._error, metadata=self._metadata)
 
         try:
             next_result = func(self._value)  # type: ignore[arg-type]
         except Exception as ex:  # noqa: BLE001 - Result intentionally captures exceptions.
-            return Failure(ex)
+            return Failure(ex, metadata=self._metadata)
 
         if not isinstance(next_result, Result):
-            return Failure(TypeError("Result.bind callback must return Result."))
+            return Failure(TypeError("Result.bind callback must return Result."), metadata=self._metadata)
 
-        return next_result
+        metadata = {**self._metadata, **next_result.metadata}
+        return next_result.with_metadata(metadata)
+
+    def with_metadata(self, metadata: Mapping[str, object]) -> Result[T]:
+        if self.is_ok:
+            return Success(self._value, metadata=metadata)  # type: ignore[arg-type]
+
+        return Failure(self._error, metadata=metadata)
 
     def unwrap(self) -> T:
         if self.is_ok:
@@ -113,12 +131,12 @@ class _DoState:
     kind: type[Result] | type[Option]
 
 
-def Success(value: T) -> Result[T]:
-    return Result.success(value)
+def Success(value: T, metadata: Mapping[str, object] | None = None) -> Result[T]:
+    return Result.success(value, metadata=metadata)
 
 
-def Failure(error: object) -> Result[T]:
-    return Result.failure(error)
+def Failure(error: object, metadata: Mapping[str, object] | None = None) -> Result[T]:
+    return Result.failure(error, metadata=metadata)
 
 
 def Some(value: T) -> Option[T]:
@@ -129,11 +147,11 @@ def Nothing() -> Option[T]:
     return Option.none()
 
 
-def Try(thunk: Callable[[], T]) -> Result[T]:
+def Try(thunk: Callable[[], T], metadata: Mapping[str, object] | None = None) -> Result[T]:
     try:
-        return Success(thunk())
+        return Success(thunk(), metadata=metadata)
     except Exception as ex:  # noqa: BLE001 - Try converts exceptions to Failure.
-        return Failure(ex)
+        return Failure(ex, metadata=metadata)
 
 
 def do(monad_type: type[Result] | type[Option]):

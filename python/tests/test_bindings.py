@@ -37,6 +37,8 @@ def test_forward_result_wraps_failure(monkeypatch: pytest.MonkeyPatch) -> None:
 
     assert result.is_err
     assert isinstance(result.error, ValueError)
+    assert result.metadata["capability.action"] == "forward"
+    assert result.metadata["capability.hot_swap.status"] == "synchronous_native_abi"
 
 
 def test_load_model_skips_when_native_bridge_missing(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -78,6 +80,7 @@ def test_active_handle_is_used_by_forward_and_cleared_on_unload(
     assert result.logits == (0.25, 0.75)
     assert result_wrapped.is_ok
     assert result_wrapped.unwrap().output_token_ids == (42,)
+    assert result_wrapped.metadata["capability.page_in.status"] == "not_observable_from_current_abi"
     assert bindings._active_handle is None
 
 
@@ -90,7 +93,10 @@ def test_load_and_unload_result_wrappers(monkeypatch: pytest.MonkeyPatch) -> Non
     unloaded = bindings.unload_model_result(loaded.unwrap())
 
     assert loaded.is_ok
+    assert loaded.metadata["capability.action"] == "load_model"
+    assert loaded.metadata["capability.model_path"] == "model.pt"
     assert unloaded.is_ok
+    assert unloaded.metadata["capability.action"] == "unload_model"
     assert bindings._active_handle is None
 
 

@@ -48,7 +48,10 @@ def load_model(path: str | os.PathLike[str]) -> int:
 
 
 def load_model_result(path: str | os.PathLike[str]) -> Result[int]:
-    return Try(lambda: load_model(path))
+    return Try(
+        lambda: load_model(path),
+        metadata=_capability_feedback("load_model", model_path=os.fspath(path)),
+    )
 
 
 def unload_model(handle: int) -> None:
@@ -65,7 +68,10 @@ def unload_model(handle: int) -> None:
 
 
 def unload_model_result(handle: int) -> Result[None]:
-    return Try(lambda: unload_model(handle))
+    return Try(
+        lambda: unload_model(handle),
+        metadata=_capability_feedback("unload_model", handle=handle),
+    )
 
 
 def forward(
@@ -108,7 +114,25 @@ def forward_result(
     *,
     handle: int | None = None,
 ) -> Result[ForwardResult]:
-    return Try(lambda: forward(input_ids, handle=handle))
+    return Try(
+        lambda: forward(input_ids, handle=handle),
+        metadata=_capability_feedback("forward", handle=handle),
+    )
+
+
+def _capability_feedback(action: str, **details) -> dict[str, object]:
+    metadata: dict[str, object] = {
+        "capability.action": action,
+        "capability.hot_swap.status": "synchronous_native_abi",
+        "capability.page_in.status": "not_observable_from_current_abi",
+        "capability.page_out.status": "not_observable_from_current_abi",
+        "capability.defrag.status": "not_observable_from_current_abi",
+        "capability.feedback.channel": "result.metadata",
+    }
+    for key, value in details.items():
+        if value is not None:
+            metadata[f"capability.{key}"] = value
+    return metadata
 
 
 def _native() -> ctypes.CDLL:

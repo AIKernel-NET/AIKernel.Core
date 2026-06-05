@@ -163,26 +163,29 @@ def do(monad_type: type[Result] | type[Option]):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            metadata: dict[str, object] = {}
             try:
                 yielded = func(*args, **kwargs)
                 if not isinstance(yielded, Generator):
-                    return _pure(state, yielded)
+                    return _pure(state, yielded, metadata=metadata)
 
                 current = None
                 while True:
                     try:
                         monad = yielded.send(current)
                     except StopIteration as stop:
-                        return _pure(state, stop.value)
+                        return _pure(state, stop.value, metadata=metadata)
 
-                    short = _short_circuit(state, monad)
+                    short = _short_circuit(state, monad, metadata=metadata)
                     if short is not None:
                         return short
 
+                    if state.kind is Result:
+                        metadata.update(monad.metadata)
                     current = monad.unwrap()
             except Exception as ex:  # noqa: BLE001 - Result do notation is fail-closed.
                 if state.kind is Result:
-                    return Failure(ex)
+                    return Failure(ex, metadata=metadata)
                 raise
 
         return wrapper
@@ -190,19 +193,20 @@ def do(monad_type: type[Result] | type[Option]):
     return decorator
 
 
-def _pure(state: _DoState, value):
+def _pure(state: _DoState, value, metadata: Mapping[str, object] | None = None):
     if state.kind is Result:
-        return Success(value)
+        return Success(value, metadata=metadata)
 
     return Some(value)
 
 
-def _short_circuit(state: _DoState, monad):
+def _short_circuit(state: _DoState, monad, metadata: Mapping[str, object] | None = None):
     if state.kind is Result:
         if not isinstance(monad, Result):
-            return Failure(TypeError("Result do blocks must yield Result."))
+            return Failure(TypeError("Result do blocks must yield Result."), metadata=metadata)
         if monad.is_err:
-            return monad
+            merged = {**dict(metadata or {}), **monad.metadata}
+            return monad.with_metadata(merged)
         return None
 
     if not isinstance(monad, Option):

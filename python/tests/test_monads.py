@@ -91,6 +91,20 @@ def test_do_result_success_path() -> None:
     assert result.unwrap() == 10
 
 
+def test_do_result_preserves_metadata() -> None:
+    @do(Result)
+    def pipeline():
+        first = yield Success(2, metadata={"step": "load"})
+        second = yield Try(lambda: first + 3, metadata={"next": "forward"})
+        return second
+
+    result = pipeline()
+
+    assert result.is_ok
+    assert result.unwrap() == 5
+    assert result.metadata == {"step": "load", "next": "forward"}
+
+
 def test_do_result_short_circuits_failure() -> None:
     @do(Result)
     def pipeline():
@@ -101,6 +115,20 @@ def test_do_result_short_circuits_failure() -> None:
 
     assert result.is_err
     assert result.error == "stop"
+
+
+def test_do_result_short_circuit_preserves_metadata() -> None:
+    @do(Result)
+    def pipeline():
+        _ = yield Success("started", metadata={"step": "load"})
+        _ = yield Failure("stop", metadata={"failure_kind": "fail_closed"})
+        return "unreachable"
+
+    result = pipeline()
+
+    assert result.is_err
+    assert result.error == "stop"
+    assert result.metadata == {"step": "load", "failure_kind": "fail_closed"}
 
 
 def test_do_option_success_and_none_paths() -> None:

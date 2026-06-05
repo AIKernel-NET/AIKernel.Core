@@ -194,6 +194,9 @@ install します。
 pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
+native toolchain の前提条件と wrapper-only 開発手順は
+[python/README.md](python/README.md) を参照してください。
+
 v0.0.5 package family は、AIKernel.NET の契約パッケージ
 `AIKernel.Abstractions`、`AIKernel.Dtos`、`AIKernel.Enums` v0.0.5 と同期しています。
 `AIKernel.Vfs` は独立した NuGet 依存ではなくなり、VFS 契約は

@@ -195,6 +195,9 @@ subdirectory:
 pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
+See [python/README.md](python/README.md) for native toolchain prerequisites and
+wrapper-only development setup.
+
 The v0.0.5 package family is aligned with the AIKernel.NET contract packages
 `AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.0.5.
 `AIKernel.Vfs` is no longer a separate package dependency; the VFS contracts are

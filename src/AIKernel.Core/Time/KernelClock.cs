@@ -7,7 +7,9 @@ namespace AIKernel.Core.Time;
 /// 通常実行では SystemKernelTimeProvider を、Replay 実行では ReplayKernelTimeProvider を
 /// Logical として渡します。
 /// </summary>
-public sealed class KernelClock : IKernelClock
+public sealed class KernelClock :
+    IKernelClock,
+    AIKernel.Abstractions.Time.IKernelClock
 {
     public KernelClock(
         TimeProvider physical,
@@ -37,6 +39,19 @@ public sealed class KernelClock : IKernelClock
     public KernelTimestamp GetLogicalTimestamp()
     {
         return Logical.GetLogicalTimestamp();
+    }
+
+    AIKernel.Dtos.Time.KernelTimestamp
+        AIKernel.Abstractions.Time.IKernelClock.GetCurrentTimestamp()
+    {
+        var timestamp = GetLogicalTimestamp();
+        return new AIKernel.Dtos.Time.KernelTimestamp
+        {
+            UtcDateTime = timestamp.UtcDateTime,
+            LogicalCounter = timestamp.LogicalCounter,
+            SourceId = timestamp.SourceId,
+            Signature = timestamp.Signature
+        };
     }
 
     public static KernelClock System()

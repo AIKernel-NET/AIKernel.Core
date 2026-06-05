@@ -4,7 +4,9 @@ using System.Collections.Immutable;
 using System.Globalization;
 using AIKernel.Common.Results;
 
-public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
+public sealed class DslRomCapabilityRegistry :
+    IDslCapabilityRegistry,
+    AIKernel.Abstractions.Dsl.IDslCapabilityRegistry
 {
     private readonly IDslCapabilityRegistry _inner;
     private readonly IDslRomRegistry _romRegistry;
@@ -316,4 +318,23 @@ public sealed class DslRomCapabilityRegistry : IDslCapabilityRegistry
             Metadata = ImmutableDictionary<string, string>.Empty
                 .Add("dsl.capability_name", capabilityName)
         };
+
+    async Task<AIKernel.Dtos.Dsl.DslPipelineValue>
+        AIKernel.Abstractions.Dsl.IDslCapabilityRegistry.InvokeAsync(
+            string name,
+            AIKernel.Dtos.Dsl.DslPipelineValue input,
+            IReadOnlyDictionary<string, string> args,
+            CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var result = Invoke(name, DslContractMapper.ToCore(input), args);
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error!.Message);
+        }
+
+        return await Task.FromResult(DslContractMapper.ToContract(result.Value!))
+            .ConfigureAwait(false);
+    }
 }

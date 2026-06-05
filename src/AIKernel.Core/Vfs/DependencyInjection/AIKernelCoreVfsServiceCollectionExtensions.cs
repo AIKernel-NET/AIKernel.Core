@@ -276,6 +276,9 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         this IServiceCollection services)
     {
         services.TryAddSingleton<IKernelClock>(_ => KernelClock.System());
+        services.TryAddSingleton<AIKernel.Abstractions.Time.IKernelClock>(
+            serviceProvider => (AIKernel.Abstractions.Time.IKernelClock)
+                serviceProvider.GetRequiredService<IKernelClock>());
         services.TryAddSingleton(serviceProvider =>
             serviceProvider.GetRequiredService<IKernelClock>().Physical);
         services.TryAddSingleton(serviceProvider =>

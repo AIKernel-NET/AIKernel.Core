@@ -4,7 +4,9 @@ using System.Collections.Immutable;
 using AIKernel.Common.Results;
 using AIKernel.Core.Time;
 
-public sealed class DslPipelineCompiler : IDslPipelineCompiler
+public sealed class DslPipelineCompiler :
+    IDslPipelineCompiler,
+    AIKernel.Abstractions.Dsl.IDslPipelineCompiler
 {
     private readonly IDslCapabilityRegistry _capabilityRegistry;
     private readonly IKernelClock _clock;
@@ -30,6 +32,28 @@ public sealed class DslPipelineCompiler : IDslPipelineCompiler
                 root,
                 _capabilityRegistry,
                 _clock));
+    }
+
+    async Task<AIKernel.Abstractions.Dsl.IKernelPipeline>
+        AIKernel.Abstractions.Dsl.IDslPipelineCompiler.CompileAsync(
+            AIKernel.Dtos.Dsl.DslDocument document,
+            CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var result = Compile(DslContractMapper.ToCore(document));
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error!.Message);
+        }
+
+        if (result.Value is not AIKernel.Abstractions.Dsl.IKernelPipeline pipeline)
+        {
+            throw new InvalidOperationException(
+                "DSL compiler produced a pipeline that does not implement the contract interface.");
+        }
+
+        return await Task.FromResult(pipeline).ConfigureAwait(false);
     }
 
     private Result<PipelineRootNode> ValidateRoot(PipelineNode root)

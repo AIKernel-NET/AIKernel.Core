@@ -1,9 +1,14 @@
 namespace AIKernel.Core.Dsl;
 
+using System.Collections.Immutable;
 using AIKernel.Common.Results;
 using AIKernel.Core.Time;
+using AIKernel.Dtos.Execution;
+using AIKernel.Enums;
 
-internal sealed class CompiledDslPipeline : IKernelPipeline
+internal sealed class CompiledDslPipeline :
+    IKernelPipeline,
+    AIKernel.Abstractions.Dsl.IKernelPipeline
 {
     private readonly PipelineNode _root;
     private readonly IDslCapabilityRegistry _capabilityRegistry;
@@ -46,6 +51,39 @@ internal sealed class CompiledDslPipeline : IKernelPipeline
             context.Input);
 
         return ExecuteNode(_root, initial, context);
+    }
+
+    Task<AIKernel.Dtos.Dsl.DslPipelineExecutionResult>
+        AIKernel.Abstractions.Dsl.IKernelPipeline.ExecuteAsync(
+            AIKernel.Dtos.Dsl.DslPipelineExecutionContext context,
+            CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var result = Execute(DslContractMapper.ToCore(context));
+        var state = result.State ?? DslPipelineState.Initial("dsl.pipeline");
+        var output = result.Value ?? DslPipelineValue.Empty;
+        var status = result.IsFailure
+            ? ExecutionStatus.Failed
+            : ExecutionStatus.Succeeded;
+
+        var error = result.Error is null
+            ? null
+            : new ExecutionError(
+                result.Error.Code,
+                result.Error.Message);
+
+        return Task.FromResult(new AIKernel.Dtos.Dsl.DslPipelineExecutionResult
+        {
+            Status = status,
+            State = DslContractMapper.ToContract(state),
+            Output = DslContractMapper.ToContract(output),
+            Error = error,
+            ReplayLogCount = result.ReplayLog.Count,
+            ReplayLogHash = result.ReplayLogHash,
+            Metadata = result.Error?.Metadata?.ToImmutableDictionary()
+                ?? System.Collections.Immutable.ImmutableDictionary<string, string>.Empty
+        });
     }
 
     private static ResultStep<DslPipelineState, DslPipelineValue> InvalidExecutionContext(

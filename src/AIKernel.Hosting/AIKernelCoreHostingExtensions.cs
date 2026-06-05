@@ -40,6 +40,8 @@ public static class AIKernelCoreHostingExtensions
         ArgumentNullException.ThrowIfNull(clock);
 
         services.AddSingleton(clock);
+        services.AddSingleton<AIKernel.Abstractions.Time.IKernelClock>(
+            _ => (AIKernel.Abstractions.Time.IKernelClock)clock);
         services.AddSingleton(clock.Physical);
         services.AddSingleton(clock.Logical);
 
@@ -53,6 +55,9 @@ public static class AIKernelCoreHostingExtensions
         this IServiceCollection services)
     {
         services.TryAddSingleton<IKernelClock>(_ => KernelClock.System());
+        services.TryAddSingleton<AIKernel.Abstractions.Time.IKernelClock>(
+            serviceProvider => (AIKernel.Abstractions.Time.IKernelClock)
+                serviceProvider.GetRequiredService<IKernelClock>());
         services.TryAddSingleton(serviceProvider =>
             serviceProvider.GetRequiredService<IKernelClock>().Physical);
         services.TryAddSingleton(serviceProvider =>
@@ -89,8 +94,14 @@ public static class AIKernelCoreHostingExtensions
         services.TryAddSingleton<IRomSignatureVerifier, RomSignatureVerifier>();
         services.TryAddSingleton<IRomLoader, RomLoader>();
         services.TryAddSingleton<IHistoryRomRegistry, HistoryRomRegistry>();
+        services.TryAddSingleton<AIKernel.Abstractions.History.IHistoryRomRegistry>(
+            serviceProvider => (AIKernel.Abstractions.History.IHistoryRomRegistry)
+                serviceProvider.GetRequiredService<IHistoryRomRegistry>());
         services.TryAddSingleton<HistoryRomProvider>();
+        services.TryAddSingleton<AIKernel.Abstractions.History.IChatHistoryRomExporter, ChatHistoryRomExporter>();
         services.TryAddSingleton<HistoryRomStore>();
+        services.TryAddSingleton<AIKernel.Abstractions.History.IHistoryRomStore>(
+            serviceProvider => serviceProvider.GetRequiredService<HistoryRomStore>());
 
         services.TryAddSingleton<IContextCollectionFactory, DefaultContextCollectionFactory>();
         services.TryAddSingleton<IContextHashCalculator, DefaultContextHashCalculator>();

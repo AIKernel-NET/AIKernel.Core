@@ -4,7 +4,7 @@ using System.Text;
 using AIKernel.Common.Results;
 using AIKernel.Vfs;
 
-public sealed class DslRomStore
+public sealed class DslRomStore : AIKernel.Abstractions.Dsl.IDslRomStore
 {
     private readonly DslRomProvider _provider;
     private readonly IDslRomRegistry _registry;
@@ -82,6 +82,35 @@ public sealed class DslRomStore
         }
     }
 
+    async Task<AIKernel.Dtos.Dsl.DslRomMetadata>
+        AIKernel.Abstractions.Dsl.IDslRomStore.SaveDslAsRomAsync(
+            IVfsSession session,
+            string @namespace,
+            string name,
+            string jsonDsl,
+            DateTimeOffset createdAtUtc,
+            string? expectedRomHash,
+            CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var result = await SaveDslAsRomAsync(
+                session,
+                @namespace,
+                name,
+                jsonDsl,
+                createdAtUtc,
+                expectedRomHash)
+            .ConfigureAwait(false);
+
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error!.Message);
+        }
+
+        return DslContractMapper.ToContract(result.Value!);
+    }
+
     public async Task<Result<DslRomMetadata>> LoadDslRomAsync(
         IVfsSession session,
         string @namespace,
@@ -134,6 +163,33 @@ public sealed class DslRomStore
                 SemanticSlot = SemanticSlot.G
             });
         }
+    }
+
+    async Task<AIKernel.Dtos.Dsl.DslRomMetadata>
+        AIKernel.Abstractions.Dsl.IDslRomStore.LoadDslRomAsync(
+            IVfsSession session,
+            string @namespace,
+            string name,
+            DateTimeOffset createdAtUtc,
+            string expectedRomHash,
+            CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var result = await LoadDslRomAsync(
+                session,
+                @namespace,
+                name,
+                createdAtUtc,
+                expectedRomHash)
+            .ConfigureAwait(false);
+
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error!.Message);
+        }
+
+        return DslContractMapper.ToContract(result.Value!);
     }
 
     private static ErrorContext Error(string message)

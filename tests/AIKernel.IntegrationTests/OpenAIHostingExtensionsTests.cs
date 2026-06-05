@@ -49,8 +49,11 @@ public sealed class OpenAIHostingExtensionsTests
         using var provider = services.BuildServiceProvider();
 
         Assert.NotNull(provider.GetRequiredService<IHistoryRomRegistry>());
+        Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.History.IHistoryRomRegistry>());
         Assert.NotNull(provider.GetRequiredService<HistoryRomProvider>());
+        Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.History.IChatHistoryRomExporter>());
         Assert.NotNull(provider.GetRequiredService<HistoryRomStore>());
+        Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.History.IHistoryRomStore>());
     }
 
     [Fact]

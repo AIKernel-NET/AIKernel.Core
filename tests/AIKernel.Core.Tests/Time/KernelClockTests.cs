@@ -57,6 +57,27 @@ public sealed class KernelClockTests
     }
 
     [Fact]
+    public void ReplayClock_ImplementsContractClock()
+    {
+        var fixedUtcNow = new DateTimeOffset(
+            2026,
+            5,
+            12,
+            0,
+            0,
+            0,
+            TimeSpan.Zero);
+
+        AIKernel.Abstractions.Time.IKernelClock clock =
+            KernelClock.Replay(fixedUtcNow);
+
+        var timestamp = clock.GetCurrentTimestamp();
+
+        Assert.Equal(fixedUtcNow, timestamp.UtcDateTime);
+        Assert.Equal("replay", timestamp.SourceId);
+    }
+
+    [Fact]
     public void AddAIKernelCore_RegistersProvidedReplayClock()
     {
         var fixedUtcNow = new DateTimeOffset(
@@ -76,10 +97,13 @@ public sealed class KernelClockTests
         using var provider = services.BuildServiceProvider();
 
         var resolvedClock = provider.GetRequiredService<IKernelClock>();
+        var resolvedContractClock =
+            provider.GetRequiredService<AIKernel.Abstractions.Time.IKernelClock>();
         var resolvedPhysical = provider.GetRequiredService<TimeProvider>();
         var resolvedLogical = provider.GetRequiredService<KernelTimeProvider>();
 
         Assert.Same(clock, resolvedClock);
+        Assert.Same(clock, resolvedContractClock);
         Assert.Same(clock.Physical, resolvedPhysical);
         Assert.Same(clock.Logical, resolvedLogical);
         Assert.Equal(fixedUtcNow, resolvedClock.Now);

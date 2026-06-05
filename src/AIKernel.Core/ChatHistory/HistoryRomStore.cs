@@ -5,7 +5,7 @@ using AIKernel.Abstractions.Rom;
 using AIKernel.Common.Results;
 using AIKernel.Vfs;
 
-public sealed class HistoryRomStore
+public sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRomStore
 {
     private readonly HistoryRomProvider _provider;
     private readonly IHistoryRomRegistry _registry;
@@ -58,6 +58,39 @@ public sealed class HistoryRomStore
                 markdown.Value!,
                 generatedAtUtc)
             .ConfigureAwait(false);
+    }
+
+    async Task<AIKernel.Dtos.History.HistoryRomMetadata>
+        AIKernel.Abstractions.History.IHistoryRomStore.SaveHistoryAsRomAsync(
+            IVfsSession session,
+            string @namespace,
+            string name,
+            IReadOnlyList<AIKernel.Dtos.History.ChatHistoryRomRecord> records,
+            DateTimeOffset generatedAtUtc,
+            string entityType,
+            string version,
+            IReadOnlyList<string>? securityTags,
+            CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var result = await SaveHistoryAsRomAsync(
+                session,
+                @namespace,
+                name,
+                HistoryRomContractMapper.ToCore(records),
+                generatedAtUtc,
+                entityType,
+                version,
+                securityTags)
+            .ConfigureAwait(false);
+
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error!.Message);
+        }
+
+        return HistoryRomContractMapper.ToContract(result.Value!);
     }
 
     public async Task<Result<HistoryRomMetadata>> SaveMarkdownAsRomAsync(
@@ -132,6 +165,33 @@ public sealed class HistoryRomStore
         }
     }
 
+    async Task<AIKernel.Dtos.History.HistoryRomMetadata>
+        AIKernel.Abstractions.History.IHistoryRomStore.SaveMarkdownAsRomAsync(
+            IVfsSession session,
+            string @namespace,
+            string name,
+            string markdown,
+            DateTimeOffset createdAtUtc,
+            CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var result = await SaveMarkdownAsRomAsync(
+                session,
+                @namespace,
+                name,
+                markdown,
+                createdAtUtc)
+            .ConfigureAwait(false);
+
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error!.Message);
+        }
+
+        return HistoryRomContractMapper.ToContract(result.Value!);
+    }
+
     public async Task<Result<HistoryRomMetadata>> LoadHistoryRomAsync(
         IVfsSession session,
         string @namespace,
@@ -183,6 +243,33 @@ public sealed class HistoryRomStore
                 SemanticSlot = SemanticSlot.C
             });
         }
+    }
+
+    async Task<AIKernel.Dtos.History.HistoryRomMetadata>
+        AIKernel.Abstractions.History.IHistoryRomStore.LoadHistoryRomAsync(
+            IVfsSession session,
+            string @namespace,
+            string name,
+            DateTimeOffset createdAtUtc,
+            string? expectedRomHash,
+            CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var result = await LoadHistoryRomAsync(
+                session,
+                @namespace,
+                name,
+                createdAtUtc,
+                expectedRomHash)
+            .ConfigureAwait(false);
+
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error!.Message);
+        }
+
+        return HistoryRomContractMapper.ToContract(result.Value!);
     }
 
     private static async Task<string> ReadMarkdownAsync(

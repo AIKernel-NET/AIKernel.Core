@@ -19,7 +19,8 @@ public sealed record ChatHistoryRomOptions(
     string Version = "1",
     IReadOnlyList<string>? SecurityTags = null);
 
-public static class ChatHistoryRomExporter
+public sealed class ChatHistoryRomExporter :
+    AIKernel.Abstractions.History.IChatHistoryRomExporter
 {
     private const string SourceKind = "chat_history";
 
@@ -65,6 +66,25 @@ public static class ChatHistoryRomExporter
             securityTags,
             hash,
             body));
+    }
+
+    Task<string> AIKernel.Abstractions.History.IChatHistoryRomExporter.ToRomMarkdownAsync(
+        IReadOnlyList<AIKernel.Dtos.History.ChatHistoryRomRecord> records,
+        AIKernel.Dtos.History.ChatHistoryRomOptions options,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var result = ToRomMarkdown(
+            HistoryRomContractMapper.ToCore(records),
+            HistoryRomContractMapper.ToCore(options));
+
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error!.Message);
+        }
+
+        return Task.FromResult(result.Value!);
     }
 
     private static Result<bool> Validate(

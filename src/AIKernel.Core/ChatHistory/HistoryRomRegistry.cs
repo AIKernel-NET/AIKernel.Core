@@ -13,7 +13,9 @@ public interface IHistoryRomRegistry
     Result<HistoryRomSnapshot> Resolve(string romId);
 }
 
-public sealed class HistoryRomRegistry : IHistoryRomRegistry
+public sealed class HistoryRomRegistry :
+    IHistoryRomRegistry,
+    AIKernel.Abstractions.History.IHistoryRomRegistry
 {
     private readonly ConcurrentDictionary<string, HistoryRomSnapshot> _snapshots =
         new(StringComparer.Ordinal);
@@ -146,5 +148,46 @@ public sealed class HistoryRomRegistry : IHistoryRomRegistry
                 Metadata = ImmutableDictionary<string, string>.Empty
                     .Add(HistoryRomMetadataKeys.RomId, romId)
             });
+    }
+
+    Task<AIKernel.Dtos.History.HistoryRomMetadata>
+        AIKernel.Abstractions.History.IHistoryRomRegistry.RegisterAsync(
+            AIKernel.Dtos.History.HistoryRomSnapshot snapshot,
+            CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (snapshot is null)
+        {
+            throw new ArgumentNullException(nameof(snapshot));
+        }
+
+        var result = Register(new HistoryRomSnapshot(
+                    HistoryRomContractMapper.ToCore(snapshot.Metadata),
+                    snapshot.Markdown,
+                    snapshot.Rom));
+
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error!.Message);
+        }
+
+        return Task.FromResult(HistoryRomContractMapper.ToContract(result.Value!));
+    }
+
+    Task<AIKernel.Dtos.History.HistoryRomSnapshot>
+        AIKernel.Abstractions.History.IHistoryRomRegistry.ResolveAsync(
+            string romId,
+            CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var result = Resolve(romId);
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error!.Message);
+        }
+
+        return Task.FromResult(HistoryRomContractMapper.ToContract(result.Value!));
     }
 }

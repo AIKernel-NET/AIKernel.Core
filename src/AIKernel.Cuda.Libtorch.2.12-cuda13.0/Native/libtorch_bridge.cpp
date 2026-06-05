@@ -106,9 +106,22 @@ Tensor execute_forward(
 void copy_logits_to_result(
     const Tensor& output,
     ForwardResultNative* out_result) {
-  auto logits = output.value.reshape({-1}).to(torch::kCPU).contiguous();
+  auto logits = output.value
+      .reshape({-1})
+      .to(torch::kCPU)
+      .to(torch::kFloat32)
+      .contiguous();
 
-  const auto total_logits = static_cast<int32_t>(logits.numel());
+  const auto total_elements = logits.numel();
+  if (total_elements <= 0) {
+    out_result->status = kForwardFailed;
+    return;
+  }
+
+  const auto capped_total = std::min<int64_t>(
+      total_elements,
+      static_cast<int64_t>(std::numeric_limits<int32_t>::max()));
+  const auto total_logits = static_cast<int32_t>(capped_total);
   const auto logit_count = std::min(total_logits, kMaxLogits);
   const float* logits_data = logits.data_ptr<float>();
 

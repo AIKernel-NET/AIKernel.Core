@@ -104,6 +104,24 @@ def test_async_result_linq_aliases_compose_and_capture_exceptions() -> None:
     assert isinstance(exception.error, ValueError)
 
 
+def test_async_result_short_circuits_and_rejects_non_result() -> None:
+    called = False
+
+    async def binder(value: int):
+        nonlocal called
+        called = True
+        return Success(value)
+
+    short = _run_async(async_result(Failure("blocked")).Bind(binder))
+    invalid = _run_async(async_result(Success(1)).Bind(lambda _: "not-result"))
+
+    assert short.is_err
+    assert short.error == "blocked"
+    assert called is False
+    assert invalid.is_err
+    assert isinstance(invalid.error, TypeError)
+
+
 def test_result_bind_short_circuits_failure() -> None:
     called = False
 
@@ -215,6 +233,23 @@ def test_async_option_linq_aliases_compose_and_propagate_exceptions() -> None:
         _run_async(async_option(Some(1)).Tap(lambda _: int("not-an-int")))
 
 
+def test_async_option_short_circuits_and_rejects_non_option() -> None:
+    called = False
+
+    async def binder(value: int):
+        nonlocal called
+        called = True
+        return Some(value)
+
+    short = _run_async(async_option(Nothing()).Bind(binder))
+
+    assert short.is_none
+    assert called is False
+
+    with pytest.raises(TypeError, match="AsyncOption"):
+        _run_async(async_option(Some(1)).Bind(lambda _: "not-option"))
+
+
 def test_option_bind_short_circuits_none() -> None:
     called = False
 
@@ -296,6 +331,24 @@ def test_async_either_linq_aliases_compose_and_propagate_exceptions() -> None:
 
     with pytest.raises(ValueError):
         _run_async(async_either(Right(1)).Tap(lambda _: int("not-an-int")))
+
+
+def test_async_either_short_circuits_and_rejects_non_either() -> None:
+    called = False
+
+    async def binder(value: int):
+        nonlocal called
+        called = True
+        return Right(value)
+
+    short = _run_async(async_either(Left("blocked")).Bind(binder))
+
+    assert short.is_left
+    assert short.left_value == "blocked"
+    assert called is False
+
+    with pytest.raises(TypeError, match="AsyncEither"):
+        _run_async(async_either(Right(1)).Bind(lambda _: "not-either"))
 
 
 def test_either_bind_short_circuits_left() -> None:

@@ -52,6 +52,15 @@ def test_try_converts_exception_to_failure() -> None:
     assert isinstance(result.error, ValueError)
 
 
+def test_try_run_matches_callable_form() -> None:
+    callable_result = Try(lambda: 41 + 1)
+    run_result = Try.run(lambda: 41 + 1)
+
+    assert callable_result.is_ok
+    assert run_result.is_ok
+    assert callable_result.unwrap() == run_result.unwrap() == 42
+
+
 def test_option_map_bind_success_path() -> None:
     option = Some(3).map(lambda value: value + 1).bind(lambda value: Some(value * 2))
 

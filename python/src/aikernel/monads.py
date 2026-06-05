@@ -147,11 +147,19 @@ def Nothing() -> Option[T]:
     return Option.none()
 
 
-def Try(thunk: Callable[[], T], metadata: Mapping[str, object] | None = None) -> Result[T]:
-    try:
-        return Success(thunk(), metadata=metadata)
-    except Exception as ex:  # noqa: BLE001 - Try converts exceptions to Failure.
-        return Failure(ex, metadata=metadata)
+class _Try:
+    def __call__(self, thunk: Callable[[], T], metadata: Mapping[str, object] | None = None) -> Result[T]:
+        return self.run(thunk, metadata=metadata)
+
+    @staticmethod
+    def run(thunk: Callable[[], T], metadata: Mapping[str, object] | None = None) -> Result[T]:
+        try:
+            return Success(thunk(), metadata=metadata)
+        except Exception as ex:  # noqa: BLE001 - Try converts exceptions to Failure.
+            return Failure(ex, metadata=metadata)
+
+
+Try = _Try()
 
 
 def do(monad_type: type[Result] | type[Option]):

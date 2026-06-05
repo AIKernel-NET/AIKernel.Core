@@ -93,11 +93,13 @@ Method-chain style:
 from aikernel import Try
 
 result = (
-    Try(lambda: load_history())
-    .bind(lambda history: Try(lambda: parse_json(history)))
-    .bind(lambda document: Try(lambda: validate(document)))
+    Try.run(lambda: load_history())
+    .bind(lambda history: Try.run(lambda: parse_json(history)))
+    .bind(lambda document: Try.run(lambda: validate(document)))
 )
 ```
+
+`Try(lambda: ...)` is also supported as a shorthand for `Try.run(lambda: ...)`.
 
 Decorator-based do notation:
 
@@ -107,7 +109,7 @@ from aikernel import Result, Try, do
 
 @do(Result)
 def pipeline():
-    handle = yield Try(lambda: aikernel.load_model("model.pt"))
+    handle = yield Try.run(lambda: aikernel.load_model("model.pt"))
     output = yield aikernel.forward_result([1, 2, 3], handle=handle)
     return output
 ```

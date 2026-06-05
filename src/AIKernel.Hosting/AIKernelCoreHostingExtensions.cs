@@ -142,6 +142,8 @@ public static class AIKernelCoreHostingExtensions
         services.TryAddSingleton<IModelPromptCapabilityResolver, StaticModelPromptCapabilityResolver>();
         services.TryAddSingleton<AIKernel.Abstractions.Execution.IKernelExecutor, KernelExecutor>();
         services.TryAddSingleton<IKernelReplayer, KernelReplayer>();
+        services.TryAddSingleton<IOutputPolisher, PassThroughOutputPolisher>();
+        services.TryAddSingleton<IPolisherValidator, DefaultPolisherValidator>();
 
         services.TryAddSingleton<AIKernel.Abstractions.Governance.ChatChain.IChatTurnCanonicalizer,
             DefaultChatTurnCanonicalizer>();

@@ -18,8 +18,7 @@ public sealed class VfsDependencyInjectionTests
 
         Assert.DoesNotContain(
             services,
-            descriptor => descriptor.ServiceType == typeof(IVfsProvider)
-                && descriptor.ImplementationType == typeof(LocalFileProvider));
+            descriptor => descriptor.ServiceType == typeof(LocalFileProvider));
 
         using var provider = services.BuildServiceProvider();
         var vfsProviders = provider.GetServices<IVfsProvider>().ToArray();
@@ -41,13 +40,30 @@ public sealed class VfsDependencyInjectionTests
 
         Assert.DoesNotContain(
             services,
-            descriptor => descriptor.ServiceType == typeof(IVfsProvider)
-                && descriptor.ImplementationType == typeof(LocalFileProvider));
+            descriptor => descriptor.ServiceType == typeof(LocalFileProvider));
 
         using var provider = services.BuildServiceProvider();
         var vfsProviders = provider.GetServices<IVfsProvider>().ToArray();
 
         Assert.Contains(vfsProviders, item => item is MemoryFileProvider);
         Assert.Contains(vfsProviders, item => item is WebGetFileProvider);
+    }
+
+    [Fact]
+    public void AddLocalFileProvider_RegistersConcreteProviderAndContractProvider()
+    {
+        var services = new ServiceCollection();
+
+        services.AddLocalFileProvider(options =>
+        {
+            options.RootPath = Path.GetTempPath();
+        });
+
+        using var provider = services.BuildServiceProvider();
+
+        var localProvider = provider.GetRequiredService<LocalFileProvider>();
+        var vfsProvider = Assert.Single(provider.GetServices<IVfsProvider>());
+
+        Assert.Same(localProvider, vfsProvider);
     }
 }

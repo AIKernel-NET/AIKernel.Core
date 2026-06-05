@@ -109,7 +109,9 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
 
         services.AddKernelClockDefaults();
         services.AddLocalOptions(configure);
-        services.AddSingleton<IVfsProvider, LocalFileProvider>();
+        services.AddSingleton<LocalFileProvider>();
+        services.AddSingleton<IVfsProvider>(serviceProvider =>
+            serviceProvider.GetRequiredService<LocalFileProvider>());
 
         return services;
     }
@@ -124,7 +126,9 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
 
         services.AddKernelClockDefaults();
         services.AddLocalOptions(configuration);
-        services.AddSingleton<IVfsProvider, LocalFileProvider>();
+        services.AddSingleton<LocalFileProvider>();
+        services.AddSingleton<IVfsProvider>(serviceProvider =>
+            serviceProvider.GetRequiredService<LocalFileProvider>());
 
         return services;
     }

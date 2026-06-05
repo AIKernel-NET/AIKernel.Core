@@ -11,6 +11,11 @@ public abstract class MemoryRegionBase : IMemoryRegion
         IntPtr pointer)
     {
         Info = info ?? throw new ArgumentNullException(nameof(info));
+        if (Info.Length < 0)
+            throw new ArgumentOutOfRangeException(
+                nameof(info),
+                "Memory region length must be greater than or equal to zero.");
+
         Pointer = pointer;
     }
 

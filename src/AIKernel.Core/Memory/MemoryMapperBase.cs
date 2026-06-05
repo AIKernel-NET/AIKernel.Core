@@ -8,6 +8,10 @@ public abstract class MemoryMapperBase : IMemoryMapper
         string path,
         MemoryAccessMode accessMode = MemoryAccessMode.Read)
     {
+        if (!Enum.IsDefined(accessMode))
+            return Result<IMemoryRegion>.Fail(MemoryMappingErrors.Error(
+                "Memory access mode is invalid."));
+
         var normalized = NormalizePath(path);
         if (normalized.IsFailure)
             return Result<IMemoryRegion>.Fail(normalized.Error!);

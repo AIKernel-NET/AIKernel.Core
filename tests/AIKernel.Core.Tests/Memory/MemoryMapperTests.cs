@@ -39,6 +39,21 @@ public sealed class MemoryMapperTests
     }
 
     [Fact]
+    public void MemoryMapperBase_RejectsInvalidAccessModeWithoutOpeningCore()
+    {
+        var mapper = new CountingMemoryMapper();
+
+        var result = mapper.Open(
+            "mapped.bin",
+            (MemoryAccessMode)42);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("MEMORY_MAPPING_ERROR", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(0, mapper.OpenCoreCallCount);
+    }
+
+    [Fact]
     public void AddAIKernelKernel_RegistersOperatingSystemMemoryMapper()
     {
         var services = new ServiceCollection();

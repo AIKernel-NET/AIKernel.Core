@@ -47,6 +47,32 @@ public sealed class LibTorchCapabilityModuleTests
     }
 
     [Fact]
+    public async Task InvokeAsync_ReturnsFailClosedForCapabilityIdMismatch()
+    {
+        var invoker = new LibTorchCapabilityInvoker();
+        var request = new CapabilityInvocationRequest(
+            InvocationId: "invoke-mismatched-capability",
+            CapabilityId: "other.capability",
+            Operation: "load_model",
+            Arguments: new Dictionary<string, string>
+            {
+                ["path"] = "model.pt"
+            },
+            InputHash: null,
+            ReplayLogHash: "sha256:replay",
+            Metadata: new Dictionary<string, string>());
+
+        var result = await invoker.InvokeAsync(
+            request,
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.Succeeded);
+        Assert.Equal("LIBTORCH_CAPABILITY_ID_MISMATCH", result.ErrorCode);
+        Assert.Equal("sha256:replay", result.ReplayLogHash);
+        Assert.Equal("true", result.Metadata["fail_closed"]);
+    }
+
+    [Fact]
     public async Task InvokeAsync_ReturnsFailClosedWhenNativeLoadCannotExecute()
     {
         var invoker = new LibTorchCapabilityInvoker();

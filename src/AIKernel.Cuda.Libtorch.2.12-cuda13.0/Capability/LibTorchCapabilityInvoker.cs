@@ -18,6 +18,17 @@ public sealed class LibTorchCapabilityInvoker : ICapabilityModuleInvoker
         cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(request);
 
+        if (!string.Equals(
+            request.CapabilityId,
+            LibTorchCapabilityDescriptor.CapabilityId,
+            StringComparison.Ordinal))
+        {
+            return ValueTask.FromResult(Fail(
+                request,
+                "LIBTORCH_CAPABILITY_ID_MISMATCH",
+                "The LibTorch invoker can only execute the LibTorch CUDA capability."));
+        }
+
         return request.Operation switch
         {
             "load_model" => LoadModel(request, cancellationToken),

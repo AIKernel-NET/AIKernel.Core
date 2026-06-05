@@ -3,6 +3,7 @@ namespace AIKernel.IntegrationTests;
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
+using AIKernel.Abstractions.Rom;
 using AIKernel.Core.ChatHistory;
 using AIKernel.Core.Context;
 using AIKernel.Core.Dsl;
@@ -75,6 +76,32 @@ public sealed class OpenAIHostingExtensionsTests
         Assert.NotNull(provider.GetRequiredService<DslRomProvider>());
         Assert.NotNull(provider.GetRequiredService<DslRomStore>());
         Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Dsl.IDslRomStore>());
+    }
+
+    [Fact]
+    public void AddAIKernelCore_RegistersCoreRuntimeContracts()
+    {
+        var services = new ServiceCollection();
+
+        services.AddAIKernelCore();
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        Assert.NotNull(provider.GetRequiredService<IMarkdownFrontMatterParser>());
+        Assert.NotNull(provider.GetRequiredService<IRomCanonicalizer>());
+        Assert.NotNull(provider.GetRequiredService<ISemanticHasher>());
+        Assert.NotNull(provider.GetRequiredService<IRomSignatureVerifier>());
+        Assert.NotNull(provider.GetRequiredService<IRomLoader>());
+        Assert.NotNull(provider.GetRequiredService<IContextCollectionFactory>());
+        Assert.NotNull(provider.GetRequiredService<IContextHashCalculator>());
+        Assert.NotNull(provider.GetRequiredService<IRomPathResolver>());
+        Assert.NotNull(provider.GetRequiredService<IContextAssemblyGovernancePolicy>());
+        Assert.NotNull(provider.GetRequiredService<IContextAssembler>());
+        Assert.NotNull(provider.GetRequiredService<ITokenizer>());
+        Assert.NotNull(provider.GetRequiredService<IContextPromptProjector>());
+        Assert.NotNull(provider.GetRequiredService<IPromptGenerator>());
+        Assert.NotNull(provider.GetRequiredService<IModelPromptCapabilityResolver>());
+        Assert.NotNull(provider.GetRequiredService<AIKernel.Abstractions.Execution.IKernelExecutor>());
     }
 
     [Fact]

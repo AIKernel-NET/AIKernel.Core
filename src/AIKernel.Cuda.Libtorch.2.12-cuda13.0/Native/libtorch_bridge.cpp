@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <cstring>
 #include <iterator>
+#include <limits>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -140,6 +141,10 @@ AIKERNEL_EXPORT int32_t load_model(const char* path) {
     auto session = create_session(path);
 
     std::lock_guard<std::mutex> lock(g_registry_mutex);
+    if (g_next_handle == std::numeric_limits<int32_t>::max()) {
+      return kLoadFailed;
+    }
+
     const auto handle = g_next_handle++;
     g_sessions.emplace(handle, std::move(session));
 
@@ -150,6 +155,10 @@ AIKERNEL_EXPORT int32_t load_model(const char* path) {
 }
 
 AIKERNEL_EXPORT int32_t unload_model(int32_t handle) {
+  if (handle <= 0) {
+    return kInvalidArgument;
+  }
+
   std::lock_guard<std::mutex> lock(g_registry_mutex);
   return g_sessions.erase(handle) == 0 ? kModelNotFound : kSuccess;
 }
@@ -161,7 +170,7 @@ AIKERNEL_EXPORT int32_t forward(
     ForwardResultNative* out_result) {
   zero_result(out_result);
 
-  if (out_result == nullptr || input_ids == nullptr || length <= 0) {
+  if (out_result == nullptr || input_ids == nullptr || length <= 0 || handle <= 0) {
     return kInvalidArgument;
   }
 

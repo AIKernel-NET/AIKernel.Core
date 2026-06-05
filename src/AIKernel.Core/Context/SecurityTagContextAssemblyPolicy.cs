@@ -1,6 +1,7 @@
 namespace AIKernel.Core.Context;
 
 using AIKernel.Abstractions.Context;
+using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Rom;
 
 public sealed class SecurityTagContextAssemblyPolicy : IContextAssemblyGovernancePolicy
@@ -30,7 +31,7 @@ public sealed class SecurityTagContextAssemblyPolicy : IContextAssemblyGovernanc
         if (rom.SecurityTags.Length == 0)
         {
             return ValueTask.FromResult(
-                ContextAssemblyDecision.Deny("ROM has no security tags."));
+                new ContextAssemblyDecision(false, "ROM has no security tags."));
         }
 
         var deniedTags = rom.SecurityTags
@@ -41,10 +42,11 @@ public sealed class SecurityTagContextAssemblyPolicy : IContextAssemblyGovernanc
         if (deniedTags.Length > 0)
         {
             return ValueTask.FromResult(
-                ContextAssemblyDecision.Deny(
+                new ContextAssemblyDecision(
+                    false,
                     $"ROM contains denied security tags: {string.Join(", ", deniedTags)}"));
         }
 
-        return ValueTask.FromResult(ContextAssemblyDecision.Allow());
+        return ValueTask.FromResult(new ContextAssemblyDecision(true));
     }
 }

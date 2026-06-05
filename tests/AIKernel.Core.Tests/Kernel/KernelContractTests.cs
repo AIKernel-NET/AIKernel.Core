@@ -1,4 +1,4 @@
-﻿namespace AIKernel.Core.Tests.Kernel;
+namespace AIKernel.Core.Tests.Kernel;
 
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;

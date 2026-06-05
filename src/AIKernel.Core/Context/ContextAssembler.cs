@@ -2,7 +2,9 @@ namespace AIKernel.Core.Context;
 
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Rom;
+using AIKernel.Core.Rom;
 using AIKernel.Core.Time;
+using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Rom;
 using AIKernel.Vfs;
 
@@ -148,7 +150,9 @@ public sealed class ContextAssembler : IContextAssembler
 
         foreach (var relation in GetRelationsToFollow(rom, state.Request))
         {
-            var targetRomId = RomId.Parse(relation.TargetRomId);
+            var targetRomId = RomIdFactory.Create(
+                relation.TargetRomId,
+                nameof(relation.TargetRomId));
 
             await LoadGraphAsync(
                 session,

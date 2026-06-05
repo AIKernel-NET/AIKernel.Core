@@ -98,7 +98,7 @@ public sealed class RomLoader : IRomLoader
 
         return new RomSnapshotCandidate
         {
-            RomId = RomId.Parse(romId),
+            RomId = RomIdFactory.Create(romId, "rom_id"),
             SourcePath = document.SourcePath,
             Body = document.Body,
             SecurityTags = ExtractSecurityTags(frontMatter),

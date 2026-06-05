@@ -96,15 +96,15 @@ public sealed class StaticKernelModelProviderSelectorTests
             Input = "run external capability",
             RootRomId = new RomId("rom://external/capability"),
             VfsProviderId = "memory-file",
-            VfsCredentials = new FakeVfsCredentials(),
+            Credentials = new VfsCredentials(),
             Scope = new ContextAssemblyScope
             {
                 Purpose = "external-capability-test",
                 Capabilities = ["external"],
                 Metadata = ImmutableDictionary<string, string>.Empty
             },
-            PromptOptions = PromptGenerationOptions.Default,
-            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            PromptOptions = TestExecutionDefaults.PromptOptions,
+            ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
             RequestedModelId = "gpt-test",
             Metadata = metadata
         };
@@ -127,7 +127,7 @@ public sealed class StaticKernelModelProviderSelectorTests
 
         public string Name => "Fake Provider";
 
-        public string Version => "0.0.3";
+        public string Version => "0.0.4";
 
         public IProviderCapabilities GetCapabilities()
         {

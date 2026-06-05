@@ -45,7 +45,23 @@ public sealed class KernelVfsSessionFactory : IKernelVfsSessionFactory
         // Side effect boundary:
         // Opens provider-specific VFS session.
         return await provider
-            .OpenSessionAsync(request.VfsCredentials)
+            .OpenSessionAsync(new KernelVfsCredentialsAdapter(request.Credentials))
             .ConfigureAwait(false);
+    }
+
+    private sealed class KernelVfsCredentialsAdapter(
+        AIKernel.Dtos.Vfs.VfsCredentials credentials) : IVfsCredentials
+    {
+        public string? Username => credentials.Username;
+
+        public string? ApiKey => credentials.ApiKey;
+
+        public string? Token => credentials.Token;
+
+        public IReadOnlyDictionary<string, object>? Parameters =>
+            credentials.Parameters?.ToDictionary(
+                item => item.Key,
+                item => (object)item.Value,
+                StringComparer.Ordinal);
     }
 }

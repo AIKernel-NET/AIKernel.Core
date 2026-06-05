@@ -47,7 +47,7 @@ public static class ChatHistoryRomExporter
 
         var candidate = new RomSnapshotCandidate
         {
-            RomId = RomId.Parse(options.RomId),
+            RomId = RomIdFactory.Create(options.RomId, nameof(options.RomId)),
             SourcePath = $"rom/chat-history/{SanitizeRomId(options.RomId)}.md",
             Body = body,
             SecurityTags = securityTags,

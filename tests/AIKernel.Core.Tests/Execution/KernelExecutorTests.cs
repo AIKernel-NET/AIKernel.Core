@@ -64,10 +64,12 @@ public sealed class KernelExecutorTests
             new FakeModelProvider(),
             new KernelExecutionRequest
             {
-                ContextSnapshot = null!,
+                ContextSnapshotId = string.Empty,
+                ContextHash = string.Empty,
+                ContextBlocks = [],
                 UserInstruction = "hello",
-                PromptOptions = PromptGenerationOptions.Default,
-                ExecutionOptions = ExecutionOptions.DeterministicDefault,
+                PromptOptions = TestExecutionDefaults.PromptOptions,
+                ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
                 RequestedModelId = "gpt-test"
             },
             TestContext.Current.CancellationToken);
@@ -95,10 +97,12 @@ public sealed class KernelExecutorTests
             new FakeModelProvider(),
             new KernelExecutionRequest
             {
-                ContextSnapshot = null!,
+                ContextSnapshotId = string.Empty,
+                ContextHash = string.Empty,
+                ContextBlocks = [],
                 UserInstruction = "hello",
-                PromptOptions = PromptGenerationOptions.Default,
-                ExecutionOptions = ExecutionOptions.DeterministicDefault,
+                PromptOptions = TestExecutionDefaults.PromptOptions,
+                ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
                 RequestedModelId = "gpt-test"
             },
             TestContext.Current.CancellationToken);
@@ -235,10 +239,12 @@ public sealed class KernelExecutorTests
             new FakeModelProvider(output: "contract output"),
             new KernelExecutionRequest
             {
-                ContextSnapshot = null!,
+                ContextSnapshotId = string.Empty,
+                ContextHash = string.Empty,
+                ContextBlocks = [],
                 UserInstruction = "hello",
-                PromptOptions = PromptGenerationOptions.Default,
-                ExecutionOptions = ExecutionOptions.DeterministicDefault,
+                PromptOptions = TestExecutionDefaults.PromptOptions,
+                ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
                 RequestedModelId = "gpt-test"
             },
             TestContext.Current.CancellationToken);
@@ -291,9 +297,9 @@ public sealed class KernelExecutorTests
                 MessageFormat = PromptMessageFormat.ChatMessages,
                 MaxInputTokens = 128,
                 MaxOutputTokens = _maxOutputTokens,
-                SupportedRoles = [ModelMessageRoles.User],
+                SupportedRoles = ["user"],
                 SupportsSystemMessages = true,
-                SystemInstructionRole = ModelMessageRoles.System
+                SystemInstructionRole = "system"
             };
         }
     }
@@ -333,7 +339,7 @@ public sealed class KernelExecutorTests
                 Capability = request.Capability,
                 Messages =
                 [
-                    new ModelMessage(ModelMessageRoles.User, request.UserInstruction)
+                    new AIKernel.Dtos.Execution.ModelMessage("user", request.UserInstruction)
                 ],
                 EstimatedInputTokens = 1,
                 Metadata = ImmutableDictionary<string, string>.Empty
@@ -353,12 +359,12 @@ public sealed class KernelExecutorTests
             {
                 PromptId = "prompt:executor",
                 PromptHash = "sha256:executor-prompt",
-                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
-                ContextHash = request.ContextSnapshot.ContextHash,
+                ContextSnapshotId = request.ContextSnapshotId,
+                ContextHash = request.ContextHash,
                 Capability = request.Capability,
                 Messages =
                 [
-                    new ModelMessage(ModelMessageRoles.User, request.UserInstruction)
+                    new AIKernel.Dtos.Execution.ModelMessage("user", request.UserInstruction)
                 ],
                 EstimatedInputTokens = 1,
                 Metadata = ImmutableDictionary<string, string>.Empty
@@ -383,7 +389,7 @@ public sealed class KernelExecutorTests
 
         public string Name => "Fake Provider";
 
-        public string Version => "0.0.3";
+        public string Version => "0.0.4";
 
         public IProviderCapabilities GetCapabilities()
         {
@@ -505,19 +511,14 @@ public sealed class KernelExecutorTests
 
     private static KernelExecutionRequest CreateExecutionRequest()
     {
-        IContextSnapshot snapshot = new AssembledContextSnapshot(
-            snapshotId: "snapshot:executor",
-            parentSnapshotId: null,
-            createdAtUtc: DateTimeOffset.UnixEpoch,
-            contextHash: "sha256:executor-context",
-            context: new ContextCollectionSnapshot([]));
-
         return new KernelExecutionRequest
         {
-            ContextSnapshot = snapshot,
+            ContextSnapshotId = "snapshot:executor",
+            ContextHash = "sha256:executor-context",
+            ContextBlocks = [],
             UserInstruction = "hello",
-            PromptOptions = PromptGenerationOptions.Default,
-            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            PromptOptions = TestExecutionDefaults.PromptOptions,
+            ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
             RequestedModelId = "gpt-test"
         };
     }

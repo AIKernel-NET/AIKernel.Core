@@ -3,6 +3,7 @@ namespace AIKernel.Providers.MicrosoftAI.DependencyInjection;
 using System.Collections.Immutable;
 using AIKernel.Abstractions.Providers;
 using AIKernel.Dtos.Execution;
+using AIKernel.Enums;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,11 @@ using Microsoft.Extensions.Options;
 
 public static class OpenAIHostingExtensions
 {
+    private const string UserRole = "user";
+    private const string SystemRole = "system";
+    private const string AssistantRole = "assistant";
+    private const string ToolRole = "tool";
+
     public static TBuilder WithOpenAI<TBuilder>(
         this TBuilder builder,
         Action<OpenAICompatibleProviderOptions> configure,
@@ -97,22 +103,22 @@ public static class OpenAIHostingExtensions
 
         var supportedRoles = new List<string>
         {
-            ModelMessageRoles.User
+            UserRole
         };
 
         if (options.SupportsSystemRole)
         {
-            supportedRoles.Add(ModelMessageRoles.System);
+            supportedRoles.Add(SystemRole);
         }
 
         if (options.SupportsAssistantRole)
         {
-            supportedRoles.Add(ModelMessageRoles.Assistant);
+            supportedRoles.Add(AssistantRole);
         }
 
         if (options.SupportsToolRole)
         {
-            supportedRoles.Add(ModelMessageRoles.Tool);
+            supportedRoles.Add(ToolRole);
         }
 
         return new ModelPromptCapability
@@ -124,8 +130,8 @@ public static class OpenAIHostingExtensions
             MaxOutputTokens = options.MaxOutputTokens ?? 1024,
             SupportedRoles = supportedRoles.ToImmutableArray(),
             SystemInstructionRole = options.SupportsSystemRole
-                ? ModelMessageRoles.System
-                : ModelMessageRoles.User
+                ? SystemRole
+                : UserRole
         };
     }
 

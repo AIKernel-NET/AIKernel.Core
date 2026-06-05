@@ -150,8 +150,8 @@ public sealed class ModelProviderHostingExtensionsTests
             MessageFormat = PromptMessageFormat.ChatMessages,
             MaxInputTokens = 2048,
             MaxOutputTokens = 512,
-            SupportedRoles = [ModelMessageRoles.User],
-            SystemInstructionRole = ModelMessageRoles.User
+            SupportedRoles = ["user"],
+            SystemInstructionRole = "user"
         };
     }
 
@@ -160,10 +160,12 @@ public sealed class ModelProviderHostingExtensionsTests
     {
         return new KernelExecutionRequest
         {
-            ContextSnapshot = CreateContextSnapshot(),
+            ContextSnapshotId = "snapshot:external-capability",
+            ContextHash = "sha256:external-capability",
+            ContextBlocks = [],
             UserInstruction = "run capability",
-            PromptOptions = PromptGenerationOptions.Default,
-            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            PromptOptions = TestExecutionDefaults.PromptOptions,
+            ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
             RequestedModelId = modelId
         };
     }
@@ -195,7 +197,7 @@ public sealed class ModelProviderHostingExtensionsTests
 
         public string Name => "External Capability Provider";
 
-        public string Version => "0.0.3";
+        public string Version => "0.0.4";
 
         public IProviderCapabilities GetCapabilities()
         {

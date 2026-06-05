@@ -4,11 +4,13 @@ using System.Collections.Immutable;
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Common.Results;
+using AIKernel.Core.Context;
 using AIKernel.Core.Execution;
 using AIKernel.Core.Rom;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
+using AIKernel.Enums;
 
 internal sealed class KernelFailureResultFactory
 {

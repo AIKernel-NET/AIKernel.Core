@@ -3,6 +3,7 @@ namespace AIKernel.Core.Execution;
 using System.Collections.Immutable;
 using AIKernel.Common.Results;
 using AIKernel.Dtos.Execution;
+using AIKernel.Enums;
 
 internal sealed class KernelExecutionSuccessResultFactory
 {
@@ -36,8 +37,8 @@ internal sealed class KernelExecutionSuccessResultFactory
                 Status = ExecutionStatus.Succeeded,
                 ProviderId = capability.ProviderId,
                 ModelId = capability.ModelId,
-                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
-                ContextHash = request.ContextSnapshot.ContextHash,
+                ContextSnapshotId = request.ContextSnapshotId,
+                ContextHash = request.ContextHash,
                 PromptHash = prompt.PromptHash,
                 OutputText = output,
                 Usage = new ExecutionUsage(

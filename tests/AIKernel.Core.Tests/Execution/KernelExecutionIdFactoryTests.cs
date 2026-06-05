@@ -129,10 +129,12 @@ public sealed class KernelExecutionIdFactoryTests
         var result = factory.TryCreateExecutionId(
             new KernelExecutionRequest
             {
-                ContextSnapshot = null!,
+                ContextSnapshotId = string.Empty,
+                ContextHash = string.Empty,
+                ContextBlocks = [],
                 UserInstruction = "hello",
-                PromptOptions = PromptGenerationOptions.Default,
-                ExecutionOptions = ExecutionOptions.DeterministicDefault,
+                PromptOptions = TestExecutionDefaults.PromptOptions,
+                ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
                 RequestedModelId = "gpt-test"
             },
             ExecutionStatus.Failed,
@@ -142,7 +144,7 @@ public sealed class KernelExecutionIdFactoryTests
             executionSequence: 1);
 
         Assert.True(result.IsFailure);
-        Assert.Equal("ContextSnapshot is required.", result.Error!.Message);
+        Assert.Equal("ContextSnapshotId is required.", result.Error!.Message);
         AssertSemanticHashFailure(result.Error);
     }
 
@@ -179,19 +181,14 @@ public sealed class KernelExecutionIdFactoryTests
 
     private static KernelExecutionRequest CreateExecutionRequest()
     {
-        IContextSnapshot snapshot = new AssembledContextSnapshot(
-            snapshotId: "snapshot:1",
-            parentSnapshotId: null,
-            createdAtUtc: DateTimeOffset.UnixEpoch,
-            contextHash: "sha256:context",
-            context: new ContextCollectionSnapshot([]));
-
         return new KernelExecutionRequest
         {
-            ContextSnapshot = snapshot,
+            ContextSnapshotId = "snapshot:1",
+            ContextHash = "sha256:context",
+            ContextBlocks = [],
             UserInstruction = "hello",
-            PromptOptions = PromptGenerationOptions.Default,
-            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            PromptOptions = TestExecutionDefaults.PromptOptions,
+            ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
             RequestedModelId = "gpt-test"
         };
     }
@@ -203,15 +200,15 @@ public sealed class KernelExecutionIdFactoryTests
             Input = "hello",
             RootRomId = new RomId("root"),
             VfsProviderId = "memory-file",
-            VfsCredentials = new TestVfsCredentials(),
+            Credentials = new VfsCredentials(),
             Scope = new ContextAssemblyScope
             {
                 Purpose = "test",
                 Capabilities = ["execute"],
                 Metadata = ImmutableDictionary<string, string>.Empty
             },
-            PromptOptions = PromptGenerationOptions.Default,
-            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            PromptOptions = TestExecutionDefaults.PromptOptions,
+            ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
             RequestedModelId = "gpt-test",
             Metadata = ImmutableDictionary<string, string>.Empty
         };

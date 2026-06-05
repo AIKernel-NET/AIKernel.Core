@@ -78,6 +78,10 @@ public sealed class SimpleTokenizer : ITokenizer
         {
             LogicalTokenCount = logicalTokenCount,
             PhysicalCardinality = physicalCardinality,
+            PaddingAmount = Math.Max(0, physicalCardinality - logicalTokenCount),
+            PaddingPercentage = logicalTokenCount <= 0
+                ? 0
+                : (float)Math.Max(0, physicalCardinality - logicalTokenCount) / logicalTokenCount,
             PaddingMethod = "none",
             Rationale = "Simple tokenizer does not apply padding."
         };

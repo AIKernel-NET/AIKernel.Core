@@ -134,11 +134,23 @@ ABI と振る舞いの規律を検証するための Contract Test Framework で
 ### 1. パッケージのインストール
 
 ```bash
-dotnet add package AIKernel.Core
-dotnet add package AIKernel.Hosting
-dotnet add package AIKernel.Kernel
-dotnet add package AIKernel.Providers.MicrosoftAI
+dotnet add package AIKernel.Core --version 0.0.4
+dotnet add package AIKernel.Hosting --version 0.0.4
+dotnet add package AIKernel.Kernel --version 0.0.4
+dotnet add package AIKernel.Providers.MicrosoftAI --version 0.0.4
 ```
+
+関数型プリミティブや Contract Test helper を直接利用する場合:
+
+```bash
+dotnet add package AIKernel.Common --version 0.0.4
+dotnet add package AIKernel.TestKit --version 0.0.4
+```
+
+v0.0.4 package family は、AIKernel.NET の契約パッケージ
+`AIKernel.Abstractions`、`AIKernel.Dtos`、`AIKernel.Enums` v0.0.4 と同期しています。
+`AIKernel.Vfs` は独立した NuGet 依存ではなくなり、VFS 契約は
+`AIKernel.Abstractions` から提供されます。
 
 ### 2. API ホスト向けに Core を登録する
 
@@ -215,6 +227,13 @@ DSL は決定論的な `ResultStep` pipeline に compile され、有限 `Loop` 
 として保存し、`dsl://{namespace}/{name}` で再利用可能 capability として呼び出せます。
 schema と運用規則は、AIKernel.NET の
 `docs/architecture/18.DSL_PIPELINE_AND_ROM_SPEC-jp.md` にある正典文書で定義されています。
+
+チャット履歴も immutable な HistoryROM asset として固定できます。
+`HistoryRomStore.SaveHistoryAsRomAsync` は、順序付き chat record を署名済み Markdown ROM
+へ変換し、VFS の `rom/history/{namespace}/{name}.md` に保存して、
+`history://{namespace}/{name}` として登録します。HistoryROM の読み込みは他の Core ROM
+asset と同じ ROM signature verification path を使い、hash mismatch や既存 history path
+への異なる内容での上書きを拒否します。
 
 ---
 

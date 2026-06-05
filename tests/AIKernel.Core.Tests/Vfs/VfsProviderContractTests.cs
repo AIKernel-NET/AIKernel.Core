@@ -1,4 +1,4 @@
-﻿namespace AIKernel.Core.Tests.Vfs;
+namespace AIKernel.Core.Tests.Vfs;
 
 using AIKernel.Vfs;
 using Xunit;

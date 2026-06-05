@@ -1,4 +1,4 @@
-﻿namespace AIKernel.IntegrationTests;
+namespace AIKernel.IntegrationTests;
 
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
@@ -8,6 +8,7 @@ using AIKernel.Core.Context;
 using AIKernel.Core.Security;
 using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Execution;
+using AIKernel.Enums;
 using AIKernel.Hosting;
 using AIKernel.Kernel;
 using AIKernel.Providers.MicrosoftAI;
@@ -212,8 +213,8 @@ public sealed class OpenAIHostingExtensionsTests
         Assert.Equal("gpt-demo", capability.ModelId);
         Assert.Equal(4096, capability.MaxInputTokens);
         Assert.Equal(512, capability.MaxOutputTokens);
-        Assert.Contains(ModelMessageRoles.User, capability.SupportedRoles);
-        Assert.Contains(ModelMessageRoles.System, capability.SupportedRoles);
+        Assert.Contains("user", capability.SupportedRoles);
+        Assert.Contains("system", capability.SupportedRoles);
     }
 
     [Fact]
@@ -248,10 +249,12 @@ public sealed class OpenAIHostingExtensionsTests
             modelProvider,
             new KernelExecutionRequest
             {
-                ContextSnapshot = CreateContextSnapshot(),
+                ContextSnapshotId = "snapshot:openai-hosting",
+                ContextHash = "sha256:openai-hosting",
+                ContextBlocks = [],
                 UserInstruction = "hello",
-                PromptOptions = PromptGenerationOptions.Default,
-                ExecutionOptions = ExecutionOptions.DeterministicDefault,
+                PromptOptions = CreatePromptOptions(),
+                ExecutionOptions = CreateExecutionOptions(),
                 RequestedModelId = "gpt-demo"
             });
 
@@ -426,6 +429,27 @@ public sealed class OpenAIHostingExtensionsTests
             createdAtUtc: DateTimeOffset.UnixEpoch,
             contextHash: "sha256:openai-hosting",
             context: new ContextCollectionSnapshot([]));
+    }
+
+    private static PromptGenerationOptions CreatePromptOptions()
+    {
+        return new PromptGenerationOptions
+        {
+            OverflowPolicy = PromptOverflowPolicy.FailClosed,
+            IncludeContextHash = true,
+            IncludeSourceMetadata = true
+        };
+    }
+
+    private static ExecutionOptions CreateExecutionOptions()
+    {
+        return new ExecutionOptions
+        {
+            Temperature = 0,
+            TopP = 1,
+            MaxOutputTokens = 128,
+            StopSequences = []
+        };
     }
 
     private sealed class StubChatClient : IChatClient

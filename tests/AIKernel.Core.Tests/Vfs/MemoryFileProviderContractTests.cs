@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace AIKernel.Core.Tests.VFS;
 
+using AIKernel.Core.Vfs.Abstractions;
 using AIKernel.Vfs;
 using Xunit;
 

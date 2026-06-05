@@ -83,8 +83,8 @@ public sealed class StaticModelPromptCapabilityResolverTests
             MessageFormat = PromptMessageFormat.ChatMessages,
             MaxInputTokens = 2048,
             MaxOutputTokens = 512,
-            SupportedRoles = [ModelMessageRoles.User],
-            SystemInstructionRole = ModelMessageRoles.User
+            SupportedRoles = ["user"],
+            SystemInstructionRole = "user"
         };
     }
 
@@ -93,15 +93,12 @@ public sealed class StaticModelPromptCapabilityResolverTests
     {
         return new KernelExecutionRequest
         {
-            ContextSnapshot = new AssembledContextSnapshot(
-                snapshotId: "snapshot:capability",
-                parentSnapshotId: null,
-                createdAtUtc: DateTimeOffset.UnixEpoch,
-                contextHash: "sha256:capability",
-                context: new ContextCollectionSnapshot([])),
+            ContextSnapshotId = "snapshot:capability",
+            ContextHash = "sha256:capability",
+            ContextBlocks = [],
             UserInstruction = "run capability",
-            PromptOptions = PromptGenerationOptions.Default,
-            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            PromptOptions = TestExecutionDefaults.PromptOptions,
+            ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
             RequestedModelId = modelId
         };
     }
@@ -113,7 +110,7 @@ public sealed class StaticModelPromptCapabilityResolverTests
 
         public string Name => "Fake Provider";
 
-        public string Version => "0.0.3";
+        public string Version => "0.0.4";
 
         public IProviderCapabilities GetCapabilities()
         {

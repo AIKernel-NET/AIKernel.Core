@@ -205,15 +205,15 @@ public sealed class KernelProviderRoutingDecisionTests
             Input = "aik://tools/run",
             RootRomId = new RomId("rom://routing/test"),
             VfsProviderId = "memory-file",
-            VfsCredentials = new TestVfsCredentials(),
+            Credentials = new VfsCredentials(),
             Scope = new ContextAssemblyScope
             {
                 Purpose = "routing-test",
                 Capabilities = ["external"],
                 Metadata = ImmutableDictionary<string, string>.Empty
             },
-            PromptOptions = PromptGenerationOptions.Default,
-            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            PromptOptions = TestExecutionDefaults.PromptOptions,
+            ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
             RequestedModelId = requestedModelId,
             Metadata = ImmutableDictionary<string, string>.Empty
                 .Add("user_key", "user-value")
@@ -235,10 +235,12 @@ public sealed class KernelProviderRoutingDecisionTests
     {
         return new KernelExecutionRequest
         {
-            ContextSnapshot = CreateContextSnapshot(),
+            ContextSnapshotId = "snapshot:routing",
+            ContextHash = "sha256:routing",
+            ContextBlocks = [],
             UserInstruction = "aik://tools/run",
-            PromptOptions = PromptGenerationOptions.Default,
-            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            PromptOptions = TestExecutionDefaults.PromptOptions,
+            ExecutionOptions = TestExecutionDefaults.ExecutionOptions,
             RequestedModelId = requestedModelId
         };
     }
@@ -254,8 +256,8 @@ public sealed class KernelProviderRoutingDecisionTests
             MessageFormat = PromptMessageFormat.ChatMessages,
             MaxInputTokens = 2048,
             MaxOutputTokens = 512,
-            SupportedRoles = [ModelMessageRoles.User],
-            SystemInstructionRole = ModelMessageRoles.User
+            SupportedRoles = ["user"],
+            SystemInstructionRole = "user"
         };
     }
 
@@ -266,7 +268,7 @@ public sealed class KernelProviderRoutingDecisionTests
 
         public string Name => "Fake Provider";
 
-        public string Version => "0.0.3";
+        public string Version => "0.0.4";
 
         public IProviderCapabilities GetCapabilities()
         {

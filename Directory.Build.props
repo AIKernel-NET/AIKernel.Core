@@ -4,10 +4,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
-    <Version>0.0.3</Version>
-    <AssemblyVersion>0.0.3.0</AssemblyVersion>
-    <FileVersion>0.0.3.0</FileVersion>
-    <InformationalVersion>0.0.3</InformationalVersion>
+    <Version>0.0.4</Version>
+    <AssemblyVersion>0.0.4.0</AssemblyVersion>
+    <FileVersion>0.0.4.0</FileVersion>
+    <InformationalVersion>0.0.4</InformationalVersion>
 
     <Authors>Takuya Sogawa</Authors>
     <Company>AIKernel-NET</Company>
@@ -17,7 +17,7 @@
     <Copyright>Copyright © 2026 Takuya Sogawa of AIKernel-NET</Copyright>
     <PackageTags>aikernel;aikernel-core;ai-os;kernel;provider;hosting;rom;vfs;context;execution;immutability;fail-closed</PackageTags>
     <PackageReleaseNotes>
-      AIKernel.Core v0.0.3 - Aligns runtime packages with AIKernel.NET contract packages v0.0.3, including Vfs contract ownership in AIKernel.Abstractions and AIKernel.Vfs type-forwarding compatibility. Removes local draft contract compilation in favor of official package contracts.
+      AIKernel.Core package family v0.0.4 - Initial public release aligned with AIKernel.NET contract packages v0.0.4. Removes the AIKernel.Vfs package dependency, adapts to interface-only contract packages, and keeps runtime parsing and fail-closed exceptions owned by runtime packages.
     </PackageReleaseNotes>
   </PropertyGroup>
 

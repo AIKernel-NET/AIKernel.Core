@@ -12,10 +12,13 @@ using AIKernel.Core.Rom;
 using AIKernel.Core.Tests.Support;
 using AIKernel.Kernel;
 using AIKernel.Dtos.Core;
+using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Dtos.Rom;
 using AIKernel.Dtos.Routing;
+using AIKernel.Dtos.Vfs;
+using AIKernel.Enums;
 using AIKernel.Vfs;
 
 public sealed class KernelConcreteContractTests : KernelContractTests
@@ -282,7 +285,7 @@ public sealed class KernelConcreteContractTests : KernelContractTests
             Input = "Summarize the context.",
             RootRomId = new RomId(rootRomId),
             VfsProviderId = "memory-file",
-            VfsCredentials = new FakeVfsCredentials(),
+            Credentials = new VfsCredentials(),
             Scope = new ContextAssemblyScope
             {
                 Purpose = "contract-test",
@@ -291,8 +294,8 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                     ? null!
                     : ImmutableDictionary<string, string>.Empty
             },
-            PromptOptions = PromptGenerationOptions.Default,
-            ExecutionOptions = ExecutionOptions.DeterministicDefault,
+            PromptOptions = CreatePromptOptions(),
+            ExecutionOptions = CreateExecutionOptions(),
             RequestedModelId = "gpt-test",
             Metadata = useNullMetadata
                 ? null!
@@ -391,8 +394,8 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 Status = ExecutionStatus.Succeeded,
                 ProviderId = provider.ProviderId,
                 ModelId = request.RequestedModelId ?? "gpt-test",
-                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
-                ContextHash = request.ContextSnapshot.ContextHash,
+                ContextSnapshotId = request.ContextSnapshotId,
+                ContextHash = request.ContextHash,
                 PromptHash = "sha256:prompt",
                 OutputText = "contract output",
                 Usage = new ExecutionUsage(
@@ -426,8 +429,8 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 Status = ExecutionStatus.Succeeded,
                 ProviderId = provider.ProviderId,
                 ModelId = request.RequestedModelId ?? "gpt-test",
-                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
-                ContextHash = request.ContextSnapshot.ContextHash,
+                ContextSnapshotId = request.ContextSnapshotId,
+                ContextHash = request.ContextHash,
                 PromptHash = "sha256:prompt",
                 OutputText = "contract output",
                 Usage = new ExecutionUsage(
@@ -457,8 +460,8 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 Status = ExecutionStatus.Succeeded,
                 ProviderId = "executor-provider",
                 ModelId = "executor-model",
-                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
-                ContextHash = request.ContextSnapshot.ContextHash,
+                ContextSnapshotId = request.ContextSnapshotId,
+                ContextHash = request.ContextHash,
                 PromptHash = "sha256:prompt",
                 OutputText = "contract output",
                 Usage = new ExecutionUsage(
@@ -521,8 +524,8 @@ public sealed class KernelConcreteContractTests : KernelContractTests
                 Status = ExecutionStatus.Succeeded,
                 ProviderId = provider.ProviderId,
                 ModelId = request.RequestedModelId ?? "gpt-test",
-                ContextSnapshotId = request.ContextSnapshot.SnapshotId,
-                ContextHash = request.ContextSnapshot.ContextHash,
+                ContextSnapshotId = request.ContextSnapshotId,
+                ContextHash = request.ContextHash,
                 PromptHash = "sha256:prompt",
                 OutputText = "contract output",
                 Usage = new ExecutionUsage(
@@ -568,7 +571,7 @@ public sealed class KernelConcreteContractTests : KernelContractTests
 
         public string Name => "Fake Provider";
 
-        public string Version => "0.0.3";
+        public string Version => "0.0.4";
 
         public IProviderCapabilities GetCapabilities()
         {
@@ -692,6 +695,27 @@ public sealed class KernelConcreteContractTests : KernelContractTests
 
         public IReadOnlyDictionary<string, object> Parameters =>
             ImmutableDictionary<string, object>.Empty;
+    }
+
+    private static PromptGenerationOptions CreatePromptOptions()
+    {
+        return new PromptGenerationOptions
+        {
+            OverflowPolicy = PromptOverflowPolicy.FailClosed,
+            IncludeContextHash = true,
+            IncludeSourceMetadata = true
+        };
+    }
+
+    private static ExecutionOptions CreateExecutionOptions()
+    {
+        return new ExecutionOptions
+        {
+            Temperature = 0,
+            TopP = 1,
+            MaxOutputTokens = 128,
+            StopSequences = []
+        };
     }
 
     private sealed class FakeVfsSession : IVfsSession

@@ -7,6 +7,8 @@ using AIKernel.Abstractions.Kernel;
 using AIKernel.Abstractions.Providers;
 using AIKernel.Abstractions.Scheduling;
 using AIKernel.Abstractions.Security;
+using AIKernel.Core.Context;
+using AIKernel.Core.Execution;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Context;
 using AIKernel.Core.Rom;
@@ -121,7 +123,9 @@ public sealed class Kernel : IKernel
 
             var executionRequest = new KernelExecutionRequest
             {
-                ContextSnapshot = contextSnapshot,
+                ContextSnapshotId = contextSnapshot.SnapshotId,
+                ContextHash = contextSnapshot.ContextHash,
+                ContextBlocks = CreateContextPromptBlocks(contextSnapshot, request.PromptOptions.IncludeSourceMetadata),
                 UserInstruction = request.Input,
                 PromptOptions = request.PromptOptions,
                 ExecutionOptions = request.ExecutionOptions,
@@ -170,6 +174,37 @@ public sealed class Kernel : IKernel
                 ex,
                 selectedProviderId);
         }
+    }
+
+    private static IReadOnlyList<ContextPromptBlock> CreateContextPromptBlocks(
+        IContextSnapshot snapshot,
+        bool includeSourceMetadata)
+    {
+        return snapshot.Context.GetAll()
+            .OrderBy(fragment => fragment.Category)
+            .ThenBy(fragment => fragment.FragmentId, StringComparer.Ordinal)
+            .Select(fragment => new ContextPromptBlock(
+                Id: fragment.FragmentId,
+                Category: fragment.Category.ToString(),
+                Content: fragment.Content,
+                Priority: ResolveContextPriority(fragment.Category),
+                Metadata: includeSourceMetadata
+                    ? fragment.Metadata ?? new Dictionary<string, string>(StringComparer.Ordinal)
+                    : new Dictionary<string, string>(StringComparer.Ordinal)))
+            .ToArray();
+    }
+
+    private static int ResolveContextPriority(ContextCategory category)
+    {
+        return category switch
+        {
+            ContextCategory.Governance => 1000,
+            ContextCategory.Orchestration => 900,
+            ContextCategory.Material => 700,
+            ContextCategory.History => 500,
+            ContextCategory.Expression => 100,
+            _ => 300
+        };
     }
 
     public string GetVersion()
@@ -263,9 +298,9 @@ public sealed class Kernel : IKernel
             throw new KernelRequestValidationException("VfsProviderId is required.");
         }
 
-        if (request.VfsCredentials is null)
+        if (request.Credentials is null)
         {
-            throw new KernelRequestValidationException("VfsCredentials is required.");
+            throw new KernelRequestValidationException("Credentials is required.");
         }
 
         if (request.Scope is null)

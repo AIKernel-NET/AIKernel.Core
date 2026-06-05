@@ -8,9 +8,14 @@ using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
 using AIKernel.Common.Results;
 using AIKernel.Dtos.Execution;
+using AIKernel.Enums;
+using ExecutionModelMessage = AIKernel.Dtos.Execution.ModelMessage;
 
 public sealed class DefaultPromptGenerator : IPromptGenerator
 {
+    private const string SystemRole = "system";
+    private const string UserRole = "user";
+
     private readonly IContextPromptProjector _projector;
     private readonly ITokenizer _tokenizer;
 
@@ -27,16 +32,14 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        ArgumentNullException.ThrowIfNull(request.ContextSnapshot);
+        ArgumentNullException.ThrowIfNull(request.ContextBlocks);
         ArgumentNullException.ThrowIfNull(request.Capability);
 
         cancellationToken.ThrowIfCancellationRequested();
 
         ValidateCapability(request.Capability);
 
-        var blocks = _projector.Project(
-            request.ContextSnapshot,
-            new PromptProjectionOptions(request.Options.IncludeSourceMetadata));
+        var blocks = NormalizeBlocks(request.ContextBlocks, request.Options.IncludeSourceMetadata);
 
         var messages = BuildMessages(request, blocks);
         var estimatedTokens = CountMessages(messages);
@@ -67,7 +70,7 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
         }
 
         var promptHash = ComputePromptHash(
-            request.ContextSnapshot.ContextHash,
+            request.ContextHash,
             request.Capability,
             messages);
 
@@ -75,8 +78,8 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
         {
             PromptId = $"prompt:{promptHash}",
             PromptHash = promptHash,
-            ContextSnapshotId = request.ContextSnapshot.SnapshotId,
-            ContextHash = request.ContextSnapshot.ContextHash,
+            ContextSnapshotId = request.ContextSnapshotId,
+            ContextHash = request.ContextHash,
             Capability = request.Capability,
             Messages = messages.ToImmutableArray(),
             EstimatedInputTokens = estimatedTokens,
@@ -115,13 +118,13 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
             throw new UnsupportedPromptCapabilityException("SupportedRoles must not be empty.");
         }
 
-        if (!capability.SupportedRoles.Contains(ModelMessageRoles.User))
+        if (!capability.SupportedRoles.Contains(UserRole))
         {
             throw new UnsupportedPromptCapabilityException("Capability must support the user role.");
         }
     }
 
-    private static IReadOnlyList<IModelMessage> BuildMessages(
+    private static IReadOnlyList<ExecutionModelMessage> BuildMessages(
         PromptGenerationRequest request,
         IReadOnlyList<ContextPromptBlock> blocks)
     {
@@ -135,23 +138,23 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
         };
     }
 
-    private static IReadOnlyList<IModelMessage> BuildChatMessages(
+    private static IReadOnlyList<ExecutionModelMessage> BuildChatMessages(
         PromptGenerationRequest request,
         IReadOnlyList<ContextPromptBlock> blocks)
     {
         var systemText = BuildSystemInstruction(request, blocks);
         var systemRole = request.Capability.SupportsSystemMessages
-            ? ModelMessageRoles.System
+            ? SystemRole
             : request.Capability.SystemInstructionRole;
 
         return
         [
-            new ModelMessage(systemRole, systemText),
-            new ModelMessage(ModelMessageRoles.User, request.UserInstruction.Trim())
+            new ExecutionModelMessage(systemRole, systemText),
+            new ExecutionModelMessage(UserRole, request.UserInstruction.Trim())
         ];
     }
 
-    private static IReadOnlyList<IModelMessage> BuildSingleUserMessage(
+    private static IReadOnlyList<ExecutionModelMessage> BuildSingleUserMessage(
         PromptGenerationRequest request,
         IReadOnlyList<ContextPromptBlock> blocks)
     {
@@ -159,7 +162,7 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
             + "\n\nUser instruction:\n"
             + request.UserInstruction.Trim();
 
-        return [new ModelMessage(ModelMessageRoles.User, text)];
+        return [new ExecutionModelMessage(UserRole, text)];
     }
 
     private static string BuildSystemInstruction(
@@ -175,8 +178,8 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
 
         if (request.Options.IncludeContextHash)
         {
-            builder.AppendLine($"ContextSnapshotId: {request.ContextSnapshot.SnapshotId}");
-            builder.AppendLine($"ContextHash: {request.ContextSnapshot.ContextHash}");
+            builder.AppendLine($"ContextSnapshotId: {request.ContextSnapshotId}");
+            builder.AppendLine($"ContextHash: {request.ContextHash}");
             builder.AppendLine();
         }
 
@@ -194,7 +197,7 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
         return builder.ToString().Trim();
     }
 
-    private IReadOnlyList<IModelMessage> TrimByPriority(
+    private IReadOnlyList<ExecutionModelMessage> TrimByPriority(
         PromptGenerationRequest request,
         IReadOnlyList<ContextPromptBlock> blocks,
         int maxInputTokens,
@@ -232,7 +235,7 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
             maxInputTokens);
     }
 
-    private int CountMessages(IReadOnlyList<IModelMessage> messages)
+    private int CountMessages(IReadOnlyList<ExecutionModelMessage> messages)
     {
         var total = 0;
 
@@ -248,7 +251,7 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
     private static string ComputePromptHash(
         string contextHash,
         ModelPromptCapability capability,
-        IReadOnlyList<IModelMessage> messages)
+        IReadOnlyList<ExecutionModelMessage> messages)
     {
         var payload = new
         {
@@ -276,5 +279,22 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
         var hash = SHA256.HashData(bytes);
 
         return "sha256:" + Convert.ToHexString(hash).ToLowerInvariant();
+    }
+
+    private static IReadOnlyList<ContextPromptBlock> NormalizeBlocks(
+        IReadOnlyList<ContextPromptBlock> blocks,
+        bool includeSourceMetadata)
+    {
+        if (includeSourceMetadata)
+        {
+            return blocks;
+        }
+
+        return blocks
+            .Select(block => block with
+            {
+                Metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+            })
+            .ToArray();
     }
 }

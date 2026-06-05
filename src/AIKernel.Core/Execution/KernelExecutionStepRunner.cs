@@ -4,6 +4,7 @@ using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
 using AIKernel.Common.Results;
 using AIKernel.Dtos.Execution;
+using ExecutionModelMessage = AIKernel.Dtos.Execution.ModelMessage;
 
 internal sealed class KernelExecutionStepRunner
 {
@@ -52,7 +53,9 @@ internal sealed class KernelExecutionStepRunner
             var prompt = await _promptGenerator
                 .GenerateAsync(
                     new PromptGenerationRequest(
-                        request.ContextSnapshot,
+                        request.ContextSnapshotId,
+                        request.ContextHash,
+                        request.ContextBlocks,
                         request.UserInstruction,
                         capability,
                         request.PromptOptions),
@@ -81,7 +84,7 @@ internal sealed class KernelExecutionStepRunner
         try
         {
             var output = await provider
-                .GenerateAsync(prompt.Messages, cancellationToken)
+                .GenerateAsync(ToProviderMessages(prompt.Messages), cancellationToken)
                 .ConfigureAwait(false);
 
             return Result<string>.Success(output);
@@ -97,6 +100,12 @@ internal sealed class KernelExecutionStepRunner
                 OriginStep.Provider));
         }
     }
+
+    private static IReadOnlyList<IModelMessage> ToProviderMessages(
+        IReadOnlyList<ExecutionModelMessage> messages)
+        => messages
+            .Select(message => new ProviderModelMessage(message.Role, message.Content))
+            .ToArray();
 
     public Result<int> CountOutputTokens(string output)
     {
@@ -137,4 +146,8 @@ internal sealed class KernelExecutionStepRunner
             }
         };
     }
+
+    private sealed record ProviderModelMessage(
+        string Role,
+        string Content) : IModelMessage;
 }

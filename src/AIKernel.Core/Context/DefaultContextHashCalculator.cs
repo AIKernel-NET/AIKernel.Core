@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using AIKernel.Abstractions.Context;
+using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Rom;
 
 public sealed class DefaultContextHashCalculator : IContextHashCalculator

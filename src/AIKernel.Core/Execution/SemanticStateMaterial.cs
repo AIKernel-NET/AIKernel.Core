@@ -3,6 +3,7 @@ namespace AIKernel.Core.Execution;
 using AIKernel.Common.Results;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
+using AIKernel.Enums;
 
 public sealed record SemanticStateMaterial
 {
@@ -53,9 +54,14 @@ public sealed record SemanticStateMaterial
             return Result<SemanticStateMaterial>.Fail(SemanticHashError("KernelExecutionRequest is required."));
         }
 
-        if (request.ContextSnapshot is null)
+        if (string.IsNullOrWhiteSpace(request.ContextSnapshotId))
         {
-            return Result<SemanticStateMaterial>.Fail(SemanticHashError("ContextSnapshot is required."));
+            return Result<SemanticStateMaterial>.Fail(SemanticHashError("ContextSnapshotId is required."));
+        }
+
+        if (string.IsNullOrWhiteSpace(request.ContextHash))
+        {
+            return Result<SemanticStateMaterial>.Fail(SemanticHashError("ContextHash is required."));
         }
 
         // Phase-2 SemanticStateHash boundary:
@@ -64,8 +70,8 @@ public sealed record SemanticStateMaterial
         // changing KernelExecutor or the public execution contract.
         var payload = string.Join(
             '\n',
-            request.ContextSnapshot.ContextHash,
-            request.ContextSnapshot.SnapshotId,
+            request.ContextHash,
+            request.ContextSnapshotId,
             request.RequestedModelId ?? string.Empty,
             promptHash,
             status.ToString(),

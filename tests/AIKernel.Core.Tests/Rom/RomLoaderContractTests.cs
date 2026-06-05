@@ -1,4 +1,4 @@
-﻿namespace AIKernel.Core.Tests.Rom;
+namespace AIKernel.Core.Tests.Rom;
 
 using AIKernel.Abstractions.Rom;
 using AIKernel.Core.Rom;

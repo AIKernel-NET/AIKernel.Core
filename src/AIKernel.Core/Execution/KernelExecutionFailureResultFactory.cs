@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using AIKernel.Common.Results;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Execution;
+using AIKernel.Enums;
 
 internal sealed class KernelExecutionFailureResultFactory
 {
@@ -222,11 +223,15 @@ internal sealed class KernelExecutionFailureResultFactory
 
     private static string GetContextSnapshotId(KernelExecutionRequest request)
     {
-        return request.ContextSnapshot?.SnapshotId ?? "unknown";
+        return string.IsNullOrWhiteSpace(request.ContextSnapshotId)
+            ? "unknown"
+            : request.ContextSnapshotId;
     }
 
     private static string GetContextHash(KernelExecutionRequest request)
     {
-        return request.ContextSnapshot?.ContextHash ?? "unknown";
+        return string.IsNullOrWhiteSpace(request.ContextHash)
+            ? "unknown"
+            : request.ContextHash;
     }
 }

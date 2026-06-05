@@ -3,6 +3,7 @@ namespace AIKernel.Core.Execution;
 using AIKernel.Common.Results;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
+using AIKernel.Enums;
 
 public sealed class KernelExecutionIdFactory
 {

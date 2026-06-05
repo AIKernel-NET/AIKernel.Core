@@ -1,6 +1,5 @@
 namespace AIKernel.Core.Context;
 
-using AIKernel.Abstractions.Context;
 using AIKernel.Dtos.Rom;
 
 public sealed class RomIdentityMismatchException : ContextAssemblyException

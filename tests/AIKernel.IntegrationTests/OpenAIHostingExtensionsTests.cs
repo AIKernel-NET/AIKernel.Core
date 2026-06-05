@@ -42,6 +42,44 @@ public sealed class OpenAIHostingExtensionsTests
     }
 
     [Fact]
+    public void AddAIKernelKernel_RegistersKernelCapabilityInterfaces()
+    {
+        var services = new ServiceCollection();
+
+        services.AddAIKernelCore();
+        services.AddAIKernelKernel();
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        var kernel = provider.GetRequiredService<AIKernel.Abstractions.Kernel.IKernel>();
+
+        Assert.Same(
+            kernel,
+            provider.GetRequiredService<AIKernel.Abstractions.Kernel.IKernelVersionProvider>());
+        Assert.Same(
+            kernel,
+            provider.GetRequiredService<AIKernel.Abstractions.Kernel.IKernelContextExecutor>());
+        Assert.Same(
+            kernel,
+            provider.GetRequiredService<AIKernel.Abstractions.Kernel.IKernelAttentionAnalyzer>());
+        Assert.Same(
+            kernel,
+            provider.GetRequiredService<AIKernel.Abstractions.Kernel.IKernelMaterialPreprocessor>());
+        Assert.Same(
+            kernel,
+            provider.GetRequiredService<AIKernel.Abstractions.Kernel.IKernelExpressionPreparer>());
+        Assert.Same(
+            kernel,
+            provider.GetRequiredService<AIKernel.Abstractions.Kernel.IKernelProviderRouterAccessor>());
+        Assert.Same(
+            kernel,
+            provider.GetRequiredService<AIKernel.Abstractions.Kernel.IKernelGuardAccessor>());
+        Assert.Same(
+            kernel,
+            provider.GetRequiredService<AIKernel.Abstractions.Kernel.IKernelPdpAccessor>());
+    }
+
+    [Fact]
     public void AddAIKernelCore_RegistersHistoryRomServices()
     {
         var services = new ServiceCollection();

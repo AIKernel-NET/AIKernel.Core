@@ -50,6 +50,33 @@ reimplement Kernel internals, `Win32MemoryMapper`, `PosixMemoryMapper`,
 `AIKERNEL_MANAGED_ASSEMBLY_PATH`, then matching packages from the NuGet
 global-packages cache (`NUGET_PACKAGES` or `~/.nuget/packages`).
 
+## Implementation Status
+
+The current Python surface is a native ABI language binding:
+
+```text
+Python
+  -> ctypes
+  -> C++ Native ABI (libtorch_bridge)
+  -> LibTorch
+```
+
+The package also bundles and discovers the managed AIKernel assemblies so hosts
+can locate the .NET Core / Kernel / Capability payloads from Python packaging.
+The managed Capability execution path exists on the .NET side:
+
+```text
+C# LibTorchCapabilityInvoker
+  -> Core IMemoryMapper
+  -> Kernel Win32MemoryMapper / PosixMemoryMapper
+  -> C++ Native ABI (libtorch_bridge)
+```
+
+Python does not yet host the .NET runtime or invoke
+`LibTorchCapabilityInvoker` directly. When that managed bridge is added, it
+should reuse the bundled assemblies and keep Python as an outer API layer
+rather than copying Kernel or OS-specific mapper internals into Python.
+
 For wrapper-only development or CI tests without LibTorch, disable the native
 and managed builds explicitly:
 

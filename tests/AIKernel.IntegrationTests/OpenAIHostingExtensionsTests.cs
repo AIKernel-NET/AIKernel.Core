@@ -421,6 +421,48 @@ public sealed class OpenAIHostingExtensionsTests
     }
 
     [Fact]
+    public async Task WithOpenAI_HydratesProviderAndCapabilityRegistries()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["AIKernel:Providers:OpenAI:ProviderId"] = "openai-demo",
+                    ["AIKernel:Providers:OpenAI:ModelId"] = "gpt-demo",
+                    ["AIKernel:Providers:OpenAI:ApiKey"] = "sk-direct-123456",
+                    ["AIKernel:Providers:OpenAI:MaxInputTokens"] = "4096",
+                    ["AIKernel:Providers:OpenAI:MaxOutputTokens"] = "512"
+                })
+            .Build();
+
+        var services = new ServiceCollection();
+
+        services
+            .AddAIKernelCore()
+            .WithOpenAI(
+                configuration.GetSection("AIKernel:Providers:OpenAI"),
+                (_, _) => new StubChatClient("ok"));
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        var providerRegistry = provider.GetRequiredService<IProviderRegistry>();
+        var capabilityRegistry = provider.GetRequiredService<AIKernel.Abstractions.Routing.ICapabilityRegistry>();
+        var capacity = await capabilityRegistry.GetCapabilityAsync(
+            "openai-demo",
+            TestContext.Current.CancellationToken);
+        var candidates = await capabilityRegistry.ResolveCandidatesAsync(
+            new AIKernel.Dtos.Rules.RuleEvaluationContext(
+                "context",
+                "routing",
+                new Dictionary<string, string>()),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(["openai-demo"], providerRegistry.GetRegisteredProviders());
+        Assert.NotNull(capacity);
+        Assert.Equal(["openai-demo"], candidates);
+    }
+
+    [Fact]
     public async Task WithOpenAI_RegistersDefaultProviderCapabilities()
     {
         var configuration = new ConfigurationBuilder()

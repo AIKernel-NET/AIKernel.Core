@@ -75,6 +75,39 @@ public sealed class ModelProviderHostingExtensionsTests
     }
 
     [Fact]
+    public void WithModelProvider_FactoryKeepsMultipleSameTypeRegistrationsDistinct()
+    {
+        var services = new ServiceCollection();
+
+        services
+            .AddAIKernelCore()
+            .WithModelProvider(
+                _ => new ExternalCapabilityProvider("tools-process-adapter"),
+                CreateCapability("tools-process-adapter", "tools-cli"))
+            .WithModelProvider(
+                _ => new ExternalCapabilityProvider("rh-process-adapter"),
+                CreateCapability("rh-process-adapter", "rh-cli"));
+
+        using var provider = services.BuildServiceProvider();
+
+        var providerIds = provider
+            .GetServices<IModelProvider>()
+            .Select(modelProvider => modelProvider.ProviderId)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+        var registeredIds = provider
+            .GetRequiredService<IProviderRegistry>()
+            .GetRegisteredProviders()
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Equal(
+            ["rh-process-adapter", "tools-process-adapter"],
+            providerIds);
+        Assert.Equal(providerIds, registeredIds);
+    }
+
+    [Fact]
     public void WithModelProvider_RegistersMultipleCapabilitiesForOneProvider()
     {
         var services = new ServiceCollection();

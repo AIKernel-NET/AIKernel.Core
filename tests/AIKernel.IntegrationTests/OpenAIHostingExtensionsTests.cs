@@ -156,6 +156,10 @@ public sealed class OpenAIHostingExtensionsTests
             AIKernel.Abstractions.Providers.IProviderRegistry>());
         Assert.NotNull(provider.GetRequiredService<
             AIKernel.Abstractions.Routing.ICapabilityRegistry>());
+        Assert.NotNull(provider.GetRequiredService<
+            AIKernel.Abstractions.Capabilities.ICapabilityModuleRegistry>());
+        Assert.NotNull(provider.GetRequiredService<
+            AIKernel.Abstractions.Capabilities.ICapabilityModuleInvoker>());
     }
 
     [Fact]

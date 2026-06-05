@@ -4,6 +4,7 @@ using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Rom;
 using AIKernel.Abstractions.Security;
+using AIKernel.Core.Capabilities;
 using AIKernel.Core.ChatHistory;
 using AIKernel.Core.Context;
 using AIKernel.Core.Dsl;
@@ -158,6 +159,10 @@ public static class AIKernelCoreHostingExtensions
             InMemoryProviderRegistry>();
         services.TryAddSingleton<AIKernel.Abstractions.Routing.ICapabilityRegistry,
             InMemoryCapabilityRegistry>();
+        services.TryAddSingleton<AIKernel.Abstractions.Capabilities.ICapabilityModuleRegistry,
+            InMemoryCapabilityModuleRegistry>();
+        services.TryAddSingleton<AIKernel.Abstractions.Capabilities.ICapabilityModuleInvoker,
+            FailClosedCapabilityModuleInvoker>();
 
         return services;
     }

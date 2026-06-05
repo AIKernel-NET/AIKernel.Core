@@ -216,6 +216,13 @@ extension registers the `IModelProvider` implementation and its
 `ModelPromptCapability` entries together, so the static resolver can bind the
 selected ProviderId and ModelId without provider-specific wiring in Core.
 
+For contract-level external Capability modules, Core registers an in-memory
+`ICapabilityModuleRegistry` and a fail-closed `ICapabilityModuleInvoker` by
+default. Hosts can register module descriptors for CLI, assembly-referenced,
+native, DSL ROM, or remote modules without granting execution by accident.
+Actual module execution should be supplied by a trusted Tools, Provider, or
+host package that replaces the default invoker.
+
 User-land routing pipelines can return a `KernelProviderRoutingDecision` from a
 `ResultStep`/LINQ chain, then apply it to a `KernelRequest` and its metadata.
 This supports policies such as low-tier versus high-tier LLM selection, or

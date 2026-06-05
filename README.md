@@ -147,6 +147,12 @@ dotnet add package AIKernel.Common --version 0.0.5
 dotnet add package AIKernel.TestKit --version 0.0.5
 ```
 
+For the optional LibTorch 2.12.0 / CUDA 13.0 Native ABI reference capability:
+
+```bash
+dotnet add package AIKernel.Cuda.Libtorch.2.12-cuda13.0 --version 0.0.5
+```
+
 The v0.0.5 package family is aligned with the AIKernel.NET contract packages
 `AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.0.5.
 `AIKernel.Vfs` is no longer a separate package dependency; the VFS contracts are
@@ -222,6 +228,9 @@ default. Hosts can register module descriptors for CLI, assembly-referenced,
 native, DSL ROM, or remote modules without granting execution by accident.
 Actual module execution should be supplied by a trusted Tools, Provider, or
 host package that replaces the default invoker.
+`AIKernel.Cuda.Libtorch.2.12-cuda13.0` is the first Native ABI reference module:
+it wraps LibTorch through a small C API bridge and intentionally keeps all CUDA
+and LibTorch runtime files outside AIKernel.Core and outside the NuGet payload.
 
 User-land routing pipelines can return a `KernelProviderRoutingDecision` from a
 `ResultStep`/LINQ chain, then apply it to a `KernelRequest` and its metadata.

@@ -72,8 +72,11 @@ The wrapper is intentionally thin:
 - `unload_model_result(handle) -> Result[None]`
 - `managed_assemblies() -> ManagedAssemblySet`
 - `require_managed_assemblies() -> ManagedAssemblySet`
+- `runtime_layout() -> RuntimeLayout`
 
 MemoryRegion / MemoryMapper internals are not exposed to Python.
+`runtime_layout()` reports package file locations only; it does not expose
+KernelContext or OS-specific mapper internals.
 
 ## Monad Syntax
 

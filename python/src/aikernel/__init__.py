@@ -10,7 +10,13 @@ from .bindings import (
     unload_model,
     unload_model_result,
 )
-from .managed import ManagedAssemblySet, managed_assemblies, require_managed_assemblies
+from .managed import (
+    ManagedAssemblySet,
+    RuntimeLayout,
+    managed_assemblies,
+    require_managed_assemblies,
+    runtime_layout,
+)
 from .monads import (
     Failure,
     Nothing,
@@ -30,6 +36,7 @@ __all__ = [
     "Nothing",
     "Option",
     "Result",
+    "RuntimeLayout",
     "Some",
     "Success",
     "Try",
@@ -40,6 +47,7 @@ __all__ = [
     "load_model_result",
     "managed_assemblies",
     "require_managed_assemblies",
+    "runtime_layout",
     "unload_model",
     "unload_model_result",
 ]

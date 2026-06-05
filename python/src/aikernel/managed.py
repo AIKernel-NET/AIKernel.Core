@@ -37,11 +37,30 @@ class ManagedAssemblySet:
         return tuple(sorted(self.root.glob("*.deps.json")))
 
 
+@dataclass(frozen=True)
+class RuntimeLayout:
+    managed: ManagedAssemblySet
+    native_root: Path
+
+    @property
+    def native_libraries(self) -> tuple[Path, ...]:
+        patterns = ("*.dll", "*.so", "*.dylib")
+        return tuple(sorted(path for pattern in patterns for path in self.native_root.glob(pattern)))
+
+
 def managed_assemblies() -> ManagedAssemblySet:
     root = Path(__file__).resolve().parent / "managed"
     return ManagedAssemblySet(
         root=root,
         assemblies=tuple(root / name for name in _MANAGED_ASSEMBLIES),
+    )
+
+
+def runtime_layout() -> RuntimeLayout:
+    package_root = Path(__file__).resolve().parent
+    return RuntimeLayout(
+        managed=managed_assemblies(),
+        native_root=package_root / "native",
     )
 
 

@@ -37,7 +37,16 @@ def test_managed_runtime_file_lists_are_safe_when_empty() -> None:
     assert isinstance(assemblies.dependency_manifests, tuple)
 
 
+def test_runtime_layout_reports_managed_and_native_roots() -> None:
+    layout = managed.runtime_layout()
+
+    assert layout.managed.root.name == "managed"
+    assert layout.native_root.name == "native"
+    assert isinstance(layout.native_libraries, tuple)
+
+
 def test_managed_api_is_exported() -> None:
     assert "managed_assemblies" in aikernel.__all__
     assert "require_managed_assemblies" in aikernel.__all__
+    assert "runtime_layout" in aikernel.__all__
     assert aikernel.managed_assemblies().root.name == "managed"

@@ -45,6 +45,13 @@ def test_result_captures_map_exception() -> None:
     assert isinstance(result.error, ValueError)
 
 
+def test_result_bind_rejects_non_result_return() -> None:
+    result = Success(1).bind(lambda _: "not-a-result")
+
+    assert result.is_err
+    assert isinstance(result.error, TypeError)
+
+
 def test_try_converts_exception_to_failure() -> None:
     result = Try(lambda: int("not-an-int"))
 
@@ -140,6 +147,18 @@ def test_do_result_short_circuit_preserves_metadata() -> None:
     assert result.metadata == {"step": "load", "failure_kind": "fail_closed"}
 
 
+def test_do_result_rejects_non_result_yield() -> None:
+    @do(Result)
+    def pipeline():
+        _ = yield Some("wrong-monad")
+        return "unreachable"
+
+    result = pipeline()
+
+    assert result.is_err
+    assert isinstance(result.error, TypeError)
+
+
 def test_do_option_success_and_none_paths() -> None:
     @do(Option)
     def success_pipeline():
@@ -154,3 +173,13 @@ def test_do_option_success_and_none_paths() -> None:
 
     assert success_pipeline().unwrap() == 5
     assert none_pipeline().is_none
+
+
+def test_do_option_rejects_non_option_yield() -> None:
+    @do(Option)
+    def pipeline():
+        _ = yield Success("wrong-monad")
+        return "unreachable"
+
+    with pytest.raises(TypeError):
+        pipeline()

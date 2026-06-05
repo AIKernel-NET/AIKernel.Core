@@ -8,6 +8,7 @@ from typing import Generic, TypeVar
 
 T = TypeVar("T")
 U = TypeVar("U")
+V = TypeVar("V")
 L = TypeVar("L")
 R = TypeVar("R")
 
@@ -54,6 +55,32 @@ class Result(Generic[T]):
     def map(self, func: Callable[[T], U]) -> Result[U]:
         return self.bind(lambda value: Success(func(value)))
 
+    def Map(self, func: Callable[[T], U]) -> Result[U]:
+        return self.map(func)
+
+    def select(self, selector: Callable[[T], U]) -> Result[U]:
+        return self.map(selector)
+
+    def Select(self, selector: Callable[[T], U]) -> Result[U]:
+        return self.select(selector)
+
+    def select_many(
+        self,
+        binder: Callable[[T], Result[U]],
+        projector: Callable[[T, U], V] | None = None,
+    ) -> Result[V] | Result[U]:
+        if projector is None:
+            return self.bind(binder)
+
+        return self.bind(lambda value: binder(value).map(lambda bound: projector(value, bound)))
+
+    def SelectMany(
+        self,
+        binder: Callable[[T], Result[U]],
+        projector: Callable[[T, U], V] | None = None,
+    ) -> Result[V] | Result[U]:
+        return self.select_many(binder, projector)
+
     def bind(self, func: Callable[[T], Result[U]]) -> Result[U]:
         if self.is_err:
             return Failure(self._error, metadata=self._metadata)
@@ -69,11 +96,47 @@ class Result(Generic[T]):
         metadata = {**self._metadata, **next_result.metadata}
         return next_result.with_metadata(metadata)
 
+    def Bind(self, func: Callable[[T], Result[U]]) -> Result[U]:
+        return self.bind(func)
+
+    def tap(self, action: Callable[[T], object]) -> Result[T]:
+        if self.is_err:
+            return Failure(self._error, metadata=self._metadata)
+
+        try:
+            action(self._value)  # type: ignore[arg-type]
+            return self
+        except Exception as ex:  # noqa: BLE001 - Result intentionally captures exceptions.
+            return Failure(ex, metadata=self._metadata)
+
+    def Tap(self, action: Callable[[T], object]) -> Result[T]:
+        return self.tap(action)
+
+    def where(self, predicate: Callable[[T], bool]) -> Result[T]:
+        if self.is_err:
+            return Failure(self._error, metadata=self._metadata)
+
+        try:
+            if predicate(self._value):  # type: ignore[arg-type]
+                return self
+            return Failure(ValueError("Predicate failed"), metadata=self._metadata)
+        except Exception as ex:  # noqa: BLE001 - Result intentionally captures exceptions.
+            return Failure(ex, metadata=self._metadata)
+
+    def Where(self, predicate: Callable[[T], bool]) -> Result[T]:
+        return self.where(predicate)
+
     def with_metadata(self, metadata: Mapping[str, object]) -> Result[T]:
         if self.is_ok:
             return Success(self._value, metadata=metadata)  # type: ignore[arg-type]
 
         return Failure(self._error, metadata=metadata)
+
+    def match(self, success: Callable[[T], U], failure: Callable[[object | None], U]) -> U:
+        return success(self._value) if self.is_ok else failure(self._error)  # type: ignore[arg-type]
+
+    def Match(self, success: Callable[[T], U], failure: Callable[[object | None], U]) -> U:
+        return self.match(success, failure)
 
     def unwrap(self) -> T:
         if self.is_ok:
@@ -111,6 +174,32 @@ class Option(Generic[T]):
     def map(self, func: Callable[[T], U]) -> Option[U]:
         return self.bind(lambda value: Some(func(value)))
 
+    def Map(self, func: Callable[[T], U]) -> Option[U]:
+        return self.map(func)
+
+    def select(self, selector: Callable[[T], U]) -> Option[U]:
+        return self.map(selector)
+
+    def Select(self, selector: Callable[[T], U]) -> Option[U]:
+        return self.select(selector)
+
+    def select_many(
+        self,
+        binder: Callable[[T], Option[U]],
+        projector: Callable[[T, U], V] | None = None,
+    ) -> Option[V] | Option[U]:
+        if projector is None:
+            return self.bind(binder)
+
+        return self.bind(lambda value: binder(value).map(lambda bound: projector(value, bound)))
+
+    def SelectMany(
+        self,
+        binder: Callable[[T], Option[U]],
+        projector: Callable[[T, U], V] | None = None,
+    ) -> Option[V] | Option[U]:
+        return self.select_many(binder, projector)
+
     def bind(self, func: Callable[[T], Option[U]]) -> Option[U]:
         if self.is_none:
             return Nothing()
@@ -120,6 +209,37 @@ class Option(Generic[T]):
             raise TypeError("Option.bind callback must return Option.")
 
         return next_option
+
+    def Bind(self, func: Callable[[T], Option[U]]) -> Option[U]:
+        return self.bind(func)
+
+    def tap(self, action: Callable[[T], object]) -> Option[T]:
+        if self.is_some:
+            action(self._value)  # type: ignore[arg-type]
+        return self
+
+    def Tap(self, action: Callable[[T], object]) -> Option[T]:
+        return self.tap(action)
+
+    def where(self, predicate: Callable[[T], bool]) -> Option[T]:
+        if self.is_none:
+            return self
+        return self if predicate(self._value) else Nothing()  # type: ignore[arg-type]
+
+    def Where(self, predicate: Callable[[T], bool]) -> Option[T]:
+        return self.where(predicate)
+
+    def or_else(self, fallback: T) -> T:
+        return self._value if self.is_some else fallback  # type: ignore[return-value]
+
+    def OrElse(self, fallback: T) -> T:
+        return self.or_else(fallback)
+
+    def match(self, some: Callable[[T], U], none: Callable[[], U]) -> U:
+        return some(self._value) if self.is_some else none()  # type: ignore[arg-type]
+
+    def Match(self, some: Callable[[T], U], none: Callable[[], U]) -> U:
+        return self.match(some, none)
 
     def unwrap(self) -> T:
         if self.is_some:
@@ -168,6 +288,32 @@ class Either(Generic[L, R]):
     def map(self, func: Callable[[R], U]) -> Either[L, U]:
         return self.bind(lambda value: Right(func(value)))
 
+    def Map(self, func: Callable[[R], U]) -> Either[L, U]:
+        return self.map(func)
+
+    def select(self, selector: Callable[[R], U]) -> Either[L, U]:
+        return self.map(selector)
+
+    def Select(self, selector: Callable[[R], U]) -> Either[L, U]:
+        return self.select(selector)
+
+    def select_many(
+        self,
+        binder: Callable[[R], Either[L, U]],
+        projector: Callable[[R, U], V] | None = None,
+    ) -> Either[L, V] | Either[L, U]:
+        if projector is None:
+            return self.bind(binder)
+
+        return self.bind(lambda value: binder(value).map(lambda bound: projector(value, bound)))
+
+    def SelectMany(
+        self,
+        binder: Callable[[R], Either[L, U]],
+        projector: Callable[[R, U], V] | None = None,
+    ) -> Either[L, V] | Either[L, U]:
+        return self.select_many(binder, projector)
+
     def bind(self, func: Callable[[R], Either[L, U]]) -> Either[L, U]:
         if self.is_left:
             return Left(self._left)  # type: ignore[arg-type]
@@ -177,6 +323,31 @@ class Either(Generic[L, R]):
             raise TypeError("Either.bind callback must return Either.")
 
         return next_either
+
+    def Bind(self, func: Callable[[R], Either[L, U]]) -> Either[L, U]:
+        return self.bind(func)
+
+    def tap(self, action: Callable[[R], object]) -> Either[L, R]:
+        if self.is_right:
+            action(self._right)  # type: ignore[arg-type]
+        return self
+
+    def Tap(self, action: Callable[[R], object]) -> Either[L, R]:
+        return self.tap(action)
+
+    def where(self, predicate: Callable[[R], bool], left_factory: Callable[[], L]) -> Either[L, R]:
+        if self.is_left:
+            return self
+        return self if predicate(self._right) else Left(left_factory())  # type: ignore[arg-type]
+
+    def Where(self, predicate: Callable[[R], bool], left_factory: Callable[[], L]) -> Either[L, R]:
+        return self.where(predicate, left_factory)
+
+    def match(self, left: Callable[[L], U], right: Callable[[R], U]) -> U:
+        return right(self._right) if self.is_right else left(self._left)  # type: ignore[arg-type]
+
+    def Match(self, left: Callable[[L], U], right: Callable[[R], U]) -> U:
+        return self.match(left, right)
 
     def unwrap(self) -> R:
         if self.is_right:

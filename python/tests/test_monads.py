@@ -22,6 +22,42 @@ def test_result_metadata_flows_through_bind() -> None:
     assert result.metadata == {"step": "load", "next": "forward"}
 
 
+def test_result_linq_aliases_compose_and_capture_failures() -> None:
+    observed: list[int] = []
+
+    result = (
+        Success(2)
+        .select(lambda value: value + 1)
+        .select_many(lambda value: Success(value * 2), lambda left, right: left + right)
+        .tap(lambda value: observed.append(value))
+        .where(lambda value: value == 9)
+    )
+    failed = result.where(lambda value: value < 0)
+    exception = Success(1).tap(lambda _: int("not-an-int"))
+
+    assert result.is_ok
+    assert result.unwrap() == 9
+    assert observed == [9]
+    assert failed.is_err
+    assert isinstance(failed.error, ValueError)
+    assert exception.is_err
+    assert isinstance(exception.error, ValueError)
+    assert result.match(lambda value: f"ok:{value}", lambda error: f"err:{error}") == "ok:9"
+
+
+def test_result_csharp_linq_aliases_are_available() -> None:
+    result = (
+        Success(2)
+        .Select(lambda value: value + 1)
+        .SelectMany(lambda value: Success(value * 2), lambda left, right: left + right)
+        .Tap(lambda _: None)
+        .Where(lambda value: value == 9)
+    )
+
+    assert result.is_ok
+    assert result.Match(lambda value: value, lambda _: 0) == 9
+
+
 def test_result_bind_short_circuits_failure() -> None:
     called = False
 
@@ -75,6 +111,39 @@ def test_option_map_bind_success_path() -> None:
     assert option.unwrap() == 8
 
 
+def test_option_linq_aliases_filter_or_else_and_match() -> None:
+    observed: list[int] = []
+
+    option = (
+        Some(2)
+        .select(lambda value: value + 1)
+        .select_many(lambda value: Some(value * 2), lambda left, right: left + right)
+        .tap(lambda value: observed.append(value))
+    )
+    filtered = option.where(lambda value: value < 0)
+
+    assert option.is_some
+    assert option.unwrap() == 9
+    assert observed == [9]
+    assert filtered.is_none
+    assert filtered.or_else(42) == 42
+    assert option.match(lambda value: f"some:{value}", lambda: "none") == "some:9"
+
+
+def test_option_csharp_linq_aliases_are_available() -> None:
+    option = (
+        Some(2)
+        .Select(lambda value: value + 1)
+        .SelectMany(lambda value: Some(value * 2), lambda left, right: left + right)
+        .Tap(lambda _: None)
+        .Where(lambda value: value == 9)
+    )
+
+    assert option.is_some
+    assert option.OrElse(0) == 9
+    assert option.Match(lambda value: value, lambda: 0) == 9
+
+
 def test_option_bind_short_circuits_none() -> None:
     called = False
 
@@ -99,6 +168,38 @@ def test_either_map_bind_success_path() -> None:
 
     assert either.is_right
     assert either.unwrap() == 8
+
+
+def test_either_linq_aliases_filter_and_match() -> None:
+    observed: list[int] = []
+
+    either = (
+        Right(2)
+        .select(lambda value: value + 1)
+        .select_many(lambda value: Right(value * 2), lambda left, right: left + right)
+        .tap(lambda value: observed.append(value))
+    )
+    filtered = either.where(lambda value: value < 0, lambda: "too-small")
+
+    assert either.is_right
+    assert either.unwrap() == 9
+    assert observed == [9]
+    assert filtered.is_left
+    assert filtered.left_value == "too-small"
+    assert either.match(lambda left: f"left:{left}", lambda right: f"right:{right}") == "right:9"
+
+
+def test_either_csharp_linq_aliases_are_available() -> None:
+    either = (
+        Right(2)
+        .Select(lambda value: value + 1)
+        .SelectMany(lambda value: Right(value * 2), lambda left, right: left + right)
+        .Tap(lambda _: None)
+        .Where(lambda value: value == 9, lambda: "blocked")
+    )
+
+    assert either.is_right
+    assert either.Match(lambda _: 0, lambda value: value) == 9
 
 
 def test_either_bind_short_circuits_left() -> None:

@@ -136,6 +136,42 @@ result = (
 
 `Try(lambda: ...)` is also supported as a shorthand for `Try.run(lambda: ...)`.
 
+LINQ-style aliases are available for Python method chains:
+
+```python
+from aikernel import Right, Success, Try
+
+route = (
+    Try.run(lambda: load_context())
+    .select(lambda context: context.strip())
+    .where(lambda context: len(context) > 0)
+    .select_many(
+        lambda context: Success("cli" if context.startswith("aik") else "llm"),
+        lambda context, provider: {"context": context, "provider": provider},
+    )
+    .tap(lambda decision: audit(decision))
+)
+
+capability = (
+    Right({"provider": "cli", "operation": "observe"})
+    .where(lambda decision: decision["provider"] == "cli", lambda: "not-cli")
+    .select(lambda decision: decision["operation"])
+)
+```
+
+The Python aliases map to the C# Common names:
+
+- `select(...)` mirrors LINQ `Select` and delegates to `map(...)`
+- `select_many(...)` mirrors LINQ `SelectMany` and is expressed as `bind + map`
+- `tap(...)` observes success / Some / Right values without changing them
+- `where(...)` filters in the same short-circuit style as the matching monad
+- `match(...)` folds `Result`, `Option`, or `Either` into a plain value
+- `or_else(...)` is available on `Option`
+
+For users porting C# examples directly, PascalCase aliases are also available:
+`Map`, `Bind`, `Tap`, `Where`, `Select`, `SelectMany`, `Match`, and
+`Option.OrElse`.
+
 Decorator-based do notation:
 
 ```python

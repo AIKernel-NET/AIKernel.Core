@@ -63,7 +63,9 @@ This repository consists of runtime, provider, and verification layers.
 
 ```text
 src/
+  AIKernel.Common
   AIKernel.Core
+  AIKernel.Cuda.Libtorch.2.12-cuda13.0
   AIKernel.Kernel
   AIKernel.Hosting
   Providers/
@@ -76,6 +78,13 @@ tests/
 ```
 
 ### `src/` — Runtime Implementation
+
+#### `AIKernel.Common`
+
+Functional primitives shared by the runtime family.
+
+It contains pure Result / Option / Either helpers and does not depend on
+AIKernel runtime DTOs, providers, hosting, or kernel implementations.
 
 #### `AIKernel.Core`
 
@@ -102,6 +111,12 @@ It provides `IServiceCollection` extensions and default wiring for ASP.NET Core 
 #### `Providers/`
 
 Provider implementations that connect AIKernel to external models and external services.
+
+##### `AIKernel.Cuda.Libtorch.2.12-cuda13.0`
+
+A Windows/MSVC Native ABI reference Capability module for LibTorch 2.12.0 with
+CUDA 13.0. It keeps CUDA and LibTorch runtime files outside the Core runtime and
+outside the NuGet payload.
 
 ##### `AIKernel.Providers.MicrosoftAI`
 

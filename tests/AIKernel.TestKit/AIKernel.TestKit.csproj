@@ -18,6 +18,10 @@ JA: AIKernel.NET 実装向けの Contract Test ツールキットです。Provid
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="..\..\assets\aikernel-logo.png">
+      <Pack>True</Pack>
+      <PackagePath>assets\</PackagePath>
+    </None>
     <None Include="..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

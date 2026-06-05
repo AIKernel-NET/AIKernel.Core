@@ -18,6 +18,10 @@ JA: Microsoft.Extensions.AI を利用した AIKernel.NET 向け Provider 実装�
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="..\..\..\assets\aikernel-logo.png">
+      <Pack>True</Pack>
+      <PackagePath>assets\</PackagePath>
+    </None>
     <None Include="..\..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

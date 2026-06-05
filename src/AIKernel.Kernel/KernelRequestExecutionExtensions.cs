@@ -1,7 +1,6 @@
-#pragma warning disable IDE0130 // Namespace がフォルダー構造と一致しません
-namespace AIKernel.Abstractions.Kernel;
-#pragma warning restore IDE0130 // Namespace がフォルダー構造と一致しません
+namespace AIKernel.Kernel;
 
+using AIKernel.Abstractions.Kernel;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 

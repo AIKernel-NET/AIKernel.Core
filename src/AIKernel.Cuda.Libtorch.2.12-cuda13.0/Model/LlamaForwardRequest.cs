@@ -6,6 +6,8 @@ public sealed record LlamaForwardRequest(
     int ModelHandle,
     int[] InputIds)
 {
+    public const int MaxInputTokens = 4096;
+
     public static LlamaForwardRequestParseResult TryCreate(
         IReadOnlyDictionary<string, string> arguments)
     {
@@ -32,6 +34,19 @@ public sealed record LlamaForwardRequest(
 
         var tokens = inputIdsText
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        if (tokens.Length == 0)
+        {
+            return LlamaForwardRequestParseResult.Fail(
+                "Argument 'input_ids' must contain at least one token id.");
+        }
+
+        if (tokens.Length > MaxInputTokens)
+        {
+            return LlamaForwardRequestParseResult.Fail(
+                $"Argument 'input_ids' must contain at most {MaxInputTokens} token ids.");
+        }
+
         var inputIds = new int[tokens.Length];
 
         for (var i = 0; i < tokens.Length; i++)

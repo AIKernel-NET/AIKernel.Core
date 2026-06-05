@@ -153,4 +153,38 @@ public sealed class LibTorchCapabilityModuleTests
         Assert.Null(result.Value);
         Assert.Contains("input_ids", result.ErrorMessage);
     }
+
+    [Fact]
+    public void TryCreate_RejectsEmptyInputIds()
+    {
+        var result = LlamaForwardRequest.TryCreate(
+            new Dictionary<string, string>
+            {
+                ["model_handle"] = "42",
+                ["input_ids"] = ", ,"
+            });
+
+        Assert.False(result.Succeeded);
+        Assert.Null(result.Value);
+        Assert.Contains("at least one", result.ErrorMessage);
+    }
+
+    [Fact]
+    public void TryCreate_RejectsInputIdsOverLimit()
+    {
+        var inputIds = string.Join(
+            ",",
+            Enumerable.Range(0, LlamaForwardRequest.MaxInputTokens + 1));
+
+        var result = LlamaForwardRequest.TryCreate(
+            new Dictionary<string, string>
+            {
+                ["model_handle"] = "42",
+                ["input_ids"] = inputIds
+            });
+
+        Assert.False(result.Succeeded);
+        Assert.Null(result.Value);
+        Assert.Contains("at most", result.ErrorMessage);
+    }
 }

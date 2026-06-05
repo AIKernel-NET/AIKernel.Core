@@ -19,6 +19,7 @@ The native bridge uses the Cdecl calling convention.
 - `forward`
   - Arguments: `model_handle`, `input_ids`
   - `input_ids` is a comma-separated list of integer token ids.
+  - `input_ids` accepts up to 4096 token ids.
   - Returns metadata containing `output_tokens` and `logits_count`.
 
 ## Runtime Layout

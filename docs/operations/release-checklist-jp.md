@@ -14,8 +14,9 @@ AIKernel.Core は以下の managed runtime packages を公開します。
 - `AIKernel.Providers.MicrosoftAI`
 - `AIKernel.TestKit`
 
-Python binding は、`aikernel` package を universal `py3-none-any` の
-CPU-only wheel として公開します。
+Python binding は、`aikernel-net` package を universal `py3-none-any` の
+CPU-only wheel として公開します。import package は `aikernel_net` です。
+PyPI の `aikernel` は別プロジェクトです。
 
 AIKernel.Core は CUDA、LibTorch、Native ABI、GPU runtime、Capability 固有 binary を
 公開しません。GPU 対応は外部 Capability repository から提供します。
@@ -54,9 +55,9 @@ py -m pip wheel . -w dist --no-deps
 Python wheel について以下を確認します。
 
 - tag が `py3-none-any`
-- `aikernel/py.typed` を含む
+- `aikernel_net/py.typed` を含む
 - `dist-info/licenses/LICENSE` を含む
-- `aikernel/managed/` 配下に managed assemblies を含む
+- `aikernel_net/managed/` 配下に managed assemblies を含む
 - CUDA、LibTorch、Native ABI、GPU runtime files を含まない
 - Result / Option / Either / Try helpers と DSL pipeline helpers を公開する
 
@@ -75,7 +76,7 @@ CUDA が既定でインストールされるような表現を避けます。
 
 1. AIKernel.NET contract packages を先に公開する。
 2. AIKernel.Core package family を公開する。
-3. CPU-only `aikernel` Python package を公開する。
+3. CPU-only `aikernel-net` Python package を公開する。
 4. 外部 Capability metadata package は managed dependencies が利用可能になってから公開する。
 5. 外部 Capability full runtime package を GitHub Release に添付する。
 
@@ -94,6 +95,6 @@ Python:
 
 ```powershell
 py -m venv .venv
-.\.venv\Scripts\python -m pip install aikernel==0.0.5
-.\.venv\Scripts\python -c "import aikernel; print(aikernel.__version__)"
+.\.venv\Scripts\python -m pip install aikernel-net==0.0.5.1
+.\.venv\Scripts\python -c "import aikernel_net; print(aikernel_net.__version__)"
 ```

@@ -14,8 +14,9 @@ AIKernel.Core publishes the managed runtime packages:
 - `AIKernel.Providers.MicrosoftAI`
 - `AIKernel.TestKit`
 
-The Python binding publishes the `aikernel` package as a universal
-`py3-none-any` CPU-only wheel.
+The Python binding publishes the `aikernel-net` package as a universal
+`py3-none-any` CPU-only wheel. Import it as `aikernel_net`. The PyPI package
+named `aikernel` is a different project.
 
 AIKernel.Core does not publish CUDA, LibTorch, native ABI, GPU runtime, or
 Capability-specific binaries. GPU support is supplied by external Capability
@@ -55,9 +56,9 @@ Before publishing, inspect the generated `.nupkg` files and verify:
 Verify the Python wheel:
 
 - is tagged `py3-none-any`
-- includes `aikernel/py.typed`
+- includes `aikernel_net/py.typed`
 - includes `dist-info/licenses/LICENSE`
-- includes managed assemblies under `aikernel/managed/`
+- includes managed assemblies under `aikernel_net/managed/`
 - does not include CUDA, LibTorch, native ABI, or GPU runtime files
 - exposes Result / Option / Either / Try helpers and DSL pipeline helpers
 
@@ -76,7 +77,7 @@ repository and should not imply that CUDA is installed by default.
 
 1. Publish AIKernel.NET contract packages first.
 2. Publish AIKernel.Core package family.
-3. Publish the CPU-only `aikernel` Python package.
+3. Publish the CPU-only `aikernel-net` Python package.
 4. Publish external Capability metadata packages only after their managed
    dependencies are available.
 5. Attach external Capability full runtime packages to their GitHub Releases.
@@ -96,6 +97,6 @@ For Python:
 
 ```powershell
 py -m venv .venv
-.\.venv\Scripts\python -m pip install aikernel==0.0.5
-.\.venv\Scripts\python -c "import aikernel; print(aikernel.__version__)"
+.\.venv\Scripts\python -m pip install aikernel-net==0.0.5.1
+.\.venv\Scripts\python -c "import aikernel_net; print(aikernel_net.__version__)"
 ```

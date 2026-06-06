@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 from importlib import resources
 
-import aikernel
-from aikernel import managed
+import aikernel_net
+from aikernel_net import managed
 
 
 def test_managed_assembly_manifest_is_stable() -> None:
@@ -85,14 +85,14 @@ def test_runtime_layout_reports_managed_and_native_roots() -> None:
 
 
 def test_managed_api_is_exported() -> None:
-    assert "managed_assemblies" in aikernel.__all__
-    assert "require_managed_assemblies" in aikernel.__all__
-    assert "runtime_layout" in aikernel.__all__
-    assert aikernel.managed_assemblies().root.name == "managed"
+    assert "managed_assemblies" in aikernel_net.__all__
+    assert "require_managed_assemblies" in aikernel_net.__all__
+    assert "runtime_layout" in aikernel_net.__all__
+    assert aikernel_net.managed_assemblies().root.name == "managed"
 
 
 def test_package_declares_inline_types() -> None:
-    marker = resources.files("aikernel").joinpath("py.typed")
+    marker = resources.files("aikernel_net").joinpath("py.typed")
 
     assert marker.is_file()
 

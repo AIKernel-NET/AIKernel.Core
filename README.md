@@ -151,7 +151,7 @@ Integration tests that pass through multiple runtime layers.
 A thin Python binding for AIKernel.Core functional primitives and managed
 assembly discovery.
 
-It installs as the `aikernel` Python package and is CPU-only by default. The
+It installs as the `aikernel-net` Python package and is CPU-only by default. The
 package exposes Python monad helpers and managed assembly discovery; it does not
 ship CUDA, LibTorch, or the native `libtorch_bridge` ABI. The Python package
 does not reimplement OS-specific memory mapping, Kernel internals, or Capability
@@ -198,13 +198,14 @@ Capability repository and publish a separate Capability module.
 For the optional Python language binding:
 
 ```bash
-pip install aikernel
+pip install aikernel-net
 ```
 
 The base Python package is a CPU-only universal `py3-none-any` wheel for
-Windows and Linux. Use NuGet packages from C# hosts, and use the `aikernel` pip
-package from Python hosts. GPU/native runtimes remain explicit Capability
-installs.
+Windows and Linux. Use NuGet packages from C# hosts, and use the `aikernel-net`
+distribution from Python hosts. Import it as `aikernel_net`. The PyPI package
+named `aikernel` is a different project. GPU/native runtimes remain explicit
+Capability installs.
 
 For source-based local validation, install from the repository subdirectory:
 

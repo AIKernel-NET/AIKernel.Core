@@ -3,8 +3,8 @@ requires = ["scikit-build-core", "setuptools", "wheel"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "aikernel"
-version = "0.0.5"
+name = "aikernel-net"
+version = "0.0.5.1"
 description = "Python binding for AIKernel Core functional primitives and managed assembly discovery."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -14,7 +14,7 @@ authors = [
   { name = "Takuya Sogawa" }
 ]
 keywords = [
-  "aikernel",
+  "aikernel-net",
   "capability",
   "monads",
   "managed-assemblies"
@@ -38,7 +38,7 @@ test = [
 cmake.source-dir = "."
 
 [tool.scikit-build.wheel]
-packages = ["src/aikernel"]
+packages = ["src/aikernel_net"]
 py-api = "py3"
 platlib = false
 

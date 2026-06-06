@@ -4,7 +4,7 @@ import pytest
 
 import asyncio
 
-from aikernel import (
+from aikernel_net import (
     Either,
     Failure,
     Left,

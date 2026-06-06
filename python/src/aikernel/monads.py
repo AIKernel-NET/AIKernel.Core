@@ -710,6 +710,27 @@ def do(monad_type: type[Result] | type[Option] | type[Either]):
     return decorator
 
 
+def async_do(monad_type: type[Result] | type[Option] | type[Either]):
+    if monad_type not in (Result, Option, Either):
+        raise TypeError("async_do currently supports Result, Option, and Either.")
+
+    state = _DoState(kind=monad_type)
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if state.kind is Result:
+                return AsyncResult(_run_async_result_do(state, func, args, kwargs))
+            if state.kind is Either:
+                return AsyncEither(_run_async_either_do(state, func, args, kwargs))
+
+            return AsyncOption(_run_async_option_do(state, func, args, kwargs))
+
+        return wrapper
+
+    return decorator
+
+
 def _pure(state: _DoState, value, metadata: Mapping[str, object] | None = None):
     if state.kind is Result:
         return Success(value, metadata=metadata)
@@ -740,6 +761,68 @@ def _short_circuit(state: _DoState, monad, metadata: Mapping[str, object] | None
     if monad.is_none:
         return monad
     return None
+
+
+async def _run_async_result_do(state: _DoState, func, args, kwargs):
+    metadata: dict[str, object] = {}
+    try:
+        yielded = func(*args, **kwargs)
+        if not isinstance(yielded, Generator):
+            return _pure(state, yielded, metadata=metadata)
+
+        current = None
+        while True:
+            try:
+                monad = yielded.send(current)
+            except StopIteration as stop:
+                return _pure(state, stop.value, metadata=metadata)
+
+            result = await _resolve_result(monad, metadata=metadata)
+            if result.is_err:
+                return result
+
+            metadata.update(result.metadata)
+            current = result.unwrap()
+    except Exception as ex:  # noqa: BLE001 - AsyncResult do notation is fail-closed.
+        return Failure(ex, metadata=metadata)
+
+
+async def _run_async_option_do(state: _DoState, func, args, kwargs):
+    yielded = func(*args, **kwargs)
+    if not isinstance(yielded, Generator):
+        return _pure(state, yielded)
+
+    current = None
+    while True:
+        try:
+            monad = yielded.send(current)
+        except StopIteration as stop:
+            return _pure(state, stop.value)
+
+        option = await _resolve_option(monad)
+        if option.is_none:
+            return option
+
+        current = option.unwrap()
+
+
+async def _run_async_either_do(state: _DoState, func, args, kwargs):
+    yielded = func(*args, **kwargs)
+    if not isinstance(yielded, Generator):
+        return _pure(state, yielded)
+
+    current = None
+    while True:
+        try:
+            monad = yielded.send(current)
+        except StopIteration as stop:
+            return _pure(state, stop.value)
+
+        either = await _resolve_either(monad)
+        if either.is_left:
+            return either
+
+        current = either.unwrap()
 
 
 async def _resolve_result(

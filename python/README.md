@@ -210,11 +210,30 @@ def pipeline():
     return output
 ```
 
+Async do notation is available when yielded steps may be awaitables,
+`AsyncResult`, `AsyncOption`, or `AsyncEither` instances:
+
+```python
+from aikernel import Result, Success, async_do, async_result
+
+async def load_context_result():
+    return Success(await load_context_async())
+
+@async_do(Result)
+def async_pipeline():
+    context = yield load_context_result()
+    route = yield async_result(route_provider(context))
+    return route
+
+result = await async_pipeline()
+```
+
 `Result` captures exceptions as failures. `Option` is a pure short-circuit
 container and propagates exceptions normally. `Either` is also pure:
 `Right(value)` flows through `bind` / `map`, while `Left(value)` short-circuits
-without capturing exceptions. `do(Result)`, `do(Option)`, and `do(Either)` are
-supported; only the `Result` form converts exceptions into failures.
+without capturing exceptions. `do(Result)`, `do(Option)`, `do(Either)`,
+`async_do(Result)`, `async_do(Option)`, and `async_do(Either)` are supported;
+only the `Result` forms convert exceptions into failures.
 
 Native wrapper result APIs attach capability lifecycle feedback to
 `Result.metadata`. With the current stable C ABI, asynchronous page-in,

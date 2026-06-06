@@ -15,6 +15,7 @@ from aikernel import (
     Some,
     Success,
     Try,
+    async_do,
     async_either,
     async_option,
     async_result,
@@ -446,6 +447,63 @@ def test_do_result_rejects_non_result_yield() -> None:
     assert isinstance(result.error, TypeError)
 
 
+def test_async_do_result_composes_async_steps_and_preserves_metadata() -> None:
+    async def start():
+        return Success(2, metadata={"step": "start"})
+
+    async def next_value(value: int):
+        return Success(value + 3, metadata={"next": "forward"})
+
+    @async_do(Result)
+    def pipeline():
+        first = yield start()
+        second = yield async_result(next_value(first))
+        return second * 2
+
+    result = _run_async(pipeline())
+
+    assert result.is_ok
+    assert result.unwrap() == 10
+    assert result.metadata == {"step": "start", "next": "forward"}
+
+
+def test_async_do_result_short_circuits_failure() -> None:
+    called = False
+
+    async def blocked():
+        return Failure("stop", metadata={"failure_kind": "fail_closed"})
+
+    async def unreachable():
+        nonlocal called
+        called = True
+        return Success("unreachable")
+
+    @async_do(Result)
+    def pipeline():
+        _ = yield blocked()
+        _ = yield unreachable()
+        return "unreachable"
+
+    result = _run_async(pipeline())
+
+    assert result.is_err
+    assert result.error == "stop"
+    assert result.metadata == {"failure_kind": "fail_closed"}
+    assert called is False
+
+
+def test_async_do_result_rejects_non_result_yield() -> None:
+    @async_do(Result)
+    def pipeline():
+        _ = yield Some("wrong-monad")
+        return "unreachable"
+
+    result = _run_async(pipeline())
+
+    assert result.is_err
+    assert isinstance(result.error, TypeError)
+
+
 def test_do_option_success_and_none_paths() -> None:
     @do(Option)
     def success_pipeline():
@@ -470,6 +528,38 @@ def test_do_option_rejects_non_option_yield() -> None:
 
     with pytest.raises(TypeError):
         pipeline()
+
+
+def test_async_do_option_success_and_none_paths() -> None:
+    async def start():
+        return Some(2)
+
+    async def missing():
+        return Nothing()
+
+    @async_do(Option)
+    def success_pipeline():
+        first = yield start()
+        second = yield async_option(Some(first + 3))
+        return second
+
+    @async_do(Option)
+    def none_pipeline():
+        _ = yield missing()
+        return "unreachable"
+
+    assert _run_async(success_pipeline()).unwrap() == 5
+    assert _run_async(none_pipeline()).is_none
+
+
+def test_async_do_option_rejects_non_option_yield() -> None:
+    @async_do(Option)
+    def pipeline():
+        _ = yield Success("wrong-monad")
+        return "unreachable"
+
+    with pytest.raises(TypeError, match="AsyncOption"):
+        _run_async(pipeline())
 
 
 def test_do_either_success_and_left_paths() -> None:
@@ -501,6 +591,43 @@ def test_do_either_rejects_non_either_yield() -> None:
 
     with pytest.raises(TypeError, match="Either do blocks"):
         pipeline()
+
+
+def test_async_do_either_success_and_left_paths() -> None:
+    async def start():
+        return Right(2)
+
+    async def blocked():
+        return Left("blocked")
+
+    @async_do(Either)
+    def success_pipeline():
+        first = yield start()
+        second = yield async_either(Right(first + 3))
+        return second
+
+    @async_do(Either)
+    def left_pipeline():
+        _ = yield blocked()
+        return "unreachable"
+
+    success = _run_async(success_pipeline())
+    blocked_result = _run_async(left_pipeline())
+
+    assert success.is_right
+    assert success.unwrap() == 5
+    assert blocked_result.is_left
+    assert blocked_result.left_value == "blocked"
+
+
+def test_async_do_either_rejects_non_either_yield() -> None:
+    @async_do(Either)
+    def pipeline():
+        _ = yield Success("wrong-monad")
+        return "unreachable"
+
+    with pytest.raises(TypeError, match="AsyncEither"):
+        _run_async(pipeline())
 
 
 def test_do_either_propagates_exceptions() -> None:

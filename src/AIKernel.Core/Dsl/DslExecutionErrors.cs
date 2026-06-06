@@ -13,6 +13,14 @@ internal static class DslExecutionErrors
             SemanticSlot = SemanticSlot.T
         };
 
+    public static ErrorContext PredicateRejected(string message)
+        => new(message, "DSL_PREDICATE_REJECTED", false)
+        {
+            FailureKind = FailureKind.Reject,
+            OriginStep = OriginStep.KernelFacade,
+            SemanticSlot = SemanticSlot.T
+        };
+
     public static ErrorContext CapabilityException(
         string capabilityName,
         Exception exception)

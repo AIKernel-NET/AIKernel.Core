@@ -64,6 +64,38 @@ public static class DslPipelineLinqExtensions
             }));
     }
 
+    public static IKernelPipeline Where(
+        this IKernelPipeline pipeline,
+        Func<DslPipelineValue, bool> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(pipeline);
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        return new DelegateKernelPipeline(context =>
+            pipeline.Execute(context).Bind(value =>
+            {
+                bool accepted;
+                try
+                {
+                    accepted = predicate(value);
+                }
+                catch (Exception ex)
+                {
+                    return PredicateExceptionResult(ex);
+                }
+
+                if (accepted)
+                {
+                    return ResultStep<DslPipelineState, DslPipelineValue>
+                        .Success(
+                            DslPipelineState.Initial("dsl.pipeline.linq"),
+                            value);
+                }
+
+                return PredicateRejectedResult();
+            }));
+    }
+
     private static DslPipelineExecutionContext CreateContinuationContext(
         DslPipelineExecutionContext context,
         DslPipelineValue value)
@@ -82,4 +114,33 @@ public static class DslPipelineLinqExtensions
                 "fail_closed",
                 "linq",
                 "select_many"));
+
+    private static ResultStep<DslPipelineState, DslPipelineValue> PredicateRejectedResult()
+        => ResultStep<DslPipelineState, DslPipelineValue>
+            .Fail(
+                DslPipelineState.Initial("dsl.pipeline.linq"),
+                DslExecutionErrors.PredicateRejected(
+                    "DSL LINQ predicate rejected the pipeline value."))
+            .WithSemanticDelta(DslSemanticDeltaFactory.CreateNodeDelta(
+                "dsl.pipeline.linq",
+                "reject",
+                "linq",
+                "where"));
+
+    private static ResultStep<DslPipelineState, DslPipelineValue> PredicateExceptionResult(
+        Exception exception)
+        => ResultStep<DslPipelineState, DslPipelineValue>
+            .Fail(
+                DslPipelineState.Initial("dsl.pipeline.linq"),
+                ErrorContext.FromException(exception) with
+                {
+                    FailureKind = FailureKind.FailClosed,
+                    OriginStep = OriginStep.KernelFacade,
+                    SemanticSlot = SemanticSlot.T
+                })
+            .WithSemanticDelta(DslSemanticDeltaFactory.CreateNodeDelta(
+                "dsl.pipeline.linq",
+                "fail_closed",
+                "linq",
+                "where"));
 }

@@ -745,6 +745,88 @@ public sealed class DslPipelineCompilerTests
         }
     }
 
+    [Fact]
+    public void PipelineLinq_WherePassesWithoutAppendingReplayNode()
+    {
+        var pipeline = Compile("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "CallCapability", "name": "Observe" }
+          ]
+        }
+        """);
+
+        var filtered =
+            from value in pipeline
+            where value.Data["last_capability"] == "Observe"
+            select value.With("filtered", "true");
+
+        var result = filtered.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("true", result.Value!.Data["filtered"]);
+        Assert.Single(result.ReplayLog);
+        Assert.Equal("dsl.capability.call", result.ReplayLog[0].SemanticDelta.Label);
+    }
+
+    [Fact]
+    public void PipelineLinq_WhereRejectsWhenPredicateReturnsFalse()
+    {
+        var pipeline = Compile("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "CallCapability", "name": "Observe" }
+          ]
+        }
+        """);
+
+        var filtered =
+            from value in pipeline
+            where value.Data["last_capability"] == "Decide"
+            select value;
+
+        var result = filtered.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("DSL_PREDICATE_REJECTED", result.Error!.Code);
+        Assert.Equal(FailureKind.Reject, result.Error.FailureKind);
+        Assert.Equal(2, result.ReplayLog.Count);
+        Assert.Equal("reject", result.ReplayLog[^1].SemanticDelta.Kind);
+    }
+
+    [Fact]
+    public void PipelineLinq_WherePredicateExceptionReturnsFailClosedResult()
+    {
+        var pipeline = Compile("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "CallCapability", "name": "Observe" }
+          ]
+        }
+        """);
+
+        var filtered =
+            from value in pipeline
+            where Throws(value)
+            select value;
+
+        var result = filtered.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, result.Error.FailureKind);
+        Assert.Equal(2, result.ReplayLog.Count);
+        Assert.Equal("fail_closed", result.ReplayLog[^1].SemanticDelta.Kind);
+
+        static bool Throws(DslPipelineValue _)
+        {
+            throw new InvalidOperationException("predicate failed.");
+        }
+    }
+
     private static IKernelPipeline Compile(
         string json,
         IDslCapabilityRegistry? registry = null,

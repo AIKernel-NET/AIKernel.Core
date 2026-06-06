@@ -294,10 +294,11 @@ ROM under `rom/dsl/{namespace}/{name}.json` for later invocation through
 `dsl://{namespace}/{name}`. The canonical schema and operational rules are
 documented in AIKernel.NET as `docs/architecture/18.DSL_PIPELINE_AND_ROM_SPEC.md`.
 
-Compiled DSL pipelines also support C# LINQ query composition. `Select` is a
-pure projection and does not append a replay node; `SelectMany` executes the
-next DSL pipeline with the previous output as input and concatenates the
-`ResultStep` replay log.
+Compiled DSL pipelines also support C# LINQ query composition. `Select` and
+passing `where` predicates are pure projections and do not append replay nodes;
+`SelectMany` executes the next DSL pipeline with the previous output as input
+and concatenates the `ResultStep` replay log. Failed `where` predicates are
+recorded as deterministic reject nodes.
 
 ```csharp
 IKernelPipeline observe = compiler.Compile(observeDocument).Value!;
@@ -305,6 +306,7 @@ IKernelPipeline decide = compiler.Compile(decideDocument).Value!;
 
 IKernelPipeline agent =
     from first in observe
+    where first.Data["last_capability"] == "Observe"
     from second in decide
     select second.With(
         "route",

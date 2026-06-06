@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>AIKernel.Common</Title>
+    <PackageProjectUrl>https://aikernel.net/</PackageProjectUrl>
+    <PackageIcon>aikernel-logo128x128.png</PackageIcon>
+    <Description>English
+AIKernel.Common provides foundational utility components shared across the AIKernel ecosystem.
+This package contains cross-cutting features such as functional Result / Option / Either primitives, deterministic ResultStep replay metadata, JSON serialization helpers, file and path utilities, logging primitives, and common exception types.
+It is designed as a lightweight, implementation-level support library used by AIKernel.Core, AIKernel.Tools, and AIKernel.CLI.
+
+AIKernel.Common does not include domain logic or kernel abstractions; instead, it offers standardized behaviors and reusable helpers that ensure consistency across all AIKernel modules.
+
+日本語
+AIKernel.Common は、AIKernel エコシステム全体で共通して利用される基盤ユーティリティ群を提供します。
+本パッケージには、Result / Option / Either などの関数型プリミティブ、決定論的 ResultStep replay metadata、JSON シリアライズ補助、ファイル／パス操作、ロギング基盤、共通例外型など、横断的な機能が含まれています。
+AIKernel.Core、AIKernel.Tools、AIKernel.CLI などの実装レイヤーから利用される軽量なサポートライブラリとして設計されています。
+
+AIKernel.Common はドメインロジックやカーネル抽象を含まず、AIKernel 全モジュール間で一貫した動作と再利用性を提供することを目的としています。</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\aikernel-logo128x128.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

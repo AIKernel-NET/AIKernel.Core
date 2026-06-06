@@ -1,0 +1,99 @@
+# AIKernel.Core リリースチェックリスト
+
+このチェックリストは、AIKernel.Core 0.0.5 package family と CPU-only の
+Python binding を公開するためのものです。
+
+## 公開対象
+
+AIKernel.Core は以下の managed runtime packages を公開します。
+
+- `AIKernel.Common`
+- `AIKernel.Core`
+- `AIKernel.Kernel`
+- `AIKernel.Hosting`
+- `AIKernel.Providers.MicrosoftAI`
+- `AIKernel.TestKit`
+
+Python binding は、`aikernel` package を universal `py3-none-any` の
+CPU-only wheel として公開します。
+
+AIKernel.Core は CUDA、LibTorch、Native ABI、GPU runtime、Capability 固有 binary を
+公開しません。GPU 対応は外部 Capability repository から提供します。
+
+## 事前確認
+
+repository root で実行します。
+
+```powershell
+dotnet test AIKernel.Core.slnx -c Release --no-restore
+dotnet pack AIKernel.Core.slnx -c Release --no-restore
+```
+
+`python/` で実行します。
+
+```powershell
+py -m compileall src tests
+py -m pytest
+py -m pip wheel . -w dist --no-deps
+```
+
+## NuGet package 確認
+
+公開前に生成済み `.nupkg` を確認します。
+
+- package id と version が `0.0.5`
+- license が `Apache-2.0`
+- repository metadata が AIKernel.Core repository を指す
+- README と icon assets が必要な package に含まれる
+- CUDA、LibTorch、Native ABI、外部 Capability binary が含まれない
+- `AIKernel.Vfs` package dependency が存在しない
+- AIKernel.NET contract packages 参照が `0.0.5`
+
+## Python wheel 確認
+
+Python wheel について以下を確認します。
+
+- tag が `py3-none-any`
+- `aikernel/py.typed` を含む
+- `dist-info/licenses/LICENSE` を含む
+- `aikernel/managed/` 配下に managed assemblies を含む
+- CUDA、LibTorch、Native ABI、GPU runtime files を含まない
+- Result / Option / Either / Try helpers と DSL pipeline helpers を公開する
+
+## 外部 Capability 境界
+
+CUDA Capability はこのリリースには含めません。参照 CUDA Capability は
+split distribution を使います。
+
+- NuGet.org には managed AIKernel dependencies を持つ小さな metadata package を置く
+- GitHub Releases には full runtime `.nupkg` を置く
+
+Core documentation は、GPU ユーザーを対応する外部 Capability repository へ誘導し、
+CUDA が既定でインストールされるような表現を避けます。
+
+## 公開順序
+
+1. AIKernel.NET contract packages を先に公開する。
+2. AIKernel.Core package family を公開する。
+3. CPU-only `aikernel` Python package を公開する。
+4. 外部 Capability metadata package は managed dependencies が利用可能になってから公開する。
+5. 外部 Capability full runtime package を GitHub Release に添付する。
+
+## 公開後 smoke check
+
+clean な consumer project で確認します。
+
+```powershell
+dotnet new console
+dotnet add package AIKernel.Core --version 0.0.5
+dotnet add package AIKernel.Kernel --version 0.0.5
+dotnet build
+```
+
+Python:
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\python -m pip install aikernel==0.0.5
+.\.venv\Scripts\python -c "import aikernel; print(aikernel.__version__)"
+```

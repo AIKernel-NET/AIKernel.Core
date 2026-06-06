@@ -18,6 +18,10 @@ JA: Microsoft.Extensions.AI を利用した AIKernel.NET 向け Provider 実装�
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="..\..\..\assets\aikernel-logo.png">
+      <Pack>True</Pack>
+      <PackagePath>assets\</PackagePath>
+    </None>
     <None Include="..\..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -25,9 +29,19 @@ JA: Microsoft.Extensions.AI を利用した AIKernel.NET 向け Provider 実装�
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AIKernel.Abstractions" Version="0.0.1" />
-    <PackageReference Include="AIKernel.Dtos" Version="0.0.1" />
-    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.5.2" />
+    <PackageReference Include="AIKernel.Abstractions" Version="0.0.5" />
+    <PackageReference Include="AIKernel.Dtos" Version="0.0.5" />
+    <PackageReference Include="AIKernel.Enums" Version="0.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.6.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AIKernel.Core\AIKernel.Core.csproj" />
   </ItemGroup>
 
 </Project>

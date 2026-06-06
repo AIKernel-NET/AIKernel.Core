@@ -63,6 +63,7 @@ This repository consists of runtime, provider, and verification layers.
 
 ```text
 src/
+  AIKernel.Common
   AIKernel.Core
   AIKernel.Kernel
   AIKernel.Hosting
@@ -73,9 +74,19 @@ tests/
   AIKernel.TestKit
   AIKernel.Core.Tests
   AIKernel.IntegrationTests
+
+python/
+  AIKernel.Python
 ```
 
 ### `src/` — Runtime Implementation
+
+#### `AIKernel.Common`
+
+Functional primitives shared by the runtime family.
+
+It contains pure Result / Option / Either helpers and does not depend on
+AIKernel runtime DTOs, providers, hosting, or kernel implementations.
 
 #### `AIKernel.Core`
 
@@ -87,11 +98,17 @@ VFS → ROM → Context → Execution
 
 This layer owns the Core runtime logic and separates implementation concerns from external Hosting and Provider boundaries.
 
+It also defines OS-independent `IMemoryRegion` / `IMemoryMapper`
+abstractions for Native Capability modules. The abstractions live in Core while
+the concrete Win32/POSIX mapping implementations live in Kernel.
+
 #### `AIKernel.Kernel`
 
 The governance and orchestration layer of the OS.
 
 It exposes the `IKernel` Facade and integrates all runtime layers.
+It also supplies the default OS-specific `IMemoryMapper` implementation used by
+trusted hosts.
 
 #### `AIKernel.Hosting`
 
@@ -127,49 +144,205 @@ Unit tests for internal runtime logic.
 
 Integration tests that pass through multiple runtime layers.
 
+### `python/` — Language Binding
+
+#### `AIKernel.Python`
+
+A thin Python binding for AIKernel.Core functional primitives and managed
+assembly discovery.
+
+It installs as the `aikernel` Python package and is CPU-only by default. The
+package exposes Python monad helpers and managed assembly discovery; it does not
+ship CUDA, LibTorch, or the native `libtorch_bridge` ABI. The Python package
+does not reimplement OS-specific memory mapping, Kernel internals, or Capability
+internals.
+
 ---
 
 ## Quick Start
 
-> This section describes the intended Draft API for v0.1.0.  
-> Names and signatures may be adjusted during the v0.0.x / v0.1.0 implementation phase.
-
 ### 1. Install Packages
 
 ```bash
-dotnet add package AIKernel.Core
-dotnet add package AIKernel.Hosting
-dotnet add package AIKernel.Providers.MicrosoftAI
+dotnet add package AIKernel.Core --version 0.0.5
+dotnet add package AIKernel.Hosting --version 0.0.5
+dotnet add package AIKernel.Kernel --version 0.0.5
+dotnet add package AIKernel.Providers.MicrosoftAI --version 0.0.5
 ```
 
-### 2. Ignite the Kernel
+For direct use of functional primitives and contract testing helpers:
+
+```bash
+dotnet add package AIKernel.Common --version 0.0.5
+dotnet add package AIKernel.TestKit --version 0.0.5
+```
+
+CUDA is optional and lives outside this repository. GPU hosts should install an
+external Capability package such as `AIKernel.Cuda13.0.Libtorch2.12.win-x64`
+explicitly. CUDA Capability packages may use split distribution: NuGet.org
+contains a small metadata package, while the full runtime package with
+LibTorch/CUDA/native payloads is attached to the matching Capability GitHub
+Release. For CUDA execution, download the full `.nupkg`, add its folder as a
+local NuGet source, and install from that source:
+
+```bash
+dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5 --source <folder-containing-full-cuda-nupkg>
+```
+
+LLM / SLM developers who need direct CUDA integration should read
+[docs/development/cuda-capability-development-guide.md](docs/development/cuda-capability-development-guide.md).
+Other CUDA versions, model runtimes, or Linux CUDA hosts should fork the CUDA
+Capability repository and publish a separate Capability module.
+
+For the optional Python language binding:
+
+```bash
+pip install aikernel
+```
+
+The base Python package is a CPU-only universal `py3-none-any` wheel for
+Windows and Linux. Use NuGet packages from C# hosts, and use the `aikernel` pip
+package from Python hosts. GPU/native runtimes remain explicit Capability
+installs.
+
+For source-based local validation, install from the repository subdirectory:
+
+```bash
+pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
+```
+
+The default Python install is CPU-only/CUDA-free and does not include a native
+bridge. Install GPU integrations from the matching external Capability package
+and follow that Capability repository's distribution instructions.
+
+The v0.0.5 package family is aligned with the AIKernel.NET contract packages
+`AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.0.5.
+`AIKernel.Vfs` is no longer a separate package dependency; the VFS contracts are
+provided by `AIKernel.Abstractions`. The `AIKernel.Vfs` namespace remains as a
+Core implementation namespace for in-process VFS providers and stores; it is not
+a separate NuGet package.
+
+### 2. Register Core for an API Host
+
+Use the Server/API host to hold model credentials and execute OpenAI-compatible
+providers. Keep browser/WASM clients behind your own API boundary; do not place
+model API keys in a WebAssembly client.
 
 ```csharp
-// Configure the DI container
-services.AddAIKernelCore(options =>
-{
-    options.DefaultVfsProviderId = "local";
-});
+builder.Services
+    .AddAIKernelCore(builder.Configuration)
+    .WithOpenAI(
+        builder.Configuration.GetSection("AIKernel:Providers:OpenAI"),
+        (sp, options) =>
+        {
+            // Return an IChatClient from Microsoft.Extensions.AI.
+            // The provider package registers default capabilities and prompt
+            // capability metadata for the configured ProviderId and ModelId.
+            return CreateChatClient(options);
+        });
 
-// Register an OpenAI-compatible Provider through Microsoft.Extensions.AI
-services.AddOpenAICompatibleProvider(sp =>
-    new OpenAICompatibleClient(
-        new Uri("https://your-openai-compatible-endpoint.example.com"),
-        apiKey));
-
-// Execute through the Kernel Facade
-var kernel = serviceProvider.GetRequiredService<IKernel>();
-
-var result = await kernel.ExecuteAsync(new KernelRequest
-{
-    Input = "Explain the design philosophy of AIKernel.",
-    RootRomId = new RomId("rom://aikernel/docs/vision"),
-    VfsProviderId = "local"
-});
-
-Console.WriteLine(result.PrimaryText);
-Console.WriteLine(result.ContextHash);
+builder.Services.AddAIKernelKernel();
 ```
+
+Example configuration:
+
+```json
+{
+  "AIKernel": {
+    "Providers": {
+      "OpenAI": {
+        "ProviderId": "openai-compatible",
+        "ModelId": "gpt-4.1-mini",
+        "SecretKeyName": "OpenAI:ApiKey",
+        "MaxInputTokens": 8192,
+        "MaxOutputTokens": 1024
+      }
+    }
+  },
+  "OpenAI": {
+    "ApiKey": "<store this in user-secrets, Key Vault, or environment configuration>"
+  }
+}
+```
+
+For browser/WASM-oriented clients, register only browser-safe VFS providers in
+the client-side service collection:
+
+```csharp
+services.AddAIKernelBrowserVfsProviders();
+```
+
+Use `AddAIKernelCoreVfsProviders` only in trusted server or desktop hosts where
+local filesystem access is expected.
+
+When a host registers external capability modules or model providers, select the
+provider through request metadata using `KernelFacadeMetadataKeys.ProviderId`.
+This avoids hard-coded metadata strings across AIKernel.Tools, AIKernel.RH, and
+other provider packages.
+
+External provider packages can attach either assembly-referenced providers or
+process-backed adapter providers through `WithModelProvider<TProvider>`. The
+extension registers the `IModelProvider` implementation and its
+`ModelPromptCapability` entries together, so the static resolver can bind the
+selected ProviderId and ModelId without provider-specific wiring in Core.
+
+For contract-level external Capability modules, Core registers an in-memory
+`ICapabilityModuleRegistry` and a fail-closed `ICapabilityModuleInvoker` by
+default. Hosts can register module descriptors for CLI, assembly-referenced,
+native, DSL ROM, or remote modules without granting execution by accident.
+Actual module execution should be supplied by a trusted Tools, Provider, or
+host package that replaces the default invoker.
+GPU and Native ABI implementations are external Capability packages. For
+example, `AIKernel.Cuda13.0.Libtorch2.12.win-x64` owns its native bridge, runtime version metadata,
+and CUDA-specific implementation while conforming to AIKernel Capability
+contracts.
+For trusted hosts, `AddAIKernelKernel()` registers an OS-specific
+`IMemoryMapper` (`Win32MemoryMapper` on Windows, `PosixMemoryMapper` elsewhere)
+behind the Core memory abstraction. Native Capability packages consume only the
+Core abstraction and never reference Kernel directly.
+
+User-land routing pipelines can return a `KernelProviderRoutingDecision` from a
+`ResultStep`/LINQ chain, then apply it to a `KernelRequest` and its metadata.
+This supports policies such as low-tier versus high-tier LLM selection, or
+routing `aik...` contexts to a CLI-backed capability adapter, while keeping
+Kernel execution driven by the same ProviderId / ModelId contract.
+
+AIKernel.Core also includes a standard JSON DSL pipeline runtime for
+AI-generated plans. The DSL compiles to deterministic `ResultStep` pipelines,
+supports finite `Loop` / `LoopUntil` / `Suspend` nodes, and can be saved as DSL
+ROM under `rom/dsl/{namespace}/{name}.json` for later invocation through
+`dsl://{namespace}/{name}`. The canonical schema and operational rules are
+documented in AIKernel.NET as `docs/architecture/18.DSL_PIPELINE_AND_ROM_SPEC.md`.
+
+Compiled DSL pipelines also support C# LINQ query composition. `Select` and
+passing `where` predicates are pure projections and do not append replay nodes;
+`SelectMany` executes the next DSL pipeline with the previous output as input
+and concatenates the `ResultStep` replay log. Failed `where` predicates are
+recorded as deterministic reject nodes.
+
+```csharp
+IKernelPipeline observe = compiler.Compile(observeDocument).Value!;
+IKernelPipeline decide = compiler.Compile(decideDocument).Value!;
+
+IKernelPipeline agent =
+    from first in observe
+    where first.Data["last_capability"] == "Observe"
+    from second in decide
+    select second.With(
+        "route",
+        $"{first.Data["last_capability"]}->{second.Data["last_capability"]}");
+
+var result = agent.Execute(DslPipelineExecutionContext.Create());
+```
+
+Chat histories can also be fixed as immutable HistoryROM assets. Use
+`HistoryRomStore.SaveHistoryAsRomAsync` to convert ordered chat records into a
+signed Markdown ROM, store it in VFS under `rom/history/{namespace}/{name}.md`,
+and register it as `history://{namespace}/{name}`. Loading a HistoryROM uses the
+same ROM signature verification path as other Core ROM assets and rejects hash
+mismatches or attempts to overwrite an existing history path with different
+content.
 
 ---
 
@@ -323,5 +496,5 @@ AIKernel.Core proves them through implementation.
 
 ## License
 
-MIT License.  
+Apache License 2.0.
 See the `LICENSE` file for details.

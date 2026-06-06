@@ -5,6 +5,10 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="..\..\assets\aikernel-logo.png">
+      <Pack>True</Pack>
+      <PackagePath>assets\</PackagePath>
+    </None>
     <None Include="..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -13,6 +17,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AIKernel.Core\AIKernel.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AIKernel.Abstractions" Version="0.0.5" />
+    <PackageReference Include="AIKernel.Dtos" Version="0.0.5" />
+    <PackageReference Include="AIKernel.Enums" Version="0.0.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
   </ItemGroup>
 
   <PropertyGroup>

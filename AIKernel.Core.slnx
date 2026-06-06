@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/AIKernel.Common/AIKernel.Common.csproj" Id="715b84bb-7b0b-4084-a39e-7ae58f0167b8" />
     <Project Path="src/AIKernel.Core/AIKernel.Core.csproj" />
     <Project Path="src/AIKernel.Hosting/AIKernel.Hosting.csproj" />
     <Project Path="src/AIKernel.Kernel/AIKernel.Kernel.csproj" />

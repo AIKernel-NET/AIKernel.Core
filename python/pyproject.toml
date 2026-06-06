@@ -1,0 +1,47 @@
+[build-system]
+requires = ["scikit-build-core", "setuptools", "wheel"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "aikernel"
+version = "0.0.5"
+description = "Python binding for AIKernel Core functional primitives and managed assembly discovery."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Takuya Sogawa" }
+]
+keywords = [
+  "aikernel",
+  "capability",
+  "monads",
+  "managed-assemblies"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13"
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=9.0"
+]
+
+[tool.scikit-build]
+cmake.source-dir = "."
+
+[tool.scikit-build.wheel]
+packages = ["src/aikernel"]
+py-api = "py3"
+platlib = false
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

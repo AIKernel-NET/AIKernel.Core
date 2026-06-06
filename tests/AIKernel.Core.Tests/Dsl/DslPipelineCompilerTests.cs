@@ -640,6 +640,111 @@ public sealed class DslPipelineCompilerTests
         Assert.Equal("dsl.context.invalid", entry.SemanticDelta.Label);
     }
 
+    [Fact]
+    public void PipelineLinq_SelectProjectsWithoutAppendingReplayNode()
+    {
+        var pipeline = Compile("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "CallCapability", "name": "Observe" }
+          ]
+        }
+        """);
+
+        var projected =
+            from value in pipeline
+            select value.With("projection", "done");
+
+        var result = projected.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("done", result.Value!.Data["projection"]);
+        Assert.Equal("Observe", result.Value.Data["last_capability"]);
+        Assert.Single(result.ReplayLog);
+        Assert.Equal("dsl.capability.call", result.ReplayLog[0].SemanticDelta.Label);
+    }
+
+    [Fact]
+    public void PipelineLinq_SelectManyComposesDslPipelinesAndConcatsReplayLog()
+    {
+        var observe = Compile("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "CallCapability", "name": "Observe" }
+          ]
+        }
+        """);
+        var decide = Compile("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "CallCapability", "name": "Decide" }
+          ]
+        }
+        """);
+
+        var pipeline =
+            from first in observe
+            from second in decide
+            select second.With(
+                "linq_path",
+                $"{first.Data["last_capability"]}->{second.Data["last_capability"]}");
+
+        var result = pipeline.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("Observe->Decide", result.Value!.Data["linq_path"]);
+        Assert.Equal("called", result.Value.Data["capability.Observe"]);
+        Assert.Equal("called", result.Value.Data["capability.Decide"]);
+        Assert.Equal(2, result.ReplayLog.Count);
+        Assert.Equal(result.ReplayLog[0].StepId, result.ReplayLog[1].ParentStepId);
+        ReplayMetadataAssertions.AssertReplayLogHash(result.ReplayLogHash);
+    }
+
+    [Fact]
+    public void PipelineLinq_SelectManyShortCircuitsFailure()
+    {
+        var reject = Compile(
+            """
+            {
+              "type": "Pipeline",
+              "steps": [
+                { "type": "CallCapability", "name": "RejectPlan" }
+              ]
+            }
+            """,
+            new TestCapabilityRegistry("RejectPlan"));
+        var execute = Compile("""
+        {
+          "type": "Pipeline",
+          "steps": [
+            { "type": "CallCapability", "name": "ExecutePlan" }
+          ]
+        }
+        """);
+        var binderCalled = false;
+
+        var pipeline =
+            from first in reject
+            from second in BindAfterReject(first)
+            select second;
+
+        var result = pipeline.Execute(DslPipelineExecutionContext.Create());
+
+        Assert.False(binderCalled);
+        Assert.True(result.IsFailure);
+        Assert.Equal("CAPABILITY_REJECTED", result.Error!.Code);
+        Assert.Single(result.ReplayLog);
+
+        IKernelPipeline BindAfterReject(DslPipelineValue _)
+        {
+            binderCalled = true;
+            return execute;
+        }
+    }
+
     private static IKernelPipeline Compile(
         string json,
         IDslCapabilityRegistry? registry = null,

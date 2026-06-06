@@ -294,6 +294,25 @@ ROM under `rom/dsl/{namespace}/{name}.json` for later invocation through
 `dsl://{namespace}/{name}`. The canonical schema and operational rules are
 documented in AIKernel.NET as `docs/architecture/18.DSL_PIPELINE_AND_ROM_SPEC.md`.
 
+Compiled DSL pipelines also support C# LINQ query composition. `Select` is a
+pure projection and does not append a replay node; `SelectMany` executes the
+next DSL pipeline with the previous output as input and concatenates the
+`ResultStep` replay log.
+
+```csharp
+IKernelPipeline observe = compiler.Compile(observeDocument).Value!;
+IKernelPipeline decide = compiler.Compile(decideDocument).Value!;
+
+IKernelPipeline agent =
+    from first in observe
+    from second in decide
+    select second.With(
+        "route",
+        $"{first.Data["last_capability"]}->{second.Data["last_capability"]}");
+
+var result = agent.Execute(DslPipelineExecutionContext.Create());
+```
+
 Chat histories can also be fixed as immutable HistoryROM assets. Use
 `HistoryRomStore.SaveHistoryAsRomAsync` to convert ordered chat records into a
 signed Markdown ROM, store it in VFS under `rom/history/{namespace}/{name}.md`,

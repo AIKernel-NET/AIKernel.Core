@@ -291,6 +291,24 @@ DSL は決定論的な `ResultStep` pipeline に compile され、有限 `Loop` 
 schema と運用規則は、AIKernel.NET の
 `docs/architecture/18.DSL_PIPELINE_AND_ROM_SPEC-jp.md` にある正典文書で定義されています。
 
+compile 済み DSL pipeline は C# の LINQ query 構文でも合成できます。`Select` は純粋な
+投影で ReplayLog node を追加しません。`SelectMany` は前段の出力を次の DSL pipeline
+の入力として渡し、`ResultStep` の ReplayLog を連結します。
+
+```csharp
+IKernelPipeline observe = compiler.Compile(observeDocument).Value!;
+IKernelPipeline decide = compiler.Compile(decideDocument).Value!;
+
+IKernelPipeline agent =
+    from first in observe
+    from second in decide
+    select second.With(
+        "route",
+        $"{first.Data["last_capability"]}->{second.Data["last_capability"]}");
+
+var result = agent.Execute(DslPipelineExecutionContext.Create());
+```
+
 チャット履歴も immutable な HistoryROM asset として固定できます。
 `HistoryRomStore.SaveHistoryAsRomAsync` は、順序付き chat record を署名済み Markdown ROM
 へ変換し、VFS の `rom/history/{namespace}/{name}.md` に保存して、

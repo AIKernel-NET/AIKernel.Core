@@ -233,6 +233,73 @@ public sealed class TaskResultStepExtensionsTests
     }
 
     [Fact]
+    public async Task LinqQuery_WherePassesWithoutAppendingReplayNode()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var step = await (
+            from value in Task.FromResult(ResultStep<string, int>
+                .Success("capability", 2)
+                .WithSemanticDelta(delta))
+            where value == 2
+            select value + 1);
+
+        Assert.True(step.IsSuccess);
+        Assert.Equal(3, step.Value);
+        var entry = Assert.Single(step.ReplayLog);
+        Assert.Equal(delta, entry.SemanticDelta);
+    }
+
+    [Fact]
+    public async Task LinqQuery_WhereFailureAppendsRejectReplayNode()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var step = await (
+            from value in Task.FromResult(ResultStep<string, int>
+                .Success("capability", 2)
+                .WithSemanticDelta(delta))
+            where value > 2
+            select value);
+
+        Assert.True(step.IsFailure);
+        Assert.Equal("PREDICATE_FAILED", step.Error!.Code);
+        Assert.Equal(FailureKind.Reject, step.Error.FailureKind);
+        Assert.Equal(2, step.ReplayLog.Count);
+        Assert.Equal("result_step.where", step.ReplayLog[1].SemanticDelta.Label);
+        Assert.Equal("reject", step.ReplayLog[1].SemanticDelta.Kind);
+    }
+
+    [Fact]
+    public async Task LinqQuery_WhereExceptionAppendsFailClosedReplayNode()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var step = await (
+            from value in Task.FromResult(ResultStep<string, int>
+                .Success("capability", 2)
+                .WithSemanticDelta(delta))
+            where Throws(value)
+            select value);
+
+        Assert.True(step.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", step.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, step.Error.FailureKind);
+        Assert.Equal(2, step.ReplayLog.Count);
+        Assert.Equal("result_step.where", step.ReplayLog[1].SemanticDelta.Label);
+        Assert.Equal("fail_closed", step.ReplayLog[1].SemanticDelta.Kind);
+    }
+
+    [Fact]
     public async Task LinqQuery_ReturnsBinderFailureWithLatestState()
     {
         var failure = new ErrorContext("missing", "MISSING", false);
@@ -272,5 +339,10 @@ public sealed class TaskResultStepExtensionsTests
     private static int ThrowProjector(int value)
     {
         throw new InvalidOperationException("task-step-projector-boom");
+    }
+
+    private static bool Throws(int value)
+    {
+        throw new InvalidOperationException("task-step-predicate-boom");
     }
 }

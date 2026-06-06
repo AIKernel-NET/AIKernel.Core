@@ -29,13 +29,15 @@ Instead, it offers standardized behaviors and reusable helpers that ensure consi
 - `Either<L,R>` for pure left/right branching
 - `ResultStep<TState,TValue>` for deterministic step identity, semantic deltas, and replay logs
 - `PipelineStep` for deterministic finite loops, timeout-style loops, suspend, and resume points
-- LINQ query syntax support through `Select`, `SelectMany`, `Bind`, `Map`, and `Tap`
+- LINQ query syntax support through `Select`, `SelectMany`, `Where`, `Bind`, `Map`, and `Tap`
 
 `PipelineStep` keeps agent-style user-land control flow finite and observable.
 Each loop iteration, suspend point, and resume point is represented as a
 `ResultStepReplayLogEntry`; `Map` remains a pure projection and does not add a
 replay node. Use `PipelineStepMetadataKeys` when reading loop, suspend, and
 resume metadata from external capability modules.
+For `ResultStep`, passing `where` predicates also remain projections; rejected
+or throwing predicates append deterministic reject / fail-closed replay nodes.
 
 ###  JSON Utilities  
 - Unified `JsonSerializerOptions`  

@@ -37,6 +37,14 @@ public static class TaskResultStepExtensions
         return step.Map(selector);
     }
 
+    public static async Task<ResultStep<TState, TValue>> Where<TState, TValue>(
+        this Task<ResultStep<TState, TValue>> task,
+        Func<TValue, bool> predicate)
+    {
+        var step = await task.ConfigureAwait(false);
+        return step.Where(predicate);
+    }
+
     public static Task<ResultStep<TState, TNext>> Select<TState, TValue, TNext>(
         this Task<ResultStep<TState, TValue>> task,
         Func<TValue, TNext> selector)

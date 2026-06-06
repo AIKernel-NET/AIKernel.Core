@@ -292,6 +292,80 @@ public sealed class ResultStepTests
     }
 
     [Fact]
+    public void Where_PassingPredicatePreservesReplayLogWithoutAddingNode()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var step =
+            from value in ResultStep<string, int>
+                .Success("capability", 2)
+                .WithSemanticDelta(delta)
+            where value == 2
+            select value + 1;
+
+        Assert.True(step.IsSuccess);
+        Assert.Equal(3, step.Value);
+        var entry = Assert.Single(step.ReplayLog);
+        Assert.Equal(delta, entry.SemanticDelta);
+    }
+
+    [Fact]
+    public void Where_FailingPredicateAppendsRejectReplayNode()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var step =
+            from value in ResultStep<string, int>
+                .Success("capability", 2)
+                .WithSemanticDelta(delta)
+            where value > 2
+            select value;
+
+        Assert.True(step.IsFailure);
+        Assert.Equal("PREDICATE_FAILED", step.Error!.Code);
+        Assert.Equal(FailureKind.Reject, step.Error.FailureKind);
+        Assert.Equal(2, step.ReplayLog.Count);
+        Assert.Equal(delta, step.ReplayLog[0].SemanticDelta);
+        Assert.Equal("result_step.where", step.ReplayLog[1].SemanticDelta.Label);
+        Assert.Equal("reject", step.ReplayLog[1].SemanticDelta.Kind);
+        Assert.Equal(step.ReplayLog[0].StepId, step.ReplayLog[1].ParentStepId);
+    }
+
+    [Fact]
+    public void Where_PredicateExceptionAppendsFailClosedReplayNode()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var step =
+            from value in ResultStep<string, int>
+                .Success("capability", 2)
+                .WithSemanticDelta(delta)
+            where Throws(value)
+            select value;
+
+        Assert.True(step.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", step.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, step.Error.FailureKind);
+        Assert.Equal(2, step.ReplayLog.Count);
+        Assert.Equal("result_step.where", step.ReplayLog[1].SemanticDelta.Label);
+        Assert.Equal("fail_closed", step.ReplayLog[1].SemanticDelta.Kind);
+
+        static bool Throws(int _)
+        {
+            throw new InvalidOperationException("predicate-boom");
+        }
+    }
+
+    [Fact]
     public void MapState_UpdatesStateOnlyOnSuccess()
     {
         var step = ResultStep<string, int>

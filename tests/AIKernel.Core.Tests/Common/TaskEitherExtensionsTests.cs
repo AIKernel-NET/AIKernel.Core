@@ -231,6 +231,49 @@ public sealed class TaskEitherExtensionsTests
         Assert.Equal("blocked", either.Left);
     }
 
+    [Fact]
+    public async Task Where_ReturnsRight_WhenPredicatePasses()
+    {
+        var either = await RightAsync(4)
+            .Where(value => value > 1, () => "too-small");
+
+        Assert.True(either.IsRight);
+        Assert.Equal(4, either.Right);
+    }
+
+    [Fact]
+    public async Task Where_ReturnsLeft_WhenPredicateFails()
+    {
+        var either = await RightAsync(1)
+            .Where(value => value > 1, () => "too-small");
+
+        Assert.True(either.IsLeft);
+        Assert.Equal("too-small", either.Left);
+    }
+
+    [Fact]
+    public async Task Where_AwaitsAsyncPredicate()
+    {
+        var either = await RightAsync(4)
+            .Where(value => Task.FromResult(value > 1), () => "too-small");
+
+        Assert.True(either.IsRight);
+        Assert.Equal(4, either.Right);
+    }
+
+    [Fact]
+    public async Task Where_PropagatesAsyncPredicateException()
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await RightAsync(4)
+                .Where<string, int>(
+                    _ => Task.FromException<bool>(
+                        new InvalidOperationException("either-async-predicate-boom")),
+                    () => "blocked"));
+
+        Assert.Equal("either-async-predicate-boom", exception.Message);
+    }
+
     private static Task<Either<string, int>> RightAsync(int value)
     {
         return Task.FromResult(Either<string, int>.FromRight(value));

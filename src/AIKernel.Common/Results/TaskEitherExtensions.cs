@@ -87,4 +87,32 @@ public static class TaskEitherExtensions
         => await task
             .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
+
+    public static async Task<Either<L, R>> Where<L, R>(
+        this Task<Either<L, R>> task,
+        Func<R, bool> predicate,
+        Func<L> leftFactory)
+    {
+        var either = await task.ConfigureAwait(false);
+        if (either.IsLeft)
+            return either;
+
+        return predicate(either.Right!)
+            ? either
+            : Either<L, R>.FromLeft(leftFactory());
+    }
+
+    public static async Task<Either<L, R>> Where<L, R>(
+        this Task<Either<L, R>> task,
+        Func<R, Task<bool>> predicate,
+        Func<L> leftFactory)
+    {
+        var either = await task.ConfigureAwait(false);
+        if (either.IsLeft)
+            return either;
+
+        return await predicate(either.Right!).ConfigureAwait(false)
+            ? either
+            : Either<L, R>.FromLeft(leftFactory());
+    }
 }

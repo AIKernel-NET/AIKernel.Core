@@ -30,6 +30,34 @@ public static class ResultStepWhereExtensions
         }
     }
 
+    public static async Task<ResultStep<TState, TValue>> Where<TState, TValue>(
+        this ResultStep<TState, TValue> step,
+        Func<TValue, Task<bool>> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        if (step.IsFailure)
+            return step;
+
+        try
+        {
+            return await predicate(step.Value!).ConfigureAwait(false)
+                ? step
+                : AppendPredicateFailure(step, PredicateFailedError());
+        }
+        catch (Exception ex)
+        {
+            return AppendPredicateFailure(
+                step,
+                ErrorContext.FromException(ex) with
+                {
+                    FailureKind = FailureKind.FailClosed,
+                    OriginStep = OriginStep.KernelFacade,
+                    SemanticSlot = SemanticSlot.T
+                });
+        }
+    }
+
     private static ResultStep<TState, TValue> AppendPredicateFailure<TState, TValue>(
         ResultStep<TState, TValue> step,
         ErrorContext error)

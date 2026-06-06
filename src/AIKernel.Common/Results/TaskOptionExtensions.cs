@@ -100,4 +100,17 @@ public static class TaskOptionExtensions
             ? option
             : Option<T>.None();
     }
+
+    public static async Task<Option<T>> Where<T>(
+        this Task<Option<T>> task,
+        Func<T, Task<bool>> predicate)
+    {
+        var option = await task.ConfigureAwait(false);
+        if (!option.HasValue)
+            return option;
+
+        return await predicate(option.Value!).ConfigureAwait(false)
+            ? option
+            : Option<T>.None();
+    }
 }

@@ -366,6 +366,28 @@ public sealed class TaskResultExtensionsTests
         Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
     }
 
+    [Fact]
+    public async Task Where_AwaitsAsyncPredicate()
+    {
+        var result = await SuccessAsync(3)
+            .Where(value => Task.FromResult(value > 1));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(3, result.Value);
+    }
+
+    [Fact]
+    public async Task Where_CatchesAsyncPredicateException()
+    {
+        var result = await SuccessAsync(3)
+            .Where<int>(_ => Task.FromException<bool>(
+                new InvalidOperationException("task-async-predicate-boom")));
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("task-async-predicate-boom", result.Error!.Message);
+        Assert.Equal("UNHANDLED_EXCEPTION", result.Error.Code);
+    }
+
     private static Task<Result<int>> SuccessAsync(int value)
     {
         return Task.FromResult(Result<int>.Success(value));

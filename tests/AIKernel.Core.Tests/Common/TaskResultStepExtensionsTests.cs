@@ -300,6 +300,68 @@ public sealed class TaskResultStepExtensionsTests
     }
 
     [Fact]
+    public async Task Where_AwaitsAsyncPredicate()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var step = await Task.FromResult(ResultStep<string, int>
+                .Success("capability", 2)
+                .WithSemanticDelta(delta))
+            .Where(value => Task.FromResult(value == 2));
+
+        Assert.True(step.IsSuccess);
+        var entry = Assert.Single(step.ReplayLog);
+        Assert.Equal(delta, entry.SemanticDelta);
+    }
+
+    [Fact]
+    public async Task Where_AsyncPredicateFailureAppendsRejectReplayNode()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var step = await Task.FromResult(ResultStep<string, int>
+                .Success("capability", 2)
+                .WithSemanticDelta(delta))
+            .Where(value => Task.FromResult(value > 2));
+
+        Assert.True(step.IsFailure);
+        Assert.Equal("PREDICATE_FAILED", step.Error!.Code);
+        Assert.Equal(FailureKind.Reject, step.Error.FailureKind);
+        Assert.Equal(2, step.ReplayLog.Count);
+        Assert.Equal("result_step.where", step.ReplayLog[1].SemanticDelta.Label);
+        Assert.Equal("reject", step.ReplayLog[1].SemanticDelta.Kind);
+    }
+
+    [Fact]
+    public async Task Where_AsyncPredicateExceptionAppendsFailClosedReplayNode()
+    {
+        var delta = new SemanticDelta(
+            "kernel.capability.resolve",
+            OriginStep.Capability,
+            SemanticSlot.T);
+
+        var step = await Task.FromResult(ResultStep<string, int>
+                .Success("capability", 2)
+                .WithSemanticDelta(delta))
+            .Where<string, int>(
+                _ => Task.FromException<bool>(
+                    new InvalidOperationException("task-step-async-predicate-boom")));
+
+        Assert.True(step.IsFailure);
+        Assert.Equal("UNHANDLED_EXCEPTION", step.Error!.Code);
+        Assert.Equal(FailureKind.FailClosed, step.Error.FailureKind);
+        Assert.Equal(2, step.ReplayLog.Count);
+        Assert.Equal("result_step.where", step.ReplayLog[1].SemanticDelta.Label);
+        Assert.Equal("fail_closed", step.ReplayLog[1].SemanticDelta.Kind);
+    }
+
+    [Fact]
     public async Task LinqQuery_ReturnsBinderFailureWithLatestState()
     {
         var failure = new ErrorContext("missing", "MISSING", false);

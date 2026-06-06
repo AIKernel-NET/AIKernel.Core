@@ -196,6 +196,27 @@ public sealed class TaskOptionExtensionsTests
     }
 
     [Fact]
+    public async Task Where_AwaitsAsyncPredicate()
+    {
+        var option = await SomeAsync(4)
+            .Where(value => Task.FromResult(value > 1));
+
+        Assert.True(option.HasValue);
+        Assert.Equal(4, option.Value);
+    }
+
+    [Fact]
+    public async Task Where_PropagatesAsyncPredicateException()
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await SomeAsync(4)
+                .Where<int>(_ => Task.FromException<bool>(
+                    new InvalidOperationException("option-async-predicate-boom"))));
+
+        Assert.Equal("option-async-predicate-boom", exception.Message);
+    }
+
+    [Fact]
     public async Task Tap_RunsSynchronousActionForSomeAndPreservesValue()
     {
         var observed = 0;

@@ -123,6 +123,39 @@ def test_async_result_short_circuits_and_rejects_non_result() -> None:
     assert isinstance(invalid.error, TypeError)
 
 
+def test_async_result_where_accepts_async_predicates_and_captures_exceptions() -> None:
+    called = False
+
+    async def passes(value: int) -> bool:
+        return value == 3
+
+    async def fails(value: int) -> bool:
+        return value < 0
+
+    async def raises(_: int) -> bool:
+        raise ValueError("predicate failed")
+
+    async def unreachable(value: int) -> bool:
+        nonlocal called
+        called = True
+        return value == 3
+
+    passed = _run_async(async_result(Success(3)).Where(passes))
+    rejected = _run_async(async_result(Success(3)).Where(fails))
+    exception = _run_async(async_result(Success(3)).Where(raises))
+    short = _run_async(async_result(Failure("blocked")).Where(unreachable))
+
+    assert passed.is_ok
+    assert passed.unwrap() == 3
+    assert rejected.is_err
+    assert isinstance(rejected.error, ValueError)
+    assert exception.is_err
+    assert isinstance(exception.error, ValueError)
+    assert short.is_err
+    assert short.error == "blocked"
+    assert called is False
+
+
 def test_result_bind_short_circuits_failure() -> None:
     called = False
 
@@ -251,6 +284,37 @@ def test_async_option_short_circuits_and_rejects_non_option() -> None:
         _run_async(async_option(Some(1)).Bind(lambda _: "not-option"))
 
 
+def test_async_option_where_accepts_async_predicates_and_propagates_exceptions() -> None:
+    called = False
+
+    async def passes(value: int) -> bool:
+        return value == 3
+
+    async def fails(value: int) -> bool:
+        return value < 0
+
+    async def raises(_: int) -> bool:
+        raise ValueError("predicate failed")
+
+    async def unreachable(value: int) -> bool:
+        nonlocal called
+        called = True
+        return value == 3
+
+    passed = _run_async(async_option(Some(3)).Where(passes))
+    rejected = _run_async(async_option(Some(3)).Where(fails))
+    short = _run_async(async_option(Nothing()).Where(unreachable))
+
+    assert passed.is_some
+    assert passed.unwrap() == 3
+    assert rejected.is_none
+    assert short.is_none
+    assert called is False
+
+    with pytest.raises(ValueError, match="predicate failed"):
+        _run_async(async_option(Some(3)).Where(raises))
+
+
 def test_option_bind_short_circuits_none() -> None:
     called = False
 
@@ -350,6 +414,39 @@ def test_async_either_short_circuits_and_rejects_non_either() -> None:
 
     with pytest.raises(TypeError, match="AsyncEither"):
         _run_async(async_either(Right(1)).Bind(lambda _: "not-either"))
+
+
+def test_async_either_where_accepts_async_predicates_and_propagates_exceptions() -> None:
+    called = False
+
+    async def passes(value: int) -> bool:
+        return value == 3
+
+    async def fails(value: int) -> bool:
+        return value < 0
+
+    async def raises(_: int) -> bool:
+        raise ValueError("predicate failed")
+
+    async def unreachable(value: int) -> bool:
+        nonlocal called
+        called = True
+        return value == 3
+
+    passed = _run_async(async_either(Right(3)).Where(passes, lambda: "blocked"))
+    rejected = _run_async(async_either(Right(3)).Where(fails, lambda: "blocked"))
+    short = _run_async(async_either(Left("already-left")).Where(unreachable, lambda: "blocked"))
+
+    assert passed.is_right
+    assert passed.unwrap() == 3
+    assert rejected.is_left
+    assert rejected.left_value == "blocked"
+    assert short.is_left
+    assert short.left_value == "already-left"
+    assert called is False
+
+    with pytest.raises(ValueError, match="predicate failed"):
+        _run_async(async_either(Right(3)).Where(raises, lambda: "blocked"))
 
 
 def test_either_bind_short_circuits_left() -> None:

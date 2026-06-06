@@ -185,10 +185,13 @@ async def load_context_result():
 async def route_provider(context):
     return Success("cli" if context.startswith("aik") else "llm")
 
+async def is_routable(context):
+    return len(context) > 0
+
 route = await (
     async_result(load_context_result())
     .Select(lambda context: context.strip())
-    .Where(lambda context: len(context) > 0)
+    .Where(is_routable)
     .SelectMany(route_provider, lambda context, provider: {
         "context": context,
         "provider": provider,

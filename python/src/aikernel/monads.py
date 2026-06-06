@@ -434,10 +434,23 @@ class AsyncResult(Generic[T]):
     def Tap(self, action: Callable[[T], object | Awaitable[object]]) -> AsyncResult[T]:
         return self.tap(action)
 
-    def where(self, predicate: Callable[[T], bool]) -> AsyncResult[T]:
-        return self.bind(lambda value: Success(value).where(predicate))
+    def where(self, predicate: Callable[[T], bool | Awaitable[bool]]) -> AsyncResult[T]:
+        async def run() -> Result[T]:
+            result = await self._awaitable
+            if result.is_err:
+                return Failure(result.error, metadata=result.metadata)
+            try:
+                observed = predicate(result.unwrap())
+                passed = await observed if inspect.isawaitable(observed) else observed
+                if passed:
+                    return result
+                return Failure(ValueError("Predicate failed"), metadata=result.metadata)
+            except Exception as ex:  # noqa: BLE001 - AsyncResult intentionally captures exceptions.
+                return Failure(ex, metadata=result.metadata)
 
-    def Where(self, predicate: Callable[[T], bool]) -> AsyncResult[T]:
+        return AsyncResult(run())
+
+    def Where(self, predicate: Callable[[T], bool | Awaitable[bool]]) -> AsyncResult[T]:
         return self.where(predicate)
 
 
@@ -508,14 +521,19 @@ class AsyncOption(Generic[T]):
     def Tap(self, action: Callable[[T], object | Awaitable[object]]) -> AsyncOption[T]:
         return self.tap(action)
 
-    def where(self, predicate: Callable[[T], bool]) -> AsyncOption[T]:
+    def where(self, predicate: Callable[[T], bool | Awaitable[bool]]) -> AsyncOption[T]:
         async def run() -> Option[T]:
             option = await self._awaitable
-            return option.where(predicate)
+            if option.is_none:
+                return option
+
+            observed = predicate(option.unwrap())
+            passed = await observed if inspect.isawaitable(observed) else observed
+            return option if passed else Nothing()
 
         return AsyncOption(run())
 
-    def Where(self, predicate: Callable[[T], bool]) -> AsyncOption[T]:
+    def Where(self, predicate: Callable[[T], bool | Awaitable[bool]]) -> AsyncOption[T]:
         return self.where(predicate)
 
 
@@ -586,14 +604,27 @@ class AsyncEither(Generic[L, R]):
     def Tap(self, action: Callable[[R], object | Awaitable[object]]) -> AsyncEither[L, R]:
         return self.tap(action)
 
-    def where(self, predicate: Callable[[R], bool], left_factory: Callable[[], L]) -> AsyncEither[L, R]:
+    def where(
+        self,
+        predicate: Callable[[R], bool | Awaitable[bool]],
+        left_factory: Callable[[], L],
+    ) -> AsyncEither[L, R]:
         async def run() -> Either[L, R]:
             either = await self._awaitable
-            return either.where(predicate, left_factory)
+            if either.is_left:
+                return either
+
+            observed = predicate(either.unwrap())
+            passed = await observed if inspect.isawaitable(observed) else observed
+            return either if passed else Left(left_factory())
 
         return AsyncEither(run())
 
-    def Where(self, predicate: Callable[[R], bool], left_factory: Callable[[], L]) -> AsyncEither[L, R]:
+    def Where(
+        self,
+        predicate: Callable[[R], bool | Awaitable[bool]],
+        left_factory: Callable[[], L],
+    ) -> AsyncEither[L, R]:
         return self.where(predicate, left_factory)
 
 

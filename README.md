@@ -188,7 +188,13 @@ LLM / SLM developers who need direct CUDA integration should read
 Other CUDA versions, model runtimes, or Linux CUDA hosts should fork the CUDA
 Capability repository and publish a separate Capability module.
 
-For the optional Python language binding, install from the repository
+For the optional Python language binding:
+
+```bash
+pip install aikernel
+```
+
+For source-based pre-release or local validation, install from the repository
 subdirectory:
 
 ```bash
@@ -201,7 +207,9 @@ bridge. Install GPU integrations from the matching external Capability package.
 The v0.0.5 package family is aligned with the AIKernel.NET contract packages
 `AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.0.5.
 `AIKernel.Vfs` is no longer a separate package dependency; the VFS contracts are
-provided by `AIKernel.Abstractions`.
+provided by `AIKernel.Abstractions`. The `AIKernel.Vfs` namespace remains as a
+Core implementation namespace for in-process VFS providers and stores; it is not
+a separate NuGet package.
 
 ### 2. Register Core for an API Host
 

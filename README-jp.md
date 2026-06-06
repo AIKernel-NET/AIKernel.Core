@@ -194,6 +194,12 @@ Python language binding は CPU-only 既定で install します。GPU integrati
 
 ```bash
 pip install aikernel
+```
+
+source-based pre-release や local validation では repository subdirectory から
+install できます。
+
+```bash
 pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
@@ -203,7 +209,9 @@ native toolchain の前提条件と wrapper-only 開発手順は
 v0.0.5 package family は、AIKernel.NET の契約パッケージ
 `AIKernel.Abstractions`、`AIKernel.Dtos`、`AIKernel.Enums` v0.0.5 と同期しています。
 `AIKernel.Vfs` は独立した NuGet 依存ではなくなり、VFS 契約は
-`AIKernel.Abstractions` から提供されます。
+`AIKernel.Abstractions` から提供されます。`AIKernel.Vfs` namespace は、
+in-process VFS provider / store の Core 実装 namespace として残りますが、
+独立 NuGet package ではありません。
 
 ### 2. API ホスト向けに Core を登録する
 

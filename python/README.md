@@ -7,8 +7,32 @@ The default package is CPU-only and is published as a universal
 `py3-none-any` wheel for Windows and Linux:
 
 ```bash
-pip install aikernel
+pip install aikernel-net
 ```
+
+The PyPI package named `aikernel` belongs to another project. AIKernel.NET uses
+the distribution name `aikernel-net` to avoid that collision. Import the module
+as `aikernel_net`.
+
+See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the `0.0.5.1` rename notes.
+
+## Release Channels
+
+Stable user releases are published to PyPI:
+
+- distribution: `aikernel-net`
+- versions: `0.0.5.1`, then `0.1.0`, and later stable releases
+- policy: stable releases only
+
+Development releases are reserved for CI/CD and developer validation through
+GitHub Packages:
+
+- distribution: `aikernel-net-dev`
+- versions: `0.0.5.1-dev.1` style prereleases
+- policy: breaking changes are allowed
+
+User documentation defaults to the PyPI stable package. Use development
+packages only for CI/CD or integration testing.
 
 For source-based local validation, install directly from GitHub:
 
@@ -17,8 +41,8 @@ pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=p
 ```
 
 Use a clean virtual environment or force a reinstall when validating a local
-checkout, especially if an older local `aikernel` package was installed
-previously:
+checkout, especially if an older local `aikernel-net` package was installed
+previously. This is a development workflow, not the stable user install path:
 
 ```bash
 pip install --force-reinstall \
@@ -27,7 +51,7 @@ pip install --force-reinstall \
 
 GPU integrations are opt-in Capability packages and are not installed by
 default. CUDA, ROCm, DirectML, and native model runtimes may publish their own
-platform-specific packages, but the base `aikernel` package stays universal.
+platform-specific packages, but the base `aikernel-net` package stays universal.
 
 ## Scope
 
@@ -38,7 +62,7 @@ belong to external Capability repositories such as `AIKernel.Cuda13.0.Libtorch2.
 The intended install paths are:
 
 - C# applications on Windows or Linux: install the `AIKernel.*` NuGet packages.
-- Python applications on Windows or Linux: install the `aikernel` pip package.
+- Python applications on Windows or Linux: install the `aikernel-net` pip package.
 - GPU hosts: explicitly add a matching external Capability package.
 
 The package provides:
@@ -65,7 +89,7 @@ Capability repository or package.
 ## Managed Assemblies
 
 By default, the package build runs `dotnet publish` and bundles the managed
-AIKernel assemblies under `aikernel/managed`:
+AIKernel assemblies under `aikernel_net/managed`:
 
 - `AIKernel.Abstractions.dll`
 - `AIKernel.Common.dll`
@@ -94,13 +118,21 @@ pip install -e . \
 pytest
 ```
 
+For PyPI publication, build the wheel from the repository source tree so the
+managed assemblies can be bundled into `aikernel_net/managed`:
+
+```bash
+python -m build --wheel
+python -m twine check dist/aikernel_net-0.0.5.1-py3-none-any.whl
+```
+
 ## API
 
 ```python
-import aikernel
+import aikernel_net
 
-assemblies = aikernel.managed_assemblies()
-layout = aikernel.runtime_layout()
+assemblies = aikernel_net.managed_assemblies()
+layout = aikernel_net.runtime_layout()
 ```
 
 The wrapper surface is intentionally small:
@@ -121,7 +153,7 @@ monad style without copying Kernel or Capability internals.
 Method-chain style:
 
 ```python
-from aikernel import Try
+from aikernel_net import Try
 
 result = (
     Try.run(lambda: load_history())
@@ -135,7 +167,7 @@ result = (
 LINQ-style aliases are available for Python method chains:
 
 ```python
-from aikernel import Right, Success, Try
+from aikernel_net import Right, Success, Try
 
 route = (
     Try.run(lambda: load_context())
@@ -173,7 +205,7 @@ Async pipelines are available through `async_result`, `async_option`, and
 `Task<Either<L,R>>` extension style:
 
 ```python
-from aikernel import Success, async_result
+from aikernel_net import Success, async_result
 
 async def load_context_result():
     return Success(await load_context_async())
@@ -199,7 +231,7 @@ route = await (
 Decorator-based do notation:
 
 ```python
-from aikernel import Result, Try, do
+from aikernel_net import Result, Try, do
 
 @do(Result)
 def pipeline():
@@ -212,7 +244,7 @@ Async do notation is available when yielded steps may be awaitables,
 `AsyncResult`, `AsyncOption`, or `AsyncEither` instances:
 
 ```python
-from aikernel import Result, Success, async_do, async_result
+from aikernel_net import Result, Success, async_do, async_result
 
 async def load_context_result():
     return Success(await load_context_async())

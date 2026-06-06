@@ -3,11 +3,11 @@ from __future__ import annotations
 import tomllib
 from pathlib import Path
 
-import aikernel
+import aikernel_net
 
 
 def test_python_binding_does_not_reimplement_os_memory_mapping() -> None:
-    package_root = Path(__file__).resolve().parents[1] / "src" / "aikernel"
+    package_root = Path(__file__).resolve().parents[1] / "src" / "aikernel_net"
     forbidden = (
         "CreateFileMapping",
         "MapViewOfFile",
@@ -51,8 +51,8 @@ def test_python_package_does_not_export_native_model_apis() -> None:
     )
 
     for name in forbidden:
-        assert name not in aikernel.__all__
-        assert not hasattr(aikernel, name)
+        assert name not in aikernel_net.__all__
+        assert not hasattr(aikernel_net, name)
 
 
 def test_python_package_declares_apache_license_file() -> None:

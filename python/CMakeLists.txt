@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(aikernel_python LANGUAGES NONE)
+project(aikernel_net_python LANGUAGES NONE)
 
 option(AIKERNEL_PYTHON_INCLUDE_MANAGED "Include AIKernel managed assemblies" ON)
 set(AIKERNEL_MANAGED_CONFIGURATION "Release" CACHE STRING "AIKernel managed build configuration")
@@ -27,7 +27,7 @@ if(AIKERNEL_PYTHON_INCLUDE_MANAGED)
 
   install(DIRECTORY
     ${AIKERNEL_MANAGED_INSTALL_DIRS}
-    DESTINATION aikernel/managed
+    DESTINATION aikernel_net/managed
     FILES_MATCHING
       PATTERN "*.dll"
       PATTERN "*.deps.json")

@@ -150,10 +150,10 @@ ABI と振る舞いの規律を検証するための Contract Test Framework で
 AIKernel.Core の関数型プリミティブと managed assembly discovery を提供する薄い
 Python binding です。
 
-既定の Python package は CPU-only / CUDA-free です。source-based pre-release や
-local validation では GitHub の subdirectory から直接 install できます。
-Python package は OS 固有 memory mapping、Kernel 内部構造、Capability 内部実装を
-再実装しません。
+`aikernel` Python package として install でき、既定では CPU-only / CUDA-free です。
+Python monad helper と managed assembly discovery を公開し、CUDA、LibTorch、
+native `libtorch_bridge` ABI は同梱しません。Python package は OS 固有 memory
+mapping、Kernel 内部構造、Capability 内部実装を再実装しません。
 
 ---
 
@@ -196,8 +196,7 @@ Python language binding は CPU-only 既定で install します。GPU integrati
 pip install aikernel
 ```
 
-source-based pre-release や local validation では repository subdirectory から
-install できます。
+source-based local validation では repository subdirectory から install できます。
 
 ```bash
 pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python

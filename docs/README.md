@@ -8,6 +8,7 @@ runtime implementation and package usage guidance.
 
 - [CUDA Capability Development Guide](development/cuda-capability-development-guide.md)
 - [CUDA Capability 開発ガイド](development/cuda-capability-development-guide-jp.md)
+- [AIKernel.Python README](../python/README.md)
 
 ## Package Boundaries
 

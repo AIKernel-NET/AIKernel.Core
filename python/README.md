@@ -9,15 +9,15 @@ The default package is CPU-only:
 pip install aikernel
 ```
 
-For source-based pre-release or local validation, install directly from GitHub:
+For source-based local validation, install directly from GitHub:
 
 ```bash
 pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
-Use a clean virtual environment or force a reinstall when validating a release
-candidate, especially if an older native-preview `aikernel` package was
-installed previously:
+Use a clean virtual environment or force a reinstall when validating a local
+checkout, especially if an older local `aikernel` package was installed
+previously:
 
 ```bash
 pip install --force-reinstall \

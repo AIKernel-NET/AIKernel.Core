@@ -151,9 +151,11 @@ Integration tests that pass through multiple runtime layers.
 A thin Python binding for AIKernel.Core functional primitives and managed
 assembly discovery.
 
-It is installed directly from GitHub and wraps the existing C ABI with `ctypes`.
-The Python package does not reimplement OS-specific memory mapping, Kernel
-internals, or Capability internals.
+It installs as the `aikernel` Python package and is CPU-only by default. The
+package exposes Python monad helpers and managed assembly discovery; it does not
+ship CUDA, LibTorch, or the native `libtorch_bridge` ABI. The Python package
+does not reimplement OS-specific memory mapping, Kernel internals, or Capability
+internals.
 
 ---
 
@@ -194,8 +196,7 @@ For the optional Python language binding:
 pip install aikernel
 ```
 
-For source-based pre-release or local validation, install from the repository
-subdirectory:
+For source-based local validation, install from the repository subdirectory:
 
 ```bash
 pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python

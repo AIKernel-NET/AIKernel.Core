@@ -181,11 +181,18 @@ dotnet add package AIKernel.Common --version 0.0.5
 dotnet add package AIKernel.TestKit --version 0.0.5
 ```
 
-LibTorch 2.12.0 / CUDA 13.0 Native ABI の参照 Capability を利用する場合:
+CUDA は任意機能です。LibTorch 2.12.0 / CUDA 13.0 Native ABI の参照
+Capability は、それを明示的に必要とする信頼済み GPU ホストでのみ利用してください。
 
 ```bash
 dotnet add package AIKernel.Cuda.Libtorch.2.12-cuda13.0 --version 0.0.5
 ```
+
+CUDA を直接利用したい LLM / SLM 開発者向けの仮想メモリレイヤー、仕様、
+モナド Pipeline、module 作成方針は
+[docs/development/cuda-capability-development-guide-jp.md](docs/development/cuda-capability-development-guide-jp.md)
+を参照してください。他の CUDA version、model runtime、Linux CUDA host では、
+既存の LibTorch CUDA module を参考に新しい Capability module を作成します。
 
 任意の Python language binding を利用する場合は、repository subdirectory から
 install します。

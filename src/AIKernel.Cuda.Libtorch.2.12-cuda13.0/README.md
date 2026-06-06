@@ -3,11 +3,19 @@
 Reference AIKernel external Capability module for LibTorch 2.12.0 with CUDA
 13.0 on Windows/MSVC.
 
+CUDA is optional in AIKernel.Core. This package is for trusted GPU hosts that
+explicitly need direct LibTorch / CUDA execution. Default AIKernel.Core and
+AIKernel.Python installs do not require this package.
+
 This package keeps the LibTorch/CUDA implementation outside AIKernel.Core. It
 depends on the standard AIKernel.NET external Capability module contracts and
 the OS-independent `AIKernel.Core.Memory` abstractions, then calls a small
 native C ABI bridge by P/Invoke. LibTorch and CUDA types never cross the managed
 boundary. The native bridge uses the Cdecl calling convention.
+
+For the broader virtual memory layer, module design rules, monad pipeline
+patterns, and guidance for other CUDA versions or Linux CUDA hosts, see
+[`docs/development/cuda-capability-development-guide.md`](../../docs/development/cuda-capability-development-guide.md).
 
 ## Operations
 
@@ -69,3 +77,6 @@ only in trusted GPU hosts.
 - Do not expose LibTorch or CUDA types to managed code.
 - Keep all GPU execution inside `libtorch_bridge`.
 - Treat missing native libraries as host configuration failures.
+- For other CUDA versions, other model runtimes, or Linux CUDA, create a new
+  Capability module using this package as a template instead of mixing platform
+  paths into this Windows/MSVC reference module.

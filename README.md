@@ -191,6 +191,11 @@ capability only on trusted GPU hosts that explicitly need it:
 dotnet add package AIKernel.Cuda.Libtorch.2.12-cuda13.0 --version 0.0.5
 ```
 
+LLM / SLM developers who need direct CUDA integration should read
+[docs/development/cuda-capability-development-guide.md](docs/development/cuda-capability-development-guide.md).
+Other CUDA versions, model runtimes, or Linux CUDA hosts should create a new
+Capability module using the existing LibTorch CUDA module as a template.
+
 For the optional Python language binding, install from the repository
 subdirectory:
 

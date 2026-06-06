@@ -207,6 +207,10 @@ distribution from Python hosts. Import it as `aikernel_net`. The PyPI package
 named `aikernel` is a different project. GPU/native runtimes remain explicit
 Capability installs.
 
+Stable Python releases are published to PyPI as `aikernel-net`. Development
+builds may be published separately through GitHub Packages as
+`aikernel-net-dev` for CI/CD validation.
+
 For source-based local validation, install from the repository subdirectory:
 
 ```bash

@@ -14,9 +14,13 @@ AIKernel.Core は以下の managed runtime packages を公開します。
 - `AIKernel.Providers.MicrosoftAI`
 - `AIKernel.TestKit`
 
-Python binding は、`aikernel-net` package を universal `py3-none-any` の
-CPU-only wheel として公開します。import package は `aikernel_net` です。
-PyPI の `aikernel` は別プロジェクトです。
+安定版 Python binding は、`aikernel-net` package を PyPI に universal
+`py3-none-any` の CPU-only wheel として公開します。import package は
+`aikernel_net` です。PyPI の `aikernel` は別プロジェクトです。
+
+開発版は GitHub Packages に分離し、`aikernel-net-dev` のような distribution name と
+`0.0.5.1-dev.1` 形式の version を使います。開発版は破壊的変更を許容し、
+CI/CD 検証向けとします。
 
 AIKernel.Core は CUDA、LibTorch、Native ABI、GPU runtime、Capability 固有 binary を
 公開しません。GPU 対応は外部 Capability repository から提供します。
@@ -77,7 +81,7 @@ CUDA が既定でインストールされるような表現を避けます。
 
 1. AIKernel.NET contract packages を先に公開する。
 2. AIKernel.Core package family を公開する。
-3. CPU-only `aikernel-net` Python package を公開する。
+3. CPU-only の安定版 `aikernel-net` Python package を PyPI に公開する。
 4. 外部 Capability metadata package は managed dependencies が利用可能になってから公開する。
 5. 外部 Capability full runtime package を GitHub Release に添付する。
 
@@ -92,10 +96,12 @@ dotnet add package AIKernel.Kernel --version 0.0.5
 dotnet build
 ```
 
-Python:
+安定版 Python:
 
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\python -m pip install aikernel-net==0.0.5.1
 .\.venv\Scripts\python -c "import aikernel_net; print(aikernel_net.__version__)"
 ```
+
+ユーザー向け documentation や安定版 smoke check では `aikernel-net-dev` を使いません。

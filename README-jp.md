@@ -206,6 +206,9 @@ Python ホストでは `aikernel-net` distribution を利用します。import p
 `aikernel_net` です。PyPI の `aikernel` は別プロジェクトです。GPU / native runtime は
 明示的に追加する Capability install として扱います。
 
+安定版 Python release は PyPI に `aikernel-net` として公開します。開発版は
+GitHub Packages に `aikernel-net-dev` として分離し、CI/CD 検証向けに扱います。
+
 source-based local validation では repository subdirectory から install できます。
 
 ```bash

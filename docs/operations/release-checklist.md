@@ -14,9 +14,13 @@ AIKernel.Core publishes the managed runtime packages:
 - `AIKernel.Providers.MicrosoftAI`
 - `AIKernel.TestKit`
 
-The Python binding publishes the `aikernel-net` package as a universal
-`py3-none-any` CPU-only wheel. Import it as `aikernel_net`. The PyPI package
-named `aikernel` is a different project.
+The stable Python binding publishes the `aikernel-net` package to PyPI as a
+universal `py3-none-any` CPU-only wheel. Import it as `aikernel_net`. The PyPI
+package named `aikernel` is a different project.
+
+Development builds should use GitHub Packages with a separate distribution name
+such as `aikernel-net-dev` and versions like `0.0.5.1-dev.1`. Development
+packages may contain breaking changes and are intended for CI/CD validation.
 
 AIKernel.Core does not publish CUDA, LibTorch, native ABI, GPU runtime, or
 Capability-specific binaries. GPU support is supplied by external Capability
@@ -78,7 +82,7 @@ repository and should not imply that CUDA is installed by default.
 
 1. Publish AIKernel.NET contract packages first.
 2. Publish AIKernel.Core package family.
-3. Publish the CPU-only `aikernel-net` Python package.
+3. Publish the CPU-only stable `aikernel-net` Python package to PyPI.
 4. Publish external Capability metadata packages only after their managed
    dependencies are available.
 5. Attach external Capability full runtime packages to their GitHub Releases.
@@ -94,10 +98,13 @@ dotnet add package AIKernel.Kernel --version 0.0.5
 dotnet build
 ```
 
-For Python:
+For stable Python:
 
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\python -m pip install aikernel-net==0.0.5.1
 .\.venv\Scripts\python -c "import aikernel_net; print(aikernel_net.__version__)"
 ```
+
+Do not use `aikernel-net-dev` for user-facing documentation or stable release
+smoke checks.

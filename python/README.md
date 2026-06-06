@@ -16,6 +16,24 @@ as `aikernel_net`.
 
 See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the `0.0.5.1` rename notes.
 
+## Release Channels
+
+Stable user releases are published to PyPI:
+
+- distribution: `aikernel-net`
+- versions: `0.0.5.1`, then `0.1.0`, and later stable releases
+- policy: stable releases only
+
+Development releases are reserved for CI/CD and developer validation through
+GitHub Packages:
+
+- distribution: `aikernel-net-dev`
+- versions: `0.0.5.1-dev.1` style prereleases
+- policy: breaking changes are allowed
+
+User documentation defaults to the PyPI stable package. Use development
+packages only for CI/CD or integration testing.
+
 For source-based local validation, install directly from GitHub:
 
 ```bash
@@ -24,7 +42,7 @@ pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=p
 
 Use a clean virtual environment or force a reinstall when validating a local
 checkout, especially if an older local `aikernel-net` package was installed
-previously:
+previously. This is a development workflow, not the stable user install path:
 
 ```bash
 pip install --force-reinstall \

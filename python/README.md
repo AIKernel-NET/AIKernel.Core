@@ -100,6 +100,14 @@ pip install -e . \
 pytest
 ```
 
+For PyPI publication, build the wheel from the repository source tree so the
+managed assemblies can be bundled into `aikernel_net/managed`:
+
+```bash
+python -m build --wheel
+python -m twine check dist/aikernel_net-0.0.5.1-py3-none-any.whl
+```
+
 ## API
 
 ```python

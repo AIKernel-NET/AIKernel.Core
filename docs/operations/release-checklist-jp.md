@@ -35,7 +35,8 @@ dotnet pack AIKernel.Core.slnx -c Release --no-restore
 ```powershell
 py -m compileall src tests
 py -m pytest
-py -m pip wheel . -w dist --no-deps
+py -m build --wheel
+py -m twine check dist/aikernel_net-0.0.5.1-py3-none-any.whl
 ```
 
 ## NuGet package 確認

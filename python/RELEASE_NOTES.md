@@ -1,14 +1,15 @@
 # AIKernel.Python Release Notes
 
-## 0.0.5.1 — Python package rename
+## 0.0.5.1 — Python package rename and PyPI registration
 
-This release renames the Python distribution package to avoid a PyPI name
-collision.
+This release renames and prepares the Python distribution package for PyPI
+registration under the AIKernel.NET project identity.
 
 - Changed the PyPI distribution name from `aikernel` to `aikernel-net`.
 - Kept API behavior and package scope intact.
 - Changed the import package to `aikernel_net`.
 - Added `__version__ = "0.0.5.1"`.
+- Prepared the package for formal PyPI registration as `aikernel-net`.
 - Updated documentation and release checklists to use:
 
 ```bash

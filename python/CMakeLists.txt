@@ -11,14 +11,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-if(NOT WIN32)
-  message(FATAL_ERROR "AIKernel.Python native bridge currently supports Windows/MSVC only.")
-endif()
-
-if(NOT MSVC)
-  message(FATAL_ERROR "AIKernel.Python native bridge currently requires MSVC.")
-endif()
-
 set(AIKERNEL_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/..")
 set(AIKERNEL_NATIVE_ROOT "${AIKERNEL_REPO_ROOT}/src/AIKernel.Cuda.Libtorch.2.12-cuda13.0/Native")
 
@@ -53,6 +45,14 @@ if(AIKERNEL_PYTHON_INCLUDE_MANAGED)
 endif()
 
 if(AIKERNEL_PYTHON_BUILD_NATIVE)
+  if(NOT WIN32)
+    message(FATAL_ERROR "AIKernel.Python native bridge currently supports Windows/MSVC only.")
+  endif()
+
+  if(NOT MSVC)
+    message(FATAL_ERROR "AIKernel.Python native bridge currently requires MSVC.")
+  endif()
+
   if(DEFINED ENV{AIKERNEL_LIBTORCH_PATH})
     file(TO_CMAKE_PATH "$ENV{AIKERNEL_LIBTORCH_PATH}" TORCH_PATH)
   elseif(DEFINED AIKERNEL_LIBTORCH_PATH)

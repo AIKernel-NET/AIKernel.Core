@@ -55,12 +55,13 @@ mapping code in Kernel or in a host-owned mapper implementation.
 
 ## Reference Module
 
-The CUDA 13.0 reference implementation belongs in a separate repository and
-targets one Windows runtime combination only:
+The CUDA 13.0 reference implementation belongs in the external
+`AIKernel.Cuda13.0` repository and targets one Windows runtime combination only:
 
 ```text
-AIKernel.Cuda13.0.Libtorch2.12.win-x64/
+AIKernel.Cuda13.0/
   src/
+    AIKernel.Cuda13.0.Libtorch2.12.win-x64/
   native/
   tests/
 ```
@@ -159,10 +160,10 @@ pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=p
 ```
 
 Install GPU-specific Python or native bindings from the matching external CUDA
-Capability repository, for example:
+Capability repository when it provides a Python package:
 
 ```bash
-pip install git+https://github.com/AIKernel-NET/AIKernel.Cuda13.0.Libtorch2.12.win-x64.git
+pip install git+https://github.com/AIKernel-NET/AIKernel.Cuda13.0.git
 ```
 
 Python exposes the outer API and monad helpers. It does not reimplement OS memory

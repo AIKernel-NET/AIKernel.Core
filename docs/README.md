@@ -20,12 +20,19 @@ AIKernel.Core publishes the CPU/default package family:
 - `AIKernel.Hosting`
 - `AIKernel.Providers.MicrosoftAI`
 - `AIKernel.TestKit`
-- `aikernel` Python binding
+- `aikernel` Python binding (`py3-none-any`, CPU-only)
 
 CUDA support is optional and lives outside this repository. Default
 AIKernel.Core and AIKernel.Python installs do not require CUDA, LibTorch, or a
 native bridge. GPU hosts should opt in by installing and registering an external
 CUDA Capability module such as `AIKernel.Cuda13.0.Libtorch2.12.win-x64`.
+
+The supported distribution paths are:
+
+- Windows/Linux C# applications install the `AIKernel.*` NuGet packages.
+- Windows/Linux Python applications install the universal CPU-only `aikernel`
+  wheel from pip.
+- GPU/native execution is added only through explicit Capability packages.
 
 `AIKernel.Vfs` is a Core implementation namespace, not a separate NuGet package.
 VFS contracts come from the AIKernel.NET contract packages and in-process VFS
@@ -44,5 +51,5 @@ py -m pip wheel . -w dist --no-deps
 ```
 
 The Python wheel should include `aikernel/managed/*.dll`, `py.typed`, and
-`dist-info/licenses/LICENSE`, and should not include CUDA, LibTorch, or native
-runtime assets.
+`dist-info/licenses/LICENSE`, should be tagged `py3-none-any`, and should not
+include CUDA, LibTorch, or native runtime assets.

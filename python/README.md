@@ -3,7 +3,8 @@
 Python binding for AIKernel.Core functional primitives and managed assembly
 discovery.
 
-The default package is CPU-only:
+The default package is CPU-only and is published as a universal
+`py3-none-any` wheel for Windows and Linux:
 
 ```bash
 pip install aikernel
@@ -25,13 +26,20 @@ pip install --force-reinstall \
 ```
 
 GPU integrations are opt-in Capability packages and are not installed by
-default.
+default. CUDA, ROCm, DirectML, and native model runtimes may publish their own
+platform-specific packages, but the base `aikernel` package stays universal.
 
 ## Scope
 
 `AIKernel.Python` is CUDA-free by default and does not include a native ABI
 bridge, CUDA Capability DLL, LibTorch binary, or GPU runtime. GPU integrations
 belong to external Capability repositories such as `AIKernel.Cuda13.0.Libtorch2.12.win-x64`.
+
+The intended install paths are:
+
+- C# applications on Windows or Linux: install the `AIKernel.*` NuGet packages.
+- Python applications on Windows or Linux: install the `aikernel` pip package.
+- GPU hosts: explicitly add a matching external Capability package.
 
 The package provides:
 

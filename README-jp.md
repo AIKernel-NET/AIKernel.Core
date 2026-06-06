@@ -196,6 +196,11 @@ Python language binding は CPU-only 既定で install します。GPU integrati
 pip install aikernel
 ```
 
+base Python package は Windows / Linux 向けの CPU-only universal
+`py3-none-any` wheel として公開します。C# ホストでは NuGet package を利用し、
+Python ホストでは `aikernel` pip package を利用します。GPU / native runtime は
+明示的に追加する Capability install として扱います。
+
 source-based local validation では repository subdirectory から install できます。
 
 ```bash

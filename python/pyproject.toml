@@ -36,7 +36,11 @@ test = [
 
 [tool.scikit-build]
 cmake.source-dir = "."
-wheel.packages = ["src/aikernel"]
+
+[tool.scikit-build.wheel]
+packages = ["src/aikernel"]
+py-api = "py3"
+platlib = false
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

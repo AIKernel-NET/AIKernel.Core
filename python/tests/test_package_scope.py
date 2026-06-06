@@ -63,3 +63,12 @@ def test_python_package_declares_apache_license_file() -> None:
     assert pyproject["project"]["license-files"] == ["LICENSE"]
     assert all(not item.startswith("License ::") for item in pyproject["project"]["classifiers"])
     assert (package_root / "LICENSE").is_file()
+
+
+def test_python_package_builds_universal_cpu_only_wheel() -> None:
+    package_root = Path(__file__).resolve().parents[1]
+    pyproject = tomllib.loads((package_root / "pyproject.toml").read_text(encoding="utf-8"))
+    wheel = pyproject["tool"]["scikit-build"]["wheel"]
+
+    assert wheel["py-api"] == "py3"
+    assert wheel["platlib"] is False

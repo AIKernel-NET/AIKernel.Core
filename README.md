@@ -196,6 +196,11 @@ For the optional Python language binding:
 pip install aikernel
 ```
 
+The base Python package is a CPU-only universal `py3-none-any` wheel for
+Windows and Linux. Use NuGet packages from C# hosts, and use the `aikernel` pip
+package from Python hosts. GPU/native runtimes remain explicit Capability
+installs.
+
 For source-based local validation, install from the repository subdirectory:
 
 ```bash

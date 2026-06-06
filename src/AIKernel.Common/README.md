@@ -148,7 +148,7 @@ var resumed =
 
 ## License / ライセンス
 
-MIT License
+Apache License 2.0
 
 ## Contributing / コントリビュート
 

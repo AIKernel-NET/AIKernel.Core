@@ -55,15 +55,19 @@ mapping code in Kernel or in a host-owned mapper implementation.
 
 ## Reference Module
 
-The current reference implementation is:
+The CUDA 13.0 reference implementation belongs in a separate repository and
+targets one Windows runtime combination only:
 
 ```text
-src/AIKernel.Cuda.Libtorch.2.12-cuda13.0
+AIKernel.Cuda13.0.Libtorch2.12.win-x64/
+  src/
+  native/
+  tests/
 ```
 
 It targets:
 
-- Windows / MSVC
+- Windows / MSVC / `win-x64`
 - LibTorch 2.12.0
 - CUDA 13.0
 - C ABI functions: `load_model`, `unload_model`, `forward`
@@ -71,7 +75,7 @@ It targets:
 Install it only on GPU hosts that explicitly need this runtime:
 
 ```bash
-dotnet add package AIKernel.Cuda.Libtorch.2.12-cuda13.0 --version 0.0.5
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5
 ```
 
 Then register the descriptor and invoker in the trusted host:
@@ -147,24 +151,18 @@ Guidelines:
 
 ## Python Usage
 
-`AIKernel.Python` defaults to CUDA-free installation:
+`AIKernel.Python` is part of AIKernel.Core and defaults to CUDA-free
+installation:
 
 ```bash
 pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
-To include the optional CUDA managed Capability assembly:
+Install GPU-specific Python or native bindings from the matching external CUDA
+Capability repository, for example:
 
 ```bash
-pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python \
-  --config-settings=cmake.define.AIKERNEL_PYTHON_INCLUDE_CUDA_CAPABILITY=ON
-```
-
-To build the optional Windows native bridge during install:
-
-```bash
-pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python \
-  --config-settings=cmake.define.AIKERNEL_PYTHON_BUILD_NATIVE=ON
+pip install git+https://github.com/AIKernel-NET/AIKernel.Cuda13.0.Libtorch2.12.win-x64.git
 ```
 
 Python exposes the outer API and monad helpers. It does not reimplement OS memory
@@ -172,18 +170,21 @@ mapping or Kernel internals.
 
 ## Other CUDA Versions And Linux CUDA
 
-The current CUDA module is a reference module for Windows/MSVC + CUDA 13.0. If
-you need another CUDA version, another LibTorch version, a different model
-runtime, or Linux CUDA, create a new Capability module by using the existing
-module as a template.
+The CUDA module should be maintained outside Core. If you need another CUDA
+version, another LibTorch version, another OS/RID, a different model runtime,
+or Linux CUDA, fork the CUDA Capability repository and create a new Capability
+module. Do not mix multiple native targets into the Windows `win-x64` package.
 
 Recommended naming:
 
 ```text
-AIKernel.Cuda.<Runtime>.<runtime-version>-cuda<cuda-version>
-AIKernel.Cuda.Libtorch.2.12-cuda13.0
-AIKernel.Cuda.Libtorch.2.13-cuda13.1
-AIKernel.Cuda.Libtorch.Linux.2.12-cuda13.0
+AIKernel.Cuda13.0.Libtorch2.12.win-x64
+AIKernel.Cuda13.0.Libtorch2.12.win-arm64
+AIKernel.Cuda13.0.Libtorch2.12.linux-x64
+AIKernel.Cuda12.4.Libtorch2.3.win-x64
+AIKernel.ROCm6.Libtorch2.12.linux-x64
+AIKernel.DirectML.win-x64
+AIKernel.Vulkan.linux-x64
 ```
 
 For a new module:
@@ -191,15 +192,15 @@ For a new module:
 1. Keep the C ABI stable or version the ABI explicitly.
 2. Add a new `CapabilityModuleDescriptor` with a unique `CapabilityId`.
 3. Keep runtime files outside Core and outside default package payloads.
-4. Consume `IMemoryMapper`; do not reference Kernel from the Capability module.
+4. Consume AIKernel.Core `IMemoryMapper`; do not reference Kernel from the Capability module.
 5. Add platform-specific native build files inside the module.
 6. Add fail-closed tests for missing runtime, invalid handle, invalid model path,
    and mapper failures.
 7. Document all required environment variables and runtime search paths.
 
-Linux CUDA support should be implemented as a new native module after the native
-Linux server environment is prepared. Do not add Linux include/lib paths to the
-Windows reference module.
+Linux CUDA support should be implemented in the external CUDA repository or one
+of its forks after the native Linux server environment is prepared. Do not add
+Linux include/lib paths to AIKernel.Core.
 
 ## Checklist
 

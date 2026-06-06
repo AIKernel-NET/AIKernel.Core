@@ -11,13 +11,13 @@
 
     <Authors>Takuya Sogawa</Authors>
     <Company>AIKernel-NET</Company>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://www.nuget.org/profiles/AIKernel-NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/AIKernel-NET/AIKernel.Core</RepositoryUrl>
     <Copyright>Copyright © 2026 Takuya Sogawa of AIKernel-NET</Copyright>
     <PackageTags>aikernel;aikernel-core;ai-os;kernel;provider;hosting;rom;vfs;context;execution;immutability;fail-closed;capability-modules;dynamicslm;seedslm;hatl;admissibility;semantic-compilation</PackageTags>
     <PackageReleaseNotes>
-      AIKernel.Core package family v0.0.5 - Aligns with AIKernel.NET contract packages v0.0.5, including interface-only contract packages, external Capability module contracts, Core MemoryRegion/MemoryMapper abstractions with Kernel Win32/POSIX implementations, the LibTorch CUDA Native ABI reference module, DynamicSLM/SeedSLM contract vocabulary, HATL cryptographic operator boundaries, governance admissibility evidence, and Semantic Compilation DTOs.
+      AIKernel.Core package family v0.0.5 - Aligns with AIKernel.NET contract packages v0.0.5, including interface-only contract packages, external Capability module contracts, Core MemoryRegion/MemoryMapper abstractions with Kernel Win32/POSIX implementations, DynamicSLM/SeedSLM contract vocabulary, HATL cryptographic operator boundaries, governance admissibility evidence, and Semantic Compilation DTOs. GPU and Native ABI implementations are external Capability packages.
     </PackageReleaseNotes>
   </PropertyGroup>
 

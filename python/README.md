@@ -1,63 +1,70 @@
 # AIKernel.Python
 
-Python binding for the AIKernel Native ABI capability bridge.
+Python binding for AIKernel.Core functional primitives and managed assembly
+discovery.
 
-This package is distributed by GitHub direct install only:
+The default package is CPU-only:
+
+```bash
+pip install aikernel
+```
+
+For source-based pre-release or local validation, install directly from GitHub:
 
 ```bash
 pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
-PyPI publication is intentionally disabled for the current phase.
-
-## Native Toolchain
-
-`AIKernel.Python` uses `scikit-build-core` and CMake. By default the package
-builds as a wrapper-only language binding so it can be installed on machines
-that do not have CUDA or LibTorch, including Linux hosts.
-
-The optional native `libtorch_bridge` C ABI build currently targets
-Windows/MSVC only. Linux and macOS native builds will be added after the native
-Linux server environment is prepared. The C ABI header is not modified.
-
-To build the Windows native bridge during install, enable it explicitly and set
-`AIKERNEL_LIBTORCH_PATH` to a LibTorch 2.12.0 + CUDA 13.0 distribution when the
-repository-local `ref/` folder is not present:
+Use a clean virtual environment or force a reinstall when validating a release
+candidate, especially if an older native-preview `aikernel` package was
+installed previously:
 
 ```bash
-pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python \
-  --config-settings=cmake.define.AIKERNEL_PYTHON_BUILD_NATIVE=ON
+pip install --force-reinstall \
+  git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
-The managed CUDA Capability assembly is also optional. Include it only for
-trusted GPU hosts:
+GPU integrations are opt-in Capability packages and are not installed by
+default.
 
-```bash
-pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python \
-  --config-settings=cmake.define.AIKERNEL_PYTHON_INCLUDE_CUDA_CAPABILITY=ON
-```
+## Scope
 
-On Windows, the repository development environment can also read `ref/env.txt`
-for `CUDA_PATH`.
+`AIKernel.Python` is CUDA-free by default and does not include a native ABI
+bridge, CUDA Capability DLL, LibTorch binary, or GPU runtime. GPU integrations
+belong to external Capability repositories such as `AIKernel.Cuda13.0.Libtorch2.12.win-x64`.
 
-At runtime, the wrapper adds the native bridge directory, `AIKERNEL_LIBTORCH_PATH`
-(`lib` when present), and `CUDA_PATH/bin` to the Windows DLL search path before
-loading the bridge. This keeps dependent LibTorch and CUDA DLL resolution local
-to the package process without copying those runtimes into the Python wrapper.
+The package provides:
 
-By default, the package build also runs `dotnet publish` and bundles the managed
+- `Result`, `Option`, `Either`, and `Try`
+- synchronous and asynchronous monad composition helpers
+- `do(...)` and `async_do(...)` notation
+- managed AIKernel assembly discovery helpers
+- package/runtime layout discovery
+
+The package does not provide:
+
+- `load_model`
+- `forward`
+- `unload_model`
+- `libtorch_bridge`
+- Win32 / POSIX memory mapping implementations
+- Kernel internals
+- CUDA / LibTorch runtime code
+
+Install GPU-specific Python or native bindings from the matching external
+Capability repository or package.
+
+## Managed Assemblies
+
+By default, the package build runs `dotnet publish` and bundles the managed
 AIKernel assemblies under `aikernel/managed`:
 
+- `AIKernel.Abstractions.dll`
 - `AIKernel.Common.dll`
 - `AIKernel.Core.dll`
 - `AIKernel.Kernel.dll`
-- `AIKernel.Abstractions.dll`
 - `AIKernel.Dtos.dll`
 - `AIKernel.Enums.dll`
-
-`AIKernel.Cuda.Libtorch.Cuda13.dll` is not bundled by default. It is resolved
-as an optional managed Capability assembly when present in the package, an
-override path, or the NuGet cache.
 
 The publish output also carries required transitive runtime DLLs such as
 `Microsoft.Extensions.*` and `YamlDotNet`.
@@ -65,40 +72,13 @@ The publish output also carries required transitive runtime DLLs such as
 Python exposes only discovery helpers for these assemblies. It does not
 reimplement Kernel internals, `Win32MemoryMapper`, `PosixMemoryMapper`,
 `KernelContext`, or OS memory APIs.
+
 `managed_assemblies()` resolves bundled assemblies first, then paths from
 `AIKERNEL_MANAGED_ASSEMBLY_PATH`, then matching packages from the NuGet
 global-packages cache (`NUGET_PACKAGES` or `~/.nuget/packages`).
 
-## Implementation Status
-
-The current Python surface is a native ABI language binding:
-
-```text
-Python
-  -> ctypes
-  -> C++ Native ABI (libtorch_bridge)
-  -> LibTorch
-```
-
-The package also bundles and discovers the managed AIKernel assemblies so hosts
-can locate the .NET Core / Kernel / Capability payloads from Python packaging.
-The managed Capability execution path exists on the .NET side:
-
-```text
-C# LibTorchCapabilityInvoker
-  -> Core IMemoryMapper
-  -> Kernel Win32MemoryMapper / PosixMemoryMapper
-  -> C++ Native ABI (libtorch_bridge)
-```
-
-Python does not yet host the .NET runtime or invoke
-`LibTorchCapabilityInvoker` directly. When that managed bridge is added, it
-should reuse the bundled assemblies and keep Python as an outer API layer
-rather than copying Kernel or OS-specific mapper internals into Python.
-
-For wrapper-only development or CI tests without LibTorch, the native build is
-already disabled by default. Disable managed assembly bundling as well when a
-.NET SDK is not available:
+For wrapper-only development or CI tests without a .NET SDK, disable managed
+assembly bundling:
 
 ```bash
 pip install -e . \
@@ -111,29 +91,18 @@ pytest
 ```python
 import aikernel
 
-handle = aikernel.load_model("model.pt")
-result = aikernel.forward([1, 2, 3])
-aikernel.unload_model(handle)
+assemblies = aikernel.managed_assemblies()
+layout = aikernel.runtime_layout()
 ```
 
-The wrapper is intentionally thin:
+The wrapper surface is intentionally small:
 
-- `load_model(path) -> int`
-- `forward(input_ids, handle=None) -> ForwardResult`
-- `unload_model(handle) -> None`
-- `load_model_result(path) -> Result[int]`
-- `forward_result(input_ids, handle=None) -> Result[ForwardResult]`
-- `unload_model_result(handle) -> Result[None]`
 - `managed_assemblies() -> ManagedAssemblySet`
 - `require_managed_assemblies() -> ManagedAssemblySet`
 - `runtime_layout() -> RuntimeLayout`
 
 The package includes inline type hints and a `py.typed` marker for PEP 561
 compatible type checkers.
-
-MemoryRegion / MemoryMapper internals are not exposed to Python.
-`runtime_layout()` reports package file locations only; it does not expose
-KernelContext or OS-specific mapper internals.
 
 ## Monad Syntax
 
@@ -222,14 +191,13 @@ route = await (
 Decorator-based do notation:
 
 ```python
-import aikernel
 from aikernel import Result, Try, do
 
 @do(Result)
 def pipeline():
-    handle = yield Try.run(lambda: aikernel.load_model("model.pt"))
-    output = yield aikernel.forward_result([1, 2, 3], handle=handle)
-    return output
+    context = yield Try.run(lambda: load_context())
+    route = yield Try.run(lambda: route_context(context))
+    return route
 ```
 
 Async do notation is available when yielded steps may be awaitables,
@@ -257,8 +225,9 @@ without capturing exceptions. `do(Result)`, `do(Option)`, `do(Either)`,
 `async_do(Result)`, `async_do(Option)`, and `async_do(Either)` are supported;
 only the `Result` forms convert exceptions into failures.
 
-Native wrapper result APIs attach capability lifecycle feedback to
-`Result.metadata`. With the current stable C ABI, asynchronous page-in,
-page-out, and defragmentation events are reported as
-`not_observable_from_current_abi`; future managed Capability feedback can be
-carried through the same metadata channel without changing the wrapper API.
+## GPU Capability Packages
+
+CUDA, ROCm, DirectML, Vulkan, and native model runtimes should be installed as
+external Capability packages. Those packages may provide their own Python API
+for model loading and inference while depending on this package for shared
+monad and managed assembly discovery behavior.

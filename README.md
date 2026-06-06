@@ -65,7 +65,6 @@ This repository consists of runtime, provider, and verification layers.
 src/
   AIKernel.Common
   AIKernel.Core
-  AIKernel.Cuda.Libtorch.2.12-cuda13.0
   AIKernel.Kernel
   AIKernel.Hosting
   Providers/
@@ -121,15 +120,6 @@ It provides `IServiceCollection` extensions and default wiring for ASP.NET Core 
 
 Provider implementations that connect AIKernel to external models and external services.
 
-##### `AIKernel.Cuda.Libtorch.2.12-cuda13.0`
-
-An optional Windows/MSVC Native ABI reference Capability module for LibTorch
-2.12.0 with CUDA 13.0. It is not required for the default AIKernel.Core or
-AIKernel.Python install path. It keeps CUDA and LibTorch runtime files outside
-the Core runtime and outside the NuGet payload. It may consume Core's
-OS-independent memory mapping abstractions, but it does not reference Kernel or
-any OS-specific mapper.
-
 ##### `AIKernel.Providers.MicrosoftAI`
 
 An OpenAI-compatible Provider implementation based on `Microsoft.Extensions.AI` (MEAI).
@@ -158,7 +148,8 @@ Integration tests that pass through multiple runtime layers.
 
 #### `AIKernel.Python`
 
-A thin Python binding for the AIKernel Native ABI capability bridge.
+A thin Python binding for AIKernel.Core functional primitives and managed
+assembly discovery.
 
 It is installed directly from GitHub and wraps the existing C ABI with `ctypes`.
 The Python package does not reimplement OS-specific memory mapping, Kernel
@@ -184,17 +175,18 @@ dotnet add package AIKernel.Common --version 0.0.5
 dotnet add package AIKernel.TestKit --version 0.0.5
 ```
 
-CUDA is optional. Install the LibTorch 2.12.0 / CUDA 13.0 Native ABI reference
-capability only on trusted GPU hosts that explicitly need it:
+CUDA is optional and lives outside this repository. GPU hosts should install an
+external Capability package such as `AIKernel.Cuda13.0.Libtorch2.12.win-x64`
+explicitly:
 
 ```bash
-dotnet add package AIKernel.Cuda.Libtorch.2.12-cuda13.0 --version 0.0.5
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5
 ```
 
 LLM / SLM developers who need direct CUDA integration should read
 [docs/development/cuda-capability-development-guide.md](docs/development/cuda-capability-development-guide.md).
-Other CUDA versions, model runtimes, or Linux CUDA hosts should create a new
-Capability module using the existing LibTorch CUDA module as a template.
+Other CUDA versions, model runtimes, or Linux CUDA hosts should fork the CUDA
+Capability repository and publish a separate Capability module.
 
 For the optional Python language binding, install from the repository
 subdirectory:
@@ -203,8 +195,8 @@ subdirectory:
 pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
-The default Python install is CUDA-free and does not build the native bridge.
-See [python/README.md](python/README.md) for optional native CUDA bridge setup.
+The default Python install is CPU-only/CUDA-free and does not include a native
+bridge. Install GPU integrations from the matching external Capability package.
 
 The v0.0.5 package family is aligned with the AIKernel.NET contract packages
 `AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.0.5.
@@ -281,10 +273,10 @@ default. Hosts can register module descriptors for CLI, assembly-referenced,
 native, DSL ROM, or remote modules without granting execution by accident.
 Actual module execution should be supplied by a trusted Tools, Provider, or
 host package that replaces the default invoker.
-`AIKernel.Cuda.Libtorch.2.12-cuda13.0` is an optional Native ABI reference
-module for GPU hosts: it wraps LibTorch through a small C API bridge and
-intentionally keeps all CUDA and LibTorch runtime files outside AIKernel.Core
-and outside the NuGet payload.
+GPU and Native ABI implementations are external Capability packages. For
+example, `AIKernel.Cuda13.0.Libtorch2.12.win-x64` owns its native bridge, runtime version metadata,
+and CUDA-specific implementation while conforming to AIKernel Capability
+contracts.
 For trusted hosts, `AddAIKernelKernel()` registers an OS-specific
 `IMemoryMapper` (`Win32MemoryMapper` on Windows, `PosixMemoryMapper` elsewhere)
 behind the Core memory abstraction. Native Capability packages consume only the
@@ -484,5 +476,5 @@ AIKernel.Core proves them through implementation.
 
 ## License
 
-MIT License.  
+Apache License 2.0.
 See the `LICENSE` file for details.

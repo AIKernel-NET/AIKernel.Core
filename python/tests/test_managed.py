@@ -19,9 +19,6 @@ def test_managed_assembly_manifest_is_stable() -> None:
         "AIKernel.Dtos.dll",
         "AIKernel.Enums.dll",
     )
-    assert tuple(path.name for path in assemblies.optional_assemblies) == (
-        "AIKernel.Cuda.Libtorch.Cuda13.dll",
-    )
 
 
 def test_require_managed_assemblies_fails_closed_when_not_bundled() -> None:
@@ -77,7 +74,6 @@ def test_managed_assemblies_resolve_from_nuget_cache(
 
     assert assemblies.is_complete
     assert all(str(path).startswith(str(nuget_root)) for path in assemblies.assemblies)
-    assert assemblies.optional_assemblies[0].name == "AIKernel.Cuda.Libtorch.Cuda13.dll"
 
 
 def test_runtime_layout_reports_managed_and_native_roots() -> None:

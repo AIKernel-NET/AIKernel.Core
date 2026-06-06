@@ -73,11 +73,19 @@ It targets:
 - CUDA 13.0
 - C ABI functions: `load_model`, `unload_model`, `forward`
 
-Install it only on GPU hosts that explicitly need this runtime:
+Install it only on GPU hosts that explicitly need this runtime.
+The reference CUDA package uses split distribution: NuGet.org carries a small
+metadata package with managed dependencies, while the full runtime `.nupkg` is a
+GitHub Release asset because it includes LibTorch, CUDA, cuDNN, and the native
+bridge.
 
 ```bash
-dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5
+dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5 --source <folder-containing-full-cuda-nupkg>
 ```
+
+Do not use a GitHub Release page URL directly as a NuGet source. Download the
+full `.nupkg` first, then add its containing folder as a local source.
 
 Then register the descriptor and invoker in the trusted host:
 
@@ -160,10 +168,12 @@ pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=p
 ```
 
 Install GPU-specific Python or native bindings from the matching external CUDA
-Capability repository when it provides a Python package:
+Capability repository when it provides a Python package. If the Capability ships
+only a full NuGet runtime package, follow that repository's GitHub Release
+installation instructions instead:
 
 ```bash
-pip install git+https://github.com/AIKernel-NET/AIKernel.Cuda13.0.git
+pip install git+https://github.com/AIKernel-NET/<matching-cuda-python-capability>.git
 ```
 
 Python exposes the outer API and monad helpers. It does not reimplement OS memory

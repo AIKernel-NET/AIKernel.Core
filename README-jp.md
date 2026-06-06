@@ -177,10 +177,14 @@ dotnet add package AIKernel.TestKit --version 0.0.5
 
 CUDA は任意機能であり、このリポジトリの外側に分離されています。GPU ホストでは、
 `AIKernel.Cuda13.0.Libtorch2.12.win-x64` などの外部 Capability package を
-明示的に追加してください。
+明示的に追加してください。CUDA Capability package は split distribution を採用する場合があります。
+NuGet.org には小さな metadata package のみを置き、LibTorch / CUDA / native payload を含む
+full runtime package は対応する Capability GitHub Release に添付します。CUDA 実行には
+full `.nupkg` を取得し、そのフォルダを local NuGet source として追加してから install します。
 
 ```bash
-dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5
+dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5 --source <folder-containing-full-cuda-nupkg>
 ```
 
 CUDA を直接利用したい LLM / SLM 開発者向けの仮想メモリレイヤー、仕様、

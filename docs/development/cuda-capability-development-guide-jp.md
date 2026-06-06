@@ -72,10 +72,17 @@ AIKernel.Cuda13.0/
 - C ABI functions: `load_model`, `unload_model`, `forward`
 
 この runtime が必要な GPU ホストでのみインストールしてください。
+参照 CUDA package は split distribution を採用します。NuGet.org には managed dependency を
+持つ小さな metadata package を置き、LibTorch、CUDA、cuDNN、native bridge を含む
+full runtime `.nupkg` は GitHub Release asset として配布します。
 
 ```bash
-dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5
+dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5 --source <folder-containing-full-cuda-nupkg>
 ```
+
+GitHub Release page URL は NuGet source ではありません。full `.nupkg` を先に取得し、
+そのファイルがあるフォルダを local source として追加してください。
 
 信頼済みホストで descriptor と invoker を登録します。
 
@@ -156,10 +163,12 @@ pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=p
 ```
 
 GPU 固有の Python / native binding は、対応する外部 CUDA Capability repository が
-Python package を提供する場合にそこからインストールしてください。
+Python package を提供する場合にそこからインストールしてください。Capability が
+full NuGet runtime package のみを提供する場合は、その repository の GitHub Release
+install 手順に従います。
 
 ```bash
-pip install git+https://github.com/AIKernel-NET/AIKernel.Cuda13.0.git
+pip install git+https://github.com/AIKernel-NET/<matching-cuda-python-capability>.git
 ```
 
 Python は外側 API と monad helper を公開します。OS memory mapping や Kernel 内部は

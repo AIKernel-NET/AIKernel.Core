@@ -179,10 +179,15 @@ dotnet add package AIKernel.TestKit --version 0.0.5
 
 CUDA is optional and lives outside this repository. GPU hosts should install an
 external Capability package such as `AIKernel.Cuda13.0.Libtorch2.12.win-x64`
-explicitly:
+explicitly. CUDA Capability packages may use split distribution: NuGet.org
+contains a small metadata package, while the full runtime package with
+LibTorch/CUDA/native payloads is attached to the matching Capability GitHub
+Release. For CUDA execution, download the full `.nupkg`, add its folder as a
+local NuGet source, and install from that source:
 
 ```bash
-dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5
+dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5 --source <folder-containing-full-cuda-nupkg>
 ```
 
 LLM / SLM developers who need direct CUDA integration should read
@@ -208,7 +213,8 @@ pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=p
 ```
 
 The default Python install is CPU-only/CUDA-free and does not include a native
-bridge. Install GPU integrations from the matching external Capability package.
+bridge. Install GPU integrations from the matching external Capability package
+and follow that Capability repository's distribution instructions.
 
 The v0.0.5 package family is aligned with the AIKernel.NET contract packages
 `AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.0.5.

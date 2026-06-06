@@ -40,7 +40,7 @@ cmake.source-dir = "."
 wheel.packages = ["src/aikernel"]
 
 [tool.scikit-build.cmake.define]
-AIKERNEL_PYTHON_BUILD_NATIVE = "ON"
+AIKERNEL_PYTHON_BUILD_NATIVE = "OFF"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

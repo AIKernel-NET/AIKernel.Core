@@ -12,14 +12,22 @@ PyPI publication is intentionally disabled for the current phase.
 
 ## Native Toolchain
 
-`AIKernel.Python` uses `scikit-build-core` and CMake to build the existing
-`libtorch_bridge` C ABI. The C ABI header is not modified.
+`AIKernel.Python` uses `scikit-build-core` and CMake. By default the package
+builds as a wrapper-only language binding so it can be installed on machines
+that do not have CUDA or LibTorch, including Linux hosts.
 
-The native bridge currently targets Windows/MSVC only. Linux and macOS native
-builds will be added after the native Linux server environment is prepared.
+The optional native `libtorch_bridge` C ABI build currently targets
+Windows/MSVC only. Linux and macOS native builds will be added after the native
+Linux server environment is prepared. The C ABI header is not modified.
 
-Set `AIKERNEL_LIBTORCH_PATH` to a LibTorch 2.12.0 + CUDA 13.0 distribution before
-installing when the repository-local `ref/` folder is not present.
+To build the Windows native bridge during install, enable it explicitly and set
+`AIKERNEL_LIBTORCH_PATH` to a LibTorch 2.12.0 + CUDA 13.0 distribution when the
+repository-local `ref/` folder is not present:
+
+```bash
+pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python \
+  --config-settings=cmake.define.AIKERNEL_PYTHON_BUILD_NATIVE=ON
+```
 
 On Windows, the repository development environment can also read `ref/env.txt`
 for `CUDA_PATH`.
@@ -77,12 +85,12 @@ Python does not yet host the .NET runtime or invoke
 should reuse the bundled assemblies and keep Python as an outer API layer
 rather than copying Kernel or OS-specific mapper internals into Python.
 
-For wrapper-only development or CI tests without LibTorch, disable the native
-and managed builds explicitly:
+For wrapper-only development or CI tests without LibTorch, the native build is
+already disabled by default. Disable managed assembly bundling as well when a
+.NET SDK is not available:
 
 ```bash
 pip install -e . \
-  --config-settings=cmake.define.AIKERNEL_PYTHON_BUILD_NATIVE=OFF \
   --config-settings=cmake.define.AIKERNEL_PYTHON_INCLUDE_MANAGED=OFF
 pytest
 ```

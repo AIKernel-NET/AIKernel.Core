@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.24)
 
 project(aikernel_python_native LANGUAGES CXX)
 
-option(AIKERNEL_PYTHON_BUILD_NATIVE "Build AIKernel Native ABI bridge" ON)
+option(AIKERNEL_PYTHON_BUILD_NATIVE "Build optional AIKernel CUDA Native ABI bridge" OFF)
 option(AIKERNEL_PYTHON_INCLUDE_MANAGED "Include AIKernel managed assemblies" ON)
+option(AIKERNEL_PYTHON_INCLUDE_CUDA_CAPABILITY "Include optional CUDA LibTorch managed Capability assembly" OFF)
 set(AIKERNEL_MANAGED_CONFIGURATION "Release" CACHE STRING "AIKernel managed build configuration")
 set(AIKERNEL_MANAGED_TFM "net10.0" CACHE STRING "AIKernel managed target framework")
 
@@ -27,17 +28,29 @@ if(AIKERNEL_PYTHON_INCLUDE_MANAGED)
       -c "${AIKERNEL_MANAGED_CONFIGURATION}"
       -f "${AIKERNEL_MANAGED_TFM}"
       -o "${AIKERNEL_MANAGED_KERNEL_PUBLISH_DIR}"
-    COMMAND "${DOTNET_EXECUTABLE}" publish
-      "${AIKERNEL_REPO_ROOT}/src/AIKernel.Cuda.Libtorch.2.12-cuda13.0/AIKernel.Cuda.Libtorch.2.12-cuda13.0.csproj"
-      -c "${AIKERNEL_MANAGED_CONFIGURATION}"
-      -f "${AIKERNEL_MANAGED_TFM}"
-      -o "${AIKERNEL_MANAGED_CAPABILITY_PUBLISH_DIR}"
     WORKING_DIRECTORY "${AIKERNEL_REPO_ROOT}"
     COMMENT "Building AIKernel managed assemblies for AIKernel.Python")
 
+  set(AIKERNEL_MANAGED_INSTALL_DIRS
+    "${AIKERNEL_MANAGED_KERNEL_PUBLISH_DIR}/")
+
+  if(AIKERNEL_PYTHON_INCLUDE_CUDA_CAPABILITY)
+    add_custom_target(aikernel_managed_cuda_capability ALL
+      COMMAND "${DOTNET_EXECUTABLE}" publish
+        "${AIKERNEL_REPO_ROOT}/src/AIKernel.Cuda.Libtorch.2.12-cuda13.0/AIKernel.Cuda.Libtorch.2.12-cuda13.0.csproj"
+        -c "${AIKERNEL_MANAGED_CONFIGURATION}"
+        -f "${AIKERNEL_MANAGED_TFM}"
+        -o "${AIKERNEL_MANAGED_CAPABILITY_PUBLISH_DIR}"
+      WORKING_DIRECTORY "${AIKERNEL_REPO_ROOT}"
+      COMMENT "Building optional AIKernel CUDA Capability assembly for AIKernel.Python")
+
+    add_dependencies(aikernel_managed_cuda_capability aikernel_managed)
+    list(APPEND AIKERNEL_MANAGED_INSTALL_DIRS
+      "${AIKERNEL_MANAGED_CAPABILITY_PUBLISH_DIR}/")
+  endif()
+
   install(DIRECTORY
-    "${AIKERNEL_MANAGED_KERNEL_PUBLISH_DIR}/"
-    "${AIKERNEL_MANAGED_CAPABILITY_PUBLISH_DIR}/"
+    ${AIKERNEL_MANAGED_INSTALL_DIRS}
     DESTINATION aikernel/managed
     FILES_MATCHING
       PATTERN "*.dll"

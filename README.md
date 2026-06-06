@@ -123,10 +123,12 @@ Provider implementations that connect AIKernel to external models and external s
 
 ##### `AIKernel.Cuda.Libtorch.2.12-cuda13.0`
 
-A Windows/MSVC Native ABI reference Capability module for LibTorch 2.12.0 with
-CUDA 13.0. It keeps CUDA and LibTorch runtime files outside the Core runtime and
-outside the NuGet payload. It may consume Core's OS-independent memory mapping
-abstractions, but it does not reference Kernel or any OS-specific mapper.
+An optional Windows/MSVC Native ABI reference Capability module for LibTorch
+2.12.0 with CUDA 13.0. It is not required for the default AIKernel.Core or
+AIKernel.Python install path. It keeps CUDA and LibTorch runtime files outside
+the Core runtime and outside the NuGet payload. It may consume Core's
+OS-independent memory mapping abstractions, but it does not reference Kernel or
+any OS-specific mapper.
 
 ##### `AIKernel.Providers.MicrosoftAI`
 
@@ -182,7 +184,8 @@ dotnet add package AIKernel.Common --version 0.0.5
 dotnet add package AIKernel.TestKit --version 0.0.5
 ```
 
-For the optional LibTorch 2.12.0 / CUDA 13.0 Native ABI reference capability:
+CUDA is optional. Install the LibTorch 2.12.0 / CUDA 13.0 Native ABI reference
+capability only on trusted GPU hosts that explicitly need it:
 
 ```bash
 dotnet add package AIKernel.Cuda.Libtorch.2.12-cuda13.0 --version 0.0.5
@@ -195,8 +198,8 @@ subdirectory:
 pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
-See [python/README.md](python/README.md) for native toolchain prerequisites and
-wrapper-only development setup.
+The default Python install is CUDA-free and does not build the native bridge.
+See [python/README.md](python/README.md) for optional native CUDA bridge setup.
 
 The v0.0.5 package family is aligned with the AIKernel.NET contract packages
 `AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.0.5.
@@ -273,9 +276,10 @@ default. Hosts can register module descriptors for CLI, assembly-referenced,
 native, DSL ROM, or remote modules without granting execution by accident.
 Actual module execution should be supplied by a trusted Tools, Provider, or
 host package that replaces the default invoker.
-`AIKernel.Cuda.Libtorch.2.12-cuda13.0` is the first Native ABI reference module:
-it wraps LibTorch through a small C API bridge and intentionally keeps all CUDA
-and LibTorch runtime files outside AIKernel.Core and outside the NuGet payload.
+`AIKernel.Cuda.Libtorch.2.12-cuda13.0` is an optional Native ABI reference
+module for GPU hosts: it wraps LibTorch through a small C API bridge and
+intentionally keeps all CUDA and LibTorch runtime files outside AIKernel.Core
+and outside the NuGet payload.
 For trusted hosts, `AddAIKernelKernel()` registers an OS-specific
 `IMemoryMapper` (`Win32MemoryMapper` on Windows, `PosixMemoryMapper` elsewhere)
 behind the Core memory abstraction. Native Capability packages consume only the

@@ -29,6 +29,14 @@ pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=p
   --config-settings=cmake.define.AIKERNEL_PYTHON_BUILD_NATIVE=ON
 ```
 
+The managed CUDA Capability assembly is also optional. Include it only for
+trusted GPU hosts:
+
+```bash
+pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python \
+  --config-settings=cmake.define.AIKERNEL_PYTHON_INCLUDE_CUDA_CAPABILITY=ON
+```
+
 On Windows, the repository development environment can also read `ref/env.txt`
 for `CUDA_PATH`.
 
@@ -43,10 +51,13 @@ AIKernel assemblies under `aikernel/managed`:
 - `AIKernel.Common.dll`
 - `AIKernel.Core.dll`
 - `AIKernel.Kernel.dll`
-- `AIKernel.Cuda.Libtorch.Cuda13.dll`
 - `AIKernel.Abstractions.dll`
 - `AIKernel.Dtos.dll`
 - `AIKernel.Enums.dll`
+
+`AIKernel.Cuda.Libtorch.Cuda13.dll` is not bundled by default. It is resolved
+as an optional managed Capability assembly when present in the package, an
+override path, or the NuGet cache.
 
 The publish output also carries required transitive runtime DLLs such as
 `Microsoft.Extensions.*` and `YamlDotNet`.

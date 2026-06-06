@@ -11,9 +11,11 @@ _MANAGED_ASSEMBLIES = (
     "AIKernel.Common.dll",
     "AIKernel.Core.dll",
     "AIKernel.Kernel.dll",
-    "AIKernel.Cuda.Libtorch.Cuda13.dll",
     "AIKernel.Dtos.dll",
     "AIKernel.Enums.dll",
+)
+_OPTIONAL_MANAGED_ASSEMBLIES = (
+    "AIKernel.Cuda.Libtorch.Cuda13.dll",
 )
 _ASSEMBLY_PACKAGES = {
     "AIKernel.Abstractions.dll": "AIKernel.Abstractions",
@@ -30,6 +32,7 @@ _ASSEMBLY_PACKAGES = {
 class ManagedAssemblySet:
     root: Path
     assemblies: tuple[Path, ...]
+    optional_assemblies: tuple[Path, ...] = ()
 
     @property
     def is_complete(self) -> bool:
@@ -41,12 +44,20 @@ class ManagedAssemblySet:
 
     @property
     def dlls(self) -> tuple[Path, ...]:
-        roots = {self.root, *(path.parent for path in self.assemblies)}
+        roots = {
+            self.root,
+            *(path.parent for path in self.assemblies),
+            *(path.parent for path in self.optional_assemblies),
+        }
         return tuple(sorted({path for root in roots for path in root.glob("*.dll")}))
 
     @property
     def dependency_manifests(self) -> tuple[Path, ...]:
-        roots = {self.root, *(path.parent for path in self.assemblies)}
+        roots = {
+            self.root,
+            *(path.parent for path in self.assemblies),
+            *(path.parent for path in self.optional_assemblies),
+        }
         return tuple(sorted({path for root in roots for path in root.glob("*.deps.json")}))
 
 
@@ -66,6 +77,10 @@ def managed_assemblies() -> ManagedAssemblySet:
     return ManagedAssemblySet(
         root=root,
         assemblies=tuple(_resolve_assembly(name) for name in _MANAGED_ASSEMBLIES),
+        optional_assemblies=tuple(
+            _resolve_assembly(name)
+            for name in _OPTIONAL_MANAGED_ASSEMBLIES
+        ),
     )
 
 

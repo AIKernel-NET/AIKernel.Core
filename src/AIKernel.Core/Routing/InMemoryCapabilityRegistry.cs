@@ -21,10 +21,9 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
 
         foreach (var capability in capabilities)
         {
-            RegisterCapabilityAsync(
+            RegisterCapability(
                 capability.ProviderId,
-                CreateCapacityVector(capability),
-                CancellationToken.None).GetAwaiter().GetResult();
+                CreateCapacityVector(capability));
         }
     }
 
@@ -34,10 +33,7 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        ArgumentException.ThrowIfNullOrWhiteSpace(providerId);
-        ArgumentNullException.ThrowIfNull(capacityVector);
-
-        _capabilities[NormalizeProviderId(providerId)] = capacityVector;
+        RegisterCapability(providerId, capacityVector);
 
         return ValueTask.CompletedTask;
     }
@@ -72,6 +68,16 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
             .ToArray();
 
         return ValueTask.FromResult(candidates);
+    }
+
+    private void RegisterCapability(
+        string providerId,
+        ModelCapacityVector capacityVector)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(providerId);
+        ArgumentNullException.ThrowIfNull(capacityVector);
+
+        _capabilities[NormalizeProviderId(providerId)] = capacityVector;
     }
 
     private static string NormalizeProviderId(string providerId)

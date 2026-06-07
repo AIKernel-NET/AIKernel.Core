@@ -1,3 +1,5 @@
+using AIKernel.Dtos.Time;
+
 namespace AIKernel.Core.Time;
 
 /// <summary>
@@ -41,17 +43,9 @@ public sealed class KernelClock :
         return Logical.GetLogicalTimestamp();
     }
 
-    AIKernel.Dtos.Time.KernelTimestamp
-        AIKernel.Abstractions.Time.IKernelClock.GetCurrentTimestamp()
+    KernelTimestamp AIKernel.Abstractions.Time.IKernelClock.GetCurrentTimestamp()
     {
-        var timestamp = GetLogicalTimestamp();
-        return new AIKernel.Dtos.Time.KernelTimestamp
-        {
-            UtcDateTime = timestamp.UtcDateTime,
-            LogicalCounter = timestamp.LogicalCounter,
-            SourceId = timestamp.SourceId,
-            Signature = timestamp.Signature
-        };
+        return GetLogicalTimestamp();
     }
 
     public static KernelClock System()

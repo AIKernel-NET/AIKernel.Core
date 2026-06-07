@@ -60,6 +60,17 @@ Before publishing, inspect the generated `.nupkg` files and verify:
 - no `AIKernel.Vfs` package dependency exists
 - references to AIKernel.NET contract packages use `0.1.0`
 
+## Contract Migration Notes
+
+The 0.1.0 contract promotion pass keeps the stable contract surface in
+AIKernel.NET:
+
+- `KernelTimestamp` is supplied by `AIKernel.Dtos.Time`; Core no longer owns a
+  duplicate timestamp DTO.
+- Control removes unused implementation-side descriptor remnants such as
+  `ControlCapabilityDescriptor` and `GpuControlDescriptor`; shared capability
+  manifests should use `AIKernel.Dtos.Capabilities.CapabilityModuleDescriptor`.
+
 ## Python Wheel Checks
 
 Verify the Python wheel:

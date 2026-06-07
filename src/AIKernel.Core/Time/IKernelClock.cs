@@ -1,3 +1,5 @@
+using AIKernel.Dtos.Time;
+
 namespace AIKernel.Core.Time;
 
 /// <summary>

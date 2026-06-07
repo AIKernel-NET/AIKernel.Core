@@ -1,3 +1,5 @@
+using AIKernel.Dtos.Time;
+
 namespace AIKernel.Core.Time;
 
 /// <summary>
@@ -85,8 +87,10 @@ public abstract class KernelTimeProvider : TimeProvider
     /// </summary>
     public virtual KernelTimestamp GetLogicalTimestamp()
     {
-        return KernelTimestamp.FromUtc(
-            GetUtcNow(),
-            IsReplaying ? "replay" : "system");
+        return new KernelTimestamp
+        {
+            UtcDateTime = GetUtcNow().ToUniversalTime(),
+            SourceId = IsReplaying ? "replay" : "system"
+        };
     }
 }

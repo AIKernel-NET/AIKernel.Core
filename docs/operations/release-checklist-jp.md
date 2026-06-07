@@ -58,6 +58,16 @@ py -m twine check dist/aikernel_net-0.1.0-py3-none-any.whl
 - `AIKernel.Vfs` package dependency が存在しない
 - AIKernel.NET contract packages 参照が `0.1.0`
 
+## 契約 migration notes
+
+0.1.0 の契約昇格では、安定 contract surface を AIKernel.NET 側に集約します。
+
+- `KernelTimestamp` は `AIKernel.Dtos.Time` から提供します。Core は重複する
+  timestamp DTO を所有しません。
+- Control は `ControlCapabilityDescriptor` / `GpuControlDescriptor` のような
+  未使用の実装側 descriptor 残骸を削除します。共有 capability manifest は
+  `AIKernel.Dtos.Capabilities.CapabilityModuleDescriptor` を使用します。
+
 ## Python wheel 確認
 
 Python wheel について以下を確認します。

@@ -485,6 +485,11 @@ The v0.0.x phase is complete. The 0.1.0 line validates the implementation
 through prototype repositories before the package family is promoted toward a
 broader stable release line.
 
+Release notes:
+
+- [English](RELEASE_NOTES.md)
+- [日本語](RELEASE_NOTES-ja.md)
+
 This roadmap preserves the progression established by the existing AIKernel.NET release notes and Issue #6:
 
 **Init → Fix → Synthesis**

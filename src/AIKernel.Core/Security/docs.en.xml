@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Security.ConfigurationCredentialProvider.GetSecretAsync">
+      <summary>Executes the GetSecretAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Security.EnvironmentCredentialProvider.GetSecretAsync">
+      <summary>Executes the GetSecretAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Security.SecureCredentialGuard.ValidateSecret">
+      <summary>Executes the ValidateSecret operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Security.SecureCredentialExpiredException.ExpiresAtUtc">
+      <summary>Gets or sets the ExpiresAtUtc value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Security.SecureCredentialExpiredException.Key">
+      <summary>Gets or sets the Key value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Security.SecureCredentialInvalidException.Key">
+      <summary>Gets or sets the Key value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Security.SecureCredentialInvalidException.Reason">
+      <summary>Gets or sets the Reason value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Security.SecureCredentialNotFoundException.Key">
+      <summary>Gets or sets the Key value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.ConfigurationCredentialProvider">
+      <summary>Represents the ConfigurationCredentialProvider public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.EnvironmentCredentialProvider">
+      <summary>Represents the EnvironmentCredentialProvider public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialAmbiguousException">
+      <summary>Represents the SecureCredentialAmbiguousException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialException">
+      <summary>Represents the SecureCredentialException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialExpiredException">
+      <summary>Represents the SecureCredentialExpiredException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialGuard">
+      <summary>Represents the SecureCredentialGuard public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialInvalidException">
+      <summary>Represents the SecureCredentialInvalidException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialNotFoundException">
+      <summary>Represents the SecureCredentialNotFoundException public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

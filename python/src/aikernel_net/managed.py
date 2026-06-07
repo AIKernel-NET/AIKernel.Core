@@ -1,3 +1,10 @@
+"""[EN]
+Reference module for aikernel_net.managed.
+
+[JA]
+aikernel_net.managed の参照モジュールです。
+"""
+
 from __future__ import annotations
 
 import os
@@ -26,19 +33,55 @@ _ASSEMBLY_PACKAGES = {
 
 @dataclass(frozen=True)
 class ManagedAssemblySet:
+    """[EN]
+    Represents the ManagedAssemblySet public Python API surface.
+    
+    [JA]
+    ManagedAssemblySet の公開 Python API サーフェスを表します。
+    """
     root: Path
     assemblies: tuple[Path, ...]
 
     @property
     def is_complete(self) -> bool:
+        """[EN]
+        Executes the is complete operation.
+        Returns:
+            Result produced by the operation.
+        
+        [JA]
+        is complete 操作を実行します。
+        戻り値:
+            操作によって生成される結果です。
+        """
         return all(path.exists() for path in self.assemblies)
 
     @property
     def missing(self) -> tuple[str, ...]:
+        """[EN]
+        Executes the missing operation.
+        Returns:
+            Result produced by the operation.
+        
+        [JA]
+        missing 操作を実行します。
+        戻り値:
+            操作によって生成される結果です。
+        """
         return tuple(path.name for path in self.assemblies if not path.exists())
 
     @property
     def dlls(self) -> tuple[Path, ...]:
+        """[EN]
+        Executes the dlls operation.
+        Returns:
+            Result produced by the operation.
+        
+        [JA]
+        dlls 操作を実行します。
+        戻り値:
+            操作によって生成される結果です。
+        """
         roots = {
             self.root,
             *(path.parent for path in self.assemblies),
@@ -47,6 +90,16 @@ class ManagedAssemblySet:
 
     @property
     def dependency_manifests(self) -> tuple[Path, ...]:
+        """[EN]
+        Executes the dependency manifests operation.
+        Returns:
+            Result produced by the operation.
+        
+        [JA]
+        dependency manifests 操作を実行します。
+        戻り値:
+            操作によって生成される結果です。
+        """
         roots = {
             self.root,
             *(path.parent for path in self.assemblies),
@@ -56,16 +109,42 @@ class ManagedAssemblySet:
 
 @dataclass(frozen=True)
 class RuntimeLayout:
+    """[EN]
+    Represents the RuntimeLayout public Python API surface.
+    
+    [JA]
+    RuntimeLayout の公開 Python API サーフェスを表します。
+    """
     managed: ManagedAssemblySet
     native_root: Path
 
     @property
     def native_libraries(self) -> tuple[Path, ...]:
+        """[EN]
+        Executes the native libraries operation.
+        Returns:
+            Result produced by the operation.
+        
+        [JA]
+        native libraries 操作を実行します。
+        戻り値:
+            操作によって生成される結果です。
+        """
         patterns = ("*.dll", "*.so", "*.dylib")
         return tuple(sorted(path for pattern in patterns for path in self.native_root.glob(pattern)))
 
 
 def managed_assemblies() -> ManagedAssemblySet:
+    """[EN]
+    Executes the managed assemblies operation.
+    Returns:
+        Result produced by the operation.
+    
+    [JA]
+    managed assemblies 操作を実行します。
+    戻り値:
+        操作によって生成される結果です。
+    """
     root = _managed_package_root()
     return ManagedAssemblySet(
         root=root,
@@ -74,6 +153,16 @@ def managed_assemblies() -> ManagedAssemblySet:
 
 
 def runtime_layout() -> RuntimeLayout:
+    """[EN]
+    Executes the runtime layout operation.
+    Returns:
+        Result produced by the operation.
+    
+    [JA]
+    runtime layout 操作を実行します。
+    戻り値:
+        操作によって生成される結果です。
+    """
     package_root = Path(__file__).resolve().parent
     return RuntimeLayout(
         managed=managed_assemblies(),
@@ -82,6 +171,16 @@ def runtime_layout() -> RuntimeLayout:
 
 
 def require_managed_assemblies() -> ManagedAssemblySet:
+    """[EN]
+    Executes the require managed assemblies operation.
+    Returns:
+        Result produced by the operation.
+    
+    [JA]
+    require managed assemblies 操作を実行します。
+    戻り値:
+        操作によって生成される結果です。
+    """
     assemblies = managed_assemblies()
     if not assemblies.is_complete:
         missing = ", ".join(assemblies.missing)

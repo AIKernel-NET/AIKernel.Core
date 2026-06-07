@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Core.Rom.Sha256SemanticHasher.Algorithm">
+      <summary>Provides the Algorithm value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.DefaultRomCanonicalizer.Canonicalize">
+      <summary>Executes the Canonicalize operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.DefaultRomCanonicalizer.CanonicalizeAsync">
+      <summary>Executes the CanonicalizeAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.MarkdownFrontMatterParser.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.MarkdownFrontMatterParser.Parse">
+      <summary>Executes the Parse operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomIdFactory.Create">
+      <summary>Executes the Create operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomLoadException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomLoader.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomLoader.LoadAsync">
+      <summary>Executes the LoadAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomRequiredMetadataMissingException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomSignatureVerificationException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomSignatureVerifier.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomSignatureVerifier.VerifyAsync">
+      <summary>Executes the VerifyAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.Sha256SemanticHasher.ComputeHash">
+      <summary>Executes the ComputeHash operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.Sha256SemanticHasher.ComputeHashAsync">
+      <summary>Executes the ComputeHashAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.Sha256SemanticHasher.VerifyHash">
+      <summary>Executes the VerifyHash operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.Sha256SemanticHasher.VerifyHashAsync">
+      <summary>Executes the VerifyHashAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Rom.RomRequiredMetadataMissingException.MetadataKey">
+      <summary>Gets or sets the MetadataKey value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Rom.RomRequiredMetadataMissingException.SourcePath">
+      <summary>Gets or sets the SourcePath value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Rom.RomSignatureVerificationException.ActualHash">
+      <summary>Gets or sets the ActualHash value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Rom.RomSignatureVerificationException.ExpectedHash">
+      <summary>Gets or sets the ExpectedHash value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Rom.RomSignatureVerificationException.SourcePath">
+      <summary>Gets or sets the SourcePath value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.DefaultRomCanonicalizer">
+      <summary>Represents the DefaultRomCanonicalizer public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.MarkdownFrontMatterParser">
+      <summary>Represents the MarkdownFrontMatterParser public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomIdFactory">
+      <summary>Represents the RomIdFactory public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomLoadException">
+      <summary>Represents the RomLoadException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomLoader">
+      <summary>Represents the RomLoader public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomRequiredMetadataMissingException">
+      <summary>Represents the RomRequiredMetadataMissingException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomSignatureVerificationException">
+      <summary>Represents the RomSignatureVerificationException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomSignatureVerifier">
+      <summary>Represents the RomSignatureVerifier public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.Sha256SemanticHasher">
+      <summary>Represents the Sha256SemanticHasher public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

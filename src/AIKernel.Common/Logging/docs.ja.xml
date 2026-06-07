@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Common.Logging.LogUtil.Error">
+      <summary>AIKernel の公開参照サーフェスとして Error 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Logging.LogUtil.Info">
+      <summary>AIKernel の公開参照サーフェスとして Info 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Logging.LogUtil.Warn">
+      <summary>AIKernel の公開参照サーフェスとして Warn 操作を実行します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Logging.LogUtil">
+      <summary>AIKernel パッケージ利用者に公開される LogUtil の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

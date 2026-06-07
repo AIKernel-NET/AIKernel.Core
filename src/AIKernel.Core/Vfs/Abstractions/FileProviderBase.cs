@@ -1,9 +1,11 @@
-﻿namespace AIKernel.Core.Vfs.Abstractions;
+namespace AIKernel.Core.Vfs.Abstractions;
 
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Vfs;
 using AIKernel.Vfs;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.FileProviderBase']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.FileProviderBase']" />
 public abstract class FileProviderBase(
     string providerId,
     string name,
@@ -12,10 +14,13 @@ public abstract class FileProviderBase(
 {
     private long _sessionSequence;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsNullOrWhiteSpace']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsNullOrWhiteSpace']" />
     public string ProviderId { get; } = string.IsNullOrWhiteSpace(providerId)
             ? throw new ArgumentException("ProviderId is required.", nameof(providerId))
             : providerId;
 
+    /// <summary>Gets the Name value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Name 値を取得します。</summary>
     public string Name { get; } = string.IsNullOrWhiteSpace(name)
             ? throw new ArgumentException("Name is required.", nameof(name))
             : name;
@@ -33,6 +38,8 @@ public abstract class FileProviderBase(
     /// </summary>
     protected IKernelClock Clock { get; } = clock ?? KernelClock.System();
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.OpenSessionAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.OpenSessionAsync']" />
     public Task<IVfsSession> OpenSessionAsync(IVfsCredentials credentials)
     {
         ArgumentNullException.ThrowIfNull(credentials);
@@ -47,11 +54,15 @@ public abstract class FileProviderBase(
         return OpenSessionCoreAsync(sessionId);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsAvailableAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsAvailableAsync']" />
     public virtual Task<bool> IsAvailableAsync()
     {
         return Task.FromResult(false);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.GetHealthAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.GetHealthAsync']" />
     public virtual Task<VfsProviderHealth> GetHealthAsync()
     {
         return Task.FromResult(new VfsProviderHealth
@@ -62,5 +73,6 @@ public abstract class FileProviderBase(
         });
     }
 
+    /// <summary>Executes the OpenSessionCoreAsync operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで OpenSessionCoreAsync 操作を実行します。</summary>
     protected abstract Task<IVfsSession> OpenSessionCoreAsync(string sessionId);
 }

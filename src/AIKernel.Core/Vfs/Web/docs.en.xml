@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.DeleteAsync">
+      <summary>Executes the DeleteAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.DisposeAsync">
+      <summary>Executes the DisposeAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.ExistsAsync">
+      <summary>Executes the ExistsAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.GetDirectoryAsync">
+      <summary>Executes the GetDirectoryAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.GetHealthAsync">
+      <summary>Executes the GetHealthAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.IsAvailableAsync">
+      <summary>Executes the IsAvailableAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.IsNullOrWhiteSpace">
+      <summary>Executes the IsNullOrWhiteSpace operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.QueryAsync">
+      <summary>Executes the QueryAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.ReadFileAsync">
+      <summary>Executes the ReadFileAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.WriteFileAsync">
+      <summary>Executes the WriteFileAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.FromSeconds">
+      <summary>Executes the FromSeconds operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.DeleteAsync">
+      <summary>Executes the DeleteAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.DisposeAsync">
+      <summary>Executes the DisposeAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.ExistsAsync">
+      <summary>Executes the ExistsAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.GetDirectoryAsync">
+      <summary>Executes the GetDirectoryAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.QueryAsync">
+      <summary>Executes the QueryAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.ReadFileAsync">
+      <summary>Executes the ReadFileAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.WriteFileAsync">
+      <summary>Executes the WriteFileAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.BaseUri">
+      <summary>Gets or sets the BaseUri value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.Clock">
+      <summary>Gets or sets the Clock value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.CredentialValidator">
+      <summary>Gets or sets the CredentialValidator value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.Name">
+      <summary>Gets or sets the Name value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.ProbePath">
+      <summary>Gets or sets the ProbePath value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.ProviderId">
+      <summary>Gets or sets the ProviderId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileSession.SessionId">
+      <summary>Gets or sets the SessionId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Web.WebGetFileProvider">
+      <summary>Represents the WebGetFileProvider public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions">
+      <summary>Represents the WebGetFileProviderOptions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Web.WebGetFileSession">
+      <summary>Represents the WebGetFileSession public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

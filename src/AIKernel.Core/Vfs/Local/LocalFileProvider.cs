@@ -1,4 +1,4 @@
-﻿namespace AIKernel.Core.Vfs.Local;
+namespace AIKernel.Core.Vfs.Local;
 
 using AIKernel.Core.Time;
 using AIKernel.Core.Vfs.Abstractions;
@@ -7,11 +7,15 @@ using AIKernel.Enums;
 using AIKernel.Vfs;
 using Microsoft.Extensions.Options;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Local.LocalFileProvider']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Local.LocalFileProvider']" />
 public sealed class LocalFileProvider : FileProviderBase
 {
     private readonly string _rootPath;
     private readonly bool _allowWrite;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.#ctor']" />
     public LocalFileProvider(
         IOptions<LocalFileProviderOptions> options,
         IKernelClock? clock = null)
@@ -21,6 +25,8 @@ public sealed class LocalFileProvider : FileProviderBase
     {
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.#ctor']" />
     public LocalFileProvider(
         LocalFileProviderOptions options,
         IKernelClock? clock = null)
@@ -36,11 +42,15 @@ public sealed class LocalFileProvider : FileProviderBase
         _allowWrite = options.AllowWrite;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsAvailableAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsAvailableAsync']" />
     public override Task<bool> IsAvailableAsync()
     {
         return Task.FromResult(Directory.Exists(_rootPath));
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetHealthAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetHealthAsync']" />
     public override Task<VfsProviderHealth> GetHealthAsync()
     {
         var exists = Directory.Exists(_rootPath);
@@ -53,6 +63,7 @@ public sealed class LocalFileProvider : FileProviderBase
         });
     }
 
+    /// <summary>Executes the OpenSessionCoreAsync operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで OpenSessionCoreAsync 操作を実行します。</summary>
     protected override Task<IVfsSession> OpenSessionCoreAsync(string sessionId)
     {
         // Provider が保持する Clock を LocalFileSession へ渡す。
@@ -81,10 +92,14 @@ public sealed class LocalFileProvider : FileProviderBase
         private readonly string _rootPath = rootPath ?? throw new ArgumentNullException(nameof(rootPath));
         private readonly IKernelClock _clock = clock ?? throw new ArgumentNullException(nameof(clock));
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsNullOrWhiteSpace']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsNullOrWhiteSpace']" />
         public string SessionId { get; } = string.IsNullOrWhiteSpace(sessionId)
                 ? throw new ArgumentException("SessionId is required.", nameof(sessionId))
                 : sessionId;
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.ReadFileAsync']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.ReadFileAsync']" />
         public async Task<IVfsFile> ReadFileAsync(string path)
         {
             var normalized = VfsPathRules.Normalize(path);
@@ -118,6 +133,8 @@ public sealed class LocalFileProvider : FileProviderBase
                 });
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.WriteFileAsync']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.WriteFileAsync']" />
         public async Task WriteFileAsync(string path, byte[] content)
         {
             if (!allowWrite)
@@ -156,6 +173,8 @@ public sealed class LocalFileProvider : FileProviderBase
             File.SetLastWriteTimeUtc(fullPath, timestamp);
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetDirectoryAsync']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetDirectoryAsync']" />
         public Task<IVfsDirectory> GetDirectoryAsync(string path)
         {
             var normalized = VfsPathRules.Normalize(path);
@@ -219,6 +238,8 @@ public sealed class LocalFileProvider : FileProviderBase
                     entries: entries));
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.ExistsAsync']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.ExistsAsync']" />
         public Task<bool> ExistsAsync(string path)
         {
             var fullPath = ResolvePath(path);
@@ -228,6 +249,8 @@ public sealed class LocalFileProvider : FileProviderBase
                 || Directory.Exists(fullPath));
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.DeleteAsync']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.DeleteAsync']" />
         public Task DeleteAsync(string path)
         {
             if (!allowWrite)
@@ -251,6 +274,8 @@ public sealed class LocalFileProvider : FileProviderBase
             return Task.CompletedTask;
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.QueryAsync']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.QueryAsync']" />
         public Task<IVfsQueryResult> QueryAsync(IVfsQuery query)
         {
             ArgumentNullException.ThrowIfNull(query);
@@ -277,6 +302,8 @@ public sealed class LocalFileProvider : FileProviderBase
             return Task.FromResult(VfsEntryQueryEngine.Execute(entries, query));
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.DisposeAsync']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.DisposeAsync']" />
         public ValueTask DisposeAsync()
         {
             return ValueTask.CompletedTask;

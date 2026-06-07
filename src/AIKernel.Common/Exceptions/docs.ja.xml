@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Common.Exceptions.CommonException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Exceptions.CommonException">
+      <summary>AIKernel パッケージ利用者に公開される CommonException の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

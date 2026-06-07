@@ -1,4 +1,4 @@
-﻿namespace AIKernel.Hosting;
+namespace AIKernel.Hosting;
 
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
@@ -20,8 +20,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.AIKernelCoreHostingExtensions']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.AIKernelCoreHostingExtensions']" />
 public static class AIKernelCoreHostingExtensions
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']" />
     public static AIKernelCoreBuilder AddAIKernelCore(
         this IServiceCollection services,
         IConfiguration? configuration = null)
@@ -36,6 +40,8 @@ public static class AIKernelCoreHostingExtensions
         return new AIKernelCoreBuilder(services, configuration);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']" />
     public static AIKernelCoreBuilder AddAIKernelCore(
         this IServiceCollection services,
         IKernelClock clock,

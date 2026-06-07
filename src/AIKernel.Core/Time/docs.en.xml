@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Core.Time.KernelClock.IsReplaying">
+      <summary>Provides the IsReplaying value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Core.Time.KernelClock.Now">
+      <summary>Provides the Now value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Core.Time.KernelClock.ReliabilityScore">
+      <summary>Provides the ReliabilityScore value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Core.Time.KernelTimeProvider.LocalTimeZone">
+      <summary>Provides the LocalTimeZone value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Core.Time.KernelTimeProvider.ReliabilityScore">
+      <summary>Provides the ReliabilityScore value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Core.Time.KernelTimeProvider.TimestampFrequency">
+      <summary>Provides the TimestampFrequency value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelClock.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelClock.GetLogicalTimestamp">
+      <summary>Executes the GetLogicalTimestamp operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelClock.Replay">
+      <summary>Executes the Replay operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelClock.System">
+      <summary>Executes the System operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelTimeProvider.CreateTimer">
+      <summary>Executes the CreateTimer operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelTimeProvider.GetLogicalTimestamp">
+      <summary>Executes the GetLogicalTimestamp operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelTimeProvider.GetTimestamp">
+      <summary>Executes the GetTimestamp operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelTimeProvider.GetUtcNow">
+      <summary>Executes the GetUtcNow operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.ReplayKernelTimeProvider.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.ReplayKernelTimeProvider.GetLogicalTimestamp">
+      <summary>Executes the GetLogicalTimestamp operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.SystemKernelTimeProvider.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Time.KernelClock.Logical">
+      <summary>Gets or sets the Logical value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Time.KernelClock.Physical">
+      <summary>Gets or sets the Physical value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Time.KernelTimeProvider.IsReplaying">
+      <summary>Gets or sets the IsReplaying value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Time.ReplayKernelTimeProvider.FixedUtcDateTime">
+      <summary>Gets or sets the FixedUtcDateTime value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Time.IKernelClock">
+      <summary>Represents the IKernelClock public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Time.KernelClock">
+      <summary>Represents the KernelClock public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Time.KernelTimeProvider">
+      <summary>Represents the KernelTimeProvider public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Time.ReplayKernelTimeProvider">
+      <summary>Represents the ReplayKernelTimeProvider public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Time.SystemKernelTimeProvider">
+      <summary>Represents the SystemKernelTimeProvider public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

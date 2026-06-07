@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <Description>EN: Integration tests for validating end-to-end AIKernel.NET runtime behavior across Core, Kernel, Hosting, and Providers.
 
 JA: Core、Kernel、Hosting、Provider を横断した AIKernel.NET ランタイムのエンドツーエンド動作を検証する結合テストです。</Description>

@@ -1,25 +1,33 @@
-﻿namespace AIKernel.Core.Rom;
+namespace AIKernel.Core.Rom;
 
 using System.Collections.Immutable;
 using AIKernel.Abstractions.Rom;
 using AIKernel.Dtos.Rom;
 using YamlDotNet.Serialization;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.MarkdownFrontMatterParser']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.MarkdownFrontMatterParser']" />
 public sealed class MarkdownFrontMatterParser : IMarkdownFrontMatterParser
 {
     private readonly IDeserializer _deserializer;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.#ctor']" />
     public MarkdownFrontMatterParser()
         : this(new DeserializerBuilder().Build())
     {
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.#ctor']" />
     public MarkdownFrontMatterParser(IDeserializer deserializer)
     {
         _deserializer = deserializer
             ?? throw new ArgumentNullException(nameof(deserializer));
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.Parse']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.Parse']" />
     public MarkdownFrontMatterDocument Parse(
         string markdown,
         string sourcePath)

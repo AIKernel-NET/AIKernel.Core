@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.CapabilityModuleId">
+      <summary>Provides the CapabilityModuleId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.InputHash">
+      <summary>Provides the InputHash value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.ProviderId">
+      <summary>Provides the ProviderId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.ProviderTier">
+      <summary>Provides the ProviderTier value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.RequestedModelId">
+      <summary>Provides the RequestedModelId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.RootRomId">
+      <summary>Provides the RootRomId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.RouteReason">
+      <summary>Provides the RouteReason value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.TransactionId">
+      <summary>Provides the TransactionId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.VfsProviderId">
+      <summary>Provides the VfsProviderId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelVfsSessionFactory.ApiKey">
+      <summary>Provides the ApiKey value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelVfsSessionFactory.Token">
+      <summary>Provides the Token value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelVfsSessionFactory.Username">
+      <summary>Provides the Username value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelVfsSessionFactory.object">
+      <summary>Provides the object value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.AnalyzeAttentionAsync">
+      <summary>Executes the AnalyzeAttentionAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.ExecuteAsync">
+      <summary>Executes the ExecuteAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.GetGuard">
+      <summary>Executes the GetGuard operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.GetPdp">
+      <summary>Executes the GetPdp operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.GetProviderRouter">
+      <summary>Executes the GetProviderRouter operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.GetVersion">
+      <summary>Executes the GetVersion operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.PrepareExpressionAsync">
+      <summary>Executes the PrepareExpressionAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.PreprocessMaterialAsync">
+      <summary>Executes the PreprocessMaterialAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelHostingExtensions.AddAIKernelKernel">
+      <summary>Executes the AddAIKernelKernel operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyTo">
+      <summary>Executes the ApplyTo operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyToRequest">
+      <summary>Executes the ApplyToRequest operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ToMetadata">
+      <summary>Executes the ToMetadata operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForCapabilityModule">
+      <summary>Executes the ForCapabilityModule operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForProvider">
+      <summary>Executes the ForProvider operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelRequestExecutionExtensions.ExecuteAsync">
+      <summary>Executes the ExecuteAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelRequestHasher.ComputeHash">
+      <summary>Executes the ComputeHash operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelRequestValidationException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelTransactionIdFactory.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelTransactionIdFactory.CreateTransactionId">
+      <summary>Executes the CreateTransactionId operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelVfsSessionFactory.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelVfsSessionFactory.OpenSessionAsync">
+      <summary>Executes the OpenSessionAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.StaticKernelModelProviderSelector.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.StaticKernelModelProviderSelector.SelectAsync">
+      <summary>Executes the SelectAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.Kernel">
+      <summary>Represents the Kernel public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelFacadeMetadataKeys">
+      <summary>Represents the KernelFacadeMetadataKeys public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelHostingExtensions">
+      <summary>Represents the KernelHostingExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions">
+      <summary>Represents the KernelProviderRoutingDecisionExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelProviderRoutingDecisionFactory">
+      <summary>Represents the KernelProviderRoutingDecisionFactory public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelRequestExecutionExtensions">
+      <summary>Represents the KernelRequestExecutionExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelRequestHasher">
+      <summary>Represents the KernelRequestHasher public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelRequestValidationException">
+      <summary>Represents the KernelRequestValidationException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelTransactionIdFactory">
+      <summary>Represents the KernelTransactionIdFactory public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelVfsSessionFactory">
+      <summary>Represents the KernelVfsSessionFactory public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.StaticKernelModelProviderSelector">
+      <summary>Represents the StaticKernelModelProviderSelector public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

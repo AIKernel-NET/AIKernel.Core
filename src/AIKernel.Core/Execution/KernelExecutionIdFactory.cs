@@ -5,10 +5,14 @@ using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Enums;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutionIdFactory']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutionIdFactory']" />
 public sealed class KernelExecutionIdFactory
 {
     private readonly SemanticStateHasher _semanticStateHasher = new();
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateExecutionId']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateExecutionId']" />
     public string CreateExecutionId(
         KernelExecutionRequest request,
         ExecutionStatus status,
@@ -29,6 +33,8 @@ public sealed class KernelExecutionIdFactory
                 executionSequence));
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateExecutionId']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateExecutionId']" />
     public Result<string> TryCreateExecutionId(
         KernelExecutionRequest request,
         ExecutionStatus status,
@@ -46,6 +52,8 @@ public sealed class KernelExecutionIdFactory
             executionSequence);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateFallbackExecutionId']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateFallbackExecutionId']" />
     public string CreateFallbackExecutionId(
         KernelRequest request,
         ExecutionStatus status)
@@ -55,6 +63,8 @@ public sealed class KernelExecutionIdFactory
         return Unwrap(CreateFallbackExecutionIdResult(request, status));
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateFallbackExecutionId']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateFallbackExecutionId']" />
     public Result<string> TryCreateFallbackExecutionId(
         KernelRequest request,
         ExecutionStatus status)

@@ -1,9 +1,11 @@
-﻿namespace AIKernel.Providers.MicrosoftAI;
+namespace AIKernel.Providers.MicrosoftAI;
 
 using System.Collections.Immutable;
 using System.Text.Json;
 using Microsoft.Extensions.AI;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseMapper']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseMapper']" />
 public sealed class OpenAICompatibleResponseMapper : IOpenAICompatibleResponseMapper
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -11,6 +13,8 @@ public sealed class OpenAICompatibleResponseMapper : IOpenAICompatibleResponseMa
         WriteIndented = false
     };
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseMapper.GetPrimaryText']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseMapper.GetPrimaryText']" />
     public string GetPrimaryText(ChatResponse response)
     {
         ArgumentNullException.ThrowIfNull(response);
@@ -24,6 +28,8 @@ public sealed class OpenAICompatibleResponseMapper : IOpenAICompatibleResponseMa
         return response.Text;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseMapper.CreateProjection']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseMapper.CreateProjection']" />
     public OpenAICompatibleResponseProjection CreateProjection(
         ChatResponse response,
         string fallbackModelId,

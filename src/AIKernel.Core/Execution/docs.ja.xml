@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Core.Execution.SimpleTokenizer.Name">
+      <summary>AIKernel の公開参照サーフェスで公開される Name 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Core.Execution.SimpleTokenizer.TokenizerProfileId">
+      <summary>AIKernel の公開参照サーフェスで公開される TokenizerProfileId 値を提供します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.DefaultContextPromptProjector.Project">
+      <summary>AIKernel の公開参照サーフェスとして Project 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.DefaultPolisherValidator.AnalyzeDivergenceAsync">
+      <summary>AIKernel の公開参照サーフェスとして AnalyzeDivergenceAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.DefaultPolisherValidator.ValidateLogicPreservationAsync">
+      <summary>AIKernel の公開参照サーフェスとして ValidateLogicPreservationAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.DefaultPromptGenerator.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.DefaultPromptGenerator.GenerateAsync">
+      <summary>AIKernel の公開参照サーフェスとして GenerateAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateExecutionId">
+      <summary>AIKernel の公開参照サーフェスとして CreateExecutionId 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateFallbackExecutionId">
+      <summary>AIKernel の公開参照サーフェスとして CreateFallbackExecutionId 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateExecutionId">
+      <summary>AIKernel の公開参照サーフェスとして TryCreateExecutionId 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateFallbackExecutionId">
+      <summary>AIKernel の公開参照サーフェスとして TryCreateFallbackExecutionId 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutor.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutor.ExecuteAsync">
+      <summary>AIKernel の公開参照サーフェスとして ExecuteAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelReplayer.CanReplay">
+      <summary>AIKernel の公開参照サーフェスとして CanReplay 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelReplayer.ReplayAsync">
+      <summary>AIKernel の公開参照サーフェスとして ReplayAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PassThroughOutputPolisher.RenderAsync">
+      <summary>AIKernel の公開参照サーフェスとして RenderAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PassThroughOutputPolisher.new">
+      <summary>AIKernel の公開参照サーフェスとして new 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PipelineOrchestrator.ExecuteAsync">
+      <summary>AIKernel の公開参照サーフェスとして ExecuteAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PipelineOrchestrator.InitializeAsync">
+      <summary>AIKernel の公開参照サーフェスとして InitializeAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PipelineOrchestrator.ReplayFromDumpAsync">
+      <summary>AIKernel の公開参照サーフェスとして ReplayFromDumpAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PromptGenerationException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PromptTokenBudgetExceededException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SemanticStateHasher.ComputeHash">
+      <summary>AIKernel の公開参照サーフェスとして ComputeHash 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelExecutionResult">
+      <summary>AIKernel の公開参照サーフェスとして CreateKernelExecutionResult 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelFallbackResult">
+      <summary>AIKernel の公開参照サーフェスとして CreateKernelFallbackResult 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelExecution">
+      <summary>AIKernel の公開参照サーフェスとして FromKernelExecution 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelFallback">
+      <summary>AIKernel の公開参照サーフェスとして FromKernelFallback 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.CountTokens">
+      <summary>AIKernel の公開参照サーフェスとして CountTokens 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.Decode">
+      <summary>AIKernel の公開参照サーフェスとして Decode 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.GetPaddingInfo">
+      <summary>AIKernel の公開参照サーフェスとして GetPaddingInfo 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.GetPhysicalCardinality">
+      <summary>AIKernel の公開参照サーフェスとして GetPhysicalCardinality 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.GetStatistics">
+      <summary>AIKernel の公開参照サーフェスとして GetStatistics 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.SupportsModel">
+      <summary>AIKernel の公開参照サーフェスとして SupportsModel 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.Tokenize">
+      <summary>AIKernel の公開参照サーフェスとして Tokenize 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.Resolve">
+      <summary>AIKernel の公開参照サーフェスとして Resolve 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.UnsupportedPromptCapabilityException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.struct.ToExecutionId">
+      <summary>AIKernel の公開参照サーフェスとして ToExecutionId 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.struct.ToString">
+      <summary>AIKernel の公開参照サーフェスとして ToString 操作を実行します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Execution.PromptTokenBudgetExceededException.ActualTokens">
+      <summary>AIKernel の公開参照サーフェスで公開される ActualTokens 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Execution.PromptTokenBudgetExceededException.MaxInputTokens">
+      <summary>AIKernel の公開参照サーフェスで公開される MaxInputTokens 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Execution.SemanticStateMaterial.CanonicalPayload">
+      <summary>AIKernel の公開参照サーフェスで公開される CanonicalPayload 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Execution.SemanticStateMaterial.Domain">
+      <summary>AIKernel の公開参照サーフェスで公開される Domain 値を取得または設定します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.DefaultContextPromptProjector">
+      <summary>AIKernel パッケージ利用者に公開される DefaultContextPromptProjector の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.DefaultPolisherValidator">
+      <summary>AIKernel パッケージ利用者に公開される DefaultPolisherValidator の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.DefaultPromptGenerator">
+      <summary>AIKernel パッケージ利用者に公開される DefaultPromptGenerator の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.KernelExecutionIdFactory">
+      <summary>AIKernel パッケージ利用者に公開される KernelExecutionIdFactory の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.KernelExecutor">
+      <summary>AIKernel パッケージ利用者に公開される KernelExecutor の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.KernelReplayer">
+      <summary>AIKernel パッケージ利用者に公開される KernelReplayer の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.ModelMessage">
+      <summary>AIKernel パッケージ利用者に公開される ModelMessage の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.PassThroughOutputPolisher">
+      <summary>AIKernel パッケージ利用者に公開される PassThroughOutputPolisher の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.PipelineOrchestrator">
+      <summary>AIKernel パッケージ利用者に公開される PipelineOrchestrator の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.PromptGenerationException">
+      <summary>AIKernel パッケージ利用者に公開される PromptGenerationException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.PromptTokenBudgetExceededException">
+      <summary>AIKernel パッケージ利用者に公開される PromptTokenBudgetExceededException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.SemanticStateHasher">
+      <summary>AIKernel パッケージ利用者に公開される SemanticStateHasher の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.SemanticStateMaterial">
+      <summary>AIKernel パッケージ利用者に公開される SemanticStateMaterial の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.SimpleTokenizer">
+      <summary>AIKernel パッケージ利用者に公開される SimpleTokenizer の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver">
+      <summary>AIKernel パッケージ利用者に公開される StaticModelPromptCapabilityResolver の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.UnsupportedPromptCapabilityException">
+      <summary>AIKernel パッケージ利用者に公開される UnsupportedPromptCapabilityException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.struct">
+      <summary>AIKernel パッケージ利用者に公開される struct の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

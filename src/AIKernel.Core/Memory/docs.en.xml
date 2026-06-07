@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Core.Memory.MemoryRegionBase.IsMapped">
+      <summary>Provides the IsMapped value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Core.Memory.MemoryRegionBase.Length">
+      <summary>Provides the Length value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Memory.MemoryMapperBase.Open">
+      <summary>Executes the Open operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult">
+      <summary>Executes the OpenResult operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Memory.MemoryRegionBase.Dispose">
+      <summary>Executes the Dispose operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Memory.MemoryRegionBase.Unmap">
+      <summary>Executes the Unmap operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Memory.MemoryRegionBase.UnmapResult">
+      <summary>Executes the UnmapResult operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Memory.MemoryRegionBase.Info">
+      <summary>Gets or sets the Info value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Memory.MemoryRegionBase.Pointer">
+      <summary>Gets or sets the Pointer value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Memory.MemoryMapperBase">
+      <summary>Represents the MemoryMapperBase public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Memory.MemoryRegionBase">
+      <summary>Represents the MemoryRegionBase public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

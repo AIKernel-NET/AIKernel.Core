@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.GetHealthAsync">
+      <summary>AIKernel の公開参照サーフェスとして GetHealthAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsAvailableAsync">
+      <summary>AIKernel の公開参照サーフェスとして IsAvailableAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsNullOrWhiteSpace">
+      <summary>AIKernel の公開参照サーフェスとして IsNullOrWhiteSpace 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.OpenSessionAsync">
+      <summary>AIKernel の公開参照サーフェスとして OpenSessionAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.VfsAuthenticationFailedException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.GetName">
+      <summary>AIKernel の公開参照サーフェスとして GetName 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsDirectChild">
+      <summary>AIKernel の公開参照サーフェスとして IsDirectChild 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsUnder">
+      <summary>AIKernel の公開参照サーフェスとして IsUnder 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.Normalize">
+      <summary>AIKernel の公開参照サーフェスとして Normalize 操作を実行します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Abstractions.VfsAuthenticationFailedException.ProviderId">
+      <summary>AIKernel の公開参照サーフェスで公開される ProviderId 値を取得または設定します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Abstractions.FileProviderBase">
+      <summary>AIKernel パッケージ利用者に公開される FileProviderBase の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Abstractions.VfsAuthenticationFailedException">
+      <summary>AIKernel パッケージ利用者に公開される VfsAuthenticationFailedException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Abstractions.VfsPathRules">
+      <summary>AIKernel パッケージ利用者に公開される VfsPathRules の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

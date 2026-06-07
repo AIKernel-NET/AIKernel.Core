@@ -1,7 +1,11 @@
-﻿namespace AIKernel.Core.Vfs.Abstractions;
+namespace AIKernel.Core.Vfs.Abstractions;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.VfsPathRules']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.VfsPathRules']" />
 public static class VfsPathRules
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.Normalize']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.Normalize']" />
     public static string Normalize(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -41,6 +45,8 @@ public static class VfsPathRules
         return string.Join('/', result);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.GetName']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.GetName']" />
     public static string GetName(string path)
     {
         var normalized = Normalize(path);
@@ -54,6 +60,8 @@ public static class VfsPathRules
         return index < 0 ? normalized : normalized[(index + 1)..];
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsUnder']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsUnder']" />
     public static bool IsUnder(string parent, string child)
     {
         parent = Normalize(parent);
@@ -64,6 +72,8 @@ public static class VfsPathRules
             || child.StartsWith(parent + "/", StringComparison.Ordinal);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsDirectChild']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsDirectChild']" />
     public static bool IsDirectChild(string parent, string child)
     {
         parent = Normalize(parent);

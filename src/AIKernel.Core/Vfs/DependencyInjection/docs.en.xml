@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders">
+      <summary>Executes the AddAIKernelBrowserVfsProviders operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders">
+      <summary>Executes the AddAIKernelCoreVfsProviders operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider">
+      <summary>Executes the AddLocalFileProvider operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider">
+      <summary>Executes the AddMemoryFileProvider operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider">
+      <summary>Executes the AddWebGetFileProvider operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions">
+      <summary>Represents the AIKernelCoreVfsServiceCollectionExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

@@ -4,10 +4,14 @@ using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
 using AIKernel.Dtos.Execution;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver']" />
 public sealed class StaticModelPromptCapabilityResolver : IModelPromptCapabilityResolver
 {
     private readonly IReadOnlyDictionary<string, ModelPromptCapability> _capabilities;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.#ctor']" />
     public StaticModelPromptCapabilityResolver(IEnumerable<ModelPromptCapability> capabilities)
     {
         ArgumentNullException.ThrowIfNull(capabilities);
@@ -15,6 +19,8 @@ public sealed class StaticModelPromptCapabilityResolver : IModelPromptCapability
         _capabilities = BuildCapabilityMap(capabilities);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.Resolve']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.Resolve']" />
     public ModelPromptCapability Resolve(
         IModelProvider provider,
         KernelExecutionRequest request)

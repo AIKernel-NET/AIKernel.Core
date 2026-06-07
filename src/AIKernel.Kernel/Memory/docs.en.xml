@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="T:AIKernel.Kernel.Memory.PosixMemoryMapper">
+      <summary>Represents the PosixMemoryMapper public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.Memory.Win32MemoryMapper">
+      <summary>Represents the Win32MemoryMapper public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

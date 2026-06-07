@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DeleteAsync">
+      <summary>Executes the DeleteAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DisposeAsync">
+      <summary>Executes the DisposeAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ExistsAsync">
+      <summary>Executes the ExistsAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetDirectoryAsync">
+      <summary>Executes the GetDirectoryAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetHealthAsync">
+      <summary>Executes the GetHealthAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsAvailableAsync">
+      <summary>Executes the IsAvailableAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsNullOrWhiteSpace">
+      <summary>Executes the IsNullOrWhiteSpace operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.QueryAsync">
+      <summary>Executes the QueryAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ReadFileAsync">
+      <summary>Executes the ReadFileAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.Seed">
+      <summary>Executes the Seed operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.WriteFileAsync">
+      <summary>Executes the WriteFileAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.Clock">
+      <summary>Gets or sets the Clock value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.CredentialValidator">
+      <summary>Gets or sets the CredentialValidator value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.Name">
+      <summary>Gets or sets the Name value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.ProviderId">
+      <summary>Gets or sets the ProviderId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Memory.MemoryFileProvider">
+      <summary>Represents the MemoryFileProvider public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions">
+      <summary>Represents the MemoryFileProviderOptions public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

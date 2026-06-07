@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.DeleteAsync">
+      <summary>AIKernel の公開参照サーフェスとして DeleteAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.DisposeAsync">
+      <summary>AIKernel の公開参照サーフェスとして DisposeAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.ExistsAsync">
+      <summary>AIKernel の公開参照サーフェスとして ExistsAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.GetDirectoryAsync">
+      <summary>AIKernel の公開参照サーフェスとして GetDirectoryAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.GetHealthAsync">
+      <summary>AIKernel の公開参照サーフェスとして GetHealthAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.IsAvailableAsync">
+      <summary>AIKernel の公開参照サーフェスとして IsAvailableAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.IsNullOrWhiteSpace">
+      <summary>AIKernel の公開参照サーフェスとして IsNullOrWhiteSpace 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.QueryAsync">
+      <summary>AIKernel の公開参照サーフェスとして QueryAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.ReadFileAsync">
+      <summary>AIKernel の公開参照サーフェスとして ReadFileAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProvider.WriteFileAsync">
+      <summary>AIKernel の公開参照サーフェスとして WriteFileAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.FromSeconds">
+      <summary>AIKernel の公開参照サーフェスとして FromSeconds 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.DeleteAsync">
+      <summary>AIKernel の公開参照サーフェスとして DeleteAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.DisposeAsync">
+      <summary>AIKernel の公開参照サーフェスとして DisposeAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.ExistsAsync">
+      <summary>AIKernel の公開参照サーフェスとして ExistsAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.GetDirectoryAsync">
+      <summary>AIKernel の公開参照サーフェスとして GetDirectoryAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.QueryAsync">
+      <summary>AIKernel の公開参照サーフェスとして QueryAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.ReadFileAsync">
+      <summary>AIKernel の公開参照サーフェスとして ReadFileAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Web.WebGetFileSession.WriteFileAsync">
+      <summary>AIKernel の公開参照サーフェスとして WriteFileAsync 操作を実行します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.BaseUri">
+      <summary>AIKernel の公開参照サーフェスで公開される BaseUri 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.Clock">
+      <summary>AIKernel の公開参照サーフェスで公開される Clock 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.CredentialValidator">
+      <summary>AIKernel の公開参照サーフェスで公開される CredentialValidator 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.Name">
+      <summary>AIKernel の公開参照サーフェスで公開される Name 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.ProbePath">
+      <summary>AIKernel の公開参照サーフェスで公開される ProbePath 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.ProviderId">
+      <summary>AIKernel の公開参照サーフェスで公開される ProviderId 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Web.WebGetFileSession.SessionId">
+      <summary>AIKernel の公開参照サーフェスで公開される SessionId 値を取得または設定します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Web.WebGetFileProvider">
+      <summary>AIKernel パッケージ利用者に公開される WebGetFileProvider の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions">
+      <summary>AIKernel パッケージ利用者に公開される WebGetFileProviderOptions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Web.WebGetFileSession">
+      <summary>AIKernel パッケージ利用者に公開される WebGetFileSession の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Context.AssembledContextSnapshot.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.AddEdge">
+      <summary>AIKernel の公開参照サーフェスとして AddEdge 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.AddLoaded">
+      <summary>AIKernel の公開参照サーフェスとして AddLoaded 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.AssembleAsync">
+      <summary>AIKernel の公開参照サーフェスとして AssembleAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.AssemblyState">
+      <summary>AIKernel の公開参照サーフェスとして AssemblyState 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.GetEdgesInDeterministicOrder">
+      <summary>AIKernel の公開参照サーフェスとして GetEdgesInDeterministicOrder 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.GetRomsInDeterministicOrder">
+      <summary>AIKernel の公開参照サーフェスとして GetRomsInDeterministicOrder 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.IsLoaded">
+      <summary>AIKernel の公開参照サーフェスとして IsLoaded 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.IsLoading">
+      <summary>AIKernel の公開参照サーフェスとして IsLoading 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.MarkCompleted">
+      <summary>AIKernel の公開参照サーフェスとして MarkCompleted 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.MarkLoading">
+      <summary>AIKernel の公開参照サーフェスとして MarkLoading 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssemblyException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssemblyGovernanceException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetAll">
+      <summary>AIKernel の公開参照サーフェスとして GetAll 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetByCategory">
+      <summary>AIKernel の公開参照サーフェスとして GetByCategory 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetExpressionBuffer">
+      <summary>AIKernel の公開参照サーフェスとして GetExpressionBuffer 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetHistoryBuffer">
+      <summary>AIKernel の公開参照サーフェスとして GetHistoryBuffer 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetMaterialBuffer">
+      <summary>AIKernel の公開参照サーフェスとして GetMaterialBuffer 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetOrchestrationBuffer">
+      <summary>AIKernel の公開参照サーフェスとして GetOrchestrationBuffer 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.DefaultContextCollectionFactory.Create">
+      <summary>AIKernel の公開参照サーフェスとして Create 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.DefaultContextHashCalculator.ComputeHash">
+      <summary>AIKernel の公開参照サーフェスとして ComputeHash 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.DictionaryRomPathResolver.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.DictionaryRomPathResolver.ResolvePathAsync">
+      <summary>AIKernel の公開参照サーフェスとして ResolvePathAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.RomIdentityMismatchException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy.EvaluateAsync">
+      <summary>AIKernel の公開参照サーフェスとして EvaluateAsync 操作を実行します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.AssembledContextSnapshot.Context">
+      <summary>AIKernel の公開参照サーフェスで公開される Context 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.AssembledContextSnapshot.ContextHash">
+      <summary>AIKernel の公開参照サーフェスで公開される ContextHash 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.AssembledContextSnapshot.CreatedAtUtc">
+      <summary>AIKernel の公開参照サーフェスで公開される CreatedAtUtc 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.AssembledContextSnapshot.ParentSnapshotId">
+      <summary>AIKernel の公開参照サーフェスで公開される ParentSnapshotId 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.AssembledContextSnapshot.SnapshotId">
+      <summary>AIKernel の公開参照サーフェスで公開される SnapshotId 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.ContextAssembler.Request">
+      <summary>AIKernel の公開参照サーフェスで公開される Request 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.ContextAssemblyGovernanceException.Reason">
+      <summary>AIKernel の公開参照サーフェスで公開される Reason 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.ContextAssemblyGovernanceException.RomId">
+      <summary>AIKernel の公開参照サーフェスで公開される RomId 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.RomIdentityMismatchException.Actual">
+      <summary>AIKernel の公開参照サーフェスで公開される Actual 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.RomIdentityMismatchException.Path">
+      <summary>AIKernel の公開参照サーフェスで公開される Path 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.RomIdentityMismatchException.Requested">
+      <summary>AIKernel の公開参照サーフェスで公開される Requested 値を取得または設定します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.AssembledContextSnapshot">
+      <summary>AIKernel パッケージ利用者に公開される AssembledContextSnapshot の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.ContextAssembler">
+      <summary>AIKernel パッケージ利用者に公開される ContextAssembler の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.ContextAssemblyException">
+      <summary>AIKernel パッケージ利用者に公開される ContextAssemblyException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.ContextAssemblyGovernanceException">
+      <summary>AIKernel パッケージ利用者に公開される ContextAssemblyGovernanceException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.ContextCollectionSnapshot">
+      <summary>AIKernel パッケージ利用者に公開される ContextCollectionSnapshot の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.DefaultContextCollectionFactory">
+      <summary>AIKernel パッケージ利用者に公開される DefaultContextCollectionFactory の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.DefaultContextHashCalculator">
+      <summary>AIKernel パッケージ利用者に公開される DefaultContextHashCalculator の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.DictionaryRomPathResolver">
+      <summary>AIKernel パッケージ利用者に公開される DictionaryRomPathResolver の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.RomIdentityMismatchException">
+      <summary>AIKernel パッケージ利用者に公開される RomIdentityMismatchException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy">
+      <summary>AIKernel パッケージ利用者に公開される SecurityTagContextAssemblyPolicy の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

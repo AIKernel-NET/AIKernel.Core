@@ -9,6 +9,7 @@
     <FileVersion>0.1.0.2</FileVersion>
     <InformationalVersion>0.1.0.2</InformationalVersion>
     <AIKernelPackageVersion>0.1.0.2</AIKernelPackageVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <Authors>Takuya Sogawa</Authors>
     <Company>AIKernel-NET</Company>

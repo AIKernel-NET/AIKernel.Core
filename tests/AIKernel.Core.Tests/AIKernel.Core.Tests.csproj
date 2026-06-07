@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <Description>EN: Unit tests for AIKernel.Core runtime components.
 JA: AIKernel.Core ランタイムコンポーネントのユニットテストです。</Description>
   </PropertyGroup>

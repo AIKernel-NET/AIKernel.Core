@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders">
+      <summary>AIKernel の公開参照サーフェスとして AddAIKernelBrowserVfsProviders 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders">
+      <summary>AIKernel の公開参照サーフェスとして AddAIKernelCoreVfsProviders 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider">
+      <summary>AIKernel の公開参照サーフェスとして AddLocalFileProvider 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider">
+      <summary>AIKernel の公開参照サーフェスとして AddMemoryFileProvider 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider">
+      <summary>AIKernel の公開参照サーフェスとして AddWebGetFileProvider 操作を実行します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions">
+      <summary>AIKernel パッケージ利用者に公開される AIKernelCoreVfsServiceCollectionExtensions の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

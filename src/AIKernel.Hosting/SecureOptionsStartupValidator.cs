@@ -1,4 +1,4 @@
-﻿namespace AIKernel.Hosting;
+namespace AIKernel.Hosting;
 
 using AIKernel.Abstractions.Security;
 using AIKernel.Core.Security;
@@ -40,6 +40,8 @@ using Microsoft.Extensions.Logging;
 /// Provider 固有 Validator では、このコンストラクタを呼び出したうえで、
 /// ILogger、HttpClient、IOptionsMonitor、独自 Client などを追加注入してください。
 /// </remarks>
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureOptionsStartupValidator']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureOptionsStartupValidator']" />
 public class SecureOptionsStartupValidator<TOptions>(
     SecureCredentialResolver<TOptions> resolver,
     ILogger<SecureOptionsStartupValidator<TOptions>>? logger = null,
@@ -108,6 +110,8 @@ public class SecureOptionsStartupValidator<TOptions>(
     /// 2. 解決済み Options に対して ValidateCoreAsync を呼び出す。
     /// 3. 例外が発生した場合は握りつぶさず、Host 起動を Fail-Closed させる。
     /// </summary>
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StartAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StartAsync']" />
     public virtual async Task StartAsync(CancellationToken cancellationToken)
     {
         if (logger?.IsEnabled(LogLevel.Debug) == true)
@@ -146,6 +150,8 @@ public class SecureOptionsStartupValidator<TOptions>(
     /// 派生クラスが外部接続や独自 Client を所有する場合は、
     /// 必要に応じて override してください。
     /// </summary>
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StopAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StopAsync']" />
     public virtual Task StopAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;

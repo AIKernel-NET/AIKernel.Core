@@ -7,8 +7,11 @@ using AIKernel.Core.Memory;
 using AIKernel.Dtos.Memory;
 using AIKernel.Enums;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.PosixMemoryMapper']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.PosixMemoryMapper']" />
 public sealed class PosixMemoryMapper : MemoryMapperBase
 {
+    /// <summary>Executes the OpenCore operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで OpenCore 操作を実行します。</summary>
     protected override Result<IMemoryRegion> OpenCore(
         string path,
         MemoryAccessMode accessMode)

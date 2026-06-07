@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Core.Rom.Sha256SemanticHasher.Algorithm">
+      <summary>AIKernel の公開参照サーフェスで公開される Algorithm 値を提供します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.DefaultRomCanonicalizer.Canonicalize">
+      <summary>AIKernel の公開参照サーフェスとして Canonicalize 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.DefaultRomCanonicalizer.CanonicalizeAsync">
+      <summary>AIKernel の公開参照サーフェスとして CanonicalizeAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.MarkdownFrontMatterParser.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.MarkdownFrontMatterParser.Parse">
+      <summary>AIKernel の公開参照サーフェスとして Parse 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomIdFactory.Create">
+      <summary>AIKernel の公開参照サーフェスとして Create 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomLoadException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomLoader.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomLoader.LoadAsync">
+      <summary>AIKernel の公開参照サーフェスとして LoadAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomRequiredMetadataMissingException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomSignatureVerificationException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomSignatureVerifier.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.RomSignatureVerifier.VerifyAsync">
+      <summary>AIKernel の公開参照サーフェスとして VerifyAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.Sha256SemanticHasher.ComputeHash">
+      <summary>AIKernel の公開参照サーフェスとして ComputeHash 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.Sha256SemanticHasher.ComputeHashAsync">
+      <summary>AIKernel の公開参照サーフェスとして ComputeHashAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.Sha256SemanticHasher.VerifyHash">
+      <summary>AIKernel の公開参照サーフェスとして VerifyHash 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Rom.Sha256SemanticHasher.VerifyHashAsync">
+      <summary>AIKernel の公開参照サーフェスとして VerifyHashAsync 操作を実行します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Rom.RomRequiredMetadataMissingException.MetadataKey">
+      <summary>AIKernel の公開参照サーフェスで公開される MetadataKey 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Rom.RomRequiredMetadataMissingException.SourcePath">
+      <summary>AIKernel の公開参照サーフェスで公開される SourcePath 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Rom.RomSignatureVerificationException.ActualHash">
+      <summary>AIKernel の公開参照サーフェスで公開される ActualHash 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Rom.RomSignatureVerificationException.ExpectedHash">
+      <summary>AIKernel の公開参照サーフェスで公開される ExpectedHash 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Rom.RomSignatureVerificationException.SourcePath">
+      <summary>AIKernel の公開参照サーフェスで公開される SourcePath 値を取得または設定します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.DefaultRomCanonicalizer">
+      <summary>AIKernel パッケージ利用者に公開される DefaultRomCanonicalizer の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.MarkdownFrontMatterParser">
+      <summary>AIKernel パッケージ利用者に公開される MarkdownFrontMatterParser の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomIdFactory">
+      <summary>AIKernel パッケージ利用者に公開される RomIdFactory の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomLoadException">
+      <summary>AIKernel パッケージ利用者に公開される RomLoadException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomLoader">
+      <summary>AIKernel パッケージ利用者に公開される RomLoader の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomRequiredMetadataMissingException">
+      <summary>AIKernel パッケージ利用者に公開される RomRequiredMetadataMissingException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomSignatureVerificationException">
+      <summary>AIKernel パッケージ利用者に公開される RomSignatureVerificationException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.RomSignatureVerifier">
+      <summary>AIKernel パッケージ利用者に公開される RomSignatureVerifier の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Rom.Sha256SemanticHasher">
+      <summary>AIKernel パッケージ利用者に公開される Sha256SemanticHasher の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

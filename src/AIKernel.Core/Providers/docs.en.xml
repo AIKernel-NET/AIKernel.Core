@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.GetRegisteredProviders">
+      <summary>Executes the GetRegisteredProviders operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.RegisterProvider">
+      <summary>Executes the RegisterProvider operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.UnregisterProvider">
+      <summary>Executes the UnregisterProvider operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Providers.InMemoryProviderRegistry">
+      <summary>Represents the InMemoryProviderRegistry public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

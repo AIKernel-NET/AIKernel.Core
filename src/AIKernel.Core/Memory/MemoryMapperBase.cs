@@ -4,8 +4,12 @@ using AIKernel.Enums;
 
 namespace AIKernel.Core.Memory;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']" />
 public abstract class MemoryMapperBase : IMemoryMapper
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']" />
     public IMemoryRegion Open(
         string path,
         MemoryAccessMode accessMode = MemoryAccessMode.Read)
@@ -18,6 +22,8 @@ public abstract class MemoryMapperBase : IMemoryMapper
             result.Error?.Message ?? "Memory mapping failed.");
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult']" />
     public Result<IMemoryRegion> OpenResult(
         string path,
         MemoryAccessMode accessMode = MemoryAccessMode.Read)
@@ -40,6 +46,7 @@ public abstract class MemoryMapperBase : IMemoryMapper
         }
     }
 
+    /// <summary>Executes the OpenCore operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで OpenCore 操作を実行します。</summary>
     protected abstract Result<IMemoryRegion> OpenCore(
         string path,
         MemoryAccessMode accessMode);

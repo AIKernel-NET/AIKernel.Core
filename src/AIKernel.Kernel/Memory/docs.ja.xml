@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="T:AIKernel.Kernel.Memory.PosixMemoryMapper">
+      <summary>AIKernel パッケージ利用者に公開される PosixMemoryMapper の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.Memory.Win32MemoryMapper">
+      <summary>AIKernel パッケージ利用者に公開される Win32MemoryMapper の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.DeleteAsync">
+      <summary>AIKernel の公開参照サーフェスとして DeleteAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.DisposeAsync">
+      <summary>AIKernel の公開参照サーフェスとして DisposeAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.ExistsAsync">
+      <summary>AIKernel の公開参照サーフェスとして ExistsAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetDirectoryAsync">
+      <summary>AIKernel の公開参照サーフェスとして GetDirectoryAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetHealthAsync">
+      <summary>AIKernel の公開参照サーフェスとして GetHealthAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsAvailableAsync">
+      <summary>AIKernel の公開参照サーフェスとして IsAvailableAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsNullOrWhiteSpace">
+      <summary>AIKernel の公開参照サーフェスとして IsNullOrWhiteSpace 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.QueryAsync">
+      <summary>AIKernel の公開参照サーフェスとして QueryAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.ReadFileAsync">
+      <summary>AIKernel の公開参照サーフェスとして ReadFileAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.WriteFileAsync">
+      <summary>AIKernel の公開参照サーフェスとして WriteFileAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.AllowWrite">
+      <summary>AIKernel の公開参照サーフェスで公開される AllowWrite 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.Clock">
+      <summary>AIKernel の公開参照サーフェスで公開される Clock 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.CredentialValidator">
+      <summary>AIKernel の公開参照サーフェスで公開される CredentialValidator 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.Name">
+      <summary>AIKernel の公開参照サーフェスで公開される Name 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.ProviderId">
+      <summary>AIKernel の公開参照サーフェスで公開される ProviderId 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.RootPath">
+      <summary>AIKernel の公開参照サーフェスで公開される RootPath 値を取得または設定します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Local.LocalFileProvider">
+      <summary>AIKernel パッケージ利用者に公開される LocalFileProvider の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Local.LocalFileProviderOptions">
+      <summary>AIKernel パッケージ利用者に公開される LocalFileProviderOptions の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

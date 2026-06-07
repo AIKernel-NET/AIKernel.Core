@@ -1,4 +1,6 @@
 using AIKernel.Common.Results;
+using AIKernel.Abstractions.Memory;
+using AIKernel.Dtos.Memory;
 
 namespace AIKernel.Core.Memory;
 
@@ -27,7 +29,10 @@ public abstract class MemoryRegionBase : IMemoryRegion
 
     public bool IsMapped => !_disposed && Pointer != IntPtr.Zero;
 
-    public Result<bool> Unmap()
+    public bool Unmap()
+        => UnmapResult().IsSuccess;
+
+    public Result<bool> UnmapResult()
     {
         if (_disposed)
             return Result<bool>.Success(true);
@@ -51,7 +56,7 @@ public abstract class MemoryRegionBase : IMemoryRegion
 
     public void Dispose()
     {
-        _ = Unmap();
+        _ = UnmapResult();
         GC.SuppressFinalize(this);
     }
 

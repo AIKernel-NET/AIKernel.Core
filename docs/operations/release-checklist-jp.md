@@ -1,7 +1,10 @@
 # AIKernel.Core リリースチェックリスト
 
-このチェックリストは、AIKernel.Core 0.0.5 package family と CPU-only の
-Python binding を公開するためのものです。
+このチェックリストは、2026-06-09 のプロトタイプ実証リリースラインとして
+AIKernel.Core 0.1.0 package family と CPU-only の Python binding を公開するためのものです。
+
+0.0.x の設計実装フェーズは完了しました。0.1.0 では、プロトタイプアプリ、
+外部 Capability module、Control Plane 実行基盤を用いて runtime を実証します。
 
 ## 公開対象
 
@@ -19,7 +22,7 @@ AIKernel.Core は以下の managed runtime packages を公開します。
 `aikernel_net` です。PyPI の `aikernel` は別プロジェクトです。
 
 開発版は GitHub Packages に分離し、`aikernel-net-dev` のような distribution name と
-`0.0.5.1-dev.1` 形式の version を使います。開発版は破壊的変更を許容し、
+`0.1.0-dev.1` 形式の version を使います。開発版は破壊的変更を許容し、
 CI/CD 検証向けとします。
 
 AIKernel.Core は CUDA、LibTorch、Native ABI、GPU runtime、Capability 固有 binary を
@@ -40,20 +43,20 @@ dotnet pack AIKernel.Core.slnx -c Release --no-restore
 py -m compileall src tests
 py -m pytest
 py -m build --wheel
-py -m twine check dist/aikernel_net-0.0.5.1-py3-none-any.whl
+py -m twine check dist/aikernel_net-0.1.0-py3-none-any.whl
 ```
 
 ## NuGet package 確認
 
 公開前に生成済み `.nupkg` を確認します。
 
-- package id と version が `0.0.5`
+- package id と version が `0.1.0`
 - license が `Apache-2.0`
 - repository metadata が AIKernel.Core repository を指す
 - README と icon assets が必要な package に含まれる
 - CUDA、LibTorch、Native ABI、外部 Capability binary が含まれない
 - `AIKernel.Vfs` package dependency が存在しない
-- AIKernel.NET contract packages 参照が `0.0.5`
+- AIKernel.NET contract packages 参照が `0.1.0`
 
 ## Python wheel 確認
 
@@ -91,8 +94,8 @@ clean な consumer project で確認します。
 
 ```powershell
 dotnet new console
-dotnet add package AIKernel.Core --version 0.0.5
-dotnet add package AIKernel.Kernel --version 0.0.5
+dotnet add package AIKernel.Core --version 0.1.0
+dotnet add package AIKernel.Kernel --version 0.1.0
 dotnet build
 ```
 
@@ -100,7 +103,7 @@ dotnet build
 
 ```powershell
 py -m venv .venv
-.\.venv\Scripts\python -m pip install aikernel-net==0.0.5.1
+.\.venv\Scripts\python -m pip install aikernel-net==0.1.0
 .\.venv\Scripts\python -c "import aikernel_net; print(aikernel_net.__version__)"
 ```
 

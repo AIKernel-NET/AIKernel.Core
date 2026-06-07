@@ -1,8 +1,11 @@
 namespace AIKernel.Kernel.Memory;
 
 using System.Runtime.InteropServices;
+using AIKernel.Abstractions.Memory;
 using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
+using AIKernel.Dtos.Memory;
+using AIKernel.Enums;
 
 public sealed class PosixMemoryMapper : MemoryMapperBase
 {

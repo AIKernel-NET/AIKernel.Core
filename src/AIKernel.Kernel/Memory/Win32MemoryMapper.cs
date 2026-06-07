@@ -1,7 +1,10 @@
 namespace AIKernel.Kernel.Memory;
 
+using AIKernel.Abstractions.Memory;
 using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
+using AIKernel.Dtos.Memory;
+using AIKernel.Enums;
 using Microsoft.Win32.SafeHandles;
 
 public sealed class Win32MemoryMapper : MemoryMapperBase

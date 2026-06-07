@@ -1,6 +1,7 @@
 namespace AIKernel.Kernel;
 
 using AIKernel.Abstractions.Kernel;
+using AIKernel.Abstractions.Memory;
 using AIKernel.Core.Memory;
 using AIKernel.Kernel.Memory;
 using Microsoft.Extensions.DependencyInjection;

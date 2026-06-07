@@ -1,10 +1,24 @@
 using AIKernel.Common.Results;
+using AIKernel.Abstractions.Memory;
+using AIKernel.Enums;
 
 namespace AIKernel.Core.Memory;
 
 public abstract class MemoryMapperBase : IMemoryMapper
 {
-    public Result<IMemoryRegion> Open(
+    public IMemoryRegion Open(
+        string path,
+        MemoryAccessMode accessMode = MemoryAccessMode.Read)
+    {
+        var result = OpenResult(path, accessMode);
+        if (result.IsSuccess)
+            return result.Value!;
+
+        throw new InvalidOperationException(
+            result.Error?.Message ?? "Memory mapping failed.");
+    }
+
+    public Result<IMemoryRegion> OpenResult(
         string path,
         MemoryAccessMode accessMode = MemoryAccessMode.Read)
     {

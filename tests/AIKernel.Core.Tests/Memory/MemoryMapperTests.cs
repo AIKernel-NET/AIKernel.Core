@@ -1,7 +1,9 @@
 namespace AIKernel.Core.Tests.Memory;
 
+using AIKernel.Abstractions.Memory;
 using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
+using AIKernel.Enums;
 using AIKernel.Kernel;
 using AIKernel.Kernel.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +15,7 @@ public sealed class MemoryMapperTests
     {
         var mapper = new CountingMemoryMapper();
 
-        var result = mapper.Open(" ");
+        var result = mapper.OpenResult(" ");
 
         Assert.True(result.IsFailure);
         Assert.Equal("MEMORY_MAPPING_ERROR", result.Error!.Code);
@@ -26,7 +28,7 @@ public sealed class MemoryMapperTests
     {
         var mapper = new ThrowingMemoryMapper();
 
-        var result = mapper.Open("mapped.bin");
+        var result = mapper.OpenResult("mapped.bin");
 
         Assert.True(result.IsFailure);
         Assert.Equal("MEMORY_MAPPING_ERROR", result.Error!.Code);
@@ -43,7 +45,7 @@ public sealed class MemoryMapperTests
     {
         var mapper = new CountingMemoryMapper();
 
-        var result = mapper.Open(
+        var result = mapper.OpenResult(
             "mapped.bin",
             (MemoryAccessMode)42);
 
@@ -103,7 +105,7 @@ public sealed class MemoryMapperTests
         {
             var mapper = new Win32MemoryMapper();
 
-            var result = mapper.Open(path);
+            var result = mapper.OpenResult(path);
 
             Assert.True(result.IsSuccess);
             using var region = result.Value!;
@@ -112,11 +114,11 @@ public sealed class MemoryMapperTests
             Assert.Equal(4, region.Length);
             Assert.Equal(MemoryAccessMode.Read, region.Info.AccessMode);
 
-            var unmap = region.Unmap();
+            var unmap = ((MemoryRegionBase)region).UnmapResult();
             Assert.True(unmap.IsSuccess);
             Assert.False(region.IsMapped);
 
-            var secondUnmap = region.Unmap();
+            var secondUnmap = ((MemoryRegionBase)region).UnmapResult();
             Assert.True(secondUnmap.IsSuccess);
         }
         finally

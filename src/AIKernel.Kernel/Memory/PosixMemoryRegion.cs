@@ -3,6 +3,7 @@ namespace AIKernel.Kernel.Memory;
 using System.Runtime.InteropServices;
 using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
+using AIKernel.Dtos.Memory;
 
 internal sealed class PosixMemoryRegion : MemoryRegionBase
 {

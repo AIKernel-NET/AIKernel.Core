@@ -1,5 +1,7 @@
 # AIKernel.Core Documentation
 
+[日本語](README-jp.md)
+
 This folder contains implementation-side development guides for AIKernel.Core.
 Canonical papers are managed in the AIKernel.NET repository; this folder is for
 runtime implementation and package usage guidance.

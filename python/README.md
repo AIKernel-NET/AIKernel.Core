@@ -1,5 +1,7 @@
 # AIKernel.Python
 
+[日本語](README-ja.md)
+
 Python binding for AIKernel.Core functional primitives and managed assembly
 discovery.
 

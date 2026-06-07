@@ -1,5 +1,7 @@
 # AIKernel.Python Release Notes
 
+[日本語](RELEASE_NOTES-ja.md)
+
 ## 0.1.0 — Stable Python binding baseline
 
 - Promoted the official PyPI package `aikernel-net` to `0.1.0`.

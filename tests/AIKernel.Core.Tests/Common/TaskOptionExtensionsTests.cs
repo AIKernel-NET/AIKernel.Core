@@ -56,6 +56,29 @@ public sealed class TaskOptionExtensionsTests
     }
 
     [Fact]
+    public async Task AsTask_LiftsSynchronousOptionIntoTaskOption()
+    {
+        var option = await Option<int>
+            .Some(3)
+            .AsTask();
+
+        Assert.True(option.HasValue);
+        Assert.Equal(3, option.Value);
+    }
+
+    [Fact]
+    public async Task LinqQuery_ComposesOptionAsTaskWithTaskOption()
+    {
+        var option = await (
+            from left in Option<int>.Some(2).AsTask()
+            from right in SomeAsync(4)
+            select left * right);
+
+        Assert.True(option.HasValue);
+        Assert.Equal(8, option.Value);
+    }
+
+    [Fact]
     public async Task Bind_ComposesSynchronousOptionWithTaskOption()
     {
         var option = await Option<int>

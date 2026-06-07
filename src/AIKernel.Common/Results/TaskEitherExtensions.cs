@@ -2,6 +2,10 @@
 
 public static class TaskEitherExtensions
 {
+    public static Task<Either<L, R>> AsTask<L, R>(
+        this Either<L, R> either)
+        => Task.FromResult(either);
+
     public static async Task<Either<L, R>> Tap<L, R>(
         this Task<Either<L, R>> task,
         Action<R> action)

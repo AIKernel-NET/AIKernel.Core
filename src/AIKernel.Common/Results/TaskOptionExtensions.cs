@@ -2,6 +2,10 @@
 
 public static class TaskOptionExtensions
 {
+    public static Task<Option<T>> AsTask<T>(
+        this Option<T> option)
+        => Task.FromResult(option);
+
     public static async Task<Option<T>> Tap<T>(
         this Task<Option<T>> task,
         Action<T> action)

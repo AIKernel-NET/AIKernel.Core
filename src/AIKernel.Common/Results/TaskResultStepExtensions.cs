@@ -2,6 +2,10 @@ namespace AIKernel.Common.Results;
 
 public static class TaskResultStepExtensions
 {
+    public static Task<ResultStep<TState, TValue>> AsTask<TState, TValue>(
+        this ResultStep<TState, TValue> step)
+        => Task.FromResult(step);
+
     public static async Task<ResultStep<TState, TValue>> Tap<TState, TValue>(
         this Task<ResultStep<TState, TValue>> task,
         Action<TValue> action)

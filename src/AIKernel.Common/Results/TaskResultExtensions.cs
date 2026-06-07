@@ -5,6 +5,10 @@ namespace AIKernel.Common.Results;
 
 public static class TaskResultExtensions
 {
+    public static Task<Result<T>> AsTask<T>(
+        this Result<T> result)
+        => Task.FromResult(result);
+
     public static async Task<Result<T>> Tap<T>(
         this Task<Result<T>> task,
         Action<T> action)

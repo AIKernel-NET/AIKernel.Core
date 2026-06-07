@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using AIKernel.Common.Results;
 
-public interface IHistoryRomRegistry
+internal interface IHistoryRomRegistry
 {
     Result<HistoryRomMetadata> Register(HistoryRomSnapshot snapshot);
 
@@ -13,7 +13,7 @@ public interface IHistoryRomRegistry
     Result<HistoryRomSnapshot> Resolve(string romId);
 }
 
-public sealed class HistoryRomRegistry :
+internal sealed class HistoryRomRegistry :
     IHistoryRomRegistry,
     AIKernel.Abstractions.History.IHistoryRomRegistry
 {

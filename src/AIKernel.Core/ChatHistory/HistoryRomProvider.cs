@@ -4,12 +4,12 @@ using AIKernel.Abstractions.Rom;
 using AIKernel.Common.Results;
 using AIKernel.Dtos.Rom;
 
-public sealed record HistoryRomSnapshot(
+internal sealed record HistoryRomSnapshot(
     HistoryRomMetadata Metadata,
     string Markdown,
     RomSnapshot Rom);
 
-public sealed class HistoryRomProvider
+internal sealed class HistoryRomProvider
 {
     public Result<HistoryRomSnapshot> CreateSnapshot(
         string @namespace,

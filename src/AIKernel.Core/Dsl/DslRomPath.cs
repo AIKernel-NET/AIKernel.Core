@@ -3,7 +3,7 @@ namespace AIKernel.Core.Dsl;
 using AIKernel.Common.Results;
 using AIKernel.Core.Vfs.Abstractions;
 
-public static class DslRomPath
+internal static class DslRomPath
 {
     private const string CapabilityPrefix = "dsl://";
 

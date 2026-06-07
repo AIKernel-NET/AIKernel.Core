@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using AIKernel.Common.Results;
 using AIKernel.Core.Time;
 
-public sealed class DslPipelineCompiler :
+internal sealed class DslPipelineCompiler :
     IDslPipelineCompiler,
     AIKernel.Abstractions.Dsl.IDslPipelineCompiler
 {

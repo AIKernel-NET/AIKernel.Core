@@ -20,7 +20,7 @@ public sealed class KernelProviderRoutingDecisionTests
     [Fact]
     public void ForProvider_AddsProviderModelAndTierMetadata()
     {
-        var decision = KernelProviderRoutingDecision.ForProvider(
+        var decision = KernelProviderRoutingDecisionFactory.ForProvider(
             providerId: "llm-low",
             requestedModelId: "gpt-mini",
             providerTier: "low",
@@ -41,7 +41,7 @@ public sealed class KernelProviderRoutingDecisionTests
     [Fact]
     public void ForCapabilityModule_AddsCliCapabilityMetadata()
     {
-        var decision = KernelProviderRoutingDecision.ForCapabilityModule(
+        var decision = KernelProviderRoutingDecisionFactory.ForCapabilityModule(
             providerId: "tools-cli-adapter",
             requestedModelId: "aik-cli",
             capabilityModuleId: "AIKernel.Tools.Cli",
@@ -60,7 +60,7 @@ public sealed class KernelProviderRoutingDecisionTests
     public void ApplyToRequest_UpdatesModelIdAndMetadata()
     {
         var request = CreateRequest("gpt-original");
-        var decision = KernelProviderRoutingDecision.ForCapabilityModule(
+        var decision = KernelProviderRoutingDecisionFactory.ForCapabilityModule(
             providerId: "tools-cli-adapter",
             requestedModelId: "aik-cli",
             capabilityModuleId: "AIKernel.Tools.Cli",
@@ -82,7 +82,7 @@ public sealed class KernelProviderRoutingDecisionTests
     [Fact]
     public async Task ApplyToRequest_RoutesProviderAndPromptCapability()
     {
-        var decision = KernelProviderRoutingDecision.ForCapabilityModule(
+        var decision = KernelProviderRoutingDecisionFactory.ForCapabilityModule(
             providerId: "tools-cli-adapter",
             requestedModelId: "aik-cli",
             capabilityModuleId: "AIKernel.Tools.Cli",
@@ -157,7 +157,7 @@ public sealed class KernelProviderRoutingDecisionTests
     public void Constructor_RejectsBlankProviderId()
     {
         var exception = Assert.Throws<ArgumentException>(
-            () => KernelProviderRoutingDecision.ForProvider("", "gpt-mini"));
+            () => KernelProviderRoutingDecisionFactory.ForProvider("", "gpt-mini"));
 
         Assert.Equal("providerId is required. (Parameter 'providerId')", exception.Message);
     }
@@ -166,7 +166,7 @@ public sealed class KernelProviderRoutingDecisionTests
     public void Constructor_RejectsBlankRequestedModelId()
     {
         var exception = Assert.Throws<ArgumentException>(
-            () => KernelProviderRoutingDecision.ForProvider("llm-low", ""));
+            () => KernelProviderRoutingDecisionFactory.ForProvider("llm-low", ""));
 
         Assert.Equal("requestedModelId is required. (Parameter 'requestedModelId')", exception.Message);
     }
@@ -175,18 +175,18 @@ public sealed class KernelProviderRoutingDecisionTests
         string normalized)
     {
         var decision = normalized.StartsWith("aik", StringComparison.OrdinalIgnoreCase)
-            ? KernelProviderRoutingDecision.ForCapabilityModule(
+            ? KernelProviderRoutingDecisionFactory.ForCapabilityModule(
                 providerId: "tools-cli-adapter",
                 requestedModelId: "aik-cli",
                 capabilityModuleId: "AIKernel.Tools.Cli",
                 routeReason: "aik-prefix")
             : normalized.Length < 32
-                ? KernelProviderRoutingDecision.ForProvider(
+                ? KernelProviderRoutingDecisionFactory.ForProvider(
                     providerId: "llm-low",
                     requestedModelId: "gpt-mini",
                     providerTier: "low",
                     routeReason: "short-context")
-                : KernelProviderRoutingDecision.ForProvider(
+                : KernelProviderRoutingDecisionFactory.ForProvider(
                     providerId: "llm-high",
                     requestedModelId: "gpt-frontier",
                     providerTier: "high",

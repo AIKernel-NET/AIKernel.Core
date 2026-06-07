@@ -1,6 +1,6 @@
 namespace AIKernel.Core.ChatHistory;
 
-public sealed record HistoryRomMetadata(
+internal sealed record HistoryRomMetadata(
     string Namespace,
     string Name,
     string Path,
@@ -8,7 +8,7 @@ public sealed record HistoryRomMetadata(
     string RomHash,
     DateTimeOffset CreatedAtUtc);
 
-public static class HistoryRomMetadataKeys
+internal static class HistoryRomMetadataKeys
 {
     public const string RomHash = "history_rom_hash";
 

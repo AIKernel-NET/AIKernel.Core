@@ -4,10 +4,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
-    <Version>0.1.0</Version>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
-    <InformationalVersion>0.1.0</InformationalVersion>
+    <Version>0.1.0.2</Version>
+    <AssemblyVersion>0.1.0.2</AssemblyVersion>
+    <FileVersion>0.1.0.2</FileVersion>
+    <InformationalVersion>0.1.0.2</InformationalVersion>
+    <AIKernelPackageVersion>0.1.0.2</AIKernelPackageVersion>
 
     <Authors>Takuya Sogawa</Authors>
     <Company>AIKernel-NET</Company>
@@ -19,6 +20,7 @@
     <PackageReleaseNotes>
       AIKernel.Core package family v0.1.0 - First executable runtime baseline aligned with AIKernel.NET contract packages v0.1.0. Core provides Result/Option/Either, ResultStep/ReplayLog semantics, DSL and ROM runtime adapters, Kernel orchestration, Provider integration, and MemoryRegion/MemoryMapper runtime adapters over the contract-owned AIKernel.Abstractions.Memory surface. GPU and Native ABI implementations remain external Capability packages.
     </PackageReleaseNotes>
+    <RestoreAdditionalProjectSources>$(MSBuildThisFileDirectory)..\artifacts\packages;$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
   </PropertyGroup>
 
   <ItemGroup>

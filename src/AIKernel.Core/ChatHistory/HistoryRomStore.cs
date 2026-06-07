@@ -5,7 +5,7 @@ using AIKernel.Abstractions.Rom;
 using AIKernel.Common.Results;
 using AIKernel.Vfs;
 
-public sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRomStore
+internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRomStore
 {
     private readonly HistoryRomProvider _provider;
     private readonly IHistoryRomRegistry _registry;

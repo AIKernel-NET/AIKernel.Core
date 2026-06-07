@@ -7,19 +7,19 @@ using AIKernel.Common.Results;
 using AIKernel.Core.Rom;
 using AIKernel.Dtos.Rom;
 
-public sealed record ChatHistoryRomRecord(
+internal sealed record ChatHistoryRomRecord(
     string Role,
     string Content,
     DateTimeOffset Timestamp);
 
-public sealed record ChatHistoryRomOptions(
+internal sealed record ChatHistoryRomOptions(
     string RomId,
     DateTimeOffset GeneratedAtUtc,
     string EntityType = "conversation",
     string Version = "1",
     IReadOnlyList<string>? SecurityTags = null);
 
-public sealed class ChatHistoryRomExporter :
+internal sealed class ChatHistoryRomExporter :
     AIKernel.Abstractions.History.IChatHistoryRomExporter
 {
     private const string SourceKind = "chat_history";

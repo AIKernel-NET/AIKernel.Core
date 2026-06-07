@@ -2,7 +2,7 @@ namespace AIKernel.Core.Dsl;
 
 using AIKernel.Common.Results;
 
-public static class DslPipelineLinqExtensions
+internal static class DslPipelineLinqExtensions
 {
     public static IKernelPipeline Select(
         this IKernelPipeline pipeline,

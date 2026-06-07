@@ -304,10 +304,12 @@ OS 固有の `IMemoryMapper`（Windows では `Win32MemoryMapper`、それ以外
 Kernel を直接参照しません。
 
 ユーザランド側の routing pipeline は、`ResultStep` / LINQ チェーンから
-`KernelProviderRoutingDecision` を返し、それを `KernelRequest` 本体と
-request metadata に適用できます。
+`AIKernel.Dtos.Routing.KernelProviderRoutingDecision` を返し、`AIKernel.Kernel`
+の extension helper 経由で `KernelRequest` 本体と request metadata に適用できます。
 これにより、低レベル / 高レベル LLM の切替や、`aik...` で始まるコンテキストを
 CLI に紐づく Capability Adapter へ流す方針を、同じ ProviderId / ModelId 契約で扱えます。
+Core が提供する構築時の guard は `KernelProviderRoutingDecisionFactory` が担い、
+DTO 自体は AIKernel.NET contract package 内の behavior-free な data carrier として維持します。
 
 AIKernel.Core には、AI が生成した計画を扱う標準 JSON DSL pipeline runtime も含まれます。
 DSL は決定論的な `ResultStep` pipeline に compile され、有限 `Loop` / `LoopUntil` /

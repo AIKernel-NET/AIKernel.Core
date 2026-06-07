@@ -2,7 +2,7 @@ namespace AIKernel.Core.Dsl;
 
 using AIKernel.Common.Results;
 
-public sealed class FailClosedDslCapabilityRegistry : IDslCapabilityRegistry
+internal sealed class FailClosedDslCapabilityRegistry : IDslCapabilityRegistry
 {
     public bool Contains(string name) => false;
 

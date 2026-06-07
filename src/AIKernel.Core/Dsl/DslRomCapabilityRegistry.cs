@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using AIKernel.Common.Results;
 
-public sealed class DslRomCapabilityRegistry :
+internal sealed class DslRomCapabilityRegistry :
     IDslCapabilityRegistry,
     AIKernel.Abstractions.Dsl.IDslCapabilityRegistry
 {

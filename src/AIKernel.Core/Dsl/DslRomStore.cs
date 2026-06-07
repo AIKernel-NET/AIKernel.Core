@@ -4,7 +4,7 @@ using System.Text;
 using AIKernel.Common.Results;
 using AIKernel.Vfs;
 
-public sealed class DslRomStore : AIKernel.Abstractions.Dsl.IDslRomStore
+internal sealed class DslRomStore : AIKernel.Abstractions.Dsl.IDslRomStore
 {
     private readonly DslRomProvider _provider;
     private readonly IDslRomRegistry _registry;

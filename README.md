@@ -310,11 +310,15 @@ For trusted hosts, `AddAIKernelKernel()` registers an OS-specific
 behind the Core memory abstraction. Native Capability packages consume only the
 Core abstraction and never reference Kernel directly.
 
-User-land routing pipelines can return a `KernelProviderRoutingDecision` from a
-`ResultStep`/LINQ chain, then apply it to a `KernelRequest` and its metadata.
+User-land routing pipelines can return
+`AIKernel.Dtos.Routing.KernelProviderRoutingDecision` from a `ResultStep`/LINQ
+chain, then apply it to a `KernelRequest` and its metadata through
+`AIKernel.Kernel` extension helpers.
 This supports policies such as low-tier versus high-tier LLM selection, or
 routing `aik...` contexts to a CLI-backed capability adapter, while keeping
 Kernel execution driven by the same ProviderId / ModelId contract.
+Use `KernelProviderRoutingDecisionFactory` for Core-provided construction
+guards; the DTO itself stays behavior-free in the AIKernel.NET contract package.
 
 AIKernel.Core also includes a standard JSON DSL pipeline runtime for
 AI-generated plans. The DSL compiles to deterministic `ResultStep` pipelines,

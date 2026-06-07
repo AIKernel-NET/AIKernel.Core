@@ -267,7 +267,7 @@ public sealed class ModelProviderHostingExtensionsTests
 
         public string Name => "External Capability Provider";
 
-        public string Version => "0.0.5";
+        public string Version => "0.1.0";
 
         public IProviderCapabilities GetCapabilities()
         {

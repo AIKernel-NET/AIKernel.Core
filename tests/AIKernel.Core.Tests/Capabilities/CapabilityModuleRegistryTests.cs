@@ -77,7 +77,7 @@ public sealed class CapabilityModuleRegistryTests
             Name: "Observe",
             Kind: CapabilityModuleKind.CliExecutable,
             InvocationMode: CapabilityInvocationMode.Sandbox,
-            Version: "0.0.5",
+            Version: "0.1.0",
             EntryPoint: "aik-tools",
             ArtifactUri: "file://tools/aik-tools.exe",
             ArtifactHash: "sha256:tools",

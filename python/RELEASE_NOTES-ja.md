@@ -22,18 +22,6 @@ Import:
 import aikernel_net
 ```
 
-## 0.0.5.1 — Python package rename and PyPI registration
-
-この release では、AIKernel.NET project identity として PyPI に登録するため、
-Python distribution package を `aikernel-net` に rename / prepare しました。
-
-- PyPI distribution name を `aikernel` から `aikernel-net` に変更しました。
-- API behavior と package scope は維持しました。
-- import package を `aikernel_net` に変更しました。
-- `__version__ = "0.0.5.1"` を追加しました。
-- `aikernel-net` として PyPI へ正式登録できるよう準備しました。
-- documentation と release checklist を更新しました。
-
 PyPI の `aikernel` は別プロジェクトです。AIKernel.NET は project identity を守り、
 user confusion を避けるために `aikernel-net` を使います。
 

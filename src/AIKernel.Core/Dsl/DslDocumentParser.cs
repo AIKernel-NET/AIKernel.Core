@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Text.Json;
 using AIKernel.Common.Results;
 
-public static class DslDocumentParser
+internal static class DslDocumentParser
 {
     public static Result<DslDocument> Parse(string json)
     {

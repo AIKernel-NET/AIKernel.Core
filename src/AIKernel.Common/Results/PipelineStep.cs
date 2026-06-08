@@ -3,10 +3,16 @@ namespace AIKernel.Common.Results;
 using System.Collections.Immutable;
 using System.Globalization;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.PipelineStep']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.PipelineStep']" />
 public static class PipelineStep
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.PipelineStep.SuspendErrorCode']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.PipelineStep.SuspendErrorCode']" />
     public const string SuspendErrorCode = "SUSPENDED";
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']" />
     public static ResultStep<TState, TValue> Loop<TState, TValue>(
         ResultStep<TState, TValue> initial,
         int maxIterations,
@@ -52,6 +58,8 @@ public static class PipelineStep
         return current;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']" />
     public static ResultStep<TState, TValue> LoopUntil<TState, TValue>(
         ResultStep<TState, TValue> initial,
         TimeSpan timeout,
@@ -130,6 +138,8 @@ public static class PipelineStep
                 decision: "max_iterations_reached"));
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']" />
     public static ResultStep<TState, TValue> Suspend<TState, TValue>(
         TState state,
         string reason)
@@ -161,6 +171,8 @@ public static class PipelineStep
                 Kind: "suspend"));
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']" />
     public static ResultStep<TState, TValue> Resume<TState, TValue>(
         IReadOnlyList<ResultStepReplayLogEntry> previousReplayLog,
         TState state,

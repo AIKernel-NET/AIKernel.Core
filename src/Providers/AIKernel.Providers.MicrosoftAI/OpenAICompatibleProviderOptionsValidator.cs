@@ -1,10 +1,14 @@
-﻿namespace AIKernel.Providers.MicrosoftAI;
+namespace AIKernel.Providers.MicrosoftAI;
 
 using Microsoft.Extensions.Options;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptionsValidator']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptionsValidator']" />
 public sealed class OpenAICompatibleProviderOptionsValidator
     : IValidateOptions<OpenAICompatibleProviderOptions>
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptionsValidator.Validate']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptionsValidator.Validate']" />
     public ValidateOptionsResult Validate(
         string? name,
         OpenAICompatibleProviderOptions options)

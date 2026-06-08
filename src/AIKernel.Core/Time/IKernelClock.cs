@@ -1,3 +1,5 @@
+using AIKernel.Dtos.Time;
+
 namespace AIKernel.Core.Time;
 
 /// <summary>
@@ -25,17 +27,25 @@ namespace AIKernel.Core.Time;
 ///   TimeProvider がどのような物理時刻を返すかは環境依存ですが、
 ///   AIKernel の replay / audit / snapshot における時間の扱いは IKernelClock に集約します。
 /// </summary>
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.IKernelClock']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.IKernelClock']" />
 public interface IKernelClock
 {
+    /// <summary>Gets the Physical value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Physical 値を取得します。</summary>
     TimeProvider Physical { get; }
 
+    /// <summary>Gets the Logical value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Logical 値を取得します。</summary>
     KernelTimeProvider Logical { get; }
 
+    /// <summary>Gets the Now value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Now 値を取得します。</summary>
     DateTimeOffset Now { get; }
 
+    /// <summary>Gets the IsReplaying value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される IsReplaying 値を取得します。</summary>
     bool IsReplaying { get; }
 
+    /// <summary>Gets the ReliabilityScore value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される ReliabilityScore 値を取得します。</summary>
     double ReliabilityScore { get; }
 
+    /// <summary>Executes the GetLogicalTimestamp operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで GetLogicalTimestamp 操作を実行します。</summary>
     KernelTimestamp GetLogicalTimestamp();
 }

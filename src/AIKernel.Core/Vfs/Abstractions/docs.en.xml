@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.GetHealthAsync">
+      <summary>Executes the GetHealthAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsAvailableAsync">
+      <summary>Executes the IsAvailableAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsNullOrWhiteSpace">
+      <summary>Executes the IsNullOrWhiteSpace operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.OpenSessionAsync">
+      <summary>Executes the OpenSessionAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.VfsAuthenticationFailedException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.GetName">
+      <summary>Executes the GetName operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsDirectChild">
+      <summary>Executes the IsDirectChild operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsUnder">
+      <summary>Executes the IsUnder operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.Normalize">
+      <summary>Executes the Normalize operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Abstractions.VfsAuthenticationFailedException.ProviderId">
+      <summary>Gets or sets the ProviderId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Abstractions.FileProviderBase">
+      <summary>Represents the FileProviderBase public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Abstractions.VfsAuthenticationFailedException">
+      <summary>Represents the VfsAuthenticationFailedException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Abstractions.VfsPathRules">
+      <summary>Represents the VfsPathRules public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

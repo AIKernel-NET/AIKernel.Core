@@ -3,10 +3,16 @@ namespace AIKernel.Core.Capabilities;
 using AIKernel.Abstractions.Capabilities;
 using AIKernel.Dtos.Capabilities;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Capabilities.FailClosedCapabilityModuleInvoker']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Capabilities.FailClosedCapabilityModuleInvoker']" />
 public sealed class FailClosedCapabilityModuleInvoker : ICapabilityModuleInvoker
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Capabilities.FailClosedCapabilityModuleInvoker.ErrorCode']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Capabilities.FailClosedCapabilityModuleInvoker.ErrorCode']" />
     public const string ErrorCode = "CAPABILITY_MODULE_INVOKER_NOT_CONFIGURED";
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.FailClosedCapabilityModuleInvoker.InvokeAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.FailClosedCapabilityModuleInvoker.InvokeAsync']" />
     public ValueTask<CapabilityInvocationResult> InvokeAsync(
         CapabilityInvocationRequest request,
         CancellationToken cancellationToken = default)

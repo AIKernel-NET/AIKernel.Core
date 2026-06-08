@@ -11,6 +11,8 @@ using AIKernel.Dtos.Execution;
 using AIKernel.Enums;
 using ExecutionModelMessage = AIKernel.Dtos.Execution.ModelMessage;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultPromptGenerator']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultPromptGenerator']" />
 public sealed class DefaultPromptGenerator : IPromptGenerator
 {
     private const string SystemRole = "system";
@@ -19,6 +21,8 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
     private readonly IContextPromptProjector _projector;
     private readonly ITokenizer _tokenizer;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPromptGenerator.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPromptGenerator.#ctor']" />
     public DefaultPromptGenerator(
         IContextPromptProjector projector,
         ITokenizer tokenizer)
@@ -27,6 +31,8 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
         _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPromptGenerator.GenerateAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPromptGenerator.GenerateAsync']" />
     public Task<GeneratedPrompt> GenerateAsync(
         PromptGenerationRequest request,
         CancellationToken cancellationToken = default)

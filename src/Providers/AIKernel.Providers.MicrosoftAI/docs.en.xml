@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.EmbeddingDimensions">
+      <summary>Provides the EmbeddingDimensions value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.MaxConcurrentConnections">
+      <summary>Provides the MaxConcurrentConnections value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.MaxQueryParts">
+      <summary>Provides the MaxQueryParts value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.RateLimit">
+      <summary>Provides the RateLimit value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportedDataTypes">
+      <summary>Provides the SupportedDataTypes value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportedEmbeddingModels">
+      <summary>Provides the SupportedEmbeddingModels value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportedOperations">
+      <summary>Provides the SupportedOperations value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportedQueryProcessingOperations">
+      <summary>Provides the SupportedQueryProcessingOperations value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportsEmbedding">
+      <summary>Provides the SupportsEmbedding value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportsQueryAugmentation">
+      <summary>Provides the SupportsQueryAugmentation value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportsQueryDecomposition">
+      <summary>Provides the SupportsQueryDecomposition value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportsQueryRouting">
+      <summary>Provides the SupportsQueryRouting value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.ProviderApiException.ErrorCode">
+      <summary>Provides the ErrorCode value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.ProviderCapabilityMismatchException.ErrorCode">
+      <summary>Provides the ErrorCode value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.ProviderExecutionTimeoutException.ErrorCode">
+      <summary>Provides the ErrorCode value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.ProviderInvalidResponseException.ErrorCode">
+      <summary>Provides the ErrorCode value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Providers.MicrosoftAI.ProviderRateLimitException.ErrorCode">
+      <summary>Provides the ErrorCode value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleCredential.Create">
+      <summary>Executes the Create operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleCredential.ToString">
+      <summary>Executes the ToString operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.AnswerAsync">
+      <summary>Executes the AnswerAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.GenerateAsync">
+      <summary>Executes the GenerateAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.GetCapabilities">
+      <summary>Executes the GetCapabilities operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.GetHealthAsync">
+      <summary>Executes the GetHealthAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.InitializeAsync">
+      <summary>Executes the InitializeAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.IsAvailableAsync">
+      <summary>Executes the IsAvailableAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.ShutdownAsync">
+      <summary>Executes the ShutdownAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.StreamGenerateAsync">
+      <summary>Executes the StreamGenerateAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.GetCapabilityProfile">
+      <summary>Executes the GetCapabilityProfile operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.GetDynamicCapacities">
+      <summary>Executes the GetDynamicCapacities operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportsDataType">
+      <summary>Executes the SupportsDataType operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportsOperation">
+      <summary>Executes the SupportsOperation operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportsQuantization">
+      <summary>Executes the SupportsQuantization operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.SupportsQueryProcessingOperation">
+      <summary>Executes the SupportsQueryProcessingOperation operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities.new">
+      <summary>Executes the new operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.ToString">
+      <summary>Executes the ToString operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptionsValidator.Validate">
+      <summary>Executes the Validate operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseMapper.CreateProjection">
+      <summary>Executes the CreateProjection operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseMapper.GetPrimaryText">
+      <summary>Executes the GetPrimaryText operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Providers.MicrosoftAI.ProviderInvalidResponseException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleCredential.ApiKey">
+      <summary>Gets or sets the ApiKey value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleCredential.ExpiresAtUtc">
+      <summary>Gets or sets the ExpiresAtUtc value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.Name">
+      <summary>Gets or sets the Name value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.ProviderId">
+      <summary>Gets or sets the ProviderId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.Version">
+      <summary>Gets or sets the Version value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderHealthContext.CheckedAtUtc">
+      <summary>Gets or sets the CheckedAtUtc value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderHealthContext.IsInitialized">
+      <summary>Gets or sets the IsInitialized value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderHealthContext.ModelId">
+      <summary>Gets or sets the ModelId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderHealthContext.Name">
+      <summary>Gets or sets the Name value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderHealthContext.ProviderId">
+      <summary>Gets or sets the ProviderId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderHealthContext.Version">
+      <summary>Gets or sets the Version value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.ApiKey">
+      <summary>Gets or sets the ApiKey value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.Endpoint">
+      <summary>Gets or sets the Endpoint value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.MaxInputTokens">
+      <summary>Gets or sets the MaxInputTokens value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.MaxOutputTokens">
+      <summary>Gets or sets the MaxOutputTokens value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.ModelId">
+      <summary>Gets or sets the ModelId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.Name">
+      <summary>Gets or sets the Name value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.ProviderHealthStatus">
+      <summary>Gets or sets the ProviderHealthStatus value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.ProviderId">
+      <summary>Gets or sets the ProviderId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.SecretKeyName">
+      <summary>Gets or sets the SecretKeyName value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.StopSequences">
+      <summary>Gets or sets the StopSequences value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.SupportsAssistantRole">
+      <summary>Gets or sets the SupportsAssistantRole value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.SupportsStreaming">
+      <summary>Gets or sets the SupportsStreaming value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.SupportsSystemRole">
+      <summary>Gets or sets the SupportsSystemRole value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.SupportsToolRole">
+      <summary>Gets or sets the SupportsToolRole value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.Temperature">
+      <summary>Gets or sets the Temperature value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.TopP">
+      <summary>Gets or sets the TopP value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions.Version">
+      <summary>Gets or sets the Version value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseProjection.IsTruncated">
+      <summary>Gets or sets the IsTruncated value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseProjection.ModelId">
+      <summary>Gets or sets the ModelId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseProjection.ObservedAtUtc">
+      <summary>Gets or sets the ObservedAtUtc value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseProjection.PrimaryText">
+      <summary>Gets or sets the PrimaryText value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseProjection.RawResponse">
+      <summary>Gets or sets the RawResponse value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseProjection.string">
+      <summary>Gets or sets the string value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Providers.MicrosoftAI.ProviderExecutionException.string">
+      <summary>Gets or sets the string value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.IOpenAICompatibleResponseMapper">
+      <summary>Represents the IOpenAICompatibleResponseMapper public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleCredential">
+      <summary>Represents the OpenAICompatibleCredential public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider">
+      <summary>Represents the OpenAICompatibleProvider public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderCapabilities">
+      <summary>Represents the OpenAICompatibleProviderCapabilities public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderHealthContext">
+      <summary>Represents the OpenAICompatibleProviderHealthContext public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptions">
+      <summary>Represents the OpenAICompatibleProviderOptions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProviderOptionsValidator">
+      <summary>Represents the OpenAICompatibleProviderOptionsValidator public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseMapper">
+      <summary>Represents the OpenAICompatibleResponseMapper public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleResponseProjection">
+      <summary>Represents the OpenAICompatibleResponseProjection public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.ProviderApiException">
+      <summary>Represents the ProviderApiException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.ProviderCapabilityMismatchException">
+      <summary>Represents the ProviderCapabilityMismatchException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.ProviderExecutionException">
+      <summary>Represents the ProviderExecutionException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.ProviderExecutionTimeoutException">
+      <summary>Represents the ProviderExecutionTimeoutException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.ProviderInvalidResponseException">
+      <summary>Represents the ProviderInvalidResponseException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Providers.MicrosoftAI.ProviderRateLimitException">
+      <summary>Represents the ProviderRateLimitException public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

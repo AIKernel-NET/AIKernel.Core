@@ -3,8 +3,12 @@ namespace AIKernel.Core.Execution;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Dtos.Execution;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultPolisherValidator']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultPolisherValidator']" />
 public sealed class DefaultPolisherValidator : IPolisherValidator
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPolisherValidator.ValidateLogicPreservationAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPolisherValidator.ValidateLogicPreservationAsync']" />
     public Task<PolisherValidationResult> ValidateLogicPreservationAsync(
         RawLogic originalLogic,
         string polishedOutput,
@@ -28,6 +32,8 @@ public sealed class DefaultPolisherValidator : IPolisherValidator
         });
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPolisherValidator.AnalyzeDivergenceAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPolisherValidator.AnalyzeDivergenceAsync']" />
     public Task<LogicDivergenceAnalysis> AnalyzeDivergenceAsync(
         RawLogic originalLogic,
         string polishedOutput,

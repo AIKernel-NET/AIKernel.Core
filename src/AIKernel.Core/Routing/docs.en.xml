@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.GetCapabilityAsync">
+      <summary>Executes the GetCapabilityAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.RegisterCapabilityAsync">
+      <summary>Executes the RegisterCapabilityAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.ResolveCandidatesAsync">
+      <summary>Executes the ResolveCandidatesAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Routing.InMemoryCapabilityRegistry">
+      <summary>Represents the InMemoryCapabilityRegistry public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

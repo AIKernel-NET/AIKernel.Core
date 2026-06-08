@@ -5,8 +5,12 @@ using AIKernel.Abstractions.Execution;
 using AIKernel.Dtos.Execution;
 using AIKernel.Enums;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultContextPromptProjector']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultContextPromptProjector']" />
 public sealed class DefaultContextPromptProjector : IContextPromptProjector
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultContextPromptProjector.Project']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultContextPromptProjector.Project']" />
     public IReadOnlyList<ContextPromptBlock> Project(
         IContextSnapshot snapshot,
         PromptProjectionOptions options)

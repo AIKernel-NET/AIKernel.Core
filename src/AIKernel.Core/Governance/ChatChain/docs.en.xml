@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Core.Governance.ChatChain.AlgorithmTaggedChatTurnSignatureProvider.Algorithm">
+      <summary>Provides the Algorithm value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Core.Governance.ChatChain.Sha256ChatTurnSemanticHasher.Algorithm">
+      <summary>Provides the Algorithm value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.AlgorithmTaggedChatTurnSignatureProvider.SignAsync">
+      <summary>Executes the SignAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.AlgorithmTaggedChatTurnSignatureProvider.VerifyAsync">
+      <summary>Executes the VerifyAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyChain">
+      <summary>Executes the VerifyChain operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyNextTurn">
+      <summary>Executes the VerifyNextTurn operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.ChatTurnVerificationResult.Fail">
+      <summary>Executes the Fail operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.ChatTurnVerificationResult.new">
+      <summary>Executes the new operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer.Canonicalize">
+      <summary>Executes the Canonicalize operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.Sha256ChatTurnSemanticHasher.ComputeHash">
+      <summary>Executes the ComputeHash operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.AlgorithmTaggedChatTurnSignatureProvider">
+      <summary>Represents the AlgorithmTaggedChatTurnSignatureProvider public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.ChatTurn">
+      <summary>Represents the ChatTurn public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier">
+      <summary>Represents the ChatTurnChainVerifier public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.ChatTurnVerificationResult">
+      <summary>Represents the ChatTurnVerificationResult public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer">
+      <summary>Represents the DefaultChatTurnCanonicalizer public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.HashChainNode">
+      <summary>Represents the HashChainNode public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.Sha256ChatTurnSemanticHasher">
+      <summary>Represents the Sha256ChatTurnSemanticHasher public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Common.Exceptions.CommonException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Exceptions.CommonException">
+      <summary>Represents the CommonException public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

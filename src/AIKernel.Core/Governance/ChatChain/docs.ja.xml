@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Core.Governance.ChatChain.AlgorithmTaggedChatTurnSignatureProvider.Algorithm">
+      <summary>AIKernel の公開参照サーフェスで公開される Algorithm 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Core.Governance.ChatChain.Sha256ChatTurnSemanticHasher.Algorithm">
+      <summary>AIKernel の公開参照サーフェスで公開される Algorithm 値を提供します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.AlgorithmTaggedChatTurnSignatureProvider.SignAsync">
+      <summary>AIKernel の公開参照サーフェスとして SignAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.AlgorithmTaggedChatTurnSignatureProvider.VerifyAsync">
+      <summary>AIKernel の公開参照サーフェスとして VerifyAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyChain">
+      <summary>AIKernel の公開参照サーフェスとして VerifyChain 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyNextTurn">
+      <summary>AIKernel の公開参照サーフェスとして VerifyNextTurn 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.ChatTurnVerificationResult.Fail">
+      <summary>AIKernel の公開参照サーフェスとして Fail 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.ChatTurnVerificationResult.new">
+      <summary>AIKernel の公開参照サーフェスとして new 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer.Canonicalize">
+      <summary>AIKernel の公開参照サーフェスとして Canonicalize 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Governance.ChatChain.Sha256ChatTurnSemanticHasher.ComputeHash">
+      <summary>AIKernel の公開参照サーフェスとして ComputeHash 操作を実行します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.AlgorithmTaggedChatTurnSignatureProvider">
+      <summary>AIKernel パッケージ利用者に公開される AlgorithmTaggedChatTurnSignatureProvider の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.ChatTurn">
+      <summary>AIKernel パッケージ利用者に公開される ChatTurn の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier">
+      <summary>AIKernel パッケージ利用者に公開される ChatTurnChainVerifier の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.ChatTurnVerificationResult">
+      <summary>AIKernel パッケージ利用者に公開される ChatTurnVerificationResult の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer">
+      <summary>AIKernel パッケージ利用者に公開される DefaultChatTurnCanonicalizer の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.HashChainNode">
+      <summary>AIKernel パッケージ利用者に公開される HashChainNode の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Governance.ChatChain.Sha256ChatTurnSemanticHasher">
+      <summary>AIKernel パッケージ利用者に公開される Sha256ChatTurnSemanticHasher の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

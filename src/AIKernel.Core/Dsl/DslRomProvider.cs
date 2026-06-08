@@ -2,12 +2,12 @@ namespace AIKernel.Core.Dsl;
 
 using AIKernel.Common.Results;
 
-public sealed record DslRomSnapshot(
+internal sealed record DslRomSnapshot(
     DslRomMetadata Metadata,
     string JsonDsl,
     IKernelPipeline Pipeline);
 
-public sealed class DslRomProvider
+internal sealed class DslRomProvider
 {
     private readonly IDslPipelineCompiler _compiler;
 

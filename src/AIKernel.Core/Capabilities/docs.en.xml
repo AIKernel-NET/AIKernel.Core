@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Core.Capabilities.FailClosedCapabilityModuleInvoker.ErrorCode">
+      <summary>Provides the ErrorCode value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Capabilities.FailClosedCapabilityModuleInvoker.InvokeAsync">
+      <summary>Executes the InvokeAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ListAsync">
+      <summary>Executes the ListAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.RegisterAsync">
+      <summary>Executes the RegisterAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ResolveAsync">
+      <summary>Executes the ResolveAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Capabilities.FailClosedCapabilityModuleInvoker">
+      <summary>Represents the FailClosedCapabilityModuleInvoker public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry">
+      <summary>Represents the InMemoryCapabilityModuleRegistry public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

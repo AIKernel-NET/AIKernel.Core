@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Common.IO.FileUtil.Exists">
+      <summary>Executes the Exists operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.IO.FileUtil.ReadTextAsync">
+      <summary>Executes the ReadTextAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.IO.FileUtil.WriteTextAsync">
+      <summary>Executes the WriteTextAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.IO.PathUtil.Combine">
+      <summary>Executes the Combine operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.IO.PathUtil.Normalize">
+      <summary>Executes the Normalize operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Common.IO.FileUtil">
+      <summary>Represents the FileUtil public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.IO.PathUtil">
+      <summary>Represents the PathUtil public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

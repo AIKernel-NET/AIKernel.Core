@@ -98,9 +98,10 @@ VFS → ROM → Context → Execution
 
 This layer owns the Core runtime logic and separates implementation concerns from external Hosting and Provider boundaries.
 
-It also defines OS-independent `IMemoryRegion` / `IMemoryMapper`
-abstractions for Native Capability modules. The abstractions live in Core while
-the concrete Win32/POSIX mapping implementations live in Kernel.
+For Native Capability modules, the OS-independent MemoryRegion / MemoryMapper
+runtime surface is owned by AIKernel.Core in the 0.1.0 prototype validation
+baseline. Core exposes the Result-based runtime adapter, while the concrete
+Win32/POSIX mapping implementations live in Kernel.
 
 #### `AIKernel.Kernel`
 
@@ -164,17 +165,17 @@ internals.
 ### 1. Install Packages
 
 ```bash
-dotnet add package AIKernel.Core --version 0.0.5
-dotnet add package AIKernel.Hosting --version 0.0.5
-dotnet add package AIKernel.Kernel --version 0.0.5
-dotnet add package AIKernel.Providers.MicrosoftAI --version 0.0.5
+dotnet add package AIKernel.Core --version 0.1.0
+dotnet add package AIKernel.Hosting --version 0.1.0
+dotnet add package AIKernel.Kernel --version 0.1.0
+dotnet add package AIKernel.Providers.MicrosoftAI --version 0.1.0
 ```
 
 For direct use of functional primitives and contract testing helpers:
 
 ```bash
-dotnet add package AIKernel.Common --version 0.0.5
-dotnet add package AIKernel.TestKit --version 0.0.5
+dotnet add package AIKernel.Common --version 0.1.0
+dotnet add package AIKernel.TestKit --version 0.1.0
 ```
 
 CUDA is optional and lives outside this repository. GPU hosts should install an
@@ -187,7 +188,7 @@ local NuGet source, and install from that source:
 
 ```bash
 dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
-dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.0.5 --source <folder-containing-full-cuda-nupkg>
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.1.0
 ```
 
 LLM / SLM developers who need direct CUDA integration should read
@@ -221,8 +222,8 @@ The default Python install is CPU-only/CUDA-free and does not include a native
 bridge. Install GPU integrations from the matching external Capability package
 and follow that Capability repository's distribution instructions.
 
-The v0.0.5 package family is aligned with the AIKernel.NET contract packages
-`AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.0.5.
+The v0.1.0 package family is aligned with the AIKernel.NET contract packages
+`AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.1.0.
 `AIKernel.Vfs` is no longer a separate package dependency; the VFS contracts are
 provided by `AIKernel.Abstractions`. The `AIKernel.Vfs` namespace remains as a
 Core implementation namespace for in-process VFS providers and stores; it is not
@@ -307,11 +308,15 @@ For trusted hosts, `AddAIKernelKernel()` registers an OS-specific
 behind the Core memory abstraction. Native Capability packages consume only the
 Core abstraction and never reference Kernel directly.
 
-User-land routing pipelines can return a `KernelProviderRoutingDecision` from a
-`ResultStep`/LINQ chain, then apply it to a `KernelRequest` and its metadata.
+User-land routing pipelines can return
+`AIKernel.Kernel.KernelProviderRoutingDecision` from a `ResultStep`/LINQ chain,
+then apply it to a `KernelRequest` and its metadata through `AIKernel.Kernel`
+extension helpers.
 This supports policies such as low-tier versus high-tier LLM selection, or
 routing `aik...` contexts to a CLI-backed capability adapter, while keeping
 Kernel execution driven by the same ProviderId / ModelId contract.
+Use `KernelProviderRoutingDecisionFactory` for Core-provided construction
+guards; the decision carrier stays behavior-free in the Kernel facade package.
 
 AIKernel.Core also includes a standard JSON DSL pipeline runtime for
 AI-generated plans. The DSL compiles to deterministic `ResultStep` pipelines,
@@ -384,9 +389,12 @@ KernelRequest
 → IExecutionResult
 ```
 
-In the initial implementation phase, prompt composition may be simplified and static.
+In the 0.1.0 prototype validation phase, prompt composition may be simplified
+and static when a demo or provider host does not yet supply a richer pipeline.
 
-Advanced Governance, signature enforcement, Semantic Cache, and Deterministic Replay will be expanded incrementally.
+Advanced Governance, signature enforcement, Semantic Cache, and Deterministic
+Replay are validated incrementally through the prototype repositories before
+being promoted into stricter runtime defaults.
 
 ---
 
@@ -410,9 +418,10 @@ The goal is to prepare a foundation that allows future Core implementation to pr
 
 ---
 
-### v0.0.x — Development of Core Runtime Components
+### v0.0.x — Completed Design-Implementation Phase
 
-During the v0.0.x phase, Core runtime components will be implemented incrementally toward v0.1.0.
+The v0.0.x phase implemented Core runtime components incrementally toward
+v0.1.0.
 
 Based on the Canonical Contracts fixed in v0.0.1, minor refinements may be made to naming, API boundaries, and test structure where needed for implementation consistency.
 
@@ -426,17 +435,20 @@ Based on the Canonical Contracts fixed in v0.0.1, minor refinements may be made 
 - Unit Test / Integration Test skeletons
 - API, naming, and contract-boundary refinements toward v0.1.0
 
-The purpose of this phase is not to fully implement Governance or Deterministic Replay.
+The purpose of this phase was not to fully implement Governance or
+Deterministic Replay.
 
-The first goal is to confirm that AIKernel.Core can provide the following minimal execution path.
+The first goal was to confirm that AIKernel.Core can provide the following
+minimal execution path.
 
 `VFS → ROM → Context → Static Prompt → Provider → IExecutionResult`
 
 ---
 
-### v0.1.0 — Synthesis: First Executable Runtime
+### v0.1.0 — Prototype Validation: First Executable Runtime
 
-v0.1.0 is the first executable runtime release of AIKernel.Core.
+v0.1.0 is the first executable runtime and prototype validation release of
+AIKernel.Core, scheduled for publication on 2026-06-09.
 
 It integrates the Canonical Contracts established in AIKernel.NET v0.0.1 into an executable form through Core implementation, Provider integration, and tests.
 
@@ -454,7 +466,9 @@ This is the Core-side realization of **Synthesis: Executable Contracts** defined
 
 The purpose of this release is not to implement the entire AIKernel.NET philosophy all at once.
 
-The purpose is to prove, with a minimal configuration, that AIKernel can **load knowledge, construct context, and execute inference through a Provider**.
+The purpose is to prove, with prototype applications and external Capability
+modules, that AIKernel can **load knowledge, construct context, execute
+inference through a Provider, route Capabilities, and preserve replay evidence**.
 
 ---
 
@@ -465,7 +479,14 @@ AIKernel.Core development proceeds based on the Canonical Contracts defined by A
 AIKernel.NET defines the contracts.  
 AIKernel.Core proves them through implementation.
 
-During the v0.0.x phase, Core runtime components will be implemented incrementally and integrated as the first executable runtime in v0.1.0.
+The v0.0.x phase is complete. The 0.1.0 line validates the implementation
+through prototype repositories before the package family is promoted toward a
+broader stable release line.
+
+Release notes:
+
+- [English](RELEASE_NOTES.md)
+- [日本語](RELEASE_NOTES-ja.md)
 
 This roadmap preserves the progression established by the existing AIKernel.NET release notes and Issue #6:
 

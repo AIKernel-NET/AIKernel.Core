@@ -6,15 +6,20 @@ using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Routing;
 using AIKernel.Dtos.Rules;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Routing.InMemoryCapabilityRegistry']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Routing.InMemoryCapabilityRegistry']" />
 public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
 {
     private readonly ConcurrentDictionary<string, ModelCapacityVector> _capabilities =
         new(StringComparer.Ordinal);
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.#ctor']" />
     public InMemoryCapabilityRegistry()
     {
     }
 
+    /// <summary>Initializes a new instance for the InMemoryCapabilityRegistry AIKernel contract surface. JA: InMemoryCapabilityRegistry AIKernel 契約サーフェスの新しいインスタンスを初期化します。</summary>
     public InMemoryCapabilityRegistry(IEnumerable<ModelPromptCapability> capabilities)
     {
         ArgumentNullException.ThrowIfNull(capabilities);
@@ -27,6 +32,8 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
         }
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.RegisterCapabilityAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.RegisterCapabilityAsync']" />
     public ValueTask RegisterCapabilityAsync(
         string providerId,
         ModelCapacityVector capacityVector,
@@ -38,6 +45,8 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
         return ValueTask.CompletedTask;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.GetCapabilityAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.GetCapabilityAsync']" />
     public ValueTask<ModelCapacityVector?> GetCapabilityAsync(
         string providerId,
         CancellationToken cancellationToken)
@@ -56,6 +65,8 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
         return ValueTask.FromResult(capacityVector);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.ResolveCandidatesAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.ResolveCandidatesAsync']" />
     public ValueTask<IReadOnlyList<string>> ResolveCandidatesAsync(
         RuleEvaluationContext context,
         CancellationToken cancellationToken)

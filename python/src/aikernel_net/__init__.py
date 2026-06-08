@@ -1,4 +1,9 @@
-"""AIKernel Python bindings."""
+"""[EN]
+Reference module for aikernel_net.__init__.
+
+[JA]
+aikernel_net.__init__ の参照モジュールです。
+"""
 
 from .managed import (
     ManagedAssemblySet,
@@ -54,4 +59,4 @@ __all__ = [
     "runtime_layout",
 ]
 
-__version__ = "0.0.5.1"
+__version__ = "0.1.0"

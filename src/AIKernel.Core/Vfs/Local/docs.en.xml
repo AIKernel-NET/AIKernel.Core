@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.DeleteAsync">
+      <summary>Executes the DeleteAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.DisposeAsync">
+      <summary>Executes the DisposeAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.ExistsAsync">
+      <summary>Executes the ExistsAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetDirectoryAsync">
+      <summary>Executes the GetDirectoryAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetHealthAsync">
+      <summary>Executes the GetHealthAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsAvailableAsync">
+      <summary>Executes the IsAvailableAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsNullOrWhiteSpace">
+      <summary>Executes the IsNullOrWhiteSpace operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.QueryAsync">
+      <summary>Executes the QueryAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.ReadFileAsync">
+      <summary>Executes the ReadFileAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProvider.WriteFileAsync">
+      <summary>Executes the WriteFileAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.AllowWrite">
+      <summary>Gets or sets the AllowWrite value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.Clock">
+      <summary>Gets or sets the Clock value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.CredentialValidator">
+      <summary>Gets or sets the CredentialValidator value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.Name">
+      <summary>Gets or sets the Name value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.ProviderId">
+      <summary>Gets or sets the ProviderId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.RootPath">
+      <summary>Gets or sets the RootPath value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Local.LocalFileProvider">
+      <summary>Represents the LocalFileProvider public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Vfs.Local.LocalFileProviderOptions">
+      <summary>Represents the LocalFileProviderOptions public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

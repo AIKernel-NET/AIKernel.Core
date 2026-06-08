@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.GetRegisteredProviders">
+      <summary>AIKernel の公開参照サーフェスとして GetRegisteredProviders 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.RegisterProvider">
+      <summary>AIKernel の公開参照サーフェスとして RegisterProvider 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.UnregisterProvider">
+      <summary>AIKernel の公開参照サーフェスとして UnregisterProvider 操作を実行します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Providers.InMemoryProviderRegistry">
+      <summary>AIKernel パッケージ利用者に公開される InMemoryProviderRegistry の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

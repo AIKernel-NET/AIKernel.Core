@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Core.Execution.SimpleTokenizer.Name">
+      <summary>Provides the Name value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Core.Execution.SimpleTokenizer.TokenizerProfileId">
+      <summary>Provides the TokenizerProfileId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.DefaultContextPromptProjector.Project">
+      <summary>Executes the Project operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.DefaultPolisherValidator.AnalyzeDivergenceAsync">
+      <summary>Executes the AnalyzeDivergenceAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.DefaultPolisherValidator.ValidateLogicPreservationAsync">
+      <summary>Executes the ValidateLogicPreservationAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.DefaultPromptGenerator.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.DefaultPromptGenerator.GenerateAsync">
+      <summary>Executes the GenerateAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateExecutionId">
+      <summary>Executes the CreateExecutionId operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateFallbackExecutionId">
+      <summary>Executes the CreateFallbackExecutionId operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateExecutionId">
+      <summary>Executes the TryCreateExecutionId operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateFallbackExecutionId">
+      <summary>Executes the TryCreateFallbackExecutionId operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutor.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelExecutor.ExecuteAsync">
+      <summary>Executes the ExecuteAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelReplayer.CanReplay">
+      <summary>Executes the CanReplay operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.KernelReplayer.ReplayAsync">
+      <summary>Executes the ReplayAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PassThroughOutputPolisher.RenderAsync">
+      <summary>Executes the RenderAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PassThroughOutputPolisher.new">
+      <summary>Executes the new operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PipelineOrchestrator.ExecuteAsync">
+      <summary>Executes the ExecuteAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PipelineOrchestrator.InitializeAsync">
+      <summary>Executes the InitializeAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PipelineOrchestrator.ReplayFromDumpAsync">
+      <summary>Executes the ReplayFromDumpAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PromptGenerationException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.PromptTokenBudgetExceededException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SemanticStateHasher.ComputeHash">
+      <summary>Executes the ComputeHash operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelExecutionResult">
+      <summary>Executes the CreateKernelExecutionResult operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelFallbackResult">
+      <summary>Executes the CreateKernelFallbackResult operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelExecution">
+      <summary>Executes the FromKernelExecution operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelFallback">
+      <summary>Executes the FromKernelFallback operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.CountTokens">
+      <summary>Executes the CountTokens operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.Decode">
+      <summary>Executes the Decode operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.GetPaddingInfo">
+      <summary>Executes the GetPaddingInfo operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.GetPhysicalCardinality">
+      <summary>Executes the GetPhysicalCardinality operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.GetStatistics">
+      <summary>Executes the GetStatistics operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.SupportsModel">
+      <summary>Executes the SupportsModel operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.SimpleTokenizer.Tokenize">
+      <summary>Executes the Tokenize operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.Resolve">
+      <summary>Executes the Resolve operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.UnsupportedPromptCapabilityException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.struct.ToExecutionId">
+      <summary>Executes the ToExecutionId operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Execution.struct.ToString">
+      <summary>Executes the ToString operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Execution.PromptTokenBudgetExceededException.ActualTokens">
+      <summary>Gets or sets the ActualTokens value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Execution.PromptTokenBudgetExceededException.MaxInputTokens">
+      <summary>Gets or sets the MaxInputTokens value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Execution.SemanticStateMaterial.CanonicalPayload">
+      <summary>Gets or sets the CanonicalPayload value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Execution.SemanticStateMaterial.Domain">
+      <summary>Gets or sets the Domain value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.DefaultContextPromptProjector">
+      <summary>Represents the DefaultContextPromptProjector public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.DefaultPolisherValidator">
+      <summary>Represents the DefaultPolisherValidator public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.DefaultPromptGenerator">
+      <summary>Represents the DefaultPromptGenerator public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.KernelExecutionIdFactory">
+      <summary>Represents the KernelExecutionIdFactory public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.KernelExecutor">
+      <summary>Represents the KernelExecutor public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.KernelReplayer">
+      <summary>Represents the KernelReplayer public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.ModelMessage">
+      <summary>Represents the ModelMessage public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.PassThroughOutputPolisher">
+      <summary>Represents the PassThroughOutputPolisher public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.PipelineOrchestrator">
+      <summary>Represents the PipelineOrchestrator public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.PromptGenerationException">
+      <summary>Represents the PromptGenerationException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.PromptTokenBudgetExceededException">
+      <summary>Represents the PromptTokenBudgetExceededException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.SemanticStateHasher">
+      <summary>Represents the SemanticStateHasher public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.SemanticStateMaterial">
+      <summary>Represents the SemanticStateMaterial public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.SimpleTokenizer">
+      <summary>Represents the SimpleTokenizer public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver">
+      <summary>Represents the StaticModelPromptCapabilityResolver public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.UnsupportedPromptCapabilityException">
+      <summary>Represents the UnsupportedPromptCapabilityException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Execution.struct">
+      <summary>Represents the struct public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

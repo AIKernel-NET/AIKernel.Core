@@ -29,6 +29,31 @@ public sealed class TaskResultStepExtensionsTests
     }
 
     [Fact]
+    public async Task AsTask_LiftsSynchronousResultStepIntoTaskResultStep()
+    {
+        var step = await ResultStep<string, int>
+            .Success("capability", 2)
+            .AsTask();
+
+        Assert.True(step.IsSuccess);
+        Assert.Equal("capability", step.State);
+        Assert.Equal(2, step.Value);
+    }
+
+    [Fact]
+    public async Task LinqQuery_ComposesResultStepAsTaskWithTaskResultStep()
+    {
+        var step = await (
+            from capability in ResultStep<string, int>.Success("capability", 2).AsTask()
+            from prompt in SuccessAsync("capability:prompt", capability + 3)
+            select prompt);
+
+        Assert.True(step.IsSuccess);
+        Assert.Equal("capability:prompt", step.State);
+        Assert.Equal(5, step.Value);
+    }
+
+    [Fact]
     public async Task Bind_ShortCircuitsFailureWithoutRunningBinder()
     {
         var called = false;

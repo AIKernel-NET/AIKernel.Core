@@ -72,6 +72,29 @@ public sealed class TaskResultExtensionsTests
     }
 
     [Fact]
+    public async Task AsTask_LiftsSynchronousResultIntoTaskResult()
+    {
+        var result = await Result<int>
+            .Success(3)
+            .AsTask();
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(3, result.Value);
+    }
+
+    [Fact]
+    public async Task LinqQuery_ComposesAsTaskWithTaskResult()
+    {
+        var result = await (
+            from left in Result<int>.Success(3).AsTask()
+            from right in SuccessAsync(4)
+            select left + right);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(7, result.Value);
+    }
+
+    [Fact]
     public async Task Bind_ComposesSynchronousResultWithTaskResult()
     {
         var result = await Result<int>

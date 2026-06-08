@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Security.ConfigurationCredentialProvider.GetSecretAsync">
+      <summary>AIKernel の公開参照サーフェスとして GetSecretAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Security.EnvironmentCredentialProvider.GetSecretAsync">
+      <summary>AIKernel の公開参照サーフェスとして GetSecretAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Security.SecureCredentialGuard.ValidateSecret">
+      <summary>AIKernel の公開参照サーフェスとして ValidateSecret 操作を実行します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Security.SecureCredentialExpiredException.ExpiresAtUtc">
+      <summary>AIKernel の公開参照サーフェスで公開される ExpiresAtUtc 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Security.SecureCredentialExpiredException.Key">
+      <summary>AIKernel の公開参照サーフェスで公開される Key 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Security.SecureCredentialInvalidException.Key">
+      <summary>AIKernel の公開参照サーフェスで公開される Key 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Security.SecureCredentialInvalidException.Reason">
+      <summary>AIKernel の公開参照サーフェスで公開される Reason 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Security.SecureCredentialNotFoundException.Key">
+      <summary>AIKernel の公開参照サーフェスで公開される Key 値を取得または設定します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.ConfigurationCredentialProvider">
+      <summary>AIKernel パッケージ利用者に公開される ConfigurationCredentialProvider の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.EnvironmentCredentialProvider">
+      <summary>AIKernel パッケージ利用者に公開される EnvironmentCredentialProvider の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialAmbiguousException">
+      <summary>AIKernel パッケージ利用者に公開される SecureCredentialAmbiguousException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialException">
+      <summary>AIKernel パッケージ利用者に公開される SecureCredentialException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialExpiredException">
+      <summary>AIKernel パッケージ利用者に公開される SecureCredentialExpiredException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialGuard">
+      <summary>AIKernel パッケージ利用者に公開される SecureCredentialGuard の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialInvalidException">
+      <summary>AIKernel パッケージ利用者に公開される SecureCredentialInvalidException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Security.SecureCredentialNotFoundException">
+      <summary>AIKernel パッケージ利用者に公開される SecureCredentialNotFoundException の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

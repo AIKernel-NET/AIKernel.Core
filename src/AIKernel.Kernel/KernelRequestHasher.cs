@@ -1,4 +1,4 @@
-﻿namespace AIKernel.Kernel;
+namespace AIKernel.Kernel;
 
 using System.Security.Cryptography;
 using System.Text;
@@ -6,8 +6,12 @@ using System.Text.Json;
 using AIKernel.Abstractions.Kernel;
 using AIKernel.Dtos.Kernel;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelRequestHasher']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelRequestHasher']" />
 public sealed class KernelRequestHasher : IKernelRequestHasher
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelRequestHasher.ComputeHash']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelRequestHasher.ComputeHash']" />
     public string ComputeHash(KernelRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);

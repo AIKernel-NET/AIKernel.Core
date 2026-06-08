@@ -1,10 +1,20 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace AIKernel.Common.Results;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskResultExtensions']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskResultExtensions']" />
 public static class TaskResultExtensions
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.AsTask&lt;T&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.AsTask&lt;T&gt;']" />
+    public static Task<Result<T>> AsTask<T>(
+        this Result<T> result)
+        => Task.FromResult(result);
+
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.Tap&lt;T&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.Tap&lt;T&gt;']" />
     public static async Task<Result<T>> Tap<T>(
         this Task<Result<T>> task,
         Action<T> action)
@@ -20,6 +30,8 @@ public static class TaskResultExtensions
         }
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.Tap&lt;T&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.Tap&lt;T&gt;']" />
     public static async Task<Result<T>> Tap<T>(
         this Task<Result<T>> task,
         Func<T, Task> action)
@@ -44,6 +56,8 @@ public static class TaskResultExtensions
     // -------------------------
     // Map（Select）
     // -------------------------
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']" />
     public static async Task<Result<U>> Map<T, U>(
         this Task<Result<T>> task,
         Func<T, U> selector)
@@ -62,6 +76,8 @@ public static class TaskResultExtensions
     // -------------------------
     // Bind（SelectMany）
     // -------------------------
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']" />
     public static async Task<Result<U>> Bind<T, U>(
         this Result<T> result,
         Func<T, Task<Result<U>>> binder)
@@ -79,11 +95,15 @@ public static class TaskResultExtensions
         }
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']" />
     public static Task<Result<U>> Select<T, U>(
         this Task<Result<T>> task,
         Func<T, U> selector)
         => task.Map(selector);
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']" />
     public static async Task<Result<U>> Bind<T, U>(
         this Task<Result<T>> task,
         Func<T, Task<Result<U>>> binder)
@@ -102,6 +122,8 @@ public static class TaskResultExtensions
         }
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']" />
     public static async Task<Result<U>> Bind<T, U>(
         this Task<Result<T>> task,
         Func<T, Result<U>> binder)
@@ -117,6 +139,8 @@ public static class TaskResultExtensions
         }
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']" />
     public static async Task<Result<V>> SelectMany<T, U, V>(
         this Result<T> result,
         Func<T, Task<Result<U>>> binder,
@@ -125,6 +149,8 @@ public static class TaskResultExtensions
             .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']" />
     public static async Task<Result<V>> SelectMany<T, U, V>(
         this Task<Result<T>> task,
         Func<T, Task<Result<U>>> binder,
@@ -133,6 +159,8 @@ public static class TaskResultExtensions
             .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']" />
     public static async Task<Result<V>> SelectMany<T, U, V>(
         this Task<Result<T>> task,
         Func<T, Result<U>> binder,

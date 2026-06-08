@@ -1,4 +1,4 @@
-﻿namespace AIKernel.Core.Rom;
+namespace AIKernel.Core.Rom;
 
 using AIKernel.Abstractions.Rom;
 using AIKernel.Core.Time;
@@ -7,12 +7,16 @@ using AIKernel.Vfs;
 using System.Collections.Immutable;
 using System.Text;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomLoader']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomLoader']" />
 public sealed class RomLoader : IRomLoader
 {
     private readonly IMarkdownFrontMatterParser _frontMatterParser;
     private readonly IRomSignatureVerifier _signatureVerifier;
     private readonly IKernelClock _clock;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.#ctor']" />
     public RomLoader(
         IMarkdownFrontMatterParser frontMatterParser,
         IRomSignatureVerifier signatureVerifier,
@@ -27,6 +31,8 @@ public sealed class RomLoader : IRomLoader
         _clock = clock ?? KernelClock.System();
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.LoadAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.LoadAsync']" />
     public async Task<RomSnapshot> LoadAsync(
         IVfsSession session,
         string path,

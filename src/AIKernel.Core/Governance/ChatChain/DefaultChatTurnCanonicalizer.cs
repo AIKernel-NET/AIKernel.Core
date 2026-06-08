@@ -3,8 +3,12 @@ namespace AIKernel.Core.Governance.ChatChain;
 using System.Text.Json;
 using AIKernel.Abstractions.Governance.ChatChain;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer']" />
 public sealed class DefaultChatTurnCanonicalizer : IChatTurnCanonicalizer
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer.Canonicalize']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer.Canonicalize']" />
     public string Canonicalize(IChatTurn turn)
     {
         ArgumentNullException.ThrowIfNull(turn);

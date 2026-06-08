@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Common.Logging.LogUtil.Error">
+      <summary>Executes the Error operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Logging.LogUtil.Info">
+      <summary>Executes the Info operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Logging.LogUtil.Warn">
+      <summary>Executes the Warn operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Logging.LogUtil">
+      <summary>Represents the LogUtil public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

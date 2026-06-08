@@ -1,6 +1,7 @@
 namespace AIKernel.Core.Tests.Dsl;
 
 using AIKernel.Common.Results;
+using AIKernel.Dtos.Time;
 using AIKernel.Core.Dsl;
 using AIKernel.Core.Time;
 using AIKernel.Core.Tests.Support;
@@ -860,7 +861,11 @@ public sealed class DslPipelineCompilerTests
 
         public KernelTimestamp GetLogicalTimestamp()
         {
-            return KernelTimestamp.FromUtc(DateTimeOffset.UnixEpoch, "test");
+            return new KernelTimestamp
+            {
+                UtcDateTime = DateTimeOffset.UnixEpoch,
+                SourceId = "test"
+            };
         }
     }
 

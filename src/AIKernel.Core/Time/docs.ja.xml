@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Core.Time.KernelClock.IsReplaying">
+      <summary>AIKernel の公開参照サーフェスで公開される IsReplaying 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Core.Time.KernelClock.Now">
+      <summary>AIKernel の公開参照サーフェスで公開される Now 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Core.Time.KernelClock.ReliabilityScore">
+      <summary>AIKernel の公開参照サーフェスで公開される ReliabilityScore 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Core.Time.KernelTimeProvider.LocalTimeZone">
+      <summary>AIKernel の公開参照サーフェスで公開される LocalTimeZone 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Core.Time.KernelTimeProvider.ReliabilityScore">
+      <summary>AIKernel の公開参照サーフェスで公開される ReliabilityScore 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Core.Time.KernelTimeProvider.TimestampFrequency">
+      <summary>AIKernel の公開参照サーフェスで公開される TimestampFrequency 値を提供します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelClock.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelClock.GetLogicalTimestamp">
+      <summary>AIKernel の公開参照サーフェスとして GetLogicalTimestamp 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelClock.Replay">
+      <summary>AIKernel の公開参照サーフェスとして Replay 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelClock.System">
+      <summary>AIKernel の公開参照サーフェスとして System 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelTimeProvider.CreateTimer">
+      <summary>AIKernel の公開参照サーフェスとして CreateTimer 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelTimeProvider.GetLogicalTimestamp">
+      <summary>AIKernel の公開参照サーフェスとして GetLogicalTimestamp 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelTimeProvider.GetTimestamp">
+      <summary>AIKernel の公開参照サーフェスとして GetTimestamp 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.KernelTimeProvider.GetUtcNow">
+      <summary>AIKernel の公開参照サーフェスとして GetUtcNow 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.ReplayKernelTimeProvider.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.ReplayKernelTimeProvider.GetLogicalTimestamp">
+      <summary>AIKernel の公開参照サーフェスとして GetLogicalTimestamp 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Time.SystemKernelTimeProvider.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Time.KernelClock.Logical">
+      <summary>AIKernel の公開参照サーフェスで公開される Logical 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Time.KernelClock.Physical">
+      <summary>AIKernel の公開参照サーフェスで公開される Physical 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Time.KernelTimeProvider.IsReplaying">
+      <summary>AIKernel の公開参照サーフェスで公開される IsReplaying 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Time.ReplayKernelTimeProvider.FixedUtcDateTime">
+      <summary>AIKernel の公開参照サーフェスで公開される FixedUtcDateTime 値を取得または設定します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Time.IKernelClock">
+      <summary>AIKernel パッケージ利用者に公開される IKernelClock の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Time.KernelClock">
+      <summary>AIKernel パッケージ利用者に公開される KernelClock の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Time.KernelTimeProvider">
+      <summary>AIKernel パッケージ利用者に公開される KernelTimeProvider の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Time.ReplayKernelTimeProvider">
+      <summary>AIKernel パッケージ利用者に公開される ReplayKernelTimeProvider の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Time.SystemKernelTimeProvider">
+      <summary>AIKernel パッケージ利用者に公開される SystemKernelTimeProvider の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

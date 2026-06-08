@@ -3,37 +3,37 @@ namespace AIKernel.Core.Dsl;
 using System.Collections.Immutable;
 using AIKernel.Common.Results;
 
-public sealed record DslDocument(PipelineNode Root)
+internal sealed record DslDocument(PipelineNode Root)
 {
     public static Result<DslDocument> FromJson(string json)
         => DslDocumentParser.Parse(json);
 }
 
-public abstract record PipelineNode(string Type);
+internal abstract record PipelineNode(string Type);
 
-public sealed record PipelineRootNode(
+internal sealed record PipelineRootNode(
     IReadOnlyList<PipelineNode> Steps) : PipelineNode("Pipeline");
 
-public sealed record StepNode(
+internal sealed record StepNode(
     string Name) : PipelineNode("Step");
 
-public sealed record CallCapabilityNode(
+internal sealed record CallCapabilityNode(
     string Name,
     IReadOnlyDictionary<string, string> Args) : PipelineNode("CallCapability");
 
-public sealed record LoopNode(
+internal sealed record LoopNode(
     int MaxIterations,
     IReadOnlyList<PipelineNode> BodyNodes) : PipelineNode("Loop");
 
-public sealed record LoopUntilNode(
+internal sealed record LoopUntilNode(
     TimeSpan Timeout,
     int MaxIterations,
     IReadOnlyList<PipelineNode> BodyNodes) : PipelineNode("LoopUntil");
 
-public sealed record SuspendNode(
+internal sealed record SuspendNode(
     string Reason) : PipelineNode("Suspend");
 
-public sealed record DslPipelineValue(
+internal sealed record DslPipelineValue(
     IReadOnlyDictionary<string, string> Data)
 {
     public static DslPipelineValue Empty { get; } = new(
@@ -81,7 +81,7 @@ public sealed record DslPipelineValue(
     }
 }
 
-public sealed record DslPipelineState(
+internal sealed record DslPipelineState(
     string PipelineId,
     string CurrentNode,
     int ExecutedNodeCount)
@@ -97,7 +97,7 @@ public sealed record DslPipelineState(
         };
 }
 
-public sealed record DslPipelineExecutionContext(
+internal sealed record DslPipelineExecutionContext(
     DslPipelineValue Input,
     DateTimeOffset StartedAtUtc)
 {
@@ -105,18 +105,18 @@ public sealed record DslPipelineExecutionContext(
         => new(input ?? DslPipelineValue.Empty, DateTimeOffset.UnixEpoch);
 }
 
-public interface IKernelPipeline
+internal interface IKernelPipeline
 {
     ResultStep<DslPipelineState, DslPipelineValue> Execute(
         DslPipelineExecutionContext context);
 }
 
-public interface IDslPipelineCompiler
+internal interface IDslPipelineCompiler
 {
     Result<IKernelPipeline> Compile(DslDocument document);
 }
 
-public interface IDslCapabilityRegistry
+internal interface IDslCapabilityRegistry
 {
     bool Contains(string name);
 

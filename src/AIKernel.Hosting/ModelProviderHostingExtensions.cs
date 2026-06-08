@@ -4,8 +4,12 @@ using AIKernel.Abstractions.Providers;
 using AIKernel.Dtos.Execution;
 using Microsoft.Extensions.DependencyInjection;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.ModelProviderHostingExtensions']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.ModelProviderHostingExtensions']" />
 public static class ModelProviderHostingExtensions
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
         this AIKernelCoreBuilder builder,
         ModelPromptCapability capability)
@@ -24,6 +28,8 @@ public static class ModelProviderHostingExtensions
         return builder;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
         this AIKernelCoreBuilder builder,
         Func<IServiceProvider, ModelPromptCapability> capabilityFactory)
@@ -42,6 +48,8 @@ public static class ModelProviderHostingExtensions
         return builder;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
         this AIKernelCoreBuilder builder,
         IEnumerable<ModelPromptCapability> capabilities)
@@ -66,6 +74,8 @@ public static class ModelProviderHostingExtensions
         return builder;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
         this AIKernelCoreBuilder builder,
         Func<IServiceProvider, TProvider> providerFactory,
@@ -83,6 +93,8 @@ public static class ModelProviderHostingExtensions
         return builder;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
         this AIKernelCoreBuilder builder,
         Func<IServiceProvider, TProvider> providerFactory,
@@ -100,6 +112,8 @@ public static class ModelProviderHostingExtensions
         return builder;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
         this AIKernelCoreBuilder builder,
         Func<IServiceProvider, TProvider> providerFactory,
@@ -175,6 +189,8 @@ public static class ModelProviderHostingExtensions
         private readonly Lock _gate = new();
         private TProvider? _instance;
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.Get']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.Get']" />
         public TProvider Get(
             IServiceProvider serviceProvider)
         {

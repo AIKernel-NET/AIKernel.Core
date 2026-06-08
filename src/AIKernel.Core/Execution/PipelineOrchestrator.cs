@@ -9,11 +9,15 @@ using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.KernelContext;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.PipelineOrchestrator']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.PipelineOrchestrator']" />
 public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOrchestrator
 {
     private readonly IKernelReplayer _replayer =
         replayer ?? throw new ArgumentNullException(nameof(replayer));
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.InitializeAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.InitializeAsync']" />
     public Task<InitializationResult> InitializeAsync(
         IContextCollection context,
         CancellationToken cancellationToken)
@@ -30,6 +34,8 @@ public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOr
         });
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.ExecuteAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.ExecuteAsync']" />
     public Task<ExecutionResult> ExecuteAsync(
         IContextCollection context,
         SignatureVerificationResult signatureVerificationResult,
@@ -51,6 +57,8 @@ public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOr
             context));
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.ReplayFromDumpAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.ReplayFromDumpAsync']" />
     public async Task<ExecutionResult> ReplayFromDumpAsync(
         ReplayDump replayDump,
         ModificationContext modificationContext,

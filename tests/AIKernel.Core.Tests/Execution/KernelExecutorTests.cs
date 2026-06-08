@@ -410,7 +410,7 @@ public sealed class KernelExecutorTests
 
         public string Name => "Fake Provider";
 
-        public string Version => "0.0.5";
+        public string Version => "0.1.0";
 
         public IProviderCapabilities GetCapabilities()
         {

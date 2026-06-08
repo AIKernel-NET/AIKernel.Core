@@ -1,7 +1,11 @@
-﻿namespace AIKernel.Common.IO;
+namespace AIKernel.Common.IO;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.IO.PathUtil']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.IO.PathUtil']" />
 public static class PathUtil
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Normalize']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Normalize']" />
     public static string Normalize(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -17,6 +21,8 @@ public static class PathUtil
         return Path.GetFullPath(path);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Combine']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Combine']" />
     public static string Combine(params string[] parts)
         => Path.Combine(parts);
 }

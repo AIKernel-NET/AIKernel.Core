@@ -1,5 +1,7 @@
 # AIKernel.Python
 
+[日本語](README-ja.md)
+
 Python binding for AIKernel.Core functional primitives and managed assembly
 discovery.
 
@@ -14,21 +16,21 @@ The PyPI package named `aikernel` belongs to another project. AIKernel.NET uses
 the distribution name `aikernel-net` to avoid that collision. Import the module
 as `aikernel_net`.
 
-See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the `0.0.5.1` rename notes.
+See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the `0.1.0` stable baseline notes.
 
 ## Release Channels
 
 Stable user releases are published to PyPI:
 
 - distribution: `aikernel-net`
-- versions: `0.0.5.1`, then `0.1.0`, and later stable releases
+- versions: `0.1.0`, then later stable releases
 - policy: stable releases only
 
 Development releases are reserved for CI/CD and developer validation through
 GitHub Packages:
 
 - distribution: `aikernel-net-dev`
-- versions: `0.0.5.1-dev.1` style prereleases
+- versions: `0.1.0-dev.1` style prereleases
 - policy: breaking changes are allowed
 
 User documentation defaults to the PyPI stable package. Use development
@@ -123,7 +125,7 @@ managed assemblies can be bundled into `aikernel_net/managed`:
 
 ```bash
 python -m build --wheel
-python -m twine check dist/aikernel_net-0.0.5.1-py3-none-any.whl
+python -m twine check dist/aikernel_net-0.1.0-py3-none-any.whl
 ```
 
 ## API

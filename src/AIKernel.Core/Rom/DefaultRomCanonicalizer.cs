@@ -1,11 +1,15 @@
-﻿namespace AIKernel.Core.Rom;
+namespace AIKernel.Core.Rom;
 
 using System.Text.Json;
 using AIKernel.Abstractions.Rom;
 using AIKernel.Dtos.Rom;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.DefaultRomCanonicalizer']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.DefaultRomCanonicalizer']" />
 public sealed class DefaultRomCanonicalizer : IRomCanonicalizer
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.DefaultRomCanonicalizer.Canonicalize']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.DefaultRomCanonicalizer.Canonicalize']" />
     public CanonicalizedRomDto Canonicalize(IRomDocument document)
     {
         ArgumentNullException.ThrowIfNull(document);
@@ -66,6 +70,8 @@ public sealed class DefaultRomCanonicalizer : IRomCanonicalizer
         };
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.DefaultRomCanonicalizer.CanonicalizeAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.DefaultRomCanonicalizer.CanonicalizeAsync']" />
     public Task<CanonicalizedRomDto> CanonicalizeAsync(
         IRomDocument document,
         CancellationToken cancellationToken = default)

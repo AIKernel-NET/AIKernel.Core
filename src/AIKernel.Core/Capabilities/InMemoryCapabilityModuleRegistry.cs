@@ -4,11 +4,15 @@ using System.Collections.Concurrent;
 using AIKernel.Abstractions.Capabilities;
 using AIKernel.Dtos.Capabilities;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry']" />
 public sealed class InMemoryCapabilityModuleRegistry : ICapabilityModuleRegistry
 {
     private readonly ConcurrentDictionary<string, CapabilityModuleDescriptor> _descriptors =
         new(StringComparer.Ordinal);
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.RegisterAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.RegisterAsync']" />
     public ValueTask RegisterAsync(
         CapabilityModuleDescriptor descriptor,
         CancellationToken cancellationToken = default)
@@ -28,6 +32,8 @@ public sealed class InMemoryCapabilityModuleRegistry : ICapabilityModuleRegistry
         return ValueTask.CompletedTask;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ResolveAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ResolveAsync']" />
     public ValueTask<CapabilityModuleDescriptor?> ResolveAsync(
         string capabilityId,
         CancellationToken cancellationToken = default)
@@ -47,6 +53,8 @@ public sealed class InMemoryCapabilityModuleRegistry : ICapabilityModuleRegistry
             descriptor is null ? null : Clone(descriptor));
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ListAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ListAsync']" />
     public ValueTask<IReadOnlyList<CapabilityModuleDescriptor>> ListAsync(
         CancellationToken cancellationToken = default)
     {

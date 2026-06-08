@@ -8,6 +8,8 @@ using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Rom;
 using AIKernel.Vfs;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.ContextAssembler']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.ContextAssembler']" />
 public sealed class ContextAssembler : IContextAssembler
 {
     private readonly IRomLoader _romLoader;
@@ -17,6 +19,8 @@ public sealed class ContextAssembler : IContextAssembler
     private readonly IContextHashCalculator _hashCalculator;
     private readonly IKernelClock _clock;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.#ctor']" />
     public ContextAssembler(
         IRomLoader romLoader,
         IRomPathResolver pathResolver,
@@ -33,6 +37,8 @@ public sealed class ContextAssembler : IContextAssembler
         _clock = clock ?? KernelClock.System();
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AssembleAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AssembleAsync']" />
     public async Task<IContextSnapshot> AssembleAsync(
         IVfsSession session,
         ContextAssemblyRequest request,
@@ -189,32 +195,48 @@ public sealed class ContextAssembler : IContextAssembler
         private readonly HashSet<RomId> _loading = [];
         private readonly List<RomContextEdge> _edges = [];
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AssemblyState']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AssemblyState']" />
         public AssemblyState(ContextAssemblyRequest request)
         {
             Request = request;
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Context.ContextAssembler.Request']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Context.ContextAssembler.Request']" />
         public ContextAssemblyRequest Request { get; }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.IsLoaded']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.IsLoaded']" />
         public bool IsLoaded(RomId romId) => _loaded.ContainsKey(romId);
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.IsLoading']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.IsLoading']" />
         public bool IsLoading(RomId romId) => _loading.Contains(romId);
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.MarkLoading']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.MarkLoading']" />
         public void MarkLoading(RomId romId)
         {
             _loading.Add(romId);
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.MarkCompleted']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.MarkCompleted']" />
         public void MarkCompleted(RomId romId)
         {
             _loading.Remove(romId);
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AddLoaded']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AddLoaded']" />
         public void AddLoaded(RomSnapshot rom)
         {
             _loaded.Add(rom.RomId, rom);
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AddEdge']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AddEdge']" />
         public void AddEdge(RomContextEdge edge)
         {
             if (!_edges.Contains(edge))
@@ -223,6 +245,8 @@ public sealed class ContextAssembler : IContextAssembler
             }
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.GetRomsInDeterministicOrder']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.GetRomsInDeterministicOrder']" />
         public IReadOnlyList<RomSnapshot> GetRomsInDeterministicOrder()
         {
             return _loaded.Values
@@ -230,6 +254,8 @@ public sealed class ContextAssembler : IContextAssembler
                 .ToArray();
         }
 
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.GetEdgesInDeterministicOrder']" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.GetEdgesInDeterministicOrder']" />
         public IReadOnlyList<RomContextEdge> GetEdgesInDeterministicOrder()
         {
             return _edges

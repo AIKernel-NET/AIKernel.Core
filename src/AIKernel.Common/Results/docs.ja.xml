@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Common.Results.Either.IsLeft">
+      <summary>AIKernel の公開参照サーフェスで公開される IsLeft 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ExecutionMetadataKeys.DslRomHash">
+      <summary>AIKernel の公開参照サーフェスで公開される DslRomHash 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ExecutionMetadataKeys.MessageFormat">
+      <summary>AIKernel の公開参照サーフェスで公開される MessageFormat 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ExecutionMetadataKeys.OverflowPolicy">
+      <summary>AIKernel の公開参照サーフェスで公開される OverflowPolicy 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStep.SuspendErrorCode">
+      <summary>AIKernel の公開参照サーフェスで公開される SuspendErrorCode 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.DeltaKind">
+      <summary>AIKernel の公開参照サーフェスで公開される DeltaKind 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.LoopDecision">
+      <summary>AIKernel の公開参照サーフェスで公開される LoopDecision 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.LoopIteration">
+      <summary>AIKernel の公開参照サーフェスで公開される LoopIteration 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.LoopTimestamp">
+      <summary>AIKernel の公開参照サーフェスで公開される LoopTimestamp 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.PreviousReplayLogCount">
+      <summary>AIKernel の公開参照サーフェスで公開される PreviousReplayLogCount 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.PreviousReplayLogHash">
+      <summary>AIKernel の公開参照サーフェスで公開される PreviousReplayLogHash 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.ResumeReason">
+      <summary>AIKernel の公開参照サーフェスで公開される ResumeReason 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.SuspendReason">
+      <summary>AIKernel の公開参照サーフェスで公開される SuspendReason 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.FailureKind">
+      <summary>AIKernel の公開参照サーフェスで公開される FailureKind 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.OriginStep">
+      <summary>AIKernel の公開参照サーフェスで公開される OriginStep 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.ReplayLogCount">
+      <summary>AIKernel の公開参照サーフェスで公開される ReplayLogCount 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.ReplayLogHash">
+      <summary>AIKernel の公開参照サーフェスで公開される ReplayLogHash 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.SemanticDelta">
+      <summary>AIKernel の公開参照サーフェスで公開される SemanticDelta 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.SemanticSlot">
+      <summary>AIKernel の公開参照サーフェスで公開される SemanticSlot 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.StepId">
+      <summary>AIKernel の公開参照サーフェスで公開される StepId 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.Result.IsFailure">
+      <summary>AIKernel の公開参照サーフェスで公開される IsFailure 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.Result.IsSuccessState">
+      <summary>AIKernel の公開参照サーフェスで公開される IsSuccessState 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ResultMetadataKeys.ExceptionType">
+      <summary>AIKernel の公開参照サーフェスで公開される ExceptionType 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ResultMetadataKeys.SourceErrorCode">
+      <summary>AIKernel の公開参照サーフェスで公開される SourceErrorCode 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ResultStep.IsFailure">
+      <summary>AIKernel の公開参照サーフェスで公開される IsFailure 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ResultStep.IsSuspended">
+      <summary>AIKernel の公開参照サーフェスで公開される IsSuspended 値を提供します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.Bind&lt;U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Bind&lt;U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.FromLeft">
+      <summary>AIKernel の公開参照サーフェスとして FromLeft 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.FromRight">
+      <summary>AIKernel の公開参照サーフェスとして FromRight 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.Map&lt;U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Map&lt;U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.Match&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Match&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.Select&lt;U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Select&lt;U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.Tap">
+      <summary>AIKernel の公開参照サーフェスとして Tap 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.ToString">
+      <summary>AIKernel の公開参照サーフェスとして ToString 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.V&gt;">
+      <summary>AIKernel の公開参照サーフェスとして V&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.EitherWhereExtensions.R&gt;">
+      <summary>AIKernel の公開参照サーフェスとして R&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ErrorContext.FromException">
+      <summary>AIKernel の公開参照サーフェスとして FromException 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ErrorContext.ToString">
+      <summary>AIKernel の公開参照サーフェスとして ToString 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.Bind&lt;U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Bind&lt;U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.Map&lt;U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Map&lt;U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.None">
+      <summary>AIKernel の公開参照サーフェスとして None 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.OrElse">
+      <summary>AIKernel の公開参照サーフェスとして OrElse 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.Select&lt;U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Select&lt;U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.Some">
+      <summary>AIKernel の公開参照サーフェスとして Some 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.Tap">
+      <summary>AIKernel の公開参照サーフェスとして Tap 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.ToString">
+      <summary>AIKernel の公開参照サーフェスとして ToString 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.V&gt;">
+      <summary>AIKernel の公開参照サーフェスとして V&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.OptionWhereExtensions.Where&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Where&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.PipelineStep.TValue&gt;">
+      <summary>AIKernel の公開参照サーフェスとして TValue&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Bind&lt;U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Bind&lt;U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Fail">
+      <summary>AIKernel の公開参照サーフェスとして Fail 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Map&lt;U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Map&lt;U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Select&lt;U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Select&lt;U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Success">
+      <summary>AIKernel の公開参照サーフェスとして Success 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Tap">
+      <summary>AIKernel の公開参照サーフェスとして Tap 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.ToString">
+      <summary>AIKernel の公開参照サーフェスとして ToString 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.V&gt;">
+      <summary>AIKernel の公開参照サーフェスとして V&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Bind&lt;TNext&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Bind&lt;TNext&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.BindAsync&lt;TNext&gt;">
+      <summary>AIKernel の公開参照サーフェスとして BindAsync&lt;TNext&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Fail">
+      <summary>AIKernel の公開参照サーフェスとして Fail 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.FromResult">
+      <summary>AIKernel の公開参照サーフェスとして FromResult 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Map&lt;TNext&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Map&lt;TNext&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.MapState">
+      <summary>AIKernel の公開参照サーフェスとして MapState 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Select&lt;TNext&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Select&lt;TNext&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Success">
+      <summary>AIKernel の公開参照サーフェスとして Success 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.TResult&gt;">
+      <summary>AIKernel の公開参照サーフェスとして TResult&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Tap">
+      <summary>AIKernel の公開参照サーフェスとして Tap 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.ToResult">
+      <summary>AIKernel の公開参照サーフェスとして ToResult 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.WithReplayLogPrefix">
+      <summary>AIKernel の公開参照サーフェスとして WithReplayLogPrefix 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.WithSemanticDelta">
+      <summary>AIKernel の公開参照サーフェスとして WithSemanticDelta 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.WithState">
+      <summary>AIKernel の公開参照サーフェスとして WithState 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStepWhereExtensions.TValue&gt;">
+      <summary>AIKernel の公開参照サーフェスとして TValue&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultWhereExtensions.Where&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Where&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.SemanticDelta.new">
+      <summary>AIKernel の公開参照サーフェスとして new 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskEitherExtensions.R&gt;">
+      <summary>AIKernel の公開参照サーフェスとして R&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskEitherExtensions.U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskEitherExtensions.V&gt;">
+      <summary>AIKernel の公開参照サーフェスとして V&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskOptionExtensions.AsTask&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして AsTask&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskOptionExtensions.Tap&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Tap&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskOptionExtensions.V&gt;">
+      <summary>AIKernel の公開参照サーフェスとして V&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskOptionExtensions.Where&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Where&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultExtensions.AsTask&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして AsTask&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultExtensions.Tap&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Tap&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultExtensions.U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultExtensions.V&gt;">
+      <summary>AIKernel の公開参照サーフェスとして V&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultStepExtensions.TNext&gt;">
+      <summary>AIKernel の公開参照サーフェスとして TNext&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultStepExtensions.TResult&gt;">
+      <summary>AIKernel の公開参照サーフェスとして TResult&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultStepExtensions.TValue&gt;">
+      <summary>AIKernel の公開参照サーフェスとして TValue&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultWhereExtensions.Where&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Where&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Try.Run&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして Run&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Try.RunAsync&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして RunAsync&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Try.U&gt;">
+      <summary>AIKernel の公開参照サーフェスとして U&gt; 操作を実行します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Either.IsRight">
+      <summary>AIKernel の公開参照サーフェスで公開される IsRight 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Either.Left">
+      <summary>AIKernel の公開参照サーフェスで公開される Left 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Either.Right">
+      <summary>AIKernel の公開参照サーフェスで公開される Right 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ErrorContext.FailureKind">
+      <summary>AIKernel の公開参照サーフェスで公開される FailureKind 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ErrorContext.OriginStep">
+      <summary>AIKernel の公開参照サーフェスで公開される OriginStep 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ErrorContext.SemanticSlot">
+      <summary>AIKernel の公開参照サーフェスで公開される SemanticSlot 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ErrorContext.string">
+      <summary>AIKernel の公開参照サーフェスで公開される string 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Option.HasValue">
+      <summary>AIKernel の公開参照サーフェスで公開される HasValue 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Option.Value">
+      <summary>AIKernel の公開参照サーフェスで公開される Value 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Result.Error">
+      <summary>AIKernel の公開参照サーフェスで公開される Error 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Result.IsSuccess">
+      <summary>AIKernel の公開参照サーフェスで公開される IsSuccess 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Result.Value">
+      <summary>AIKernel の公開参照サーフェスで公開される Value 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.Error">
+      <summary>AIKernel の公開参照サーフェスで公開される Error 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.IsSuccess">
+      <summary>AIKernel の公開参照サーフェスで公開される IsSuccess 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.ParentStepId">
+      <summary>AIKernel の公開参照サーフェスで公開される ParentStepId 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.ReplayLog">
+      <summary>AIKernel の公開参照サーフェスで公開される ReplayLog 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.ReplayLogHash">
+      <summary>AIKernel の公開参照サーフェスで公開される ReplayLogHash 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.SemanticDelta">
+      <summary>AIKernel の公開参照サーフェスで公開される SemanticDelta 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.State">
+      <summary>AIKernel の公開参照サーフェスで公開される State 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.StepId">
+      <summary>AIKernel の公開参照サーフェスで公開される StepId 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.Value">
+      <summary>AIKernel の公開参照サーフェスで公開される Value 値を取得または設定します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.Either">
+      <summary>AIKernel パッケージ利用者に公開される Either の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.EitherWhereExtensions">
+      <summary>AIKernel パッケージ利用者に公開される EitherWhereExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ErrorContext">
+      <summary>AIKernel パッケージ利用者に公開される ErrorContext の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ExecutionMetadataKeys">
+      <summary>AIKernel パッケージ利用者に公開される ExecutionMetadataKeys の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.FailureKind">
+      <summary>AIKernel パッケージ利用者に公開される FailureKind の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.Option">
+      <summary>AIKernel パッケージ利用者に公開される Option の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.OptionWhereExtensions">
+      <summary>AIKernel パッケージ利用者に公開される OptionWhereExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.OriginStep">
+      <summary>AIKernel パッケージ利用者に公開される OriginStep の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.PipelineStep">
+      <summary>AIKernel パッケージ利用者に公開される PipelineStep の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.PipelineStepMetadataKeys">
+      <summary>AIKernel パッケージ利用者に公開される PipelineStepMetadataKeys の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ReplayMetadataKeys">
+      <summary>AIKernel パッケージ利用者に公開される ReplayMetadataKeys の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.Result">
+      <summary>AIKernel パッケージ利用者に公開される Result の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ResultMetadataKeys">
+      <summary>AIKernel パッケージ利用者に公開される ResultMetadataKeys の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ResultStep">
+      <summary>AIKernel パッケージ利用者に公開される ResultStep の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ResultStepReplayLogEntry">
+      <summary>AIKernel パッケージ利用者に公開される ResultStepReplayLogEntry の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ResultStepWhereExtensions">
+      <summary>AIKernel パッケージ利用者に公開される ResultStepWhereExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ResultWhereExtensions">
+      <summary>AIKernel パッケージ利用者に公開される ResultWhereExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.SemanticDelta">
+      <summary>AIKernel パッケージ利用者に公開される SemanticDelta の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.SemanticSlot">
+      <summary>AIKernel パッケージ利用者に公開される SemanticSlot の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.TaskEitherExtensions">
+      <summary>AIKernel パッケージ利用者に公開される TaskEitherExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.TaskOptionExtensions">
+      <summary>AIKernel パッケージ利用者に公開される TaskOptionExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.TaskResultExtensions">
+      <summary>AIKernel パッケージ利用者に公開される TaskResultExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.TaskResultStepExtensions">
+      <summary>AIKernel パッケージ利用者に公開される TaskResultStepExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.TaskResultWhereExtensions">
+      <summary>AIKernel パッケージ利用者に公開される TaskResultWhereExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.Try">
+      <summary>AIKernel パッケージ利用者に公開される Try の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

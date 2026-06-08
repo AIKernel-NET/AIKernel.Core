@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Core.Memory.MemoryRegionBase.IsMapped">
+      <summary>AIKernel の公開参照サーフェスで公開される IsMapped 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Core.Memory.MemoryRegionBase.Length">
+      <summary>AIKernel の公開参照サーフェスで公開される Length 値を提供します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Memory.MemoryMapperBase.Open">
+      <summary>AIKernel の公開参照サーフェスとして Open 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult">
+      <summary>AIKernel の公開参照サーフェスとして OpenResult 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Memory.MemoryRegionBase.Dispose">
+      <summary>AIKernel の公開参照サーフェスとして Dispose 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Memory.MemoryRegionBase.Unmap">
+      <summary>AIKernel の公開参照サーフェスとして Unmap 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Memory.MemoryRegionBase.UnmapResult">
+      <summary>AIKernel の公開参照サーフェスとして UnmapResult 操作を実行します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Memory.MemoryRegionBase.Info">
+      <summary>AIKernel の公開参照サーフェスで公開される Info 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Core.Memory.MemoryRegionBase.Pointer">
+      <summary>AIKernel の公開参照サーフェスで公開される Pointer 値を取得または設定します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Memory.MemoryMapperBase">
+      <summary>AIKernel パッケージ利用者に公開される MemoryMapperBase の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Memory.MemoryRegionBase">
+      <summary>AIKernel パッケージ利用者に公開される MemoryRegionBase の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

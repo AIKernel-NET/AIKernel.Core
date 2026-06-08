@@ -1,27 +1,51 @@
 namespace AIKernel.Common.Results;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultStep']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultStep']" />
 public readonly struct ResultStep<TState, TValue>
 {
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.IsSuccess']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.IsSuccess']" />
     public bool IsSuccess { get; }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.ResultStep.IsFailure']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.ResultStep.IsFailure']" />
     public bool IsFailure => !IsSuccess;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.ResultStep.IsSuspended']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.ResultStep.IsSuspended']" />
     public bool IsSuspended => Error?.Code == PipelineStep.SuspendErrorCode;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.State']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.State']" />
     public TState State { get; }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.Value']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.Value']" />
     public TValue? Value { get; }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.Error']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.Error']" />
     public ErrorContext? Error { get; }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.StepId']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.StepId']" />
     public string StepId { get; }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.SemanticDelta']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.SemanticDelta']" />
     public SemanticDelta SemanticDelta { get; }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ParentStepId']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ParentStepId']" />
     public string? ParentStepId { get; }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ReplayLog']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ReplayLog']" />
     public IReadOnlyList<ResultStepReplayLogEntry> ReplayLog { get; }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ReplayLogHash']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ReplayLogHash']" />
     public string ReplayLogHash { get; }
 
     private ResultStep(
@@ -51,6 +75,8 @@ public readonly struct ResultStep<TState, TValue>
         ReplayLogHash = ResultStepIdentity.CreateReplayLogHash(ReplayLog);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Success']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Success']" />
     public static ResultStep<TState, TValue> Success(
         TState state,
         TValue value)
@@ -64,6 +90,8 @@ public readonly struct ResultStep<TState, TValue>
             parentStepId: null,
             replayLog: null);
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Fail']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Fail']" />
     public static ResultStep<TState, TValue> Fail(
         TState state,
         ErrorContext error)
@@ -77,6 +105,8 @@ public readonly struct ResultStep<TState, TValue>
             parentStepId: null,
             replayLog: null);
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.FromResult']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.FromResult']" />
     public static ResultStep<TState, TValue> FromResult(
         TState state,
         Result<TValue> result)
@@ -84,6 +114,8 @@ public readonly struct ResultStep<TState, TValue>
             ? Success(state, result.Value!)
             : Fail(state, result.Error!);
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithState']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithState']" />
     public ResultStep<TState, TValue> WithState(TState state)
         => IsSuccess
             ? new(
@@ -105,6 +137,8 @@ public readonly struct ResultStep<TState, TValue>
                 ParentStepId,
                 ReplayLog);
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithSemanticDelta']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithSemanticDelta']" />
     public ResultStep<TState, TValue> WithSemanticDelta(
         SemanticDelta semanticDelta,
         string? parentStepId = null)
@@ -135,6 +169,8 @@ public readonly struct ResultStep<TState, TValue>
             replayLog);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.MapState']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.MapState']" />
     public ResultStep<TState, TValue> MapState(
         Func<TState, TValue, TState> mapper)
     {
@@ -159,6 +195,8 @@ public readonly struct ResultStep<TState, TValue>
         }
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Map&lt;TNext&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Map&lt;TNext&gt;']" />
     public ResultStep<TState, TNext> Map<TNext>(
         Func<TValue, TNext> mapper)
     {
@@ -183,6 +221,8 @@ public readonly struct ResultStep<TState, TValue>
         }
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.BindAsync&lt;TNext&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.BindAsync&lt;TNext&gt;']" />
     public async Task<ResultStep<TState, TNext>> BindAsync<TNext>(
         Func<TValue, Task<ResultStep<TState, TNext>>> binder)
     {
@@ -200,6 +240,8 @@ public readonly struct ResultStep<TState, TValue>
         }
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Bind&lt;TNext&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Bind&lt;TNext&gt;']" />
     public ResultStep<TState, TNext> Bind<TNext>(
         Func<TValue, ResultStep<TState, TNext>> binder)
     {
@@ -216,6 +258,8 @@ public readonly struct ResultStep<TState, TValue>
         }
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Tap']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Tap']" />
     public ResultStep<TState, TValue> Tap(
         Action<TValue> action)
     {
@@ -233,11 +277,15 @@ public readonly struct ResultStep<TState, TValue>
         }
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.ToResult']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.ToResult']" />
     public Result<TValue> ToResult()
         => IsSuccess
             ? Result<TValue>.Success(Value!)
             : Result<TValue>.Fail(Error!);
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithReplayLogPrefix']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithReplayLogPrefix']" />
     public ResultStep<TState, TValue> WithReplayLogPrefix(
         IReadOnlyList<ResultStepReplayLogEntry> replayLogPrefix)
     {
@@ -248,15 +296,21 @@ public readonly struct ResultStep<TState, TValue>
             : WithParentStepId(replayLogPrefix[^1].StepId, replayLogPrefix);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Select&lt;TNext&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Select&lt;TNext&gt;']" />
     public ResultStep<TState, TNext> Select<TNext>(
         Func<TValue, TNext> selector)
         => Map(selector);
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.TResult&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.TResult&gt;']" />
     public ResultStep<TState, TResult> SelectMany<TNext, TResult>(
         Func<TValue, ResultStep<TState, TNext>> binder,
         Func<TValue, TNext, TResult> projector)
         => Bind(value => binder(value).Map(next => projector(value, next)));
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.TResult&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.TResult&gt;']" />
     public async Task<ResultStep<TState, TResult>> SelectMany<TNext, TResult>(
         Func<TValue, Task<ResultStep<TState, TNext>>> binder,
         Func<TValue, TNext, TResult> projector)

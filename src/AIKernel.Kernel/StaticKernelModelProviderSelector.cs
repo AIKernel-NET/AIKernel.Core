@@ -1,4 +1,4 @@
-﻿namespace AIKernel.Kernel;
+namespace AIKernel.Kernel;
 
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Kernel;
@@ -6,10 +6,14 @@ using AIKernel.Abstractions.Providers;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Kernel;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.StaticKernelModelProviderSelector']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.StaticKernelModelProviderSelector']" />
 public sealed class StaticKernelModelProviderSelector : IKernelModelProviderSelector
 {
     private readonly IReadOnlyDictionary<string, IModelProvider> _providers;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.#ctor']" />
     public StaticKernelModelProviderSelector(IEnumerable<IModelProvider> providers)
     {
         ArgumentNullException.ThrowIfNull(providers);
@@ -17,6 +21,8 @@ public sealed class StaticKernelModelProviderSelector : IKernelModelProviderSele
         _providers = BuildProviderMap(providers);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.SelectAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.SelectAsync']" />
     public Task<IModelProvider> SelectAsync(
         KernelRequest request,
         IContextSnapshot contextSnapshot,

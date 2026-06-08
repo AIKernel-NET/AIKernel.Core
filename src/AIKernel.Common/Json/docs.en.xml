@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Common.Json.JsonFile.LoadAsync&lt;T&gt;">
+      <summary>Executes the LoadAsync&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Json.JsonFile.SaveAsync&lt;T&gt;">
+      <summary>Executes the SaveAsync&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Json.JsonOptions.new">
+      <summary>Executes the new operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Json.JsonUtil.FromJson">
+      <summary>Executes the FromJson operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Json.JsonUtil.FromJson&lt;T&gt;">
+      <summary>Executes the FromJson&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Json.JsonUtil.ToJson&lt;T&gt;">
+      <summary>Executes the ToJson&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Json.JsonFile">
+      <summary>Represents the JsonFile public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Json.JsonOptions">
+      <summary>Represents the JsonOptions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Json.JsonUtil">
+      <summary>Represents the JsonUtil public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

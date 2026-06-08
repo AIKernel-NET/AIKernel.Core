@@ -3,7 +3,7 @@ namespace AIKernel.Core.ChatHistory;
 using AIKernel.Common.Results;
 using AIKernel.Core.Vfs.Abstractions;
 
-public static class HistoryRomPath
+internal static class HistoryRomPath
 {
     private const string HistoryPrefix = "history://";
 

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Hosting.AIKernelCoreBuilder.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore">
+      <summary>Executes the AddAIKernelCore operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.ModelProviderHostingExtensions.Get">
+      <summary>Executes the Get operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;">
+      <summary>Executes the WithModelProvider&lt;TProvider&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.SecureCredentialResolver.ResolveAsync">
+      <summary>Executes the ResolveAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.SecureHostingExtensions.AddSecureCredentialResolution&lt;TOptions&gt;">
+      <summary>Executes the AddSecureCredentialResolution&lt;TOptions&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.SecureHostingExtensions.WithSecureOptions&lt;TOptions&gt;">
+      <summary>Executes the WithSecureOptions&lt;TOptions&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.SecureOptionsStartupValidator.StartAsync">
+      <summary>Executes the StartAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.SecureOptionsStartupValidator.StopAsync">
+      <summary>Executes the StopAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Hosting.AIKernelCoreBuilder.Configuration">
+      <summary>Gets or sets the Configuration value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Hosting.AIKernelCoreBuilder.Services">
+      <summary>Gets or sets the Services value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.AIKernelCoreBuilder">
+      <summary>Represents the AIKernelCoreBuilder public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.AIKernelCoreHostingExtensions">
+      <summary>Represents the AIKernelCoreHostingExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.ModelProviderHostingExtensions">
+      <summary>Represents the ModelProviderHostingExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.SecureCredentialResolver">
+      <summary>Represents the SecureCredentialResolver public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.SecureHostingExtensions">
+      <summary>Represents the SecureHostingExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.SecureOptionsStartupValidator">
+      <summary>Represents the SecureOptionsStartupValidator public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

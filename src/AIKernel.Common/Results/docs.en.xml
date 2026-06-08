@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Common.Results.Either.IsLeft">
+      <summary>Provides the IsLeft value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ExecutionMetadataKeys.DslRomHash">
+      <summary>Provides the DslRomHash value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ExecutionMetadataKeys.MessageFormat">
+      <summary>Provides the MessageFormat value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ExecutionMetadataKeys.OverflowPolicy">
+      <summary>Provides the OverflowPolicy value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStep.SuspendErrorCode">
+      <summary>Provides the SuspendErrorCode value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.DeltaKind">
+      <summary>Provides the DeltaKind value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.LoopDecision">
+      <summary>Provides the LoopDecision value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.LoopIteration">
+      <summary>Provides the LoopIteration value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.LoopTimestamp">
+      <summary>Provides the LoopTimestamp value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.PreviousReplayLogCount">
+      <summary>Provides the PreviousReplayLogCount value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.PreviousReplayLogHash">
+      <summary>Provides the PreviousReplayLogHash value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.ResumeReason">
+      <summary>Provides the ResumeReason value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.PipelineStepMetadataKeys.SuspendReason">
+      <summary>Provides the SuspendReason value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.FailureKind">
+      <summary>Provides the FailureKind value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.OriginStep">
+      <summary>Provides the OriginStep value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.ReplayLogCount">
+      <summary>Provides the ReplayLogCount value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.ReplayLogHash">
+      <summary>Provides the ReplayLogHash value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.SemanticDelta">
+      <summary>Provides the SemanticDelta value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.SemanticSlot">
+      <summary>Provides the SemanticSlot value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ReplayMetadataKeys.StepId">
+      <summary>Provides the StepId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.Result.IsFailure">
+      <summary>Provides the IsFailure value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.Result.IsSuccessState">
+      <summary>Provides the IsSuccessState value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ResultMetadataKeys.ExceptionType">
+      <summary>Provides the ExceptionType value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ResultMetadataKeys.SourceErrorCode">
+      <summary>Provides the SourceErrorCode value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ResultStep.IsFailure">
+      <summary>Provides the IsFailure value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="F:AIKernel.Common.Results.ResultStep.IsSuspended">
+      <summary>Provides the IsSuspended value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.Bind&lt;U&gt;">
+      <summary>Executes the Bind&lt;U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.FromLeft">
+      <summary>Executes the FromLeft operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.FromRight">
+      <summary>Executes the FromRight operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.Map&lt;U&gt;">
+      <summary>Executes the Map&lt;U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.Match&lt;T&gt;">
+      <summary>Executes the Match&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.Select&lt;U&gt;">
+      <summary>Executes the Select&lt;U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.Tap">
+      <summary>Executes the Tap operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.ToString">
+      <summary>Executes the ToString operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Either.V&gt;">
+      <summary>Executes the V&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.EitherWhereExtensions.R&gt;">
+      <summary>Executes the R&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ErrorContext.FromException">
+      <summary>Executes the FromException operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ErrorContext.ToString">
+      <summary>Executes the ToString operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.Bind&lt;U&gt;">
+      <summary>Executes the Bind&lt;U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.Map&lt;U&gt;">
+      <summary>Executes the Map&lt;U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.None">
+      <summary>Executes the None operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.OrElse">
+      <summary>Executes the OrElse operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.Select&lt;U&gt;">
+      <summary>Executes the Select&lt;U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.Some">
+      <summary>Executes the Some operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.Tap">
+      <summary>Executes the Tap operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.ToString">
+      <summary>Executes the ToString operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Option.V&gt;">
+      <summary>Executes the V&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.OptionWhereExtensions.Where&lt;T&gt;">
+      <summary>Executes the Where&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.PipelineStep.TValue&gt;">
+      <summary>Executes the TValue&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Bind&lt;U&gt;">
+      <summary>Executes the Bind&lt;U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Fail">
+      <summary>Executes the Fail operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Map&lt;U&gt;">
+      <summary>Executes the Map&lt;U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Select&lt;U&gt;">
+      <summary>Executes the Select&lt;U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Success">
+      <summary>Executes the Success operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.Tap">
+      <summary>Executes the Tap operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.ToString">
+      <summary>Executes the ToString operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Result.V&gt;">
+      <summary>Executes the V&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Bind&lt;TNext&gt;">
+      <summary>Executes the Bind&lt;TNext&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.BindAsync&lt;TNext&gt;">
+      <summary>Executes the BindAsync&lt;TNext&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Fail">
+      <summary>Executes the Fail operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.FromResult">
+      <summary>Executes the FromResult operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Map&lt;TNext&gt;">
+      <summary>Executes the Map&lt;TNext&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.MapState">
+      <summary>Executes the MapState operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Select&lt;TNext&gt;">
+      <summary>Executes the Select&lt;TNext&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Success">
+      <summary>Executes the Success operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.TResult&gt;">
+      <summary>Executes the TResult&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.Tap">
+      <summary>Executes the Tap operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.ToResult">
+      <summary>Executes the ToResult operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.WithReplayLogPrefix">
+      <summary>Executes the WithReplayLogPrefix operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.WithSemanticDelta">
+      <summary>Executes the WithSemanticDelta operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStep.WithState">
+      <summary>Executes the WithState operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultStepWhereExtensions.TValue&gt;">
+      <summary>Executes the TValue&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.ResultWhereExtensions.Where&lt;T&gt;">
+      <summary>Executes the Where&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.SemanticDelta.new">
+      <summary>Executes the new operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskEitherExtensions.R&gt;">
+      <summary>Executes the R&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskEitherExtensions.U&gt;">
+      <summary>Executes the U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskEitherExtensions.V&gt;">
+      <summary>Executes the V&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskOptionExtensions.AsTask&lt;T&gt;">
+      <summary>Executes the AsTask&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskOptionExtensions.Tap&lt;T&gt;">
+      <summary>Executes the Tap&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;">
+      <summary>Executes the U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskOptionExtensions.V&gt;">
+      <summary>Executes the V&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskOptionExtensions.Where&lt;T&gt;">
+      <summary>Executes the Where&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultExtensions.AsTask&lt;T&gt;">
+      <summary>Executes the AsTask&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultExtensions.Tap&lt;T&gt;">
+      <summary>Executes the Tap&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultExtensions.U&gt;">
+      <summary>Executes the U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultExtensions.V&gt;">
+      <summary>Executes the V&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultStepExtensions.TNext&gt;">
+      <summary>Executes the TNext&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultStepExtensions.TResult&gt;">
+      <summary>Executes the TResult&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultStepExtensions.TValue&gt;">
+      <summary>Executes the TValue&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.TaskResultWhereExtensions.Where&lt;T&gt;">
+      <summary>Executes the Where&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Try.Run&lt;T&gt;">
+      <summary>Executes the Run&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Try.RunAsync&lt;T&gt;">
+      <summary>Executes the RunAsync&lt;T&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Common.Results.Try.U&gt;">
+      <summary>Executes the U&gt; operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Either.IsRight">
+      <summary>Gets or sets the IsRight value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Either.Left">
+      <summary>Gets or sets the Left value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Either.Right">
+      <summary>Gets or sets the Right value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ErrorContext.FailureKind">
+      <summary>Gets or sets the FailureKind value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ErrorContext.OriginStep">
+      <summary>Gets or sets the OriginStep value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ErrorContext.SemanticSlot">
+      <summary>Gets or sets the SemanticSlot value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ErrorContext.string">
+      <summary>Gets or sets the string value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Option.HasValue">
+      <summary>Gets or sets the HasValue value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Option.Value">
+      <summary>Gets or sets the Value value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Result.Error">
+      <summary>Gets or sets the Error value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Result.IsSuccess">
+      <summary>Gets or sets the IsSuccess value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.Result.Value">
+      <summary>Gets or sets the Value value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.Error">
+      <summary>Gets or sets the Error value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.IsSuccess">
+      <summary>Gets or sets the IsSuccess value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.ParentStepId">
+      <summary>Gets or sets the ParentStepId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.ReplayLog">
+      <summary>Gets or sets the ReplayLog value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.ReplayLogHash">
+      <summary>Gets or sets the ReplayLogHash value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.SemanticDelta">
+      <summary>Gets or sets the SemanticDelta value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.State">
+      <summary>Gets or sets the State value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.StepId">
+      <summary>Gets or sets the StepId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Common.Results.ResultStep.Value">
+      <summary>Gets or sets the Value value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.Either">
+      <summary>Represents the Either public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.EitherWhereExtensions">
+      <summary>Represents the EitherWhereExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ErrorContext">
+      <summary>Represents the ErrorContext public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ExecutionMetadataKeys">
+      <summary>Represents the ExecutionMetadataKeys public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.FailureKind">
+      <summary>Represents the FailureKind public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.Option">
+      <summary>Represents the Option public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.OptionWhereExtensions">
+      <summary>Represents the OptionWhereExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.OriginStep">
+      <summary>Represents the OriginStep public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.PipelineStep">
+      <summary>Represents the PipelineStep public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.PipelineStepMetadataKeys">
+      <summary>Represents the PipelineStepMetadataKeys public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ReplayMetadataKeys">
+      <summary>Represents the ReplayMetadataKeys public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.Result">
+      <summary>Represents the Result public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ResultMetadataKeys">
+      <summary>Represents the ResultMetadataKeys public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ResultStep">
+      <summary>Represents the ResultStep public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ResultStepReplayLogEntry">
+      <summary>Represents the ResultStepReplayLogEntry public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ResultStepWhereExtensions">
+      <summary>Represents the ResultStepWhereExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.ResultWhereExtensions">
+      <summary>Represents the ResultWhereExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.SemanticDelta">
+      <summary>Represents the SemanticDelta public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.SemanticSlot">
+      <summary>Represents the SemanticSlot public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.TaskEitherExtensions">
+      <summary>Represents the TaskEitherExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.TaskOptionExtensions">
+      <summary>Represents the TaskOptionExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.TaskResultExtensions">
+      <summary>Represents the TaskResultExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.TaskResultStepExtensions">
+      <summary>Represents the TaskResultStepExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.TaskResultWhereExtensions">
+      <summary>Represents the TaskResultWhereExtensions public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Common.Results.Try">
+      <summary>Represents the Try public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

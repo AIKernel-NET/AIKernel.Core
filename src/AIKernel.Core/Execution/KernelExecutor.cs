@@ -6,6 +6,8 @@ using AIKernel.Common.Results;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Execution;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutor']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutor']" />
 public sealed class KernelExecutor : IKernelExecutor
 {
     private readonly IKernelClock _clock;
@@ -13,6 +15,8 @@ public sealed class KernelExecutor : IKernelExecutor
     private readonly KernelExecutionSuccessResultFactory _successResultFactory = new();
     private readonly KernelExecutionFailureResultFactory _failureResultFactory;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.#ctor']" />
     public KernelExecutor(
         IPromptGenerator promptGenerator,
         IModelPromptCapabilityResolver capabilityResolver,
@@ -32,6 +36,8 @@ public sealed class KernelExecutor : IKernelExecutor
         _failureResultFactory = new KernelExecutionFailureResultFactory(_clock);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.ExecuteAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.ExecuteAsync']" />
     public async Task<KernelRequestExecutionResult> ExecuteAsync(
         IModelProvider provider,
         KernelExecutionRequest request,

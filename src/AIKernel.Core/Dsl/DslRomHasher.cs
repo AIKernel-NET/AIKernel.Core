@@ -3,7 +3,7 @@ namespace AIKernel.Core.Dsl;
 using System.Security.Cryptography;
 using System.Text;
 
-public static class DslRomHasher
+internal static class DslRomHasher
 {
     public static string ComputeHash(string jsonDsl)
     {

@@ -1,4 +1,4 @@
-﻿namespace AIKernel.Kernel;
+namespace AIKernel.Kernel;
 
 using System.Collections.Immutable;
 using AIKernel.Abstractions.Context;
@@ -17,6 +17,8 @@ using AIKernel.Dtos.Kernel;
 using AIKernel.Dtos.Security;
 using AIKernel.Enums;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Kernel']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Kernel']" />
 public sealed class Kernel : IKernel
 {
     private readonly IKernelVfsSessionFactory _vfsSessionFactory;
@@ -31,6 +33,8 @@ public sealed class Kernel : IKernel
     private readonly IKernelClock _clock;
     private readonly KernelFailureResultFactory _failureResultFactory;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.#ctor']" />
     public Kernel(
         IKernelVfsSessionFactory vfsSessionFactory,
         IContextAssembler contextAssembler,
@@ -68,6 +72,8 @@ public sealed class Kernel : IKernel
         _failureResultFactory = new KernelFailureResultFactory(_clock);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.ExecuteAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.ExecuteAsync']" />
     public async Task<KernelRequestExecutionResult> ExecuteAsync(
         KernelRequest request,
         CancellationToken cancellationToken = default)
@@ -207,6 +213,8 @@ public sealed class Kernel : IKernel
         };
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetVersion']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetVersion']" />
     public string GetVersion()
     {
         return typeof(Kernel).Assembly
@@ -216,6 +224,8 @@ public sealed class Kernel : IKernel
             ?? "0.0.0";
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.ExecuteAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.ExecuteAsync']" />
     public Task<KernelExecutionResult> ExecuteAsync(UnifiedContextDto contract)
     {
         ArgumentNullException.ThrowIfNull(contract);
@@ -230,6 +240,8 @@ public sealed class Kernel : IKernel
         });
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.AnalyzeAttentionAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.AnalyzeAttentionAsync']" />
     public Task<AttentionAnalysis> AnalyzeAttentionAsync(OrchestrationContextDto contract)
     {
         ArgumentNullException.ThrowIfNull(contract);
@@ -250,6 +262,8 @@ public sealed class Kernel : IKernel
         });
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.PreprocessMaterialAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.PreprocessMaterialAsync']" />
     public Task<MaterialContextDto> PreprocessMaterialAsync(MaterialContextDto material)
     {
         ArgumentNullException.ThrowIfNull(material);
@@ -257,6 +271,8 @@ public sealed class Kernel : IKernel
         return Task.FromResult(material);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.PrepareExpressionAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.PrepareExpressionAsync']" />
     public Task<ExpressionContextDto> PrepareExpressionAsync(ExpressionContextDto expression)
     {
         ArgumentNullException.ThrowIfNull(expression);
@@ -264,16 +280,22 @@ public sealed class Kernel : IKernel
         return Task.FromResult(expression);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetProviderRouter']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetProviderRouter']" />
     public IProviderRouter GetProviderRouter()
     {
         return _providerRouter;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetGuard']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetGuard']" />
     public IGuard GetGuard()
     {
         return _guard;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetPdp']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetPdp']" />
     public IPdp GetPdp()
     {
         return _pdp;

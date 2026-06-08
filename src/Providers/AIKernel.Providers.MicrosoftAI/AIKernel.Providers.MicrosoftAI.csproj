@@ -29,9 +29,9 @@ JA: Microsoft.Extensions.AI を利用した AIKernel.NET 向け Provider 実装�
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AIKernel.Abstractions" Version="0.0.5" />
-    <PackageReference Include="AIKernel.Dtos" Version="0.0.5" />
-    <PackageReference Include="AIKernel.Enums" Version="0.0.5" />
+    <PackageReference Include="AIKernel.Abstractions" Version="$(AIKernelPackageVersion)" />
+    <PackageReference Include="AIKernel.Dtos" Version="$(AIKernelPackageVersion)" />
+    <PackageReference Include="AIKernel.Enums" Version="$(AIKernelPackageVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.6.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.8" />

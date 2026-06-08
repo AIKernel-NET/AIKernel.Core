@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Context.AssembledContextSnapshot.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.AddEdge">
+      <summary>Executes the AddEdge operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.AddLoaded">
+      <summary>Executes the AddLoaded operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.AssembleAsync">
+      <summary>Executes the AssembleAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.AssemblyState">
+      <summary>Executes the AssemblyState operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.GetEdgesInDeterministicOrder">
+      <summary>Executes the GetEdgesInDeterministicOrder operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.GetRomsInDeterministicOrder">
+      <summary>Executes the GetRomsInDeterministicOrder operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.IsLoaded">
+      <summary>Executes the IsLoaded operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.IsLoading">
+      <summary>Executes the IsLoading operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.MarkCompleted">
+      <summary>Executes the MarkCompleted operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssembler.MarkLoading">
+      <summary>Executes the MarkLoading operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssemblyException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextAssemblyGovernanceException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetAll">
+      <summary>Executes the GetAll operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetByCategory">
+      <summary>Executes the GetByCategory operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetExpressionBuffer">
+      <summary>Executes the GetExpressionBuffer operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetHistoryBuffer">
+      <summary>Executes the GetHistoryBuffer operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetMaterialBuffer">
+      <summary>Executes the GetMaterialBuffer operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.ContextCollectionSnapshot.GetOrchestrationBuffer">
+      <summary>Executes the GetOrchestrationBuffer operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.DefaultContextCollectionFactory.Create">
+      <summary>Executes the Create operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.DefaultContextHashCalculator.ComputeHash">
+      <summary>Executes the ComputeHash operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.DictionaryRomPathResolver.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.DictionaryRomPathResolver.ResolvePathAsync">
+      <summary>Executes the ResolvePathAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.RomIdentityMismatchException.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy.#ctor">
+      <summary>Executes the #ctor operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="M:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy.EvaluateAsync">
+      <summary>Executes the EvaluateAsync operation as part of the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.AssembledContextSnapshot.Context">
+      <summary>Gets or sets the Context value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.AssembledContextSnapshot.ContextHash">
+      <summary>Gets or sets the ContextHash value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.AssembledContextSnapshot.CreatedAtUtc">
+      <summary>Gets or sets the CreatedAtUtc value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.AssembledContextSnapshot.ParentSnapshotId">
+      <summary>Gets or sets the ParentSnapshotId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.AssembledContextSnapshot.SnapshotId">
+      <summary>Gets or sets the SnapshotId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.ContextAssembler.Request">
+      <summary>Gets or sets the Request value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.ContextAssemblyGovernanceException.Reason">
+      <summary>Gets or sets the Reason value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.ContextAssemblyGovernanceException.RomId">
+      <summary>Gets or sets the RomId value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.RomIdentityMismatchException.Actual">
+      <summary>Gets or sets the Actual value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.RomIdentityMismatchException.Path">
+      <summary>Gets or sets the Path value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="P:AIKernel.Core.Context.RomIdentityMismatchException.Requested">
+      <summary>Gets or sets the Requested value exposed by the AIKernel public reference surface.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.AssembledContextSnapshot">
+      <summary>Represents the AssembledContextSnapshot public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.ContextAssembler">
+      <summary>Represents the ContextAssembler public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.ContextAssemblyException">
+      <summary>Represents the ContextAssemblyException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.ContextAssemblyGovernanceException">
+      <summary>Represents the ContextAssemblyGovernanceException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.ContextCollectionSnapshot">
+      <summary>Represents the ContextCollectionSnapshot public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.DefaultContextCollectionFactory">
+      <summary>Represents the DefaultContextCollectionFactory public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.DefaultContextHashCalculator">
+      <summary>Represents the DefaultContextHashCalculator public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.DictionaryRomPathResolver">
+      <summary>Represents the DictionaryRomPathResolver public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.RomIdentityMismatchException">
+      <summary>Represents the RomIdentityMismatchException public reference surface for AIKernel package consumers.</summary>
+    </member>
+    <member name="T:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy">
+      <summary>Represents the SecurityTagContextAssemblyPolicy public reference surface for AIKernel package consumers.</summary>
+    </member>
+  </members>
+</doc>

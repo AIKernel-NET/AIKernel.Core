@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.GetCapabilityAsync">
+      <summary>AIKernel の公開参照サーフェスとして GetCapabilityAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.RegisterCapabilityAsync">
+      <summary>AIKernel の公開参照サーフェスとして RegisterCapabilityAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.ResolveCandidatesAsync">
+      <summary>AIKernel の公開参照サーフェスとして ResolveCandidatesAsync 操作を実行します。</summary>
+    </member>
+    <member name="T:AIKernel.Core.Routing.InMemoryCapabilityRegistry">
+      <summary>AIKernel パッケージ利用者に公開される InMemoryCapabilityRegistry の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

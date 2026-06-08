@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Providers.MicrosoftAI.DependencyInjection.OpenAIHostingExtensions']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Providers.MicrosoftAI.DependencyInjection.OpenAIHostingExtensions']" />
 public static class OpenAIHostingExtensions
 {
     private const string UserRole = "user";
@@ -18,6 +20,8 @@ public static class OpenAIHostingExtensions
     private const string AssistantRole = "assistant";
     private const string ToolRole = "tool";
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.DependencyInjection.OpenAIHostingExtensions.WithOpenAI&lt;TBuilder&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.DependencyInjection.OpenAIHostingExtensions.WithOpenAI&lt;TBuilder&gt;']" />
     public static TBuilder WithOpenAI<TBuilder>(
         this TBuilder builder,
         Action<OpenAICompatibleProviderOptions> configure,
@@ -39,6 +43,8 @@ public static class OpenAIHostingExtensions
         return builder;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.DependencyInjection.OpenAIHostingExtensions.WithOpenAI&lt;TBuilder&gt;']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.DependencyInjection.OpenAIHostingExtensions.WithOpenAI&lt;TBuilder&gt;']" />
     public static TBuilder WithOpenAI<TBuilder>(
         this TBuilder builder,
         IConfiguration configurationSection,

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Common.Json.JsonFile.LoadAsync&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして LoadAsync&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Json.JsonFile.SaveAsync&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして SaveAsync&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Json.JsonOptions.new">
+      <summary>AIKernel の公開参照サーフェスとして new 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Json.JsonUtil.FromJson">
+      <summary>AIKernel の公開参照サーフェスとして FromJson 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Json.JsonUtil.FromJson&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして FromJson&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Common.Json.JsonUtil.ToJson&lt;T&gt;">
+      <summary>AIKernel の公開参照サーフェスとして ToJson&lt;T&gt; 操作を実行します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Json.JsonFile">
+      <summary>AIKernel パッケージ利用者に公開される JsonFile の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Json.JsonOptions">
+      <summary>AIKernel パッケージ利用者に公開される JsonOptions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Common.Json.JsonUtil">
+      <summary>AIKernel パッケージ利用者に公開される JsonUtil の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

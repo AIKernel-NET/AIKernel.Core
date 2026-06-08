@@ -5,15 +5,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <Description>EN: Integration tests for validating end-to-end AIKernel.NET runtime behavior across Core, Kernel, Hosting, and Providers.
 
 JA: Core、Kernel、Hosting、Provider を横断した AIKernel.NET ランタイムのエンドツーエンド動作を検証する結合テストです。</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AIKernel.Abstractions" Version="0.0.5" />
-    <PackageReference Include="AIKernel.Dtos" Version="0.0.5" />
-    <PackageReference Include="AIKernel.Enums" Version="0.0.5" />
+    <PackageReference Include="AIKernel.Abstractions" Version="$(AIKernelPackageVersion)" />
+    <PackageReference Include="AIKernel.Dtos" Version="$(AIKernelPackageVersion)" />
+    <PackageReference Include="AIKernel.Enums" Version="$(AIKernelPackageVersion)" />
     <PackageReference Include="coverlet.collector" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

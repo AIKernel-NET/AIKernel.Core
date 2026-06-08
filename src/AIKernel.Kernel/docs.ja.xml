@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.CapabilityModuleId">
+      <summary>AIKernel の公開参照サーフェスで公開される CapabilityModuleId 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.InputHash">
+      <summary>AIKernel の公開参照サーフェスで公開される InputHash 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.ProviderId">
+      <summary>AIKernel の公開参照サーフェスで公開される ProviderId 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.ProviderTier">
+      <summary>AIKernel の公開参照サーフェスで公開される ProviderTier 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.RequestedModelId">
+      <summary>AIKernel の公開参照サーフェスで公開される RequestedModelId 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.RootRomId">
+      <summary>AIKernel の公開参照サーフェスで公開される RootRomId 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.RouteReason">
+      <summary>AIKernel の公開参照サーフェスで公開される RouteReason 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.TransactionId">
+      <summary>AIKernel の公開参照サーフェスで公開される TransactionId 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelFacadeMetadataKeys.VfsProviderId">
+      <summary>AIKernel の公開参照サーフェスで公開される VfsProviderId 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelVfsSessionFactory.ApiKey">
+      <summary>AIKernel の公開参照サーフェスで公開される ApiKey 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelVfsSessionFactory.Token">
+      <summary>AIKernel の公開参照サーフェスで公開される Token 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelVfsSessionFactory.Username">
+      <summary>AIKernel の公開参照サーフェスで公開される Username 値を提供します。</summary>
+    </member>
+    <member name="F:AIKernel.Kernel.KernelVfsSessionFactory.object">
+      <summary>AIKernel の公開参照サーフェスで公開される object 値を提供します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.AnalyzeAttentionAsync">
+      <summary>AIKernel の公開参照サーフェスとして AnalyzeAttentionAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.ExecuteAsync">
+      <summary>AIKernel の公開参照サーフェスとして ExecuteAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.GetGuard">
+      <summary>AIKernel の公開参照サーフェスとして GetGuard 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.GetPdp">
+      <summary>AIKernel の公開参照サーフェスとして GetPdp 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.GetProviderRouter">
+      <summary>AIKernel の公開参照サーフェスとして GetProviderRouter 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.GetVersion">
+      <summary>AIKernel の公開参照サーフェスとして GetVersion 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.PrepareExpressionAsync">
+      <summary>AIKernel の公開参照サーフェスとして PrepareExpressionAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.Kernel.PreprocessMaterialAsync">
+      <summary>AIKernel の公開参照サーフェスとして PreprocessMaterialAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelHostingExtensions.AddAIKernelKernel">
+      <summary>AIKernel の公開参照サーフェスとして AddAIKernelKernel 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyTo">
+      <summary>AIKernel の公開参照サーフェスとして ApplyTo 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyToRequest">
+      <summary>AIKernel の公開参照サーフェスとして ApplyToRequest 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ToMetadata">
+      <summary>AIKernel の公開参照サーフェスとして ToMetadata 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForCapabilityModule">
+      <summary>AIKernel の公開参照サーフェスとして ForCapabilityModule 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForProvider">
+      <summary>AIKernel の公開参照サーフェスとして ForProvider 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelRequestExecutionExtensions.ExecuteAsync">
+      <summary>AIKernel の公開参照サーフェスとして ExecuteAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelRequestHasher.ComputeHash">
+      <summary>AIKernel の公開参照サーフェスとして ComputeHash 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelRequestValidationException.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelTransactionIdFactory.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelTransactionIdFactory.CreateTransactionId">
+      <summary>AIKernel の公開参照サーフェスとして CreateTransactionId 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelVfsSessionFactory.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.KernelVfsSessionFactory.OpenSessionAsync">
+      <summary>AIKernel の公開参照サーフェスとして OpenSessionAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.StaticKernelModelProviderSelector.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Kernel.StaticKernelModelProviderSelector.SelectAsync">
+      <summary>AIKernel の公開参照サーフェスとして SelectAsync 操作を実行します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.Kernel">
+      <summary>AIKernel パッケージ利用者に公開される Kernel の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelFacadeMetadataKeys">
+      <summary>AIKernel パッケージ利用者に公開される KernelFacadeMetadataKeys の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelHostingExtensions">
+      <summary>AIKernel パッケージ利用者に公開される KernelHostingExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions">
+      <summary>AIKernel パッケージ利用者に公開される KernelProviderRoutingDecisionExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelProviderRoutingDecisionFactory">
+      <summary>AIKernel パッケージ利用者に公開される KernelProviderRoutingDecisionFactory の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelRequestExecutionExtensions">
+      <summary>AIKernel パッケージ利用者に公開される KernelRequestExecutionExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelRequestHasher">
+      <summary>AIKernel パッケージ利用者に公開される KernelRequestHasher の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelRequestValidationException">
+      <summary>AIKernel パッケージ利用者に公開される KernelRequestValidationException の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelTransactionIdFactory">
+      <summary>AIKernel パッケージ利用者に公開される KernelTransactionIdFactory の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.KernelVfsSessionFactory">
+      <summary>AIKernel パッケージ利用者に公開される KernelVfsSessionFactory の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Kernel.StaticKernelModelProviderSelector">
+      <summary>AIKernel パッケージ利用者に公開される StaticKernelModelProviderSelector の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

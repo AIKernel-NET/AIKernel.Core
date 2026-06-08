@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="M:AIKernel.Hosting.AIKernelCoreBuilder.#ctor">
+      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore">
+      <summary>AIKernel の公開参照サーフェスとして AddAIKernelCore 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.ModelProviderHostingExtensions.Get">
+      <summary>AIKernel の公開参照サーフェスとして Get 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;">
+      <summary>AIKernel の公開参照サーフェスとして WithModelProvider&lt;TProvider&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.SecureCredentialResolver.ResolveAsync">
+      <summary>AIKernel の公開参照サーフェスとして ResolveAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.SecureHostingExtensions.AddSecureCredentialResolution&lt;TOptions&gt;">
+      <summary>AIKernel の公開参照サーフェスとして AddSecureCredentialResolution&lt;TOptions&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.SecureHostingExtensions.WithSecureOptions&lt;TOptions&gt;">
+      <summary>AIKernel の公開参照サーフェスとして WithSecureOptions&lt;TOptions&gt; 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.SecureOptionsStartupValidator.StartAsync">
+      <summary>AIKernel の公開参照サーフェスとして StartAsync 操作を実行します。</summary>
+    </member>
+    <member name="M:AIKernel.Hosting.SecureOptionsStartupValidator.StopAsync">
+      <summary>AIKernel の公開参照サーフェスとして StopAsync 操作を実行します。</summary>
+    </member>
+    <member name="P:AIKernel.Hosting.AIKernelCoreBuilder.Configuration">
+      <summary>AIKernel の公開参照サーフェスで公開される Configuration 値を取得または設定します。</summary>
+    </member>
+    <member name="P:AIKernel.Hosting.AIKernelCoreBuilder.Services">
+      <summary>AIKernel の公開参照サーフェスで公開される Services 値を取得または設定します。</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.AIKernelCoreBuilder">
+      <summary>AIKernel パッケージ利用者に公開される AIKernelCoreBuilder の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.AIKernelCoreHostingExtensions">
+      <summary>AIKernel パッケージ利用者に公開される AIKernelCoreHostingExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.ModelProviderHostingExtensions">
+      <summary>AIKernel パッケージ利用者に公開される ModelProviderHostingExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.SecureCredentialResolver">
+      <summary>AIKernel パッケージ利用者に公開される SecureCredentialResolver の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.SecureHostingExtensions">
+      <summary>AIKernel パッケージ利用者に公開される SecureHostingExtensions の参照サーフェスを表します。</summary>
+    </member>
+    <member name="T:AIKernel.Hosting.SecureOptionsStartupValidator">
+      <summary>AIKernel パッケージ利用者に公開される SecureOptionsStartupValidator の参照サーフェスを表します。</summary>
+    </member>
+  </members>
+</doc>

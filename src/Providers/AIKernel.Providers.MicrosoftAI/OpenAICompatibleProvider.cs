@@ -1,4 +1,4 @@
-﻿namespace AIKernel.Providers.MicrosoftAI;
+namespace AIKernel.Providers.MicrosoftAI;
 
 using AIKernel.Abstractions.Providers;
 using AIKernel.Core.Time;
@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net;
 
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider']" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider']" />
 public sealed class OpenAICompatibleProvider : IModelProvider
 {
     private static readonly Action<ILogger, string, string?, Exception?> LogCompleted =
@@ -38,6 +40,8 @@ public sealed class OpenAICompatibleProvider : IModelProvider
 
     private volatile bool _isInitialized;
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.#ctor']" />
     public OpenAICompatibleProvider(
         IChatClient chatClient,
         IProviderCapabilities capabilities,
@@ -55,6 +59,8 @@ public sealed class OpenAICompatibleProvider : IModelProvider
     {
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.#ctor']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.#ctor']" />
     public OpenAICompatibleProvider(
         IChatClient chatClient,
         IProviderCapabilities capabilities,
@@ -76,34 +82,50 @@ public sealed class OpenAICompatibleProvider : IModelProvider
         Version = RequireNonEmpty(_options.Version, nameof(_options.Version));
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.ProviderId']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.ProviderId']" />
     public string ProviderId { get; }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.Name']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.Name']" />
     public string Name { get; }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.Version']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.Version']" />
     public string Version { get; }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.GetCapabilities']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.GetCapabilities']" />
     public IProviderCapabilities GetCapabilities()
     {
         return _capabilities;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.IsAvailableAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.IsAvailableAsync']" />
     public Task<bool> IsAvailableAsync()
     {
         return Task.FromResult(_isInitialized);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.InitializeAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.InitializeAsync']" />
     public Task InitializeAsync()
     {
         _isInitialized = true;
         return Task.CompletedTask;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.ShutdownAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.ShutdownAsync']" />
     public Task ShutdownAsync()
     {
         _isInitialized = false;
         return Task.CompletedTask;
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.GetHealthAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.GetHealthAsync']" />
     public async Task<ProviderHealthStatus> GetHealthAsync()
     {
         return await _healthCheck
@@ -115,6 +137,8 @@ public sealed class OpenAICompatibleProvider : IModelProvider
             .ConfigureAwait(false);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.GenerateAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.GenerateAsync']" />
     public async Task<string> GenerateAsync(
         IReadOnlyList<IModelMessage> messages,
         CancellationToken cancellationToken = default)
@@ -228,6 +252,8 @@ public sealed class OpenAICompatibleProvider : IModelProvider
         }
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.StreamGenerateAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.StreamGenerateAsync']" />
     public async Task StreamGenerateAsync(
         IReadOnlyList<IModelMessage> messages,
         Func<string, Task> onChunk,
@@ -247,6 +273,8 @@ public sealed class OpenAICompatibleProvider : IModelProvider
         await onChunk(text).ConfigureAwait(false);
     }
 
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.AnswerAsync']" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Providers.MicrosoftAI.OpenAICompatibleProvider.AnswerAsync']" />
     public Task<string> AnswerAsync(
         string question,
         string? context = null,

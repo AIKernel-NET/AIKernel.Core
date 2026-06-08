@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using AIKernel.Common.Results;
 
-public interface IDslRomRegistry
+internal interface IDslRomRegistry
 {
     Result<DslRomMetadata> Register(DslRomSnapshot snapshot);
 
@@ -13,7 +13,7 @@ public interface IDslRomRegistry
     Result<DslRomSnapshot> Resolve(string capabilityName);
 }
 
-public sealed class DslRomRegistry :
+internal sealed class DslRomRegistry :
     IDslRomRegistry,
     AIKernel.Abstractions.Dsl.IDslRomRegistry
 {

@@ -4,10 +4,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
-    <Version>0.1.0</Version>
-    <AssemblyVersion>0.1.0</AssemblyVersion>
-    <FileVersion>0.1.0</FileVersion>
-    <InformationalVersion>0.1.0</InformationalVersion>
+    <Version>0.1.0.1</Version>
+    <AssemblyVersion>0.1.0.1</AssemblyVersion>
+    <FileVersion>0.1.0.1</FileVersion>
+    <InformationalVersion>0.1.0.1</InformationalVersion>
     <AIKernelPackageVersion>0.1.0</AIKernelPackageVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
@@ -19,7 +19,7 @@
     <Copyright>Copyright © 2026 Takuya Sogawa of AIKernel-NET</Copyright>
     <PackageTags>aikernel;aikernel-core;ai-os;kernel;provider;hosting;rom;vfs;context;execution;immutability;fail-closed;capability-modules;dynamicslm;seedslm;hatl;admissibility;semantic-compilation</PackageTags>
     <PackageReleaseNotes>
-      AIKernel.Core package family v0.1.0 - First executable runtime baseline aligned with official AIKernel.NET contract packages v0.1.0. Core provides Result/Option/Either, ResultStep/ReplayLog semantics, DSL and ROM runtime adapters, Kernel orchestration, Provider integration, Core-owned MemoryRegion/MemoryMapper runtime adapters, and Kernel provider-routing facade helpers. GPU and Native ABI implementations remain external Capability packages.
+      AIKernel.Core package family v0.1.0.1 - Patch release aligned with official AIKernel.NET contract packages v0.1.0. Core provides Result/Option/Either, ResultStep/ReplayLog semantics, DSL and ROM runtime adapters, Kernel orchestration, Provider integration, Core-owned MemoryRegion/MemoryMapper runtime adapters, and Kernel provider-routing facade helpers. GPU and Native ABI implementations remain external Capability packages.
     </PackageReleaseNotes>
   </PropertyGroup>
 

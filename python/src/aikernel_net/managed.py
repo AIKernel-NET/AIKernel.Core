@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-_PACKAGE_VERSION = "0.1.0"
+_PACKAGE_VERSION = "0.1.0.1"
 _MANAGED_ASSEMBLIES = (
     "AIKernel.Abstractions.dll",
     "AIKernel.Common.dll",

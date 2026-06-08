@@ -13,6 +13,7 @@ using AIKernel.Dtos.Kernel;
 using AIKernel.Dtos.Rom;
 using AIKernel.Dtos.Routing;
 using AIKernel.Kernel;
+using KernelProviderRoutingDecision = AIKernel.Kernel.KernelProviderRoutingDecision;
 using AIKernel.Vfs;
 
 public sealed class KernelProviderRoutingDecisionTests

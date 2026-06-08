@@ -125,7 +125,7 @@ managed assemblies can be bundled into `aikernel_net/managed`:
 
 ```bash
 python -m build --wheel
-python -m twine check dist/aikernel_net-0.1.0-py3-none-any.whl
+python -m twine check dist/aikernel_net-0.1.0.1-py3-none-any.whl
 ```
 
 ## API

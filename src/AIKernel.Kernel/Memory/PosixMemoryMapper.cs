@@ -1,11 +1,8 @@
 namespace AIKernel.Kernel.Memory;
 
 using System.Runtime.InteropServices;
-using AIKernel.Abstractions.Memory;
 using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
-using AIKernel.Dtos.Memory;
-using AIKernel.Enums;
 
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.PosixMemoryMapper']" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.PosixMemoryMapper']" />

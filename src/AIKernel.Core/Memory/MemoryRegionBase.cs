@@ -1,6 +1,4 @@
 using AIKernel.Common.Results;
-using AIKernel.Abstractions.Memory;
-using AIKernel.Dtos.Memory;
 
 namespace AIKernel.Core.Memory;
 

@@ -2,7 +2,6 @@ namespace AIKernel.Kernel;
 
 using System.Collections.Immutable;
 using AIKernel.Dtos.Kernel;
-using AIKernel.Dtos.Routing;
 
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions']" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions']" />

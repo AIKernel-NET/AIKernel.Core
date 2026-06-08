@@ -99,10 +99,9 @@ VFS → ROM → Context → Execution
 このレイヤーは Core ランタイムロジックを担当し、外部 Hosting や Provider 境界から実装上の関心事を分離します。
 
 Native Capability module 向けの OS 非依存な MemoryRegion / MemoryMapper
-contract surface は、AIKernel.NET package
-（`AIKernel.Abstractions.Memory`、`AIKernel.Dtos.Memory`、`AIKernel.Enums`）
-が所有します。Core は v0.0.x transition 中の Result-based runtime adapter を保持し、
-具体的な Win32 / POSIX の mapping 実装は Kernel に置きます。
+runtime surface は、0.1.0 prototype validation baseline では AIKernel.Core
+が所有します。Core は Result-based runtime adapter を公開し、具体的な
+Win32 / POSIX の mapping 実装は Kernel に置きます。
 
 #### `AIKernel.Kernel`
 
@@ -304,12 +303,12 @@ OS 固有の `IMemoryMapper`（Windows では `Win32MemoryMapper`、それ以外
 Kernel を直接参照しません。
 
 ユーザランド側の routing pipeline は、`ResultStep` / LINQ チェーンから
-`AIKernel.Dtos.Routing.KernelProviderRoutingDecision` を返し、`AIKernel.Kernel`
+`AIKernel.Kernel.KernelProviderRoutingDecision` を返し、`AIKernel.Kernel`
 の extension helper 経由で `KernelRequest` 本体と request metadata に適用できます。
 これにより、低レベル / 高レベル LLM の切替や、`aik...` で始まるコンテキストを
 CLI に紐づく Capability Adapter へ流す方針を、同じ ProviderId / ModelId 契約で扱えます。
 Core が提供する構築時の guard は `KernelProviderRoutingDecisionFactory` が担い、
-DTO 自体は AIKernel.NET contract package 内の behavior-free な data carrier として維持します。
+decision carrier 自体は Kernel facade package 内で behavior-free に維持します。
 
 AIKernel.Core には、AI が生成した計画を扱う標準 JSON DSL pipeline runtime も含まれます。
 DSL は決定論的な `ResultStep` pipeline に compile され、有限 `Loop` / `LoopUntil` /

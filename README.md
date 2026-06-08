@@ -99,11 +99,9 @@ VFS → ROM → Context → Execution
 This layer owns the Core runtime logic and separates implementation concerns from external Hosting and Provider boundaries.
 
 For Native Capability modules, the OS-independent MemoryRegion / MemoryMapper
-contract surface is owned by the AIKernel.NET packages
-(`AIKernel.Abstractions.Memory`, `AIKernel.Dtos.Memory`, and `AIKernel.Enums`).
-In the 0.1.0 prototype validation baseline, Core consumes that contract surface
-and keeps the Result-based runtime adapter, while the concrete Win32/POSIX
-mapping implementations live in Kernel.
+runtime surface is owned by AIKernel.Core in the 0.1.0 prototype validation
+baseline. Core exposes the Result-based runtime adapter, while the concrete
+Win32/POSIX mapping implementations live in Kernel.
 
 #### `AIKernel.Kernel`
 
@@ -311,14 +309,14 @@ behind the Core memory abstraction. Native Capability packages consume only the
 Core abstraction and never reference Kernel directly.
 
 User-land routing pipelines can return
-`AIKernel.Dtos.Routing.KernelProviderRoutingDecision` from a `ResultStep`/LINQ
-chain, then apply it to a `KernelRequest` and its metadata through
-`AIKernel.Kernel` extension helpers.
+`AIKernel.Kernel.KernelProviderRoutingDecision` from a `ResultStep`/LINQ chain,
+then apply it to a `KernelRequest` and its metadata through `AIKernel.Kernel`
+extension helpers.
 This supports policies such as low-tier versus high-tier LLM selection, or
 routing `aik...` contexts to a CLI-backed capability adapter, while keeping
 Kernel execution driven by the same ProviderId / ModelId contract.
 Use `KernelProviderRoutingDecisionFactory` for Core-provided construction
-guards; the DTO itself stays behavior-free in the AIKernel.NET contract package.
+guards; the decision carrier stays behavior-free in the Kernel facade package.
 
 AIKernel.Core also includes a standard JSON DSL pipeline runtime for
 AI-generated plans. The DSL compiles to deterministic `ResultStep` pipelines,

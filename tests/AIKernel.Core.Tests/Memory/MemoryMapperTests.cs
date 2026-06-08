@@ -1,9 +1,7 @@
 namespace AIKernel.Core.Tests.Memory;
 
-using AIKernel.Abstractions.Memory;
 using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
-using AIKernel.Enums;
 using AIKernel.Kernel;
 using AIKernel.Kernel.Memory;
 using Microsoft.Extensions.DependencyInjection;

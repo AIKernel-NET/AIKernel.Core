@@ -1,11 +1,11 @@
 namespace AIKernel.Common.Results;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskResultWhereExtensions']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskResultWhereExtensions']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskResultWhereExtensions']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskResultWhereExtensions']/summary" />
 public static class TaskResultWhereExtensions
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultWhereExtensions.Where&lt;T&gt;']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultWhereExtensions.Where&lt;T&gt;']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultWhereExtensions.Where&lt;T&gt;']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultWhereExtensions.Where&lt;T&gt;']/summary" />
     public static async Task<Result<T>> Where<T>(
         this Task<Result<T>> task,
         Func<T, bool> predicate)
@@ -26,8 +26,8 @@ public static class TaskResultWhereExtensions
         }
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultWhereExtensions.Where&lt;T&gt;']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultWhereExtensions.Where&lt;T&gt;']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultWhereExtensions.Where&lt;T&gt;']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultWhereExtensions.Where&lt;T&gt;']/summary" />
     public static async Task<Result<T>> Where<T>(
         this Task<Result<T>> task,
         Func<T, Task<bool>> predicate)

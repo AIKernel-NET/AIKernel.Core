@@ -25,55 +25,31 @@ internal sealed class KernelExecutionStepRunner
     public Result<ModelPromptCapability> ResolveCapability(
         IModelProvider provider,
         KernelExecutionRequest request)
-    {
-        try
-        {
-            return Result<ModelPromptCapability>.Success(
-                _capabilityResolver.Resolve(provider, request));
-        }
-        catch (OperationCanceledException)
-        {
-            return Result<ModelPromptCapability>.Fail(CanceledError(OriginStep.Capability));
-        }
-        catch (Exception ex)
-        {
-            return Result<ModelPromptCapability>.Fail(ExecutionFailedError(
-                ex,
-                OriginStep.Capability));
-        }
-    }
+        => Try
+            .Run(() => _capabilityResolver.Resolve(provider, request))
+            .Match(
+                error => Result<ModelPromptCapability>.Fail(ToExecutionError(error, OriginStep.Capability)),
+                Result<ModelPromptCapability>.Success);
 
     public async Task<Result<GeneratedPrompt>> GeneratePromptAsync(
         KernelExecutionRequest request,
         ModelPromptCapability capability,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var prompt = await _promptGenerator
-                .GenerateAsync(
-                    new PromptGenerationRequest(
-                        request.ContextSnapshotId,
-                        request.ContextHash,
-                        request.ContextBlocks,
-                        request.UserInstruction,
-                        capability,
-                        request.PromptOptions),
-                    cancellationToken)
-                .ConfigureAwait(false);
-
-            return Result<GeneratedPrompt>.Success(prompt);
-        }
-        catch (OperationCanceledException)
-        {
-            return Result<GeneratedPrompt>.Fail(CanceledError(OriginStep.Prompt));
-        }
-        catch (Exception ex)
-        {
-            return Result<GeneratedPrompt>.Fail(ExecutionFailedError(
-                ex,
-                OriginStep.Prompt));
-        }
+        return (await Try.RunAsync(async () => await _promptGenerator
+            .GenerateAsync(
+                new PromptGenerationRequest(
+                    request.ContextSnapshotId,
+                    request.ContextHash,
+                    request.ContextBlocks,
+                    request.UserInstruction,
+                    capability,
+                    request.PromptOptions),
+                cancellationToken)
+            .ConfigureAwait(false)).ConfigureAwait(false))
+            .Match(
+                error => Result<GeneratedPrompt>.Fail(ToExecutionError(error, OriginStep.Prompt)),
+                Result<GeneratedPrompt>.Success);
     }
 
     public async Task<Result<string>> GenerateOutputAsync(
@@ -81,24 +57,12 @@ internal sealed class KernelExecutionStepRunner
         GeneratedPrompt prompt,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var output = await provider
-                .GenerateAsync(ToProviderMessages(prompt.Messages), cancellationToken)
-                .ConfigureAwait(false);
-
-            return Result<string>.Success(output);
-        }
-        catch (OperationCanceledException)
-        {
-            return Result<string>.Fail(CanceledError(OriginStep.Provider));
-        }
-        catch (Exception ex)
-        {
-            return Result<string>.Fail(ExecutionFailedError(
-                ex,
-                OriginStep.Provider));
-        }
+        return (await Try.RunAsync(async () => await provider
+            .GenerateAsync(ToProviderMessages(prompt.Messages), cancellationToken)
+            .ConfigureAwait(false)).ConfigureAwait(false))
+            .Match(
+                error => Result<string>.Fail(ToExecutionError(error, OriginStep.Provider)),
+                Result<string>.Success);
     }
 
     private static IReadOnlyList<IModelMessage> ToProviderMessages(
@@ -108,18 +72,23 @@ internal sealed class KernelExecutionStepRunner
             .ToArray();
 
     public Result<int> CountOutputTokens(string output)
-    {
-        try
-        {
-            return Result<int>.Success(_tokenizer.CountTokens(output));
-        }
-        catch (Exception ex)
-        {
-            return Result<int>.Fail(ExecutionFailedError(
-                ex,
-                OriginStep.Tokenizer));
-        }
-    }
+        => Try
+            .Run(() => _tokenizer.CountTokens(output))
+            .Match(
+                error => Result<int>.Fail(ToExecutionError(error, OriginStep.Tokenizer)),
+                Result<int>.Success);
+
+    private static ErrorContext ToExecutionError(
+        ErrorContext error,
+        OriginStep originStep)
+        => IsOperationCanceled(error)
+            ? CanceledError(originStep)
+            : ExecutionFailedError(error, originStep);
+
+    private static bool IsOperationCanceled(ErrorContext error)
+        => error.Metadata is not null &&
+           error.Metadata.TryGetValue(ResultMetadataKeys.ExceptionType, out var exceptionType) &&
+           string.Equals(exceptionType, typeof(OperationCanceledException).FullName, StringComparison.Ordinal);
 
     private static ErrorContext CanceledError(OriginStep originStep)
     {
@@ -134,16 +103,18 @@ internal sealed class KernelExecutionStepRunner
     private static ErrorContext ExecutionFailedError(
         Exception exception,
         OriginStep originStep)
+        => ExecutionFailedError(ErrorContext.FromException(exception), originStep);
+
+    private static ErrorContext ExecutionFailedError(
+        ErrorContext source,
+        OriginStep originStep)
     {
-        return new ErrorContext(exception.Message, "execution_failed", false)
+        return source with
         {
+            Code = "execution_failed",
             FailureKind = FailureKind.FailClosed,
             OriginStep = originStep,
-            SemanticSlot = SemanticSlot.T,
-            Metadata = new Dictionary<string, string>(StringComparer.Ordinal)
-            {
-                [ResultMetadataKeys.ExceptionType] = exception.GetType().FullName ?? exception.GetType().Name
-            }
+            SemanticSlot = SemanticSlot.T
         };
     }
 

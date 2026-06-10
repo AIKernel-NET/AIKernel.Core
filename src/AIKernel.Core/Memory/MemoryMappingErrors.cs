@@ -21,4 +21,13 @@ internal static class MemoryMappingErrors
                     exception.GetType().FullName ?? exception.GetType().Name
             }
         };
+
+    public static ErrorContext FromContext(ErrorContext error)
+        => error with
+        {
+            Code = "MEMORY_MAPPING_ERROR",
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = OriginStep.Capability,
+            SemanticSlot = SemanticSlot.B
+        };
 }

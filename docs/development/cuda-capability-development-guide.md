@@ -81,7 +81,7 @@ bridge.
 
 ```bash
 dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
-dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.1.0
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.1.1
 ```
 
 Do not use a GitHub Release page URL directly as a NuGet source. Download the

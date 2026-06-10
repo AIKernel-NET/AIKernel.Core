@@ -8,8 +8,8 @@ using AIKernel.Vfs;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Memory.MemoryFileProvider']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Memory.MemoryFileProvider']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Memory.MemoryFileProvider']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Memory.MemoryFileProvider']/summary" />
 public sealed class MemoryFileProvider(
     MemoryFileProviderOptions? options = null,
     IKernelClock? clock = null) : FileProviderBase(
@@ -21,8 +21,8 @@ public sealed class MemoryFileProvider(
     private readonly ConcurrentDictionary<string, MemoryFileState> _files =
         new(StringComparer.Ordinal);
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.#ctor']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.#ctor']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.#ctor']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.#ctor']/summary" />
     public MemoryFileProvider(
         IOptions<MemoryFileProviderOptions> options,
         IKernelClock? clock = null)
@@ -32,8 +32,8 @@ public sealed class MemoryFileProvider(
     {
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.Seed']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.Seed']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.Seed']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.Seed']/summary" />
     public void Seed(string path, byte[] content)
     {
         ArgumentNullException.ThrowIfNull(content);
@@ -49,15 +49,15 @@ public sealed class MemoryFileProvider(
             ModifiedAtUtc: now);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsAvailableAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsAvailableAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsAvailableAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsAvailableAsync']/summary" />
     public override Task<bool> IsAvailableAsync()
     {
         return Task.FromResult(true);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetHealthAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetHealthAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetHealthAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetHealthAsync']/summary" />
     public override Task<VfsProviderHealth> GetHealthAsync()
     {
         return Task.FromResult(new VfsProviderHealth
@@ -94,14 +94,14 @@ public sealed class MemoryFileProvider(
         private readonly ConcurrentDictionary<string, MemoryFileState> _files = files ?? throw new ArgumentNullException(nameof(files));
         private readonly IKernelClock _clock = clock ?? throw new ArgumentNullException(nameof(clock));
 
-        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsNullOrWhiteSpace']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsNullOrWhiteSpace']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsNullOrWhiteSpace']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsNullOrWhiteSpace']/summary" />
         public string SessionId { get; } = string.IsNullOrWhiteSpace(sessionId)
                 ? throw new ArgumentException("SessionId is required.", nameof(sessionId))
                 : sessionId;
 
-        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ReadFileAsync']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ReadFileAsync']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ReadFileAsync']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ReadFileAsync']/summary" />
         public Task<IVfsFile> ReadFileAsync(string path)
         {
             var normalized = VfsPathRules.Normalize(path);
@@ -122,8 +122,8 @@ public sealed class MemoryFileProvider(
                     modifiedAt: state.ModifiedAtUtc));
         }
 
-        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.WriteFileAsync']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.WriteFileAsync']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.WriteFileAsync']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.WriteFileAsync']/summary" />
         public Task WriteFileAsync(string path, byte[] content)
         {
             ArgumentNullException.ThrowIfNull(content);
@@ -152,8 +152,8 @@ public sealed class MemoryFileProvider(
             return Task.CompletedTask;
         }
 
-        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetDirectoryAsync']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetDirectoryAsync']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetDirectoryAsync']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetDirectoryAsync']/summary" />
         public Task<IVfsDirectory> GetDirectoryAsync(string path)
         {
             var normalized = VfsPathRules.Normalize(path);
@@ -200,8 +200,8 @@ public sealed class MemoryFileProvider(
                     entries: entries));
         }
 
-        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ExistsAsync']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ExistsAsync']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ExistsAsync']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ExistsAsync']/summary" />
         public Task<bool> ExistsAsync(string path)
         {
             var normalized = VfsPathRules.Normalize(path);
@@ -213,8 +213,8 @@ public sealed class MemoryFileProvider(
             return Task.FromResult(exists);
         }
 
-        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DeleteAsync']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DeleteAsync']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DeleteAsync']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DeleteAsync']/summary" />
         public Task DeleteAsync(string path)
         {
             var normalized = VfsPathRules.Normalize(path);
@@ -224,8 +224,8 @@ public sealed class MemoryFileProvider(
             return Task.CompletedTask;
         }
 
-        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.QueryAsync']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.QueryAsync']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.QueryAsync']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.QueryAsync']/summary" />
         public Task<IVfsQueryResult> QueryAsync(IVfsQuery query)
         {
             ArgumentNullException.ThrowIfNull(query);
@@ -244,8 +244,8 @@ public sealed class MemoryFileProvider(
             return Task.FromResult(VfsEntryQueryEngine.Execute(entries, query));
         }
 
-        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DisposeAsync']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DisposeAsync']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DisposeAsync']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DisposeAsync']/summary" />
         public ValueTask DisposeAsync()
         {
             return ValueTask.CompletedTask;

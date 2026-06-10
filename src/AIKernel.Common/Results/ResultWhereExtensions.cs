@@ -1,11 +1,11 @@
 namespace AIKernel.Common.Results;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultWhereExtensions']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultWhereExtensions']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultWhereExtensions']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultWhereExtensions']/summary" />
 public static class ResultWhereExtensions
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultWhereExtensions.Where&lt;T&gt;']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultWhereExtensions.Where&lt;T&gt;']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultWhereExtensions.Where&lt;T&gt;']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultWhereExtensions.Where&lt;T&gt;']/summary" />
     public static Result<T> Where<T>(
         this Result<T> result,
         Func<T, bool> predicate)

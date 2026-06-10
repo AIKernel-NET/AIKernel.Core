@@ -4,12 +4,12 @@ using AIKernel.Abstractions.Execution;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.KernelContext;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelReplayer']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelReplayer']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelReplayer']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelReplayer']/summary" />
 public sealed class KernelReplayer : IKernelReplayer
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.CanReplay']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.CanReplay']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.CanReplay']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.CanReplay']/summary" />
     public bool CanReplay(ReplayDump replayDump)
     {
         return replayDump is
@@ -21,8 +21,8 @@ public sealed class KernelReplayer : IKernelReplayer
         && !string.IsNullOrWhiteSpace(replayDump.HashChain.HashAlgorithm);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.ReplayAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.ReplayAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.ReplayAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.ReplayAsync']/summary" />
     public ValueTask<ExecutionResult> ReplayAsync(
         ReplayDump replayDump,
         TraceContext traceContext,

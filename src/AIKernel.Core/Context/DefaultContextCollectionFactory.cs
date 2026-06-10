@@ -5,12 +5,12 @@ using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Rom;
 using AIKernel.Enums;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextCollectionFactory']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextCollectionFactory']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextCollectionFactory']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextCollectionFactory']/summary" />
 public sealed class DefaultContextCollectionFactory : IContextCollectionFactory
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextCollectionFactory.Create']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextCollectionFactory.Create']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextCollectionFactory.Create']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextCollectionFactory.Create']/summary" />
     public IContextCollection Create(
         IReadOnlyList<RomSnapshot> roms,
         IReadOnlyList<RomContextEdge> edges,

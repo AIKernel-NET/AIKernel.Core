@@ -6,14 +6,42 @@
 Canonical papers は AIKernel.NET repository で管理します。この folder は runtime
 implementation と package usage guidance のためのものです。
 
+この docs は、AIOS SDK における kernel runtime layer として Core を説明します。
+Core は provider、control、WASM、GPU backend、tools、example と組み合わせて
+AIOS distribution を構築するための安定した基盤です。
+
+公式 AIOS ディストリビューション **AIKernel.Monolith** の開発も開始されています。
+Monolith は 0.1.x 系の安定化後に SDK layer を統合する reference system として
+位置づけられます。
+
 ## Development Guides
 
+- [User Guide](user-guide/index-ja.md)
 - [CUDA Capability Development Guide](development/cuda-capability-development-guide.md)
 - [CUDA Capability 開発ガイド](development/cuda-capability-development-guide-jp.md)
 - [AIKernel.Core Release Checklist](operations/release-checklist.md)
 - [AIKernel.Core リリースチェックリスト](operations/release-checklist-jp.md)
 - [AIKernel.Python README](../python/README.md)
 - [AIKernel.Python README 日本語](../python/README-ja.md)
+
+## どのページを読むべきか
+
+- Core package を install する場合や standard provider boot surface を確認する場合は
+  User Guide を読んでください。
+- CUDA Capability guide は、明示的に外部 GPU / native package を追加する場合だけ
+  読んでください。既定の Core / Python install は CPU-only です。
+- package 公開準備を行う場合は Release Checklist を読んでください。
+- Python から `aikernel-net` 経由で Core を利用する場合は Python README を読んでください。
+
+## 最初の検証
+
+外部 Provider や native capability module を追加する前に、まず CPU/default package
+family を検証してください。
+
+```powershell
+dotnet build AIKernel.Core.slnx -c Release
+dotnet test AIKernel.Core.slnx -c Release --no-build
+```
 
 ## Package Boundaries
 
@@ -41,6 +69,26 @@ module を明示的に install / register します。
 `AIKernel.Vfs` は Core implementation namespace であり、独立 NuGet package ではありません。
 VFS contract は AIKernel.NET contract packages にあり、in-process VFS provider は
 `AIKernel.Core` 内にあります。
+
+## Standard Providers
+
+AIKernel.Core は、外部 Provider の読み込み前に利用できる OS-level 標準 Provider を含みます。
+
+- `MinimalRuntimeProvider`: 決定論的な `runtime.ping` boot capability。
+- `LocalExecutionProvider`: Core DSL runtime を使った inline DSL pipeline execution。
+- `VfsProvider`: read/list/exists/metadata operation の read-only VFS capability。
+- `SkillProvider`: OpenAI 互換 `SKILL.md` の読み込みと capability registration。
+- `SystemInfoProvider`: provider、capability、VFS state、runtime version の安全な system introspection。
+
+これらの Provider は AIKernel.Tools、外部 Provider、native ABI bridge、HTTP、model inference に依存しません。
+
+Core は、外部 Provider manifest を読み込む CLI / host scenario のために
+`IDynamicProviderRegistry` も公開します。この dynamic surface は、stable な
+`IProviderRegistry` contract package を変更せずに、provider metadata、capability
+descriptor、任意の provider assembly、CLI 向け manifest setting を登録します。
+標準 Provider invoker も同じ dynamic registry から参照できます。`SkillProvider` は
+`SKILL.md` から runtime に capability set を発見するため、provider-level invoker
+として表現します。
 
 ## Release Verification
 

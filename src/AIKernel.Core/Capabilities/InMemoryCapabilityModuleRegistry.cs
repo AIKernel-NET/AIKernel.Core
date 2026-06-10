@@ -2,17 +2,18 @@ namespace AIKernel.Core.Capabilities;
 
 using System.Collections.Concurrent;
 using AIKernel.Abstractions.Capabilities;
+using AIKernel.Common.Results;
 using AIKernel.Dtos.Capabilities;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry']/summary" />
 public sealed class InMemoryCapabilityModuleRegistry : ICapabilityModuleRegistry
 {
     private readonly ConcurrentDictionary<string, CapabilityModuleDescriptor> _descriptors =
         new(StringComparer.Ordinal);
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.RegisterAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.RegisterAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.RegisterAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.RegisterAsync']/summary" />
     public ValueTask RegisterAsync(
         CapabilityModuleDescriptor descriptor,
         CancellationToken cancellationToken = default)
@@ -32,29 +33,23 @@ public sealed class InMemoryCapabilityModuleRegistry : ICapabilityModuleRegistry
         return ValueTask.CompletedTask;
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ResolveAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ResolveAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ResolveAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ResolveAsync']/summary" />
     public ValueTask<CapabilityModuleDescriptor?> ResolveAsync(
         string capabilityId,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (string.IsNullOrWhiteSpace(capabilityId))
-        {
-            return ValueTask.FromResult<CapabilityModuleDescriptor?>(null);
-        }
-
-        _descriptors.TryGetValue(
-            NormalizeCapabilityId(capabilityId),
-            out var descriptor);
+        var descriptor = ReadCapabilityId(capabilityId)
+            .Bind(FindDescriptor);
 
         return ValueTask.FromResult(
-            descriptor is null ? null : Clone(descriptor));
+            CloneOrNull(descriptor));
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ListAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ListAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ListAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ListAsync']/summary" />
     public ValueTask<IReadOnlyList<CapabilityModuleDescriptor>> ListAsync(
         CancellationToken cancellationToken = default)
     {
@@ -73,6 +68,34 @@ public sealed class InMemoryCapabilityModuleRegistry : ICapabilityModuleRegistry
     {
         return capabilityId.Trim();
     }
+
+    private Option<CapabilityModuleDescriptor> FindDescriptor(
+        string capabilityId)
+    {
+        if (_descriptors.TryGetValue(NormalizeCapabilityId(capabilityId), out var descriptor))
+        {
+            return Option<CapabilityModuleDescriptor>.Some(descriptor);
+        }
+
+        return Option<CapabilityModuleDescriptor>.None();
+    }
+
+    private static Option<string> ReadCapabilityId(
+        string capabilityId)
+    {
+        if (!string.IsNullOrWhiteSpace(capabilityId))
+        {
+            return Option<string>.Some(capabilityId);
+        }
+
+        return Option<string>.None();
+    }
+
+    private static CapabilityModuleDescriptor? CloneOrNull(
+        Option<CapabilityModuleDescriptor> descriptor)
+        => descriptor.Match<CapabilityModuleDescriptor?>(
+            () => null,
+            Clone);
 
     private static CapabilityModuleDescriptor Clone(
         CapabilityModuleDescriptor descriptor)

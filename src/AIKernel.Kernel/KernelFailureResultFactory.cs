@@ -158,9 +158,9 @@ internal sealed class KernelFailureResultFactory
     {
         var result = _executionIdFactory.TryCreateFallbackExecutionId(request, status);
 
-        return result.IsSuccess
-            ? result.Value!
-            : $"exec:failed:{ResolveFailureCode(errorCode, result.Error?.Code)}";
+        return result.Match(
+            error => $"exec:failed:{ResolveFailureCode(errorCode, error.Code)}",
+            value => value);
     }
 
     private static string ResolveFailureCode(string errorCode, string? resultErrorCode)

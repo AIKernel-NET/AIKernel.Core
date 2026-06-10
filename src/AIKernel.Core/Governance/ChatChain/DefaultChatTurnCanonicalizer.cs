@@ -3,12 +3,12 @@ namespace AIKernel.Core.Governance.ChatChain;
 using System.Text.Json;
 using AIKernel.Abstractions.Governance.ChatChain;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer']/summary" />
 public sealed class DefaultChatTurnCanonicalizer : IChatTurnCanonicalizer
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer.Canonicalize']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer.Canonicalize']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer.Canonicalize']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.DefaultChatTurnCanonicalizer.Canonicalize']/summary" />
     public string Canonicalize(IChatTurn turn)
     {
         ArgumentNullException.ThrowIfNull(turn);

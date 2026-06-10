@@ -1,9 +1,9 @@
 # AIKernel.Core Release Checklist
 
-This checklist is for publishing the AIKernel.Core 0.1.0 package family and the
-CPU-only Python binding on the 2026-06-09 prototype validation release line.
+This checklist is for publishing the AIKernel.Core 0.1.1 package family and the
+CPU-only Python binding on the 2026-06-10 prototype validation release line.
 
-The 0.0.x design-implementation phase is complete. The 0.1.0 release validates
+The 0.0.x design-implementation phase is complete. The 0.1.1 release validates
 the runtime with prototype applications, external Capability modules, and
 control-plane execution scaffolding.
 
@@ -23,7 +23,7 @@ universal `py3-none-any` CPU-only wheel. Import it as `aikernel_net`. The PyPI
 package named `aikernel` is a different project.
 
 Development builds should use GitHub Packages with a separate distribution name
-such as `aikernel-net-dev` and versions like `0.1.0-dev.1`. Development
+such as `aikernel-net-dev` and versions like `0.1.1-dev.1`. Development
 packages may contain breaking changes and are intended for CI/CD validation.
 
 AIKernel.Core does not publish CUDA, LibTorch, native ABI, GPU runtime, or
@@ -45,24 +45,24 @@ Run from `python/`:
 py -m compileall src tests
 py -m pytest
 py -m build --wheel
-py -m twine check dist/aikernel_net-0.1.0-py3-none-any.whl
+py -m twine check dist/aikernel_net-0.1.1-py3-none-any.whl
 ```
 
 ## NuGet Package Checks
 
 Before publishing, inspect the generated `.nupkg` files and verify:
 
-- package ids and versions are `0.1.0`
+- package ids and versions are `0.1.1`
 - license is `Apache-2.0`
 - repository metadata points at the AIKernel.Core repository
 - README and icon assets are included where expected
 - no CUDA, LibTorch, native ABI, or external Capability binaries are included
 - no `AIKernel.Vfs` package dependency exists
-- references to AIKernel.NET contract packages use `0.1.0`
+- references to AIKernel.NET contract packages use `0.1.1`
 
 ## Contract Migration Notes
 
-The 0.1.0 contract promotion pass keeps the stable contract surface in
+The 0.1.1 contract promotion pass keeps the stable contract surface in
 AIKernel.NET:
 
 - `KernelTimestamp` is supplied by `AIKernel.Dtos.Time`; Core no longer owns a
@@ -108,8 +108,8 @@ In a clean consumer project:
 
 ```powershell
 dotnet new console
-dotnet add package AIKernel.Core --version 0.1.0
-dotnet add package AIKernel.Kernel --version 0.1.0
+dotnet add package AIKernel.Core --version 0.1.1
+dotnet add package AIKernel.Kernel --version 0.1.1
 dotnet build
 ```
 
@@ -117,7 +117,7 @@ For stable Python:
 
 ```powershell
 py -m venv .venv
-.\.venv\Scripts\python -m pip install aikernel-net==0.1.0
+.\.venv\Scripts\python -m pip install aikernel-net==0.1.1
 .\.venv\Scripts\python -c "import aikernel_net; print(aikernel_net.__version__)"
 ```
 

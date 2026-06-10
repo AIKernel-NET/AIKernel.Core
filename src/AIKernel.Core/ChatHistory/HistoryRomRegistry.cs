@@ -124,31 +124,15 @@ internal sealed class HistoryRomRegistry :
     }
 
     public bool Contains(string romId)
-        => HistoryRomPath.ParseRomId(romId).IsSuccess &&
-           _snapshots.ContainsKey(romId);
+        => HistoryRomPath.ParseRomId(romId)
+            .Match(
+                _ => false,
+                _ => _snapshots.ContainsKey(romId));
 
     public Result<HistoryRomSnapshot> Resolve(string romId)
-    {
-        var parsed = HistoryRomPath.ParseRomId(romId);
-        if (parsed.IsFailure)
-        {
-            return Result<HistoryRomSnapshot>.Fail(parsed.Error!);
-        }
-
-        return _snapshots.TryGetValue(romId, out var snapshot)
-            ? Result<HistoryRomSnapshot>.Success(snapshot)
-            : Result<HistoryRomSnapshot>.Fail(new ErrorContext(
-                $"History ROM was not registered: {romId}.",
-                "HISTORY_ROM_NOT_FOUND",
-                false)
-            {
-                FailureKind = FailureKind.Reject,
-                OriginStep = OriginStep.KernelFacade,
-                SemanticSlot = SemanticSlot.C,
-                Metadata = ImmutableDictionary<string, string>.Empty
-                    .Add(HistoryRomMetadataKeys.RomId, romId)
-            });
-    }
+        => from _ in HistoryRomPath.ParseRomId(romId)
+           from snapshot in ResolveSnapshot(romId)
+           select snapshot;
 
     Task<AIKernel.Dtos.History.HistoryRomMetadata>
         AIKernel.Abstractions.History.IHistoryRomRegistry.RegisterAsync(
@@ -162,17 +146,13 @@ internal sealed class HistoryRomRegistry :
             throw new ArgumentNullException(nameof(snapshot));
         }
 
-        var result = Register(new HistoryRomSnapshot(
-                    HistoryRomContractMapper.ToCore(snapshot.Metadata),
-                    snapshot.Markdown,
-                    snapshot.Rom));
-
-        if (result.IsFailure)
-        {
-            throw new InvalidOperationException(result.Error!.Message);
-        }
-
-        return Task.FromResult(HistoryRomContractMapper.ToContract(result.Value!));
+        return Task.FromResult(Register(new HistoryRomSnapshot(
+                HistoryRomContractMapper.ToCore(snapshot.Metadata),
+                snapshot.Markdown,
+                snapshot.Rom))
+            .Match(
+                error => throw new InvalidOperationException(error.Message),
+                HistoryRomContractMapper.ToContract));
     }
 
     Task<AIKernel.Dtos.History.HistoryRomSnapshot>
@@ -182,12 +162,24 @@ internal sealed class HistoryRomRegistry :
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var result = Resolve(romId);
-        if (result.IsFailure)
-        {
-            throw new InvalidOperationException(result.Error!.Message);
-        }
-
-        return Task.FromResult(HistoryRomContractMapper.ToContract(result.Value!));
+        return Task.FromResult(Resolve(romId)
+            .Match(
+                error => throw new InvalidOperationException(error.Message),
+                HistoryRomContractMapper.ToContract));
     }
+
+    private Result<HistoryRomSnapshot> ResolveSnapshot(string romId)
+        => _snapshots.TryGetValue(romId, out var snapshot)
+            ? Result<HistoryRomSnapshot>.Success(snapshot)
+            : Result<HistoryRomSnapshot>.Fail(new ErrorContext(
+                $"History ROM was not registered: {romId}.",
+                "HISTORY_ROM_NOT_FOUND",
+                false)
+            {
+                FailureKind = FailureKind.Reject,
+                OriginStep = OriginStep.KernelFacade,
+                SemanticSlot = SemanticSlot.C,
+                Metadata = ImmutableDictionary<string, string>.Empty
+                    .Add(HistoryRomMetadataKeys.RomId, romId)
+            });
 }

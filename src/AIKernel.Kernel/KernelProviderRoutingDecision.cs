@@ -1,7 +1,8 @@
 namespace AIKernel.Kernel;
 
 /// <summary>
-/// Represents a Core-side provider routing decision for the Kernel facade.
+/// [EN] Represents a Core-side provider routing decision for the Kernel facade.
+/// [JA] AIKernel の公開参照サーフェスにおける KernelProviderRoutingDecision を説明します。
 /// </summary>
 public sealed record KernelProviderRoutingDecision(
     string ProviderId,
@@ -13,7 +14,8 @@ public sealed record KernelProviderRoutingDecision(
     IReadOnlyDictionary<string, string>? Metadata);
 
 /// <summary>
-/// Carries optional routing score metadata for a provider decision.
+/// [EN] Carries optional routing score metadata for a provider decision.
+/// [JA] AIKernel の公開参照サーフェスにおける KernelProviderRoutingScore を説明します。
 /// </summary>
 public sealed record KernelProviderRoutingScore(
     double Value,

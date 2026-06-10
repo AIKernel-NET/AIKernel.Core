@@ -27,13 +27,14 @@ internal sealed class ChatHistoryRomExporter :
     public static Result<string> ToRomMarkdown(
         IReadOnlyList<ChatHistoryRomRecord> records,
         ChatHistoryRomOptions options)
-    {
-        var validation = Validate(records, options);
-        if (validation.IsFailure)
-        {
-            return Result<string>.Fail(validation.Error!);
-        }
+        => from _ in Validate(records, options)
+           from markdown in BuildRomMarkdownResult(records, options)
+           select markdown;
 
+    private static Result<string> BuildRomMarkdownResult(
+        IReadOnlyList<ChatHistoryRomRecord> records,
+        ChatHistoryRomOptions options)
+    {
         var normalizedRecords = records
             .Select((record, index) => new NormalizedRecord(
                 index + 1,
@@ -79,12 +80,9 @@ internal sealed class ChatHistoryRomExporter :
             HistoryRomContractMapper.ToCore(records),
             HistoryRomContractMapper.ToCore(options));
 
-        if (result.IsFailure)
-        {
-            throw new InvalidOperationException(result.Error!.Message);
-        }
-
-        return Task.FromResult(result.Value!);
+        return result.Match(
+            error => throw new InvalidOperationException(error.Message),
+            Task.FromResult);
     }
 
     private static Result<bool> Validate(

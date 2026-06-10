@@ -2,8 +2,8 @@
 
 [日本語](README-ja.md)
 
-Python binding for AIKernel.Core functional primitives and managed assembly
-discovery.
+Python binding for AIKernel.Core functional primitives, standard provider
+contracts, and managed assembly discovery.
 
 The default package is CPU-only and is published as a universal
 `py3-none-any` wheel for Windows and Linux:
@@ -16,21 +16,21 @@ The PyPI package named `aikernel` belongs to another project. AIKernel.NET uses
 the distribution name `aikernel-net` to avoid that collision. Import the module
 as `aikernel_net`.
 
-See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the `0.1.0` stable baseline notes.
+See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the current `0.1.1` stable release notes.
 
 ## Release Channels
 
 Stable user releases are published to PyPI:
 
 - distribution: `aikernel-net`
-- versions: `0.1.0`, then later stable releases
+- versions: `0.1.1`, then later stable releases
 - policy: stable releases only
 
 Development releases are reserved for CI/CD and developer validation through
 GitHub Packages:
 
 - distribution: `aikernel-net-dev`
-- versions: `0.1.0-dev.1` style prereleases
+- versions: `0.1.1-dev.1` style prereleases
 - policy: breaking changes are allowed
 
 User documentation defaults to the PyPI stable package. Use development
@@ -73,6 +73,7 @@ The package provides:
 - synchronous and asynchronous monad composition helpers
 - `do(...)` and `async_do(...)` notation
 - managed AIKernel assembly discovery helpers
+- standard provider contract discovery helpers
 - package/runtime layout discovery
 
 The package does not provide:
@@ -125,7 +126,7 @@ managed assemblies can be bundled into `aikernel_net/managed`:
 
 ```bash
 python -m build --wheel
-python -m twine check dist/aikernel_net-0.1.0.1-py3-none-any.whl
+python -m twine check dist/aikernel_net-0.1.1-py3-none-any.whl
 ```
 
 ## API
@@ -142,9 +143,51 @@ The wrapper surface is intentionally small:
 - `managed_assemblies() -> ManagedAssemblySet`
 - `require_managed_assemblies() -> ManagedAssemblySet`
 - `runtime_layout() -> RuntimeLayout`
+- `standard_provider_contracts() -> tuple[StandardProviderContract, ...]`
+- `standard_provider(provider_id) -> StandardProviderContract`
+- `standard_capability(capability_id) -> CapabilityContract`
+- `standard_provider_managed_types() -> tuple[str, ...]`
+- `CapabilityContract`
+- `StandardProviderContract`
+- `ProviderCliManifest`
+- `ProviderManifest`
+- `CoreCapabilityModuleContract`
+- `provider_manifest_from_dict(...) -> ProviderManifest`
+- `load_provider_manifest(path) -> ProviderManifest`
+- `rom_storage_contract(...) -> CoreCapabilityModuleContract`
+- `vfs_git_contract(...) -> CoreCapabilityModuleContract`
 
 The package includes inline type hints and a `py.typed` marker for PEP 561
 compatible type checkers.
+
+## Standard Providers
+
+The Python package exposes the Core standard provider contract surface without
+reimplementing provider execution logic:
+
+- `MINIMAL_RUNTIME_PROVIDER`
+- `LOCAL_EXECUTION_PROVIDER`
+- `VFS_PROVIDER`
+- `SKILL_PROVIDER`
+- `SYSTEM_INFO_PROVIDER`
+
+```python
+from aikernel_net import standard_provider, standard_capability
+
+runtime = standard_provider("aikernel.runtime.minimal")
+vfs = standard_capability("aikernel.vfs")
+```
+
+`SkillProvider` loads `SKILL.md` files and creates capabilities dynamically, so
+its Python descriptor exposes provider identity and managed type information
+rather than a fake static capability ID. Its managed invoker type is also
+listed because the C# `SkillProvider` itself implements dynamic skill
+invocation.
+
+The package also includes descriptor helpers for provider manifest JSON files
+and Core-owned ROM/VFS Git contracts. These helpers preserve the contract shape
+used by Core, including manifest-declared capability order and Core contract
+operation order, and do not load assemblies or execute providers in Python.
 
 ## Monad Syntax
 

@@ -7,12 +7,12 @@ using AIKernel.Abstractions.Context;
 using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Rom;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextHashCalculator']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextHashCalculator']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextHashCalculator']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextHashCalculator']/summary" />
 public sealed class DefaultContextHashCalculator : IContextHashCalculator
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextHashCalculator.ComputeHash']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextHashCalculator.ComputeHash']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextHashCalculator.ComputeHash']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextHashCalculator.ComputeHash']/summary" />
     public string ComputeHash(
         ContextAssemblyRequest request,
         IReadOnlyList<RomSnapshot> roms,

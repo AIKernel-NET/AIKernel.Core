@@ -24,8 +24,12 @@ internal static class DslExecutionErrors
     public static ErrorContext CapabilityException(
         string capabilityName,
         Exception exception)
+        => CapabilityException(capabilityName, ErrorContext.FromException(exception));
+
+    public static ErrorContext CapabilityException(
+        string capabilityName,
+        ErrorContext source)
     {
-        var source = ErrorContext.FromException(exception);
         var metadata = ImmutableDictionary.CreateBuilder<string, string>(
             StringComparer.Ordinal);
 
@@ -82,8 +86,12 @@ internal static class DslExecutionErrors
     public static ErrorContext ClockException(
         Exception exception,
         SemanticDelta loopDelta)
+        => ClockException(ErrorContext.FromException(exception), loopDelta);
+
+    public static ErrorContext ClockException(
+        ErrorContext source,
+        SemanticDelta loopDelta)
     {
-        var source = ErrorContext.FromException(exception);
         var metadata = ImmutableDictionary.CreateBuilder<string, string>(
             StringComparer.Ordinal);
 

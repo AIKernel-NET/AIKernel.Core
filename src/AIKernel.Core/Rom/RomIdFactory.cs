@@ -2,12 +2,12 @@ namespace AIKernel.Core.Rom;
 
 using AIKernel.Dtos.Rom;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomIdFactory']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomIdFactory']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomIdFactory']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomIdFactory']/summary" />
 public static class RomIdFactory
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomIdFactory.Create']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomIdFactory.Create']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomIdFactory.Create']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomIdFactory.Create']/summary" />
     public static RomId Create(string value, string? paramName = null)
     {
         if (string.IsNullOrWhiteSpace(value))

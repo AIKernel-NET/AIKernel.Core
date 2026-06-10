@@ -6,6 +6,25 @@ using Xunit;
 public sealed class ResultTests
 {
     [Fact]
+    public void OkAliasCreatesSuccessfulResult()
+    {
+        var result = Result<int>.Ok(42);
+
+        Assert.True(result.IsSuccessState);
+        Assert.Equal(42, result.Value);
+    }
+
+    [Fact]
+    public void OrElseUsesFallbackOnlyForFailure()
+    {
+        var success = Result<int>.Success(1).OrElse(Result<int>.Success(2));
+        var failure = Result<int>.Fail("blocked").OrElse(_ => Result<int>.Success(3));
+
+        Assert.Equal(1, success.Value);
+        Assert.Equal(3, failure.Value);
+    }
+
+    [Fact]
     public void Map_TransformsSuccess()
     {
         var result = Result<int>.Success(2).Map(x => x + 3);

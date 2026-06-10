@@ -5,14 +5,14 @@ using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Enums;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutionIdFactory']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutionIdFactory']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutionIdFactory']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutionIdFactory']/summary" />
 public sealed class KernelExecutionIdFactory
 {
     private readonly SemanticStateHasher _semanticStateHasher = new();
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateExecutionId']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateExecutionId']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateExecutionId']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateExecutionId']/summary" />
     public string CreateExecutionId(
         KernelExecutionRequest request,
         ExecutionStatus status,
@@ -33,8 +33,8 @@ public sealed class KernelExecutionIdFactory
                 executionSequence));
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateExecutionId']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateExecutionId']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateExecutionId']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateExecutionId']/summary" />
     public Result<string> TryCreateExecutionId(
         KernelExecutionRequest request,
         ExecutionStatus status,
@@ -52,8 +52,8 @@ public sealed class KernelExecutionIdFactory
             executionSequence);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateFallbackExecutionId']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateFallbackExecutionId']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateFallbackExecutionId']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateFallbackExecutionId']/summary" />
     public string CreateFallbackExecutionId(
         KernelRequest request,
         ExecutionStatus status)
@@ -63,8 +63,8 @@ public sealed class KernelExecutionIdFactory
         return Unwrap(CreateFallbackExecutionIdResult(request, status));
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateFallbackExecutionId']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateFallbackExecutionId']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateFallbackExecutionId']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateFallbackExecutionId']/summary" />
     public Result<string> TryCreateFallbackExecutionId(
         KernelRequest request,
         ExecutionStatus status)
@@ -103,12 +103,7 @@ public sealed class KernelExecutionIdFactory
     }
 
     private static string Unwrap(Result<string> result)
-    {
-        if (result.IsSuccess)
-        {
-            return result.Value!;
-        }
-
-        throw new InvalidOperationException(result.Error!.Message);
-    }
+        => result.Match(
+            error => throw new InvalidOperationException(error.Message),
+            value => value);
 }

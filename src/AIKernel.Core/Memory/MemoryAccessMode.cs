@@ -1,17 +1,20 @@
 namespace AIKernel.Core.Memory;
 
 /// <summary>
-/// Declares the access mode requested for a native memory mapping.
+/// [EN] Declares the access mode requested for a native memory mapping.
+/// [JA] AIKernel の公開参照サーフェスにおける MemoryAccessMode を説明します。
 /// </summary>
 public enum MemoryAccessMode
 {
     /// <summary>
-    /// Read-only memory mapping.
+    /// [EN] Read-only memory mapping.
+    /// [JA] 読み取り専用のメモリマッピングです。
     /// </summary>
     Read = 0,
 
     /// <summary>
-    /// Read/write memory mapping.
+    /// [EN] Read/write memory mapping.
+    /// [JA] 読み取り/書き込み用のメモリマッピングです。
     /// </summary>
     ReadWrite = 1
 }

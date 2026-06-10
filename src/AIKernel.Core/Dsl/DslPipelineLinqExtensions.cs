@@ -74,25 +74,16 @@ internal static class DslPipelineLinqExtensions
         return new DelegateKernelPipeline(context =>
             pipeline.Execute(context).Bind(value =>
             {
-                bool accepted;
-                try
-                {
-                    accepted = predicate(value);
-                }
-                catch (Exception ex)
-                {
-                    return PredicateExceptionResult(ex);
-                }
-
-                if (accepted)
-                {
-                    return ResultStep<DslPipelineState, DslPipelineValue>
-                        .Success(
-                            DslPipelineState.Initial("dsl.pipeline.linq"),
-                            value);
-                }
-
-                return PredicateRejectedResult();
+                return Try
+                    .Run(() => predicate(value))
+                    .Match(
+                        PredicateExceptionResult,
+                        accepted => accepted
+                            ? ResultStep<DslPipelineState, DslPipelineValue>
+                                .Success(
+                                    DslPipelineState.Initial("dsl.pipeline.linq"),
+                                    value)
+                            : PredicateRejectedResult());
             }));
     }
 
@@ -128,11 +119,11 @@ internal static class DslPipelineLinqExtensions
                 "where"));
 
     private static ResultStep<DslPipelineState, DslPipelineValue> PredicateExceptionResult(
-        Exception exception)
+        ErrorContext error)
         => ResultStep<DslPipelineState, DslPipelineValue>
             .Fail(
                 DslPipelineState.Initial("dsl.pipeline.linq"),
-                ErrorContext.FromException(exception) with
+                error with
                 {
                     FailureKind = FailureKind.FailClosed,
                     OriginStep = OriginStep.KernelFacade,

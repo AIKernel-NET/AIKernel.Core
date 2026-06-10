@@ -4,11 +4,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
-    <Version>0.1.0.1</Version>
-    <AssemblyVersion>0.1.0.1</AssemblyVersion>
-    <FileVersion>0.1.0.1</FileVersion>
-    <InformationalVersion>0.1.0.1</InformationalVersion>
-    <AIKernelPackageVersion>0.1.0</AIKernelPackageVersion>
+    <Version>0.1.1</Version>
+    <PackageVersion>0.1.1</PackageVersion>
+    <AssemblyVersion>0.1.1.0</AssemblyVersion>
+    <FileVersion>0.1.1.0</FileVersion>
+    <InformationalVersion>0.1.1</InformationalVersion>
+    <AIKernelPackageVersion>[0.1.1]</AIKernelPackageVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <Authors>Takuya Sogawa</Authors>
@@ -19,7 +20,7 @@
     <Copyright>Copyright © 2026 Takuya Sogawa of AIKernel-NET</Copyright>
     <PackageTags>aikernel;aikernel-core;ai-os;kernel;provider;hosting;rom;vfs;context;execution;immutability;fail-closed;capability-modules;dynamicslm;seedslm;hatl;admissibility;semantic-compilation</PackageTags>
     <PackageReleaseNotes>
-      AIKernel.Core package family v0.1.0.1 - Patch release aligned with official AIKernel.NET contract packages v0.1.0. Core provides Result/Option/Either, ResultStep/ReplayLog semantics, DSL and ROM runtime adapters, Kernel orchestration, Provider integration, Core-owned MemoryRegion/MemoryMapper runtime adapters, and Kernel provider-routing facade helpers. GPU and Native ABI implementations remain external Capability packages.
+      AIKernel.Core package family v0.1.1 - Release build aligned with official AIKernel.NET contract packages v0.1.1. Adds Core-owned ROM storage and VFS Git capability contracts, built-in SkillProvider, LocalExecutionProvider, MinimalRuntimeProvider, VfsProvider, SystemInfoProvider, dynamic provider registry surfaces, matching Python descriptors, broader monadic DSL/ROM/VFS parsing, validation, invocation, metadata boundaries, ResultStep Match projection, safer DSL/ROM/Kernel execution branching, and additional Result/Either/Option adapter projection cleanup.
     </PackageReleaseNotes>
   </PropertyGroup>
 

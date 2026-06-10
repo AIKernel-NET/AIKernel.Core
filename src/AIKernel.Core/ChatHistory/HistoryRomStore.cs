@@ -31,32 +31,26 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
         string version = "1",
         IReadOnlyList<string>? securityTags = null)
     {
-        var romId = HistoryRomPath.CreateRomId(@namespace, name);
-        if (romId.IsFailure)
-        {
-            return Result<HistoryRomMetadata>.Fail(romId.Error!);
-        }
+        var markdown =
+            from romId in HistoryRomPath.CreateRomId(@namespace, name)
+            from text in ChatHistoryRomExporter.ToRomMarkdown(
+                records,
+                new ChatHistoryRomOptions(
+                    romId,
+                    generatedAtUtc,
+                    entityType,
+                    version,
+                    securityTags))
+            select text;
 
-        var markdown = ChatHistoryRomExporter.ToRomMarkdown(
-            records,
-            new ChatHistoryRomOptions(
-                romId.Value!,
-                generatedAtUtc,
-                entityType,
-                version,
-                securityTags));
-
-        if (markdown.IsFailure)
-        {
-            return Result<HistoryRomMetadata>.Fail(markdown.Error!);
-        }
-
-        return await SaveMarkdownAsRomAsync(
+        return await markdown.Match(
+            error => Task.FromResult(Result<HistoryRomMetadata>.Fail(error)),
+            text => SaveMarkdownAsRomAsync(
                 session,
                 @namespace,
                 name,
-                markdown.Value!,
-                generatedAtUtc)
+                text,
+                generatedAtUtc))
             .ConfigureAwait(false);
     }
 
@@ -85,12 +79,9 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
                 securityTags)
             .ConfigureAwait(false);
 
-        if (result.IsFailure)
-        {
-            throw new InvalidOperationException(result.Error!.Message);
-        }
-
-        return HistoryRomContractMapper.ToContract(result.Value!);
+        return result.Match(
+            error => throw new InvalidOperationException(error.Message),
+            HistoryRomContractMapper.ToContract);
     }
 
     public async Task<Result<HistoryRomMetadata>> SaveMarkdownAsRomAsync(
@@ -106,19 +97,34 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
                 HistoryRomErrors.Error("VFS session is required."));
         }
 
-        var path = HistoryRomPath.Create(@namespace, name);
-        if (path.IsFailure)
-        {
-            return Result<HistoryRomMetadata>.Fail(path.Error!);
-        }
+        return await HistoryRomPath.Create(@namespace, name)
+            .Match(
+                error => Task.FromResult(Result<HistoryRomMetadata>.Fail(error)),
+                path => SaveMarkdownAtPathAsync(
+                    session,
+                    @namespace,
+                    name,
+                    markdown,
+                    createdAtUtc,
+                    path))
+            .ConfigureAwait(false);
+    }
 
+    private async Task<Result<HistoryRomMetadata>> SaveMarkdownAtPathAsync(
+        IVfsSession session,
+        string @namespace,
+        string name,
+        string markdown,
+        DateTimeOffset createdAtUtc,
+        string path)
+    {
         var wroteNewFile = false;
 
-        try
+        var result = await Try.RunAsync(async () =>
         {
-            if (await session.ExistsAsync(path.Value!).ConfigureAwait(false))
+            if (await session.ExistsAsync(path).ConfigureAwait(false))
             {
-                var existing = await ReadMarkdownAsync(session, path.Value!)
+                var existing = await ReadMarkdownAsync(session, path)
                     .ConfigureAwait(false);
                 if (!string.Equals(existing, markdown, StringComparison.Ordinal))
                 {
@@ -129,7 +135,7 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
             else
             {
                 await session.WriteFileAsync(
-                        path.Value!,
+                        path,
                         Encoding.UTF8.GetBytes(markdown))
                     .ConfigureAwait(false);
                 wroteNewFile = true;
@@ -142,28 +148,28 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
                     createdAtUtc)
                 .ConfigureAwait(false);
 
-            if (loaded.IsFailure && wroteNewFile)
-            {
-                await TryDeleteAsync(session, path.Value!).ConfigureAwait(false);
-            }
+            await DeleteWhenFailedAsync(loaded, wroteNewFile, session, path)
+                .ConfigureAwait(false);
 
             return loaded;
-        }
-        catch (Exception ex)
-        {
-            if (wroteNewFile)
-            {
-                await TryDeleteAsync(session, path.Value!).ConfigureAwait(false);
-            }
+        }).ConfigureAwait(false);
 
-            return Result<HistoryRomMetadata>.Fail(ErrorContext.FromException(ex) with
-            {
-                FailureKind = FailureKind.FailClosed,
-                OriginStep = OriginStep.KernelFacade,
-                SemanticSlot = SemanticSlot.C
-            });
-        }
+        await DeleteWhenFailedAsync(result, wroteNewFile, session, path)
+            .ConfigureAwait(false);
+
+        return result.Match(FailClosedHistoryRom<HistoryRomMetadata>, value => value);
     }
+
+    private static Task DeleteWhenFailedAsync<T>(
+        Result<T> result,
+        bool wroteNewFile,
+        IVfsSession session,
+        string path)
+        => result.Match(
+            _ => wroteNewFile
+                ? TryDeleteAsync(session, path)
+                : Task.CompletedTask,
+            _ => Task.CompletedTask);
 
     async Task<AIKernel.Dtos.History.HistoryRomMetadata>
         AIKernel.Abstractions.History.IHistoryRomStore.SaveMarkdownAsRomAsync(
@@ -184,12 +190,9 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
                 createdAtUtc)
             .ConfigureAwait(false);
 
-        if (result.IsFailure)
-        {
-            throw new InvalidOperationException(result.Error!.Message);
-        }
-
-        return HistoryRomContractMapper.ToContract(result.Value!);
+        return result.Match(
+            error => throw new InvalidOperationException(error.Message),
+            HistoryRomContractMapper.ToContract);
     }
 
     public async Task<Result<HistoryRomMetadata>> LoadHistoryRomAsync(
@@ -205,18 +208,32 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
                 HistoryRomErrors.Error("VFS session is required."));
         }
 
-        var path = HistoryRomPath.Create(@namespace, name);
-        if (path.IsFailure)
-        {
-            return Result<HistoryRomMetadata>.Fail(path.Error!);
-        }
+        return await HistoryRomPath.Create(@namespace, name)
+            .Match(
+                error => Task.FromResult(Result<HistoryRomMetadata>.Fail(error)),
+                path => LoadHistoryRomAtPathAsync(
+                    session,
+                    @namespace,
+                    name,
+                    createdAtUtc,
+                    expectedRomHash,
+                    path))
+            .ConfigureAwait(false);
+    }
 
-        try
+    private async Task<Result<HistoryRomMetadata>> LoadHistoryRomAtPathAsync(
+        IVfsSession session,
+        string @namespace,
+        string name,
+        DateTimeOffset createdAtUtc,
+        string? expectedRomHash,
+        string path)
+        => (await Try.RunAsync(async () =>
         {
-            var markdown = await ReadMarkdownAsync(session, path.Value!)
+            var markdown = await ReadMarkdownAsync(session, path)
                 .ConfigureAwait(false);
 
-            var rom = await _loader.LoadAsync(session, path.Value!)
+            var rom = await _loader.LoadAsync(session, path)
                 .ConfigureAwait(false);
 
             var snapshot = _provider.CreateSnapshot(
@@ -227,23 +244,8 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
                 rom,
                 expectedRomHash);
 
-            if (snapshot.IsFailure)
-            {
-                return Result<HistoryRomMetadata>.Fail(snapshot.Error!);
-            }
-
-            return _registry.Register(snapshot.Value!);
-        }
-        catch (Exception ex)
-        {
-            return Result<HistoryRomMetadata>.Fail(ErrorContext.FromException(ex) with
-            {
-                FailureKind = FailureKind.FailClosed,
-                OriginStep = OriginStep.KernelFacade,
-                SemanticSlot = SemanticSlot.C
-            });
-        }
-    }
+            return snapshot.Bind(_registry.Register);
+        }).ConfigureAwait(false)).Match(FailClosedHistoryRom<HistoryRomMetadata>, value => value);
 
     async Task<AIKernel.Dtos.History.HistoryRomMetadata>
         AIKernel.Abstractions.History.IHistoryRomStore.LoadHistoryRomAsync(
@@ -264,12 +266,9 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
                 expectedRomHash)
             .ConfigureAwait(false);
 
-        if (result.IsFailure)
-        {
-            throw new InvalidOperationException(result.Error!.Message);
-        }
-
-        return HistoryRomContractMapper.ToContract(result.Value!);
+        return result.Match(
+            error => throw new InvalidOperationException(error.Message),
+            HistoryRomContractMapper.ToContract);
     }
 
     private static async Task<string> ReadMarkdownAsync(
@@ -285,16 +284,22 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
         IVfsSession session,
         string path)
     {
-        try
+        await Try.RunAsync(async () =>
         {
             if (await session.ExistsAsync(path).ConfigureAwait(false))
             {
                 await session.DeleteAsync(path).ConfigureAwait(false);
             }
-        }
-        catch
-        {
-            // Cleanup is best-effort; the original fail-closed error remains authoritative.
-        }
+
+            return true;
+        }).ConfigureAwait(false);
     }
+
+    private static Result<T> FailClosedHistoryRom<T>(ErrorContext error)
+        => Result<T>.Fail(error with
+        {
+            FailureKind = FailureKind.FailClosed,
+            OriginStep = OriginStep.KernelFacade,
+            SemanticSlot = SemanticSlot.C
+        });
 }

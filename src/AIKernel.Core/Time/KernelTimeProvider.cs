@@ -1,6 +1,7 @@
-using AIKernel.Dtos.Time;
-
 namespace AIKernel.Core.Time;
+
+using AIKernel.Common.Results;
+using AIKernel.Dtos.Time;
 
 /// <summary>
 /// AIKernel.NET における「時間の法」を表す TimeProvider です。
@@ -17,8 +18,8 @@ namespace AIKernel.Core.Time;
 /// v0.1.0 では標準 TimeProvider への委譲と固定時刻 replay を提供します。
 /// v0.2.0 以降で HLC、署名付き時刻、外部時刻証明などを追加する席をここに確保します。
 /// </summary>
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.KernelTimeProvider']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.KernelTimeProvider']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.KernelTimeProvider']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.KernelTimeProvider']/summary" />
 public abstract class KernelTimeProvider : TimeProvider
 {
     /// <summary>Initializes a new instance for the KernelTimeProvider AIKernel contract surface. JA: KernelTimeProvider AIKernel 契約サーフェスの新しいインスタンスを初期化します。</summary>
@@ -44,8 +45,8 @@ public abstract class KernelTimeProvider : TimeProvider
     /// <summary>
     /// 決定論的リプレイ中かどうかを表します。
     /// </summary>
-    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.KernelTimeProvider.IsReplaying']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.KernelTimeProvider.IsReplaying']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.KernelTimeProvider.IsReplaying']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.KernelTimeProvider.IsReplaying']/summary" />
     public virtual bool IsReplaying { get; }
 
     /// <summary>
@@ -55,12 +56,12 @@ public abstract class KernelTimeProvider : TimeProvider
     /// 将来的に NTP、署名付き時刻、外部監査時刻などを導入した場合、
     /// その信頼性をここで表現します。
     /// </summary>
-    /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.ReliabilityScore']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.ReliabilityScore']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.ReliabilityScore']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.ReliabilityScore']/summary" />
     public virtual double ReliabilityScore => 1.0;
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetUtcNow']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetUtcNow']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetUtcNow']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetUtcNow']/summary" />
     public override DateTimeOffset GetUtcNow()
     {
         if (FixedUtcNow is not null)
@@ -71,23 +72,23 @@ public abstract class KernelTimeProvider : TimeProvider
         return BaseProvider.GetUtcNow();
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.LocalTimeZone']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.LocalTimeZone']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.LocalTimeZone']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.LocalTimeZone']/summary" />
     public override TimeZoneInfo LocalTimeZone => BaseProvider.LocalTimeZone;
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.TimestampFrequency']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.TimestampFrequency']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.TimestampFrequency']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.TimestampFrequency']/summary" />
     public override long TimestampFrequency => BaseProvider.TimestampFrequency;
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetTimestamp']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetTimestamp']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetTimestamp']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetTimestamp']/summary" />
     public override long GetTimestamp()
     {
         return BaseProvider.GetTimestamp();
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.CreateTimer']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.CreateTimer']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.CreateTimer']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.CreateTimer']/summary" />
     public override ITimer CreateTimer(
         TimerCallback callback,
         object? state,
@@ -103,14 +104,17 @@ public abstract class KernelTimeProvider : TimeProvider
     /// v0.1.0 では GetUtcNow() を単純にラップします。
     /// 将来的に HLC や署名付き時刻を導入しても、利用側はこの API を使い続けられます。
     /// </summary>
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetLogicalTimestamp']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetLogicalTimestamp']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetLogicalTimestamp']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetLogicalTimestamp']/summary" />
     public virtual KernelTimestamp GetLogicalTimestamp()
     {
         return new KernelTimestamp
         {
             UtcDateTime = GetUtcNow().ToUniversalTime(),
-            SourceId = IsReplaying ? "replay" : "system"
+            SourceId = SourceId(IsReplaying)
         };
     }
+
+    private static string SourceId(bool isReplaying)
+        => MonadicDecision.SelectText(isReplaying, "system", "replay");
 }

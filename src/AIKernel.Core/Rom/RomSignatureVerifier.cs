@@ -3,15 +3,15 @@ namespace AIKernel.Core.Rom;
 using AIKernel.Abstractions.Rom;
 using AIKernel.Dtos.Rom;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomSignatureVerifier']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomSignatureVerifier']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomSignatureVerifier']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomSignatureVerifier']/summary" />
 public sealed class RomSignatureVerifier : IRomSignatureVerifier
 {
     private readonly IRomCanonicalizer _canonicalizer;
     private readonly ISemanticHasher _semanticHasher;
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.#ctor']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.#ctor']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.#ctor']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.#ctor']/summary" />
     public RomSignatureVerifier(
         IRomCanonicalizer canonicalizer,
         ISemanticHasher semanticHasher)
@@ -23,8 +23,8 @@ public sealed class RomSignatureVerifier : IRomSignatureVerifier
             ?? throw new ArgumentNullException(nameof(semanticHasher));
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.VerifyAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.VerifyAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.VerifyAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.VerifyAsync']/summary" />
     public async Task<RomSignatureVerificationResult> VerifyAsync(
         RomSnapshotCandidate candidate,
         CancellationToken cancellationToken = default)

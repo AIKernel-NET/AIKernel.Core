@@ -2,26 +2,22 @@ using AIKernel.Common.Results;
 
 namespace AIKernel.Core.Memory;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']/summary" />
 public abstract class MemoryMapperBase : IMemoryMapper
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']/summary" />
     public IMemoryRegion Open(
         string path,
         MemoryAccessMode accessMode = MemoryAccessMode.Read)
-    {
-        var result = OpenResult(path, accessMode);
-        if (result.IsSuccess)
-            return result.Value!;
+        => OpenResult(path, accessMode)
+            .Match(
+                error => throw new InvalidOperationException(error.Message),
+                region => region);
 
-        throw new InvalidOperationException(
-            result.Error?.Message ?? "Memory mapping failed.");
-    }
-
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult']/summary" />
     public Result<IMemoryRegion> OpenResult(
         string path,
         MemoryAccessMode accessMode = MemoryAccessMode.Read)
@@ -30,18 +26,14 @@ public abstract class MemoryMapperBase : IMemoryMapper
             return Result<IMemoryRegion>.Fail(MemoryMappingErrors.Error(
                 "Memory access mode is invalid."));
 
-        var normalized = NormalizePath(path);
-        if (normalized.IsFailure)
-            return Result<IMemoryRegion>.Fail(normalized.Error!);
-
-        try
-        {
-            return OpenCore(normalized.Value!, accessMode);
-        }
-        catch (Exception ex)
-        {
-            return Result<IMemoryRegion>.Fail(MemoryMappingErrors.FromException(ex));
-        }
+        return
+            from normalized in NormalizePath(path)
+            from region in Try
+                .Run(() => OpenCore(normalized, accessMode))
+                .Match(
+                    error => Result<IMemoryRegion>.Fail(MemoryMappingErrors.FromContext(error)),
+                    result => result)
+            select region;
     }
 
     /// <summary>Executes the OpenCore operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで OpenCore 操作を実行します。</summary>
@@ -54,13 +46,10 @@ public abstract class MemoryMapperBase : IMemoryMapper
         if (string.IsNullOrWhiteSpace(path))
             return Result<string>.Fail(MemoryMappingErrors.Error("Memory mapped path is required."));
 
-        try
-        {
-            return Result<string>.Success(Path.GetFullPath(path));
-        }
-        catch (Exception ex)
-        {
-            return Result<string>.Fail(MemoryMappingErrors.FromException(ex));
-        }
+        return Try
+            .Run(() => Path.GetFullPath(path))
+            .Match(
+                error => Result<string>.Fail(MemoryMappingErrors.FromContext(error)),
+                Result<string>.Success);
     }
 }

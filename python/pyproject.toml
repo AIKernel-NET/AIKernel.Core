@@ -4,8 +4,8 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "aikernel-net"
-version = "0.1.0.1"
-description = "Python binding for AIKernel Core 0.1.0.1 functional primitives and managed assembly discovery."
+version = "0.1.1"
+description = "Python binding for AIKernel Core 0.1.1 functional primitives, provider contracts, manifests, and managed assembly discovery."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
@@ -17,7 +17,9 @@ keywords = [
   "aikernel-net",
   "capability",
   "monads",
-  "managed-assemblies"
+  "managed-assemblies",
+  "provider-manifest",
+  "standard-providers"
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",

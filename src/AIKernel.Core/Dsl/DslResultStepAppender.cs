@@ -10,13 +10,16 @@ internal static class DslResultStepAppender
         string decision,
         DateTimeOffset? timestamp)
     {
-        var delta = timestamp is null
-            ? DslSemanticDeltaFactory.CreateLoopDelta(iteration, decision)
-            : DslSemanticDeltaFactory.CreateLoopUntilDelta(iteration, timestamp, decision);
+        var delta = OptionalTimestamp(timestamp)
+            .Map(value => DslSemanticDeltaFactory.CreateLoopUntilDelta(
+                    iteration,
+                    value,
+                    decision))
+            .OrElse(DslSemanticDeltaFactory.CreateLoopDelta(iteration, decision));
 
-        return current.IsSuccess
-            ? AppendSuccess(current, current.State, current.Value!, delta)
-            : AppendFailure(current, current.State, current.Error!, delta);
+        return current.Match(
+            (state, error) => AppendFailure(current, state, error, delta),
+            (state, value) => AppendSuccess(current, state, value, delta));
     }
 
     public static ResultStep<DslPipelineState, DslPipelineValue> AppendSuccess(
@@ -45,7 +48,28 @@ internal static class DslResultStepAppender
 
     private static string? LastStepId(
         ResultStep<DslPipelineState, DslPipelineValue> current)
-        => current.ReplayLog.Count == 0
-            ? null
-            : current.ReplayLog[^1].StepId;
+        => LastReplayEntry(current).ToNullableStepId();
+
+    private static Option<ResultStepReplayLogEntry> LastReplayEntry(
+        ResultStep<DslPipelineState, DslPipelineValue> current)
+    {
+        if (current.ReplayLog.Count > 0)
+        {
+            return Option<ResultStepReplayLogEntry>.Some(current.ReplayLog[^1]);
+        }
+
+        return Option<ResultStepReplayLogEntry>.None();
+    }
+
+    private static Option<DateTimeOffset> OptionalTimestamp(
+        DateTimeOffset? timestamp)
+        => timestamp is { } value
+            ? Option<DateTimeOffset>.Some(value)
+            : Option<DateTimeOffset>.None();
+
+    private static string? ToNullableStepId(
+        this Option<ResultStepReplayLogEntry> entry)
+        => entry.Match<string?>(
+            () => null,
+            value => value.StepId);
 }

@@ -4,8 +4,8 @@ using System.Runtime.InteropServices;
 using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.PosixMemoryMapper']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.PosixMemoryMapper']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.PosixMemoryMapper']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.PosixMemoryMapper']/summary" />
 public sealed class PosixMemoryMapper : MemoryMapperBase
 {
     /// <summary>Executes the OpenCore operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで OpenCore 操作を実行します。</summary>

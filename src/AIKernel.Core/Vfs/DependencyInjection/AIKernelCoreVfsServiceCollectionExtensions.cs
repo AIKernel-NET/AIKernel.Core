@@ -10,12 +10,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions']/summary" />
 public static class AIKernelCoreVfsServiceCollectionExtensions
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']/summary" />
     public static IServiceCollection AddAIKernelCoreVfsProviders(
         this IServiceCollection services,
         Action<MemoryFileProviderOptions>? memory,
@@ -32,8 +32,8 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
             .AddWebGetFileProvider(webGet);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']/summary" />
     public static IServiceCollection AddAIKernelCoreVfsProviders(
         this IServiceCollection services,
         IConfiguration configuration,
@@ -50,8 +50,8 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
             .AddWebGetFileProvider(section.GetSection("WebGetFile"));
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']/summary" />
     public static IServiceCollection AddAIKernelBrowserVfsProviders(
         this IServiceCollection services,
         Action<MemoryFileProviderOptions>? memory = null)
@@ -61,8 +61,8 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services.AddMemoryFileProvider(memory);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']/summary" />
     public static IServiceCollection AddAIKernelBrowserVfsProviders(
         this IServiceCollection services,
         Action<WebGetFileProviderOptions> webGet,
@@ -76,8 +76,8 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
             .AddWebGetFileProvider(webGet);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']/summary" />
     public static IServiceCollection AddMemoryFileProvider(
         this IServiceCollection services,
         Action<MemoryFileProviderOptions>? configure = null)
@@ -94,8 +94,8 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services;
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']/summary" />
     public static IServiceCollection AddMemoryFileProvider(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -113,8 +113,8 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services;
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']/summary" />
     public static IServiceCollection AddLocalFileProvider(
         this IServiceCollection services,
         Action<LocalFileProviderOptions> configure)
@@ -132,8 +132,8 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services;
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']/summary" />
     public static IServiceCollection AddLocalFileProvider(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -151,8 +151,8 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services;
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']/summary" />
     public static IServiceCollection AddWebGetFileProvider(
         this IServiceCollection services,
         Action<WebGetFileProviderOptions> configure)
@@ -171,8 +171,8 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services;
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']/summary" />
     public static IServiceCollection AddWebGetFileProvider(
         this IServiceCollection services,
         IConfiguration configuration)

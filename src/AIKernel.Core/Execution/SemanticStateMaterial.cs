@@ -5,8 +5,8 @@ using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Enums;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.SemanticStateMaterial']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.SemanticStateMaterial']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.SemanticStateMaterial']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.SemanticStateMaterial']/summary" />
 public sealed record SemanticStateMaterial
 {
     private SemanticStateMaterial(
@@ -21,16 +21,16 @@ public sealed record SemanticStateMaterial
             ?? throw new ArgumentNullException(nameof(canonicalPayload));
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.Domain']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.Domain']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.Domain']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.Domain']/summary" />
     public string Domain { get; }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.CanonicalPayload']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.CanonicalPayload']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.CanonicalPayload']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.CanonicalPayload']/summary" />
     public string CanonicalPayload { get; }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelExecution']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelExecution']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelExecution']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelExecution']/summary" />
     public static SemanticStateMaterial FromKernelExecution(
         KernelExecutionRequest request,
         ExecutionStatus status,
@@ -49,8 +49,8 @@ public sealed record SemanticStateMaterial
                 executionSequence));
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelExecutionResult']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelExecutionResult']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelExecutionResult']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelExecutionResult']/summary" />
     public static Result<SemanticStateMaterial> CreateKernelExecutionResult(
         KernelExecutionRequest request,
         ExecutionStatus status,
@@ -92,8 +92,8 @@ public sealed record SemanticStateMaterial
             payload));
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelFallback']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelFallback']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelFallback']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelFallback']/summary" />
     public static SemanticStateMaterial FromKernelFallback(
         KernelRequest request,
         ExecutionStatus status)
@@ -101,8 +101,8 @@ public sealed record SemanticStateMaterial
         return Unwrap(CreateKernelFallbackResult(request, status));
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelFallbackResult']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelFallbackResult']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelFallbackResult']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelFallbackResult']/summary" />
     public static Result<SemanticStateMaterial> CreateKernelFallbackResult(
         KernelRequest request,
         ExecutionStatus status)
@@ -131,14 +131,9 @@ public sealed record SemanticStateMaterial
 
     private static SemanticStateMaterial Unwrap(
         Result<SemanticStateMaterial> result)
-    {
-        if (result.IsSuccess)
-        {
-            return result.Value!;
-        }
-
-        throw new InvalidOperationException(result.Error!.Message);
-    }
+        => result.Match(
+            error => throw new InvalidOperationException(error.Message),
+            value => value);
 
     private static ErrorContext SemanticHashError(string message)
     {

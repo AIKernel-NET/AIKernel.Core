@@ -157,6 +157,17 @@ Apache License 2.0
 Contributions are welcome. Please follow the AIKernel ecosystem’s coding style and architectural guidelines.
 
 AIKernel 全体のアーキテクチャガイドラインに従ってください。
+
+- [AIKernel Development Guidelines](../../../AIKernel.NET/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES.md)
+- [AIKernel 開発ガイドライン](../../../AIKernel.NET/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES-jp.md)
+
+Common owns the monadic primitives used by the rest of the ecosystem, so
+changes here must preserve LINQ composition, fail-closed semantics, deterministic
+identity metadata, and bilingual public documentation comments.
+
+Common は ecosystem 全体で利用される monadic primitive を所有します。そのため、
+ここでの変更は LINQ composition、fail-closed semantics、deterministic identity
+metadata、public API の bilingual documentation comment を維持してください。
 ## Maintainer / メンテナー
 
 AIKernel Project Maintained by **Takuya.S**

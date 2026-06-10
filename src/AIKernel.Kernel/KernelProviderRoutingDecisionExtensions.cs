@@ -3,18 +3,18 @@ namespace AIKernel.Kernel;
 using System.Collections.Immutable;
 using AIKernel.Dtos.Kernel;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions']/summary" />
 public static class KernelProviderRoutingDecisionExtensions
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ToMetadata']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ToMetadata']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ToMetadata']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ToMetadata']/summary" />
     public static ImmutableDictionary<string, string> ToMetadata(
         this KernelProviderRoutingDecision decision)
         => decision.ApplyTo(ImmutableDictionary<string, string>.Empty);
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyToRequest']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyToRequest']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyToRequest']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyToRequest']/summary" />
     public static KernelRequest ApplyToRequest(
         this KernelProviderRoutingDecision decision,
         KernelRequest request)
@@ -29,8 +29,8 @@ public static class KernelProviderRoutingDecisionExtensions
         };
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyTo']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyTo']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyTo']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyTo']/summary" />
     public static ImmutableDictionary<string, string> ApplyTo(
         this KernelProviderRoutingDecision decision,
         IReadOnlyDictionary<string, string>? metadata)

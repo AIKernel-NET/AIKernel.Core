@@ -1,11 +1,13 @@
 namespace AIKernel.Core.Vfs.Abstractions;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.VfsPathRules']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.VfsPathRules']" />
+using AIKernel.Common.Results;
+
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.VfsPathRules']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.VfsPathRules']/summary" />
 public static class VfsPathRules
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.Normalize']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.Normalize']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.Normalize']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.Normalize']/summary" />
     public static string Normalize(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -45,8 +47,8 @@ public static class VfsPathRules
         return string.Join('/', result);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.GetName']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.GetName']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.GetName']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.GetName']/summary" />
     public static string GetName(string path)
     {
         var normalized = Normalize(path);
@@ -57,11 +59,11 @@ public static class VfsPathRules
         }
 
         var index = normalized.LastIndexOf('/');
-        return index < 0 ? normalized : normalized[(index + 1)..];
+        return NameFromIndex(normalized, index);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsUnder']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsUnder']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsUnder']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsUnder']/summary" />
     public static bool IsUnder(string parent, string child)
     {
         parent = Normalize(parent);
@@ -72,19 +74,39 @@ public static class VfsPathRules
             || child.StartsWith(parent + "/", StringComparison.Ordinal);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsDirectChild']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsDirectChild']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsDirectChild']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsDirectChild']/summary" />
     public static bool IsDirectChild(string parent, string child)
     {
         parent = Normalize(parent);
         child = Normalize(child);
 
-        var relative = parent.Length == 0
-            ? child
-            : child.StartsWith(parent + "/", StringComparison.Ordinal)
-                ? child[(parent.Length + 1)..]
-                : string.Empty;
+        var relative = RelativeChild(parent, child);
 
         return relative.Length > 0 && !relative.Contains('/', StringComparison.Ordinal);
     }
+
+    private static string NameFromIndex(string normalized, int index)
+        => NameIndexDecision(normalized, index).Match(value => value, value => value);
+
+    private static Either<string, string> NameIndexDecision(string normalized, int index)
+        => index < 0
+            ? Either<string, string>.FromLeft(normalized)
+            : Either<string, string>.FromRight(normalized[(index + 1)..]);
+
+    private static string RelativeChild(string parent, string child)
+        => ParentDecision(parent)
+            .Match(
+                _ => child,
+                nonRootParent => ChildUnderParent(nonRootParent, child).Match(() => string.Empty, value => value));
+
+    private static Either<string, string> ParentDecision(string parent)
+        => parent.Length == 0
+            ? Either<string, string>.FromLeft(parent)
+            : Either<string, string>.FromRight(parent);
+
+    private static Option<string> ChildUnderParent(string parent, string child)
+        => child.StartsWith(parent + "/", StringComparison.Ordinal)
+            ? Option<string>.Some(child[(parent.Length + 1)..])
+            : Option<string>.None();
 }

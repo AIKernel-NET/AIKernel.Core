@@ -4,13 +4,21 @@
 
 この guide は AIKernel.Core を .NET / Python host から利用する方法を説明します。
 
+Core は AIOS SDK の kernel runtime layer です。決定論的 runtime、VFS / ROM、
+hosting、Kernel、標準 Core capability を提供し、provider、control、WASM、
+GPU、tools layer を追加する前の AIOS distribution の基盤になります。
+
+公式 AIOS ディストリビューション **AIKernel.Monolith** の開発も開始されています。
+Monolith は 0.1.x 系の安定化後に SDK layer を統合する標準 reference distribution
+として位置づけられます。
+
 ## Install Packages
 
 ```bash
-dotnet add package AIKernel.Common --version 0.1.0.2
-dotnet add package AIKernel.Core --version 0.1.0.2
-dotnet add package AIKernel.Hosting --version 0.1.0.2
-dotnet add package AIKernel.Kernel --version 0.1.0.2
+dotnet add package AIKernel.Common --version 0.1.1
+dotnet add package AIKernel.Core --version 0.1.1
+dotnet add package AIKernel.Hosting --version 0.1.1
+dotnet add package AIKernel.Kernel --version 0.1.1
 ```
 
 Python:

@@ -12,6 +12,19 @@ AIKernel.NET Core provides a robust execution foundation for managing knowledge 
 
 ---
 
+## AIOS SDK Role
+
+AIKernel.Core is the kernel runtime layer of the AIOS SDK. It supplies the
+deterministic runtime, monads, DSL, VFS/ROM, hosting, and standard Core
+providers that other layers combine into an AI Operating System distribution.
+
+AIKernel also provides an official AIOS distribution, codenamed
+**AIKernel.Monolith**. Monolith has begun development as the standard AIOS that
+integrates semantic runtime, capability graph, governance, providers, WASM,
+GPU backends, and tools after the 0.1.x SDK line stabilizes.
+
+---
+
 ## Architectural Discipline
 
 AIKernel.NET Core operates according to the following three canonical principles.
@@ -216,17 +229,17 @@ For a focused package usage walkthrough, see the
 ### 1. Install Packages
 
 ```bash
-dotnet add package AIKernel.Core --version 0.1.0
-dotnet add package AIKernel.Hosting --version 0.1.0
-dotnet add package AIKernel.Kernel --version 0.1.0
-dotnet add package AIKernel.Providers.MicrosoftAI --version 0.1.0
+dotnet add package AIKernel.Core --version 0.1.1
+dotnet add package AIKernel.Hosting --version 0.1.1
+dotnet add package AIKernel.Kernel --version 0.1.1
+dotnet add package AIKernel.Providers.MicrosoftAI --version 0.1.1
 ```
 
 For direct use of functional primitives and contract testing helpers:
 
 ```bash
-dotnet add package AIKernel.Common --version 0.1.0
-dotnet add package AIKernel.TestKit --version 0.1.0
+dotnet add package AIKernel.Common --version 0.1.1
+dotnet add package AIKernel.TestKit --version 0.1.1
 ```
 
 CUDA is optional and lives outside this repository. GPU hosts should install an
@@ -239,7 +252,7 @@ local NuGet source, and install from that source:
 
 ```bash
 dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
-dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.1.0
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.1.1
 ```
 
 LLM / SLM developers who need direct CUDA integration should read
@@ -260,8 +273,9 @@ named `aikernel` is a different project. GPU/native runtimes remain explicit
 Capability installs.
 
 Stable Python releases are published to PyPI as `aikernel-net`. Development
-builds may be published separately through GitHub Packages as
-`aikernel-net-dev` for CI/CD validation.
+builds may be used for CI/CD validation, but user-facing release notes describe
+only public package releases and fold development changes into the next public
+release entry.
 
 For source-based local validation, install from the repository subdirectory:
 
@@ -273,8 +287,8 @@ The default Python install is CPU-only/CUDA-free and does not include a native
 bridge. Install GPU integrations from the matching external Capability package
 and follow that Capability repository's distribution instructions.
 
-The v0.1.0 package family is aligned with the AIKernel.NET contract packages
-`AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.1.0.
+The v0.1.1 package family is aligned with the AIKernel.NET contract packages
+`AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.1.1.
 `AIKernel.Vfs` is no longer a separate package dependency; the VFS contracts are
 provided by `AIKernel.Abstractions`. The `AIKernel.Vfs` namespace remains as a
 Core implementation namespace for in-process VFS providers and stores; it is not
@@ -421,7 +435,7 @@ content.
 ## Target Boot Experience
 
 ```text
-[KERNEL] Initializing AIKernel.NET Core v0.1.0...
+[KERNEL] Initializing AIKernel.NET Core v0.1.1...
 [KERNEL] Loading VFS Provider: local... [OK]
 [KERNEL] Mounting ROM root... [OK]
 [KERNEL] Building ContextSnapshot... [OK]

@@ -7,17 +7,13 @@
 - Promotes the Python binding metadata to the AIKernel.Core 0.1.1 release line.
 - Aligns managed assembly discovery with AIKernel.NET contract packages and AIKernel.Core packages version 0.1.1.
 - Keeps the standard provider, provider manifest, monadic result, and managed assembly discovery surfaces stable for the 0.1.1 package registration flow.
-
-## 0.1.0.2.dev36 — Core standard provider contract preview
-
 - Added Python descriptors for Core standard providers:
   `MinimalRuntimeProvider`, `LocalExecutionProvider`, `VfsProvider`,
   `SkillProvider`, and `SystemInfoProvider`.
 - Exposed standard provider and capability lookup helpers without
   reimplementing C# provider execution logic.
-- Aligned managed assembly discovery with the AIKernel.Core `0.1.0-dev39`
-  local development package while keeping shared contract assemblies on the
-  stable `0.1.0` line.
+- Aligned managed assembly discovery with the AIKernel.Core 0.1.1 package
+  family.
 - Added provider-level managed invoker metadata for `SkillProvider` so the
   Python descriptors match the C# dynamic skill invocation surface.
 - Aligned Python ROM storage and VFS Git contract operation ordering with the

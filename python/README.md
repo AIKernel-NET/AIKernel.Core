@@ -16,21 +16,21 @@ The PyPI package named `aikernel` belongs to another project. AIKernel.NET uses
 the distribution name `aikernel-net` to avoid that collision. Import the module
 as `aikernel_net`.
 
-See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the `0.1.0` stable baseline notes.
+See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the current `0.1.1` stable release notes.
 
 ## Release Channels
 
 Stable user releases are published to PyPI:
 
 - distribution: `aikernel-net`
-- versions: `0.1.0`, then later stable releases
+- versions: `0.1.1`, then later stable releases
 - policy: stable releases only
 
 Development releases are reserved for CI/CD and developer validation through
 GitHub Packages:
 
 - distribution: `aikernel-net-dev`
-- versions: `0.1.0-dev.1` style prereleases
+- versions: `0.1.1-dev.1` style prereleases
 - policy: breaking changes are allowed
 
 User documentation defaults to the PyPI stable package. Use development

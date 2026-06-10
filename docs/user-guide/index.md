@@ -4,13 +4,22 @@
 
 This guide explains how to consume AIKernel.Core from .NET and Python hosts.
 
+Core is the kernel runtime layer of the AIOS SDK. It provides the deterministic
+runtime, VFS/ROM, hosting, Kernel, and standard Core capabilities that an AIOS
+distribution builds on before adding providers, control, WASM, GPU, or tools
+layers.
+
+AIKernel.Monolith is the official AIOS distribution now in development. It will
+serve as the standard reference distribution that integrates the SDK layers
+after the 0.1.x line stabilizes.
+
 ## Install Packages
 
 ```bash
-dotnet add package AIKernel.Common --version 0.1.0.2
-dotnet add package AIKernel.Core --version 0.1.0.2
-dotnet add package AIKernel.Hosting --version 0.1.0.2
-dotnet add package AIKernel.Kernel --version 0.1.0.2
+dotnet add package AIKernel.Common --version 0.1.1
+dotnet add package AIKernel.Core --version 0.1.1
+dotnet add package AIKernel.Hosting --version 0.1.1
+dotnet add package AIKernel.Kernel --version 0.1.1
 ```
 
 Python:

@@ -6,6 +6,14 @@ This folder contains implementation-side development guides for AIKernel.Core.
 Canonical papers are managed in the AIKernel.NET repository; this folder is for
 runtime implementation and package usage guidance.
 
+These docs describe Core as the kernel runtime layer of the AIOS SDK. Core is
+the stable base that AIOS distributions combine with providers, control,
+WASM, GPU backends, tools, and examples.
+
+AIKernel.Monolith is the official AIOS distribution now in development. It is
+planned as the reference system that integrates the SDK layers after the 0.1.x
+line stabilizes.
+
 ## Development Guides
 
 - [User Guide](user-guide/index.md)
@@ -14,6 +22,26 @@ runtime implementation and package usage guidance.
 - [AIKernel.Core Release Checklist](operations/release-checklist.md)
 - [AIKernel.Core リリースチェックリスト](operations/release-checklist-jp.md)
 - [AIKernel.Python README](../python/README.md)
+
+## Which Page Should I Read?
+
+- Read the User Guide when installing Core packages or confirming the standard
+  provider boot surface.
+- Read the CUDA Capability guide only when you are adding an explicit external
+  GPU/native package; default Core and Python installs are CPU-only.
+- Read the Release Checklist when preparing packages for publication.
+- Read the Python README when consuming Core from Python through
+  `aikernel-net`.
+
+## First Validation
+
+Core users should first validate the CPU/default package family before adding
+external providers or native capability modules:
+
+```powershell
+dotnet build AIKernel.Core.slnx -c Release
+dotnet test AIKernel.Core.slnx -c Release --no-build
+```
 
 ## Package Boundaries
 

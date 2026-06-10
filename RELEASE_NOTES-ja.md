@@ -2,18 +2,22 @@
 
 [English](RELEASE_NOTES.md)
 
-## 0.1.0
+## 0.1.1
 
-> [EN] Core 0.1.0 stabilizes the canonical boundaries: Context, Execution, VFS, and Semantic State now form a governed circuit.
->
-> [JA] Core 0.1.0 は正準境界を確立──Context・Execution・VFS・Semantic State が統治回路として結線される。
+**June 10th, 2026 - Cohering the core runtime.**
+**2026年6月10日--コアランタイムを一貫化する。**
 
-AIKernel.Core 0.1.0 は、AIKernel Semantic Runtime の最初の実行可能 runtime baseline です。
+Cohering the core runtime: execution, context, and semantic state form a
+governed kernel circuit. コアランタイムの一貫化--Execution・Context・Semantic
+State が統治されたカーネル回路を形成する。
 
-- AIKernel.NET 0.1.0 の Abstractions、DTO、Enum、Control、routing、memory、DSL、History ROM、Capability ROM、governance contract と整合します。
+AIKernel.Core 0.1.1 は、AIKernel Semantic OS package family の同期された実行可能
+runtime baseline です。
+
+- AIKernel.NET 0.1.1 の Abstractions、DTO、Enum、Control、routing、memory、DSL、History ROM、Capability ROM、governance contract と整合します。
 - `AIKernel.Common`、`AIKernel.Core`、`AIKernel.Kernel`、`AIKernel.Hosting`、`AIKernel.Providers.MicrosoftAI`、`AIKernel.TestKit` の runtime family を提供します。
 - Result、Option、Either、ResultStep、LINQ composition、ReplayLog、SemanticDelta、DSL execution、ROM registration、fail-closed Kernel boundary を安定化します。
-- 0.1.0.2 development patch line 向けに Core 標準 Provider surface を追加します:
+- 0.1.1 release line 向けに Core 標準 Provider surface を追加します:
   `MinimalRuntimeProvider`、`LocalExecutionProvider`、`VfsProvider`、
   `SkillProvider`、`SystemInfoProvider`。これらの組み込み Provider は、
   Tools や外部 Provider に依存せず、決定論的 boot、local DSL execution、read-only VFS、
@@ -26,4 +30,5 @@ AIKernel.Core 0.1.0 は、AIKernel Semantic Runtime の最初の実行可能 run
   Python surface は C# execution logic を再実装せず、Core 標準 Provider、provider manifest、
   ROM storage、VFS Git の contract descriptor を公開します。
 
-このリリースは 0.0.x の設計実装ラインを閉じ、0.1.x の prototype validation line を開始します。
+この release は Core runtime、contract、standard provider surface、Python binding
+metadata を横断して 0.1.1 の semantic circuit を同期します。

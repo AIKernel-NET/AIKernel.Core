@@ -78,7 +78,7 @@ full runtime `.nupkg` は GitHub Release asset として配布します。
 
 ```bash
 dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
-dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.1.0
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.1.1
 ```
 
 GitHub Release page URL は NuGet source ではありません。full `.nupkg` を先に取得し、

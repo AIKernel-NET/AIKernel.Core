@@ -2,16 +2,19 @@
 
 [日本語](RELEASE_NOTES-ja.md)
 
-## 0.1.0
+## 0.1.1
 
-> [EN] Core 0.1.0 stabilizes the canonical boundaries: Context, Execution, VFS, and Semantic State now form a governed circuit.
->
-> [JA] Core 0.1.0 は正準境界を確立──Context・Execution・VFS・Semantic State が統治回路として結線される。
+**June 10th, 2026 - Cohering the core runtime.**
+**2026年6月10日--コアランタイムを一貫化する。**
 
-AIKernel.Core 0.1.0 is the first executable runtime baseline for the AIKernel
-semantic runtime.
+Cohering the core runtime: execution, context, and semantic state form a
+governed kernel circuit. コアランタイムの一貫化--Execution・Context・Semantic
+State が統治されたカーネル回路を形成する。
 
-- Align with AIKernel.NET 0.1.0 contracts for Abstractions, DTOs, Enums,
+AIKernel.Core 0.1.1 is the synchronized executable runtime baseline for the
+AIKernel Semantic OS package family.
+
+- Align with AIKernel.NET 0.1.1 contracts for Abstractions, DTOs, Enums,
   Control, routing, memory, DSL, History ROM, Capability ROM, and governance.
 - Provide the runtime family: `AIKernel.Common`, `AIKernel.Core`,
   `AIKernel.Kernel`, `AIKernel.Hosting`, `AIKernel.Providers.MicrosoftAI`, and
@@ -19,7 +22,7 @@ semantic runtime.
 - Stabilize Result, Option, Either, ResultStep, LINQ composition, ReplayLog,
   SemanticDelta, DSL execution, ROM registration, and fail-closed Kernel
   boundaries.
-- Add Core standard provider surfaces for the 0.1.0.2 development patch line:
+- Add Core standard provider surfaces for the 0.1.1 release line:
   `MinimalRuntimeProvider`, `LocalExecutionProvider`, `VfsProvider`,
   `SkillProvider`, and `SystemInfoProvider`. These built-in providers expose
   deterministic boot, local DSL execution, read-only VFS, OpenAI-compatible
@@ -35,5 +38,5 @@ semantic runtime.
   Core standard providers, provider manifests, ROM storage, and VFS Git without
   reimplementing C# execution logic.
 
-This release closes the 0.0.x design-implementation line and opens the 0.1.x
-prototype validation line.
+This release synchronizes the 0.1.1 semantic circuit across Core runtime,
+contracts, standard provider surfaces, and Python binding metadata.

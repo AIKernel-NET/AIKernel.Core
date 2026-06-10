@@ -8,15 +8,12 @@
 - Managed assembly discovery を AIKernel.NET contract packages と AIKernel.Core packages の 0.1.1 に揃えました。
 - standard provider、provider manifest、monadic result、managed assembly discovery の公開面を 0.1.1 package registration flow 向けに安定化しました。
 
-## 0.1.0.2.dev36 — Core 標準 Provider contract preview
-
 - Core 標準 Provider の Python descriptor を追加しました:
   `MinimalRuntimeProvider`, `LocalExecutionProvider`, `VfsProvider`,
   `SkillProvider`, `SystemInfoProvider`。
 - C# 側の provider execution logic を再実装せず、standard provider / capability
   lookup helper を公開しました。
-- Managed assembly discovery を AIKernel.Core `0.1.0-dev39` の local development
-  package に合わせました。共有 contract assemblies は stable `0.1.0` line を維持します。
+- Managed assembly discovery を AIKernel.Core 0.1.1 package family に合わせました。
 - `SkillProvider` の provider-level managed invoker metadata を追加し、Python
   descriptor を C# の dynamic skill invocation surface と整合させました。
 - Python の ROM storage / VFS Git contract operation order を C# の Core-owned

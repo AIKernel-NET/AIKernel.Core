@@ -6,6 +6,14 @@
 Canonical papers は AIKernel.NET repository で管理します。この folder は runtime
 implementation と package usage guidance のためのものです。
 
+この docs は、AIOS SDK における kernel runtime layer として Core を説明します。
+Core は provider、control、WASM、GPU backend、tools、example と組み合わせて
+AIOS distribution を構築するための安定した基盤です。
+
+公式 AIOS ディストリビューション **AIKernel.Monolith** の開発も開始されています。
+Monolith は 0.1.x 系の安定化後に SDK layer を統合する reference system として
+位置づけられます。
+
 ## Development Guides
 
 - [User Guide](user-guide/index-ja.md)
@@ -15,6 +23,25 @@ implementation と package usage guidance のためのものです。
 - [AIKernel.Core リリースチェックリスト](operations/release-checklist-jp.md)
 - [AIKernel.Python README](../python/README.md)
 - [AIKernel.Python README 日本語](../python/README-ja.md)
+
+## どのページを読むべきか
+
+- Core package を install する場合や standard provider boot surface を確認する場合は
+  User Guide を読んでください。
+- CUDA Capability guide は、明示的に外部 GPU / native package を追加する場合だけ
+  読んでください。既定の Core / Python install は CPU-only です。
+- package 公開準備を行う場合は Release Checklist を読んでください。
+- Python から `aikernel-net` 経由で Core を利用する場合は Python README を読んでください。
+
+## 最初の検証
+
+外部 Provider や native capability module を追加する前に、まず CPU/default package
+family を検証してください。
+
+```powershell
+dotnet build AIKernel.Core.slnx -c Release
+dotnet test AIKernel.Core.slnx -c Release --no-build
+```
 
 ## Package Boundaries
 

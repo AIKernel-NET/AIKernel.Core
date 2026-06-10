@@ -8,6 +8,7 @@ implementation と package usage guidance のためのものです。
 
 ## Development Guides
 
+- [User Guide](user-guide/index-ja.md)
 - [CUDA Capability Development Guide](development/cuda-capability-development-guide.md)
 - [CUDA Capability 開発ガイド](development/cuda-capability-development-guide-jp.md)
 - [AIKernel.Core Release Checklist](operations/release-checklist.md)
@@ -41,6 +42,26 @@ module を明示的に install / register します。
 `AIKernel.Vfs` は Core implementation namespace であり、独立 NuGet package ではありません。
 VFS contract は AIKernel.NET contract packages にあり、in-process VFS provider は
 `AIKernel.Core` 内にあります。
+
+## Standard Providers
+
+AIKernel.Core は、外部 Provider の読み込み前に利用できる OS-level 標準 Provider を含みます。
+
+- `MinimalRuntimeProvider`: 決定論的な `runtime.ping` boot capability。
+- `LocalExecutionProvider`: Core DSL runtime を使った inline DSL pipeline execution。
+- `VfsProvider`: read/list/exists/metadata operation の read-only VFS capability。
+- `SkillProvider`: OpenAI 互換 `SKILL.md` の読み込みと capability registration。
+- `SystemInfoProvider`: provider、capability、VFS state、runtime version の安全な system introspection。
+
+これらの Provider は AIKernel.Tools、外部 Provider、native ABI bridge、HTTP、model inference に依存しません。
+
+Core は、外部 Provider manifest を読み込む CLI / host scenario のために
+`IDynamicProviderRegistry` も公開します。この dynamic surface は、stable な
+`IProviderRegistry` contract package を変更せずに、provider metadata、capability
+descriptor、任意の provider assembly、CLI 向け manifest setting を登録します。
+標準 Provider invoker も同じ dynamic registry から参照できます。`SkillProvider` は
+`SKILL.md` から runtime に capability set を発見するため、provider-level invoker
+として表現します。
 
 ## Release Verification
 

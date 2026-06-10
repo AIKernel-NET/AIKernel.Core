@@ -37,20 +37,20 @@ internal sealed class CompiledDslPipeline :
             return InvalidExecutionContext("DSL execution input is required.");
         }
 
-        if (!TryValidatePipelineValue(
+        return ValidatePipelineValue(
             context.Input,
             OriginStep.KernelFacade,
-            capabilityName: null,
-            out var inputError))
-        {
-            return InvalidExecutionContext(inputError);
-        }
+            capabilityName: null)
+            .Match(
+                InvalidExecutionContext,
+                _ =>
+                {
+                    var initial = ResultStep<DslPipelineState, DslPipelineValue>.Success(
+                        DslPipelineState.Initial("dsl.pipeline"),
+                        context.Input);
 
-        var initial = ResultStep<DslPipelineState, DslPipelineValue>.Success(
-            DslPipelineState.Initial("dsl.pipeline"),
-            context.Input);
-
-        return ExecuteNode(_root, initial, context);
+                    return ExecuteNode(_root, initial, context);
+                });
     }
 
     Task<AIKernel.Dtos.Dsl.DslPipelineExecutionResult>
@@ -61,28 +61,30 @@ internal sealed class CompiledDslPipeline :
         cancellationToken.ThrowIfCancellationRequested();
 
         var result = Execute(DslContractMapper.ToCore(context));
-        var state = result.State ?? DslPipelineState.Initial("dsl.pipeline");
-        var output = result.Value ?? DslPipelineValue.Empty;
-        var status = result.IsFailure
-            ? ExecutionStatus.Failed
-            : ExecutionStatus.Succeeded;
-
-        var error = result.Error is null
-            ? null
-            : new ExecutionError(
-                result.Error.Code,
-                result.Error.Message);
+        var projection = result.Match(
+            (state, error) => (
+                Status: ExecutionStatus.Failed,
+                State: state,
+                Output: DslPipelineValue.Empty,
+                Error: (ExecutionError?)new ExecutionError(error.Code, error.Message),
+                Metadata: error.Metadata?.ToImmutableDictionary()
+                    ?? ImmutableDictionary<string, string>.Empty),
+            (state, output) => (
+                Status: ExecutionStatus.Succeeded,
+                State: state,
+                Output: output,
+                Error: (ExecutionError?)null,
+                Metadata: ImmutableDictionary<string, string>.Empty));
 
         return Task.FromResult(new AIKernel.Dtos.Dsl.DslPipelineExecutionResult
         {
-            Status = status,
-            State = DslContractMapper.ToContract(state),
-            Output = DslContractMapper.ToContract(output),
-            Error = error,
+            Status = projection.Status,
+            State = DslContractMapper.ToContract(projection.State),
+            Output = DslContractMapper.ToContract(projection.Output),
+            Error = projection.Error,
             ReplayLogCount = result.ReplayLog.Count,
             ReplayLogHash = result.ReplayLogHash,
-            Metadata = result.Error?.Metadata?.ToImmutableDictionary()
-                ?? System.Collections.Immutable.ImmutableDictionary<string, string>.Empty
+            Metadata = projection.Metadata
         });
     }
 
@@ -109,28 +111,27 @@ internal sealed class CompiledDslPipeline :
         ResultStep<DslPipelineState, DslPipelineValue> current,
         DslPipelineExecutionContext context)
     {
-        if (current.IsFailure)
-            return current;
-
-        return node switch
-        {
-            PipelineRootNode pipeline => ExecuteNodes(pipeline.Steps, current, context),
-            StepNode step => ExecuteStep(step, current),
-            CallCapabilityNode call => ExecuteCapability(call, current),
-            LoopNode loop => ExecuteLoop(loop, current, context),
-            LoopUntilNode loopUntil => ExecuteLoopUntil(loopUntil, current, context),
-            SuspendNode suspend => ExecuteSuspend(suspend, current),
-            _ => DslResultStepAppender.AppendFailure(
-                current,
-                current.State,
-                DslExecutionErrors.InvalidRuntime(
-                    $"Unsupported pipeline node: {node.GetType().Name}."),
-                DslSemanticDeltaFactory.CreateNodeDelta(
-                    "dsl.invalid-node",
-                    "execute",
-                    "invalid",
-                    node.Type))
-        };
+        return current.Match(
+            (_, _) => current,
+            (_, _) => node switch
+            {
+                PipelineRootNode pipeline => ExecuteNodes(pipeline.Steps, current, context),
+                StepNode step => ExecuteStep(step, current),
+                CallCapabilityNode call => ExecuteCapability(call, current),
+                LoopNode loop => ExecuteLoop(loop, current, context),
+                LoopUntilNode loopUntil => ExecuteLoopUntil(loopUntil, current, context),
+                SuspendNode suspend => ExecuteSuspend(suspend, current),
+                _ => DslResultStepAppender.AppendFailure(
+                    current,
+                    current.State,
+                    DslExecutionErrors.InvalidRuntime(
+                        $"Unsupported pipeline node: {node.GetType().Name}."),
+                    DslSemanticDeltaFactory.CreateNodeDelta(
+                        "dsl.invalid-node",
+                        "execute",
+                        "invalid",
+                        node.Type))
+            });
     }
 
     private ResultStep<DslPipelineState, DslPipelineValue> ExecuteNodes(
@@ -138,93 +139,83 @@ internal sealed class CompiledDslPipeline :
         ResultStep<DslPipelineState, DslPipelineValue> current,
         DslPipelineExecutionContext context)
     {
-        var result = current;
-        foreach (var node in nodes)
-        {
-            result = ExecuteNode(node, result, context);
-            if (result.IsFailure)
-                return result;
-        }
-
-        return result;
+        return nodes.Aggregate(
+            current,
+            (result, node) => result.Match(
+                (_, _) => result,
+                (_, _) => ExecuteNode(node, result, context)));
     }
 
     private static ResultStep<DslPipelineState, DslPipelineValue> ExecuteStep(
         StepNode node,
         ResultStep<DslPipelineState, DslPipelineValue> current)
-    {
-        return DslResultStepAppender.AppendSuccess(
-            current,
-            current.State.Advance(node.Name),
-            current.Value!,
-            DslSemanticDeltaFactory.CreateNodeDelta(
-                "dsl.step",
-                "execute",
-                "step",
-                node.Name));
-    }
+        => current.Match(
+            (_, _) => current,
+            (state, value) => DslResultStepAppender.AppendSuccess(
+                current,
+                state.Advance(node.Name),
+                value,
+                DslSemanticDeltaFactory.CreateNodeDelta(
+                    "dsl.step",
+                    "execute",
+                    "step",
+                    node.Name)));
 
     private ResultStep<DslPipelineState, DslPipelineValue> ExecuteCapability(
         CallCapabilityNode node,
         ResultStep<DslPipelineState, DslPipelineValue> current)
-    {
-        var nextState = current.State.Advance(node.Name);
-        var delta = CreateCapabilityDelta(node);
+        => current.Match(
+            (_, _) => current,
+            (state, input) =>
+            {
+                var nextState = state.Advance(node.Name);
+                var capabilityResult =
+                    from invoked in InvokeCapability(node, input)
+                    from value in RequireCapabilityValue(node.Name, invoked)
+                    from validated in ValidateCapabilityValue(node.Name, value)
+                    select validated;
 
-        Result<DslPipelineValue> capabilityResult;
-        try
-        {
-            capabilityResult = _capabilityRegistry.Invoke(
+                return capabilityResult.Match(
+                    error => DslResultStepAppender.AppendFailure(
+                            current,
+                            nextState,
+                            error,
+                            CreateCapabilityDelta(node, error.Metadata)),
+                    output => DslResultStepAppender.AppendSuccess(
+                        current,
+                        nextState,
+                        output,
+                        CreateCapabilityDelta(node, output.Data)));
+            });
+
+    private Result<DslPipelineValue> InvokeCapability(
+        CallCapabilityNode node,
+        DslPipelineValue input)
+        => Try
+            .Run(() => _capabilityRegistry.Invoke(
                 node.Name,
-                current.Value!,
-                node.Args);
-        }
-        catch (Exception ex)
-        {
-            return DslResultStepAppender.AppendFailure(
-                current,
-                nextState,
-                DslExecutionErrors.CapabilityException(node.Name, ex),
-                delta);
-        }
+                input,
+                node.Args))
+            .Match(
+                error => Result<DslPipelineValue>.Fail(
+                    DslExecutionErrors.CapabilityException(node.Name, error)),
+                result => result);
 
-        if (capabilityResult.IsFailure)
-        {
-            return DslResultStepAppender.AppendFailure(
-                current,
-                nextState,
-                capabilityResult.Error!,
-                CreateCapabilityDelta(node, capabilityResult.Error!.Metadata));
-        }
-
-        if (capabilityResult.Value is null)
-        {
-            return DslResultStepAppender.AppendFailure(
-                current,
-                nextState,
-                DslExecutionErrors.CapabilityReturnedNull(node.Name),
-                delta);
-        }
-
-        if (!TryValidatePipelineValue(
-            capabilityResult.Value,
-            OriginStep.Capability,
-            node.Name,
-            out var outputError))
-        {
-            return DslResultStepAppender.AppendFailure(
-                current,
-                nextState,
-                outputError,
-                delta);
-        }
-
-        return DslResultStepAppender.AppendSuccess(
-                current,
-                nextState,
-                capabilityResult.Value,
-                CreateCapabilityDelta(node, capabilityResult.Value.Data));
+    private static Result<DslPipelineValue> RequireCapabilityValue(
+        string capabilityName,
+        DslPipelineValue? value)
+    {
+        return value is null
+            ? Result<DslPipelineValue>.Fail(
+                DslExecutionErrors.CapabilityReturnedNull(capabilityName))
+            : Result<DslPipelineValue>.Success(value);
     }
+
+    private static Result<DslPipelineValue> ValidateCapabilityValue(
+        string capabilityName,
+        DslPipelineValue value)
+        => ValidatePipelineValue(value, OriginStep.Capability, capabilityName)
+            .Map(_ => value);
 
     private ResultStep<DslPipelineState, DslPipelineValue> ExecuteLoop(
         LoopNode node,
@@ -248,13 +239,15 @@ internal sealed class CompiledDslPipeline :
             result = DslResultStepAppender.AppendLoopTransition(
                 result,
                 iteration,
-                iteration == node.MaxIterations - 1
-                    ? "max_iterations_reached"
-                    : "continue",
+                SelectLoopDecision(iteration, node.MaxIterations),
                 timestamp: null);
 
-            if (result.IsFailure)
-                return result;
+            var stopped = StopWhenFailed(result)
+                .Match<ResultStep<DslPipelineState, DslPipelineValue>?>(
+                    () => null,
+                    failed => failed);
+            if (stopped is { } failed)
+                return failed;
         }
 
         return node.MaxIterations == 0
@@ -283,12 +276,11 @@ internal sealed class CompiledDslPipeline :
         var result = current;
         for (var iteration = 0; iteration < node.MaxIterations; iteration++)
         {
-            DateTimeOffset now;
-            try
-            {
-                now = _clock.Now;
-            }
-            catch (Exception ex)
+            var nowOrFailure = Try.Run(() => _clock.Now)
+                .Match(
+                    error => (Error: error, Now: (DateTimeOffset?)null),
+                    now => (Error: (ErrorContext?)null, Now: (DateTimeOffset?)now));
+            if (nowOrFailure.Error is not null)
             {
                 var delta = DslSemanticDeltaFactory.CreateLoopUntilDelta(
                     iteration,
@@ -298,9 +290,11 @@ internal sealed class CompiledDslPipeline :
                 return DslResultStepAppender.AppendFailure(
                     result,
                     result.State,
-                    DslExecutionErrors.ClockException(ex, delta),
+                    DslExecutionErrors.ClockException(nowOrFailure.Error, delta),
                     delta);
             }
+
+            var now = nowOrFailure.Now.GetValueOrDefault();
 
             if (now - context.StartedAtUtc >= node.Timeout)
             {
@@ -315,13 +309,15 @@ internal sealed class CompiledDslPipeline :
             result = DslResultStepAppender.AppendLoopTransition(
                 result,
                 iteration,
-                iteration == node.MaxIterations - 1
-                    ? "max_iterations_reached"
-                    : "continue",
+                SelectLoopDecision(iteration, node.MaxIterations),
                 now);
 
-            if (result.IsFailure)
-                return result;
+            var stopped = StopWhenFailed(result)
+                .Match<ResultStep<DslPipelineState, DslPipelineValue>?>(
+                    () => null,
+                    failed => failed);
+            if (stopped is { } failed)
+                return failed;
         }
 
         return DslResultStepAppender.AppendLoopTransition(
@@ -342,67 +338,61 @@ internal sealed class CompiledDslPipeline :
             .WithReplayLogPrefix(current.ReplayLog);
     }
 
-    private static bool TryValidatePipelineValue(
+    private static Result<bool> ValidatePipelineValue(
         DslPipelineValue value,
         OriginStep originStep,
-        string? capabilityName,
-        out ErrorContext error)
+        string? capabilityName)
+        => from data in RequirePipelineData(value)
+                .ToPipelineValueResult(originStep, capabilityName)
+           from _ in ValidatePipelineData(data)
+                .ToPipelineValueResult(originStep, capabilityName)
+           select true;
+
+    private static Either<string, IReadOnlyDictionary<string, string>> RequirePipelineData(
+        DslPipelineValue value)
+        => value.Data is null
+            ? Either<string, IReadOnlyDictionary<string, string>>.FromLeft(
+                "DSL pipeline value data is required.")
+            : Either<string, IReadOnlyDictionary<string, string>>.FromRight(value.Data);
+
+    private static Either<string, bool> ValidatePipelineData(
+        IReadOnlyDictionary<string, string> data)
+        => data.Aggregate(
+            Either<string, bool>.FromRight(true),
+            (current, item) =>
+                from _ in current
+                from __ in ValidatePipelineEntry(item)
+                select true);
+
+    private static Either<string, bool> ValidatePipelineEntry(
+        KeyValuePair<string, string> item)
     {
-        if (value.Data is null)
+        if (item.Key is null)
         {
-            error = DslExecutionErrors.InvalidPipelineValue(
-                "DSL pipeline value data is required.",
-                originStep,
-                capabilityName);
-            return false;
+            return Either<string, bool>.FromLeft(
+                "DSL pipeline value data keys must not be null.");
         }
 
-        foreach (var item in value.Data)
+        if (string.IsNullOrWhiteSpace(item.Key))
         {
-            if (item.Key is null)
-            {
-                error = DslExecutionErrors.InvalidPipelineValue(
-                    "DSL pipeline value data keys must not be null.",
-                    originStep,
-                    capabilityName);
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(item.Key))
-            {
-                error = DslExecutionErrors.InvalidPipelineValue(
-                    "DSL pipeline value data keys must not be empty.",
-                    originStep,
-                    capabilityName);
-                return false;
-            }
-
-            if (item.Value is null)
-            {
-                error = DslExecutionErrors.InvalidPipelineValue(
-                    "DSL pipeline value data values must not be null.",
-                    originStep,
-                    capabilityName);
-                return false;
-            }
+            return Either<string, bool>.FromLeft(
+                "DSL pipeline value data keys must not be empty.");
         }
 
-        error = DslExecutionErrors.InvalidRuntime("unreachable");
-        return true;
+        if (item.Value is null)
+        {
+            return Either<string, bool>.FromLeft(
+                "DSL pipeline value data values must not be null.");
+        }
+
+        return Either<string, bool>.FromRight(true);
     }
 
     private static SemanticDelta CreateCapabilityDelta(
         CallCapabilityNode node,
         IReadOnlyDictionary<string, string>? sourceMetadata = null)
     {
-        Dictionary<string, string>? romMetadata = null;
-        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomCall, ref romMetadata);
-        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomHash, ref romMetadata);
-        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomPath, ref romMetadata);
-        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomNamespace, ref romMetadata);
-        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomName, ref romMetadata);
-        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomReplayLogCount, ref romMetadata);
-        AddIfPresent(sourceMetadata, DslRomMetadataKeys.RomReplayLogHash, ref romMetadata);
+        var romMetadata = CreateRomMetadata(sourceMetadata);
 
         return DslSemanticDeltaFactory.CreateNodeDelta(
             "dsl.capability.call",
@@ -413,18 +403,85 @@ internal sealed class CompiledDslPipeline :
             romMetadata);
     }
 
-    private static void AddIfPresent(
-        IReadOnlyDictionary<string, string>? source,
-        string key,
-        ref Dictionary<string, string>? target)
+    private static Dictionary<string, string>? CreateRomMetadata(
+        IReadOnlyDictionary<string, string>? source)
+        => ReadRomMetadata(source)
+            .ToDictionary(x => x.Key, x => x.Value, StringComparer.Ordinal) is { Count: > 0 } metadata
+                ? metadata
+                : null;
+
+    private static IEnumerable<KeyValuePair<string, string>> ReadRomMetadata(
+        IReadOnlyDictionary<string, string>? source)
+        => RomMetadataKeys()
+            .Select(key => ReadMetadata(source, key)
+                .Map(value => new KeyValuePair<string, string>(key, value)))
+            .SelectMany(option => option.Match(
+                Enumerable.Empty<KeyValuePair<string, string>>,
+                value => [value]));
+
+    private static string[] RomMetadataKeys()
+        =>
+        [
+            DslRomMetadataKeys.RomCall,
+            DslRomMetadataKeys.RomHash,
+            DslRomMetadataKeys.RomPath,
+            DslRomMetadataKeys.RomNamespace,
+            DslRomMetadataKeys.RomName,
+            DslRomMetadataKeys.RomReplayLogCount,
+            DslRomMetadataKeys.RomReplayLogHash
+        ];
+
+    private static string SelectLoopDecision(
+        int iteration,
+        int maxIterations)
+        => IsFinalLoopIteration(iteration, maxIterations)
+            .Match(
+                _ => "continue",
+                _ => "max_iterations_reached");
+
+    private static Either<string, int> IsFinalLoopIteration(
+        int iteration,
+        int maxIterations)
     {
-        if (source is null || !source.TryGetValue(key, out var value))
+        if (iteration == maxIterations - 1)
         {
-            return;
+            return Either<string, int>.FromRight(iteration);
         }
 
-        target ??= new Dictionary<string, string>(StringComparer.Ordinal);
-        target[key] = value;
+        return Either<string, int>.FromLeft("Loop has remaining iterations.");
     }
 
+    private static Option<ResultStep<DslPipelineState, DslPipelineValue>> StopWhenFailed(
+        ResultStep<DslPipelineState, DslPipelineValue> result)
+        => result.Match(
+            (_, _) => Option<ResultStep<DslPipelineState, DslPipelineValue>>.Some(result),
+            (_, _) => Option<ResultStep<DslPipelineState, DslPipelineValue>>.None());
+
+    private static Option<string> ReadMetadata(
+        IReadOnlyDictionary<string, string>? source,
+        string key)
+    {
+        if (source is not null &&
+            source.TryGetValue(key, out var value))
+        {
+            return Option<string>.Some(value);
+        }
+
+        return Option<string>.None();
+    }
+
+}
+
+internal static class CompiledDslPipelineEitherExtensions
+{
+    public static Result<T> ToPipelineValueResult<T>(
+        this Either<string, T> value,
+        OriginStep originStep,
+        string? capabilityName)
+        => value.Match(
+            left => Result<T>.Fail(DslExecutionErrors.InvalidPipelineValue(
+                left,
+                originStep,
+                capabilityName)),
+            Result<T>.Success);
 }

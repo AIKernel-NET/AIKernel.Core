@@ -6,11 +6,17 @@ using AIKernel.Abstractions.Rom;
 using AIKernel.Abstractions.Security;
 using AIKernel.Core.Capabilities;
 using AIKernel.Core.ChatHistory;
+using AIKernel.Core.Control;
 using AIKernel.Core.Context;
 using AIKernel.Core.Dsl;
 using AIKernel.Core.Execution;
 using AIKernel.Core.Governance.ChatChain;
 using AIKernel.Core.Providers;
+using AIKernel.Core.Providers.LocalExecutionProvider;
+using AIKernel.Core.Providers.MinimalRuntimeProvider;
+using AIKernel.Core.Providers.SkillProvider;
+using AIKernel.Core.Providers.SystemInfoProvider;
+using AIKernel.Core.Providers.VfsProvider;
 using AIKernel.Core.Rom;
 using AIKernel.Core.Routing;
 using AIKernel.Core.Security;
@@ -20,12 +26,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.AIKernelCoreHostingExtensions']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.AIKernelCoreHostingExtensions']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.AIKernelCoreHostingExtensions']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.AIKernelCoreHostingExtensions']/summary" />
 public static class AIKernelCoreHostingExtensions
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']/summary" />
     public static AIKernelCoreBuilder AddAIKernelCore(
         this IServiceCollection services,
         IConfiguration? configuration = null)
@@ -40,8 +46,8 @@ public static class AIKernelCoreHostingExtensions
         return new AIKernelCoreBuilder(services, configuration);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']/summary" />
     public static AIKernelCoreBuilder AddAIKernelCore(
         this IServiceCollection services,
         IKernelClock clock,
@@ -161,13 +167,77 @@ public static class AIKernelCoreHostingExtensions
             AlgorithmTaggedChatTurnSignatureProvider>();
         services.TryAddSingleton<AIKernel.Abstractions.Governance.ChatChain.IChatTurnChainVerifier,
             ChatTurnChainVerifier>();
-        services.TryAddSingleton<AIKernel.Abstractions.Providers.IProviderRegistry,
-            InMemoryProviderRegistry>();
         services.TryAddSingleton<AIKernel.Abstractions.Routing.ICapabilityRegistry,
             InMemoryCapabilityRegistry>();
+        services.TryAddSingleton<AIKernel.Abstractions.Routing.ISemanticRouter,
+            PassThroughSemanticRouter>();
+        services.TryAddSingleton<RuleEvaluator>();
+        services.TryAddSingleton(
+            serviceProvider => new BonsaiEngine(
+                serviceProvider.GetRequiredService<RuleEvaluator>(),
+                serviceProvider.GetService<AIKernel.Abstractions.Events.IEventBus>()));
+        services.TryAddSingleton<IBonsaiEngine>(
+            serviceProvider => serviceProvider.GetRequiredService<BonsaiEngine>());
         services.TryAddSingleton<AIKernel.Abstractions.Capabilities.ICapabilityModuleRegistry,
             InMemoryCapabilityModuleRegistry>();
-        services.TryAddSingleton<AIKernel.Abstractions.Capabilities.ICapabilityModuleInvoker,
+        services.TryAddSingleton<SkillManifestParser>();
+        services.TryAddSingleton<SkillLoader>();
+        services.TryAddSingleton<LocalExecutionInvoker>();
+        services.TryAddSingleton<MinimalRuntimeInvoker>();
+        services.TryAddSingleton<VfsInvoker>();
+        services.TryAddSingleton<SystemInfoInvoker>();
+        services.TryAddSingleton<LocalExecutionProvider>(
+            serviceProvider => new LocalExecutionProvider(
+                serviceProvider.GetRequiredService<AIKernel.Abstractions.Capabilities.ICapabilityModuleRegistry>()));
+        services.TryAddSingleton<MinimalRuntimeProvider>(
+            serviceProvider => new MinimalRuntimeProvider(
+                serviceProvider.GetRequiredService<AIKernel.Abstractions.Capabilities.ICapabilityModuleRegistry>()));
+        services.TryAddSingleton<VfsProvider>(
+            serviceProvider => new VfsProvider(
+                serviceProvider.GetRequiredService<AIKernel.Abstractions.Capabilities.ICapabilityModuleRegistry>()));
+        services.TryAddSingleton<SystemInfoProvider>(
+            serviceProvider => new SystemInfoProvider(
+                serviceProvider.GetRequiredService<AIKernel.Abstractions.Capabilities.ICapabilityModuleRegistry>()));
+        services.TryAddSingleton<SkillProvider>(
+            serviceProvider => new SkillProvider(
+                serviceProvider.GetRequiredService<AIKernel.Abstractions.Capabilities.ICapabilityModuleRegistry>(),
+                serviceProvider.GetRequiredService<AIKernel.Abstractions.Dsl.IDslPipelineCompiler>(),
+                serviceProvider.GetRequiredService<SkillLoader>()));
+        services.AddSingleton<AIKernel.Abstractions.Providers.IProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<LocalExecutionProvider>());
+        services.AddSingleton<AIKernel.Abstractions.Providers.IProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<MinimalRuntimeProvider>());
+        services.AddSingleton<AIKernel.Abstractions.Providers.IProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<VfsProvider>());
+        services.AddSingleton<AIKernel.Abstractions.Providers.IProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<SystemInfoProvider>());
+        services.AddSingleton<AIKernel.Abstractions.Providers.IProvider>(
+            serviceProvider => serviceProvider.GetRequiredService<SkillProvider>());
+        services.AddSingleton<AIKernel.Abstractions.Capabilities.ICapabilityModuleInvoker>(
+            serviceProvider => serviceProvider.GetRequiredService<LocalExecutionInvoker>());
+        services.AddSingleton<AIKernel.Abstractions.Capabilities.ICapabilityModuleInvoker>(
+            serviceProvider => serviceProvider.GetRequiredService<MinimalRuntimeInvoker>());
+        services.AddSingleton<AIKernel.Abstractions.Capabilities.ICapabilityModuleInvoker>(
+            serviceProvider => serviceProvider.GetRequiredService<VfsInvoker>());
+        services.AddSingleton<AIKernel.Abstractions.Capabilities.ICapabilityModuleInvoker>(
+            serviceProvider => serviceProvider.GetRequiredService<SystemInfoInvoker>());
+        services.AddSingleton<AIKernel.Abstractions.Capabilities.ICapabilityModuleInvoker>(
+            serviceProvider => serviceProvider.GetRequiredService<SkillProvider>());
+        services.TryAddSingleton<AIKernel.Abstractions.Providers.IProviderRegistry>(
+            serviceProvider => new InMemoryProviderRegistry(
+                serviceProvider.GetRequiredService<AIKernel.Abstractions.Capabilities.ICapabilityModuleRegistry>(),
+                serviceProvider.GetServices<AIKernel.Abstractions.Providers.IProvider>(),
+                serviceProvider.GetServices<AIKernel.Abstractions.Capabilities.ICapabilityModuleInvoker>()));
+        services.TryAddSingleton<IDynamicProviderRegistry>(
+            serviceProvider =>
+                serviceProvider.GetRequiredService<AIKernel.Abstractions.Providers.IProviderRegistry>()
+                    is IDynamicProviderRegistry dynamicProviderRegistry
+                    ? dynamicProviderRegistry
+                    : new InMemoryProviderRegistry(
+                        serviceProvider.GetRequiredService<AIKernel.Abstractions.Capabilities.ICapabilityModuleRegistry>(),
+                        serviceProvider.GetServices<AIKernel.Abstractions.Providers.IProvider>(),
+                        serviceProvider.GetServices<AIKernel.Abstractions.Capabilities.ICapabilityModuleInvoker>()));
+        services.AddSingleton<AIKernel.Abstractions.Capabilities.ICapabilityModuleInvoker,
             FailClosedCapabilityModuleInvoker>();
 
         return services;

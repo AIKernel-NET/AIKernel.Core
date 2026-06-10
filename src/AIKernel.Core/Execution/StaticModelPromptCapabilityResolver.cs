@@ -2,16 +2,17 @@ namespace AIKernel.Core.Execution;
 
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Providers;
+using AIKernel.Common.Results;
 using AIKernel.Dtos.Execution;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver']/summary" />
 public sealed class StaticModelPromptCapabilityResolver : IModelPromptCapabilityResolver
 {
     private readonly IReadOnlyDictionary<string, ModelPromptCapability> _capabilities;
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.#ctor']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.#ctor']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.#ctor']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.#ctor']/summary" />
     public StaticModelPromptCapabilityResolver(IEnumerable<ModelPromptCapability> capabilities)
     {
         ArgumentNullException.ThrowIfNull(capabilities);
@@ -19,8 +20,8 @@ public sealed class StaticModelPromptCapabilityResolver : IModelPromptCapability
         _capabilities = BuildCapabilityMap(capabilities);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.Resolve']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.Resolve']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.Resolve']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.Resolve']/summary" />
     public ModelPromptCapability Resolve(
         IModelProvider provider,
         KernelExecutionRequest request)
@@ -28,28 +29,43 @@ public sealed class StaticModelPromptCapabilityResolver : IModelPromptCapability
         ArgumentNullException.ThrowIfNull(provider);
         ArgumentNullException.ThrowIfNull(request);
 
-        var modelId = request.RequestedModelId;
-
-        if (string.IsNullOrWhiteSpace(modelId))
-        {
-            throw new UnsupportedPromptCapabilityException(
-                "RequestedModelId is required for static capability resolution.");
-        }
-
-        var key = CreateKey(provider.ProviderId, modelId);
-
-        if (!_capabilities.TryGetValue(key, out var capability))
-        {
-            throw new UnsupportedPromptCapabilityException(
-                $"Prompt capability was not found. ProviderId='{provider.ProviderId}', ModelId='{modelId}'.");
-        }
-
-        return capability;
+        return RequireModelId(request.RequestedModelId)
+            .Match(
+                message => throw new UnsupportedPromptCapabilityException(message),
+                modelId => FindCapability(provider.ProviderId, modelId)
+                    .Match(
+                        () => throw new UnsupportedPromptCapabilityException(
+                            $"Prompt capability was not found. ProviderId='{provider.ProviderId}', ModelId='{modelId}'."),
+                        capability => capability));
     }
 
     private static string CreateKey(string providerId, string modelId)
     {
         return providerId + "::" + modelId;
+    }
+
+    private Option<ModelPromptCapability> FindCapability(
+        string providerId,
+        string modelId)
+    {
+        if (_capabilities.TryGetValue(CreateKey(providerId, modelId), out var capability))
+        {
+            return Option<ModelPromptCapability>.Some(capability);
+        }
+
+        return Option<ModelPromptCapability>.None();
+    }
+
+    private static Either<string, string> RequireModelId(
+        string? modelId)
+    {
+        if (!string.IsNullOrWhiteSpace(modelId))
+        {
+            return Either<string, string>.FromRight(modelId);
+        }
+
+        return Either<string, string>.FromLeft(
+            "RequestedModelId is required for static capability resolution.");
     }
 
     private static IReadOnlyDictionary<string, ModelPromptCapability> BuildCapabilityMap(

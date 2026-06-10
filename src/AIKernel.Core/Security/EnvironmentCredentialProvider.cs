@@ -3,14 +3,14 @@ namespace AIKernel.Core.Security;
 using AIKernel.Abstractions.Security;
 using AIKernel.Core.Time;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Security.EnvironmentCredentialProvider']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Security.EnvironmentCredentialProvider']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Security.EnvironmentCredentialProvider']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Security.EnvironmentCredentialProvider']/summary" />
 public sealed class EnvironmentCredentialProvider(IKernelClock? clock = null) : ISecureCredentialProvider
 {
     private readonly IKernelClock _clock = clock ?? KernelClock.System();
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Security.EnvironmentCredentialProvider.GetSecretAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Security.EnvironmentCredentialProvider.GetSecretAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Security.EnvironmentCredentialProvider.GetSecretAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Security.EnvironmentCredentialProvider.GetSecretAsync']/summary" />
     public ValueTask<string> GetSecretAsync(
         string key,
         CancellationToken cancellationToken = default)

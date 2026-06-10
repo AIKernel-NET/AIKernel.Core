@@ -105,15 +105,10 @@ internal sealed class KernelExecutionFailureResultFactory
 
     public KernelRequestExecutionResult Resolve(
         Result<KernelRequestExecutionResult> result)
-    {
-        if (result.IsSuccess)
+        => result.Match(
+            error => new KernelRequestExecutionResult
         {
-            return result.Value!;
-        }
-
-        return new KernelRequestExecutionResult
-        {
-            ExecutionId = "exec:failed:" + result.Error!.Code.ToLowerInvariant(),
+            ExecutionId = "exec:failed:" + error.Code.ToLowerInvariant(),
             Status = ExecutionStatus.Failed,
             ProviderId = "unknown",
             ModelId = "unknown",
@@ -126,13 +121,13 @@ internal sealed class KernelExecutionFailureResultFactory
                 OutputTokens: 0,
                 TotalTokens: 0),
             Error = new ExecutionError(
-                Code: result.Error.Code.ToLowerInvariant(),
-                Message: result.Error.Message),
+                Code: error.Code.ToLowerInvariant(),
+                Message: error.Message),
             StartedAtUtc = _clock.Now,
             CompletedAtUtc = _clock.Now,
-            Metadata = BuildFailureMetadata(result.Error)
-        };
-    }
+            Metadata = BuildFailureMetadata(error)
+        },
+            value => value);
 
     private Result<KernelRequestExecutionResult> CreateFailureResult(
         KernelExecutionRequest request,
@@ -212,14 +207,9 @@ internal sealed class KernelExecutionFailureResultFactory
     }
 
     private static string ResolveExecutionId(Result<string> executionId)
-    {
-        if (executionId.IsSuccess)
-        {
-            return executionId.Value!;
-        }
-
-        return "exec:failed:" + executionId.Error!.Code.ToLowerInvariant();
-    }
+        => executionId.Match(
+            error => "exec:failed:" + error.Code.ToLowerInvariant(),
+            value => value);
 
     private static string GetContextSnapshotId(KernelExecutionRequest request)
     {

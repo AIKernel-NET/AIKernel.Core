@@ -6,12 +6,12 @@ using System.Text.Json;
 using AIKernel.Abstractions.Kernel;
 using AIKernel.Dtos.Kernel;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelRequestHasher']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelRequestHasher']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelRequestHasher']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelRequestHasher']/summary" />
 public sealed class KernelRequestHasher : IKernelRequestHasher
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelRequestHasher.ComputeHash']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelRequestHasher.ComputeHash']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelRequestHasher.ComputeHash']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelRequestHasher.ComputeHash']/summary" />
     public string ComputeHash(KernelRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);

@@ -31,25 +31,36 @@ internal sealed class HistoryRomProvider
                 HistoryRomErrors.Error("History ROM snapshot is required."));
         }
 
-        var path = HistoryRomPath.Create(@namespace, name);
-        if (path.IsFailure)
-        {
-            return Result<HistoryRomSnapshot>.Fail(path.Error!);
-        }
+        var identity =
+            from path in HistoryRomPath.Create(@namespace, name)
+            from romId in HistoryRomPath.CreateRomId(@namespace, name)
+            from parsed in HistoryRomPath.ParseRomId(romId)
+            select (Path: path, RomId: romId, Parsed: parsed);
 
-        var romId = HistoryRomPath.CreateRomId(@namespace, name);
-        if (romId.IsFailure)
-        {
-            return Result<HistoryRomSnapshot>.Fail(romId.Error!);
-        }
+        return identity.Match(
+            Result<HistoryRomSnapshot>.Fail,
+            resolved => CreateSnapshotFromIdentity(
+                resolved,
+                markdown,
+                createdAtUtc,
+                rom,
+                expectedRomHash));
+    }
 
-        if (!string.Equals(rom.RomId.Value, romId.Value, StringComparison.Ordinal))
+    private static Result<HistoryRomSnapshot> CreateSnapshotFromIdentity(
+        (string Path, string RomId, (string Namespace, string Name) Parsed) resolved,
+        string markdown,
+        DateTimeOffset createdAtUtc,
+        RomSnapshot rom,
+        string? expectedRomHash)
+    {
+        if (!string.Equals(rom.RomId.Value, resolved.RomId, StringComparison.Ordinal))
         {
             return Result<HistoryRomSnapshot>.Fail(
                 HistoryRomErrors.Error("Loaded History ROM id does not match the requested identity."));
         }
 
-        if (!string.Equals(rom.SourcePath, path.Value, StringComparison.Ordinal))
+        if (!string.Equals(rom.SourcePath, resolved.Path, StringComparison.Ordinal))
         {
             return Result<HistoryRomSnapshot>.Fail(
                 HistoryRomErrors.Error("Loaded History ROM path does not match the canonical path."));
@@ -78,18 +89,12 @@ internal sealed class HistoryRomProvider
                 HistoryRomErrors.Error("History ROM hash mismatch."));
         }
 
-        var identity = HistoryRomPath.ParseRomId(romId.Value!);
-        if (identity.IsFailure)
-        {
-            return Result<HistoryRomSnapshot>.Fail(identity.Error!);
-        }
-
         return Result<HistoryRomSnapshot>.Success(new HistoryRomSnapshot(
             new HistoryRomMetadata(
-                identity.Value.Namespace,
-                identity.Value.Name,
-                path.Value!,
-                romId.Value!,
+                resolved.Parsed.Namespace,
+                resolved.Parsed.Name,
+                resolved.Path,
+                resolved.RomId,
                 hash,
                 createdAtUtc),
             markdown,

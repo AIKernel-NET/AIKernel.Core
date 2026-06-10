@@ -461,7 +461,7 @@ public sealed class OpenAIHostingExtensionsTests
                 new Dictionary<string, string>()),
             TestContext.Current.CancellationToken);
 
-        Assert.Equal(["openai-demo"], providerRegistry.GetRegisteredProviders());
+        Assert.Contains("openai-demo", providerRegistry.GetRegisteredProviders());
         Assert.NotNull(capacity);
         Assert.Equal(["openai-demo"], candidates);
     }

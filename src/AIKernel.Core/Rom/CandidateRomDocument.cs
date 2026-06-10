@@ -1,6 +1,7 @@
-﻿namespace AIKernel.Core.Rom;
+namespace AIKernel.Core.Rom;
 
 using AIKernel.Abstractions.Rom;
+using AIKernel.Common.Results;
 using AIKernel.Dtos.Rom;
 
 internal sealed class CandidateRomDocument : IRomDocument
@@ -22,14 +23,10 @@ internal sealed class CandidateRomDocument : IRomDocument
     public string EntityId => _candidate.RomId.Value;
 
     public string EntityType =>
-        _candidate.AdditionalMetadata.TryGetValue("entity_type", out var entityType)
-            ? entityType
-            : "rom";
+        ReadMetadata("entity_type").OrElse("rom");
 
     public string Version =>
-        _candidate.AdditionalMetadata.TryGetValue("version", out var version)
-            ? version
-            : "1";
+        ReadMetadata("version").OrElse("1");
 
     public string Body => _candidate.Body;
 
@@ -52,5 +49,17 @@ internal sealed class CandidateRomDocument : IRomDocument
     public Task<CanonicalizedRomDto> CanonicalizeAsync()
     {
         return _canonicalizer.CanonicalizeAsync(this);
+    }
+
+    private Option<string> ReadMetadata(
+        string key)
+    {
+        if (_candidate.AdditionalMetadata.TryGetValue(key, out var value) &&
+            !string.IsNullOrWhiteSpace(value))
+        {
+            return Option<string>.Some(value);
+        }
+
+        return Option<string>.None();
     }
 }

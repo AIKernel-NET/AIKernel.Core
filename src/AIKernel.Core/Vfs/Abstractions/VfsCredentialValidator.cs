@@ -2,5 +2,8 @@ namespace AIKernel.Core.Vfs.Abstractions;
 
 using AIKernel.Vfs;
 
-/// <summary>Gets the VfsCredentialValidator value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される VfsCredentialValidator 値を取得します。</summary>
+/// <summary>
+/// [EN] Validates credentials supplied to a VFS provider.
+/// [JA] VFS provider に渡される credentials を検証します。
+/// </summary>
 public delegate bool VfsCredentialValidator(IVfsCredentials credentials);

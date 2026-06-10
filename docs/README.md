@@ -8,6 +8,7 @@ runtime implementation and package usage guidance.
 
 ## Development Guides
 
+- [User Guide](user-guide/index.md)
 - [CUDA Capability Development Guide](development/cuda-capability-development-guide.md)
 - [CUDA Capability 開発ガイド](development/cuda-capability-development-guide-jp.md)
 - [AIKernel.Core Release Checklist](operations/release-checklist.md)
@@ -44,6 +45,29 @@ The supported distribution paths are:
 `AIKernel.Vfs` is a Core implementation namespace, not a separate NuGet package.
 VFS contracts come from the AIKernel.NET contract packages and in-process VFS
 providers live inside `AIKernel.Core`.
+
+## Standard Providers
+
+AIKernel.Core includes OS-level standard providers that are available before
+external providers are loaded:
+
+- `MinimalRuntimeProvider`: deterministic `runtime.ping` boot capability.
+- `LocalExecutionProvider`: inline DSL pipeline execution using the Core DSL runtime.
+- `VfsProvider`: read-only VFS capability for read/list/exists/metadata operations.
+- `SkillProvider`: OpenAI-compatible `SKILL.md` loading and capability registration.
+- `SystemInfoProvider`: safe system introspection for providers, capabilities,
+  VFS state, and runtime versions.
+
+These providers do not depend on AIKernel.Tools, external providers, native ABI
+bridges, HTTP, or model inference.
+
+Core also exposes `IDynamicProviderRegistry` for CLI and host scenarios that
+load external provider manifests. The dynamic surface registers provider
+metadata, capability descriptors, optional provider assemblies, and CLI-facing
+manifest settings without changing the stable `IProviderRegistry` contract
+package. Standard provider invokers are available from the same dynamic
+registry, and `SkillProvider` is represented as a provider-level invoker because
+its capability set is discovered from `SKILL.md` at runtime.
 
 ## Release Verification
 

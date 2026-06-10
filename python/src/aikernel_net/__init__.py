@@ -1,8 +1,8 @@
 """[EN]
-Reference module for aikernel_net.__init__.
+Public package surface for the aikernel-net Python binding.
 
 [JA]
-aikernel_net.__init__ の参照モジュールです。
+aikernel-net Python binding の公開 package surface です。
 """
 
 from .managed import (
@@ -11,6 +11,11 @@ from .managed import (
     managed_assemblies,
     require_managed_assemblies,
     runtime_layout,
+)
+from .core_contracts import (
+    CoreCapabilityModuleContract,
+    rom_storage_contract,
+    vfs_git_contract,
 )
 from .monads import (
     AsyncEither,
@@ -32,6 +37,25 @@ from .monads import (
     async_result,
     do,
 )
+from .standard_providers import (
+    LOCAL_EXECUTION_PROVIDER,
+    MINIMAL_RUNTIME_PROVIDER,
+    SKILL_PROVIDER,
+    SYSTEM_INFO_PROVIDER,
+    VFS_PROVIDER,
+    CapabilityContract,
+    StandardProviderContract,
+    standard_capability,
+    standard_provider,
+    standard_provider_contracts,
+    standard_provider_managed_types,
+)
+from .provider_manifest import (
+    ProviderCliManifest,
+    ProviderManifest,
+    load_provider_manifest,
+    provider_manifest_from_dict,
+)
 
 __all__ = [
     "AsyncEither",
@@ -40,23 +64,41 @@ __all__ = [
     "Either",
     "Failure",
     "Left",
+    "LOCAL_EXECUTION_PROVIDER",
+    "CoreCapabilityModuleContract",
     "ManagedAssemblySet",
+    "MINIMAL_RUNTIME_PROVIDER",
     "Nothing",
     "Option",
+    "ProviderCliManifest",
+    "ProviderManifest",
     "Result",
     "RuntimeLayout",
     "Right",
+    "SKILL_PROVIDER",
+    "SYSTEM_INFO_PROVIDER",
     "Some",
     "Success",
+    "CapabilityContract",
+    "StandardProviderContract",
     "Try",
+    "VFS_PROVIDER",
     "async_do",
     "async_either",
     "async_option",
     "async_result",
     "do",
+    "load_provider_manifest",
     "managed_assemblies",
+    "provider_manifest_from_dict",
     "require_managed_assemblies",
+    "rom_storage_contract",
     "runtime_layout",
+    "standard_capability",
+    "standard_provider",
+    "standard_provider_contracts",
+    "standard_provider_managed_types",
+    "vfs_git_contract",
 ]
 
-__version__ = "0.1.0.1"
+__version__ = "0.1.1"

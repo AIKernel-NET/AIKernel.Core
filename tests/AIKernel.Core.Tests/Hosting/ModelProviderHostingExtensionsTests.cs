@@ -98,6 +98,7 @@ public sealed class ModelProviderHostingExtensionsTests
         var registeredIds = provider
             .GetRequiredService<IProviderRegistry>()
             .GetRegisteredProviders()
+            .Where(providerId => !providerId.StartsWith("aikernel.", StringComparison.Ordinal))
             .Order(StringComparer.Ordinal)
             .ToArray();
 

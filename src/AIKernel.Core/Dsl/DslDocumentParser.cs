@@ -14,17 +14,15 @@ internal static class DslDocumentParser
             return Invalid<DslDocument>("DSL JSON is required.");
         }
 
-        try
-        {
-            using var document = JsonDocument.Parse(json);
-            return ParseNode(document.RootElement)
-                .Bind(RequirePipelineRoot)
-                .Map(node => new DslDocument(node));
-        }
-        catch (JsonException ex)
-        {
-            return Invalid<DslDocument>(ex.Message);
-        }
+        return Try
+            .Run(() =>
+            {
+                using var document = JsonDocument.Parse(json);
+                return ParseNode(document.RootElement)
+                    .Bind(RequirePipelineRoot)
+                    .Map(node => new DslDocument(node));
+            })
+            .Match(error => Invalid<DslDocument>(error.Message), result => result);
     }
 
     private static Result<PipelineNode> ParseNode(JsonElement element)
@@ -34,11 +32,15 @@ internal static class DslDocumentParser
             return Invalid<PipelineNode>("Pipeline node must be a JSON object.");
         }
 
-        var type = ReadRequiredString(element, "type");
-        if (type.IsFailure)
-            return Result<PipelineNode>.Fail(type.Error!);
+        return ReadRequiredString(element, "type")
+            .Bind(type => ParseTypedNode(type, element));
+    }
 
-        return type.Value switch
+    private static Result<PipelineNode> ParseTypedNode(
+        string type,
+        JsonElement element)
+    {
+        return type switch
         {
             "Pipeline" => ParsePipeline(element),
             "Step" => ParseStep(element),
@@ -47,7 +49,7 @@ internal static class DslDocumentParser
             "LoopUntil" => ParseLoopUntil(element),
             "Suspend" => ParseSuspend(element),
             _ => Result<PipelineNode>.Fail(new ErrorContext(
-                $"Unknown pipeline node type: {type.Value}.",
+                $"Unknown pipeline node type: {type}.",
                 "INVALID_DSL",
                 false)
             {
@@ -112,105 +114,82 @@ internal static class DslDocumentParser
         JsonElement element,
         string propertyName)
     {
-        if (!element.TryGetProperty(propertyName, out var property) ||
-            property.ValueKind != JsonValueKind.Array)
-        {
-            return Result<IReadOnlyList<PipelineNode>>.Fail(new ErrorContext(
-                $"{propertyName} must be a JSON array.",
-                "INVALID_DSL",
-                false)
-            {
-                FailureKind = FailureKind.Reject,
-                OriginStep = OriginStep.KernelFacade,
-                SemanticSlot = SemanticSlot.T
-            });
-        }
+        var array = from property in RequireProperty(element, propertyName)
+                    from valid in RequireValueKind(
+                        property,
+                        JsonValueKind.Array,
+                        $"{propertyName} must be a JSON array.")
+                    select valid;
 
-        var nodes = new List<PipelineNode>();
-        foreach (var child in property.EnumerateArray())
-        {
-            var node = ParseNode(child);
-            if (node.IsFailure)
-                return Result<IReadOnlyList<PipelineNode>>.Fail(node.Error!);
-
-            nodes.Add(node.Value!);
-        }
-
-        return Result<IReadOnlyList<PipelineNode>>.Success(nodes.ToArray());
+        return array.Match(
+            Invalid<IReadOnlyList<PipelineNode>>,
+            valid => valid
+                .EnumerateArray()
+                .Aggregate(
+                    Result<ImmutableArray<PipelineNode>>.Success(
+                        ImmutableArray<PipelineNode>.Empty),
+                    (current, child) =>
+                        from nodes in current
+                        from node in ParseNode(child)
+                        select nodes.Add(node))
+                .Map<IReadOnlyList<PipelineNode>>(nodes => nodes));
     }
 
     private static Result<string> ReadRequiredString(
         JsonElement element,
         string propertyName)
     {
-        if (!element.TryGetProperty(propertyName, out var property) ||
-            property.ValueKind != JsonValueKind.String)
-        {
-            return Invalid($"{propertyName} must be a string.");
-        }
+        var value = from property in RequireProperty(element, propertyName)
+                    from valid in RequireValueKind(
+                        property,
+                        JsonValueKind.String,
+                        $"{propertyName} must be a string.")
+                    from text in RequireNonEmpty(
+                        valid.GetString(),
+                        $"{propertyName} must not be empty.")
+                    select text;
 
-        var value = property.GetString();
-        return string.IsNullOrWhiteSpace(value)
-            ? Invalid($"{propertyName} must not be empty.")
-            : Result<string>.Success(value);
+        return value.ToInvalidResult();
     }
 
     private static Result<int> ReadRequiredInt(
         JsonElement element,
         string propertyName)
     {
-        if (!element.TryGetProperty(propertyName, out var property) ||
-            property.ValueKind != JsonValueKind.Number ||
-            !property.TryGetInt32(out var value))
-        {
-            return Result<int>.Fail(new ErrorContext(
-                $"{propertyName} must be an integer.",
-                "INVALID_DSL",
-                false)
-            {
-                FailureKind = FailureKind.Reject,
-                OriginStep = OriginStep.KernelFacade,
-                SemanticSlot = SemanticSlot.T
-            });
-        }
+        var value = from property in RequireProperty(element, propertyName)
+                    from valid in RequireValueKind(
+                        property,
+                        JsonValueKind.Number,
+                        $"{propertyName} must be an integer.")
+                    from integer in ReadInt32(valid, $"{propertyName} must be an integer.")
+                    select integer;
 
-        return Result<int>.Success(value);
+        return value.ToInvalidResult();
     }
 
     private static Result<TimeSpan> ReadRequiredTimeout(
         JsonElement element,
         string propertyName)
     {
-        if (!element.TryGetProperty(propertyName, out var property))
-        {
-            return Result<TimeSpan>.Fail(new ErrorContext(
-                $"{propertyName} is required.",
-                "INVALID_DSL",
-                false)
-            {
-                FailureKind = FailureKind.Reject,
-                OriginStep = OriginStep.KernelFacade,
-                SemanticSlot = SemanticSlot.T
-            });
-        }
+        return ReadProperty(element, propertyName)
+            .Match(
+                () => Invalid<TimeSpan>($"{propertyName} is required."),
+                property => ReadTimeoutValue(property, propertyName));
+    }
 
+    private static Result<TimeSpan> ReadTimeoutValue(
+        JsonElement property,
+        string propertyName)
+    {
         if (property.ValueKind == JsonValueKind.Number &&
             property.TryGetDouble(out var seconds))
         {
-            try
-            {
-                return Result<TimeSpan>.Success(TimeSpan.FromSeconds(seconds));
-            }
-            catch (ArgumentException)
-            {
-                return Invalid<TimeSpan>(
-                    $"{propertyName} must be a finite TimeSpan value.");
-            }
-            catch (OverflowException)
-            {
-                return Invalid<TimeSpan>(
-                    $"{propertyName} must be within the TimeSpan range.");
-            }
+            return Try
+                .Run(() => TimeSpan.FromSeconds(seconds))
+                .Match(
+                    _ => Invalid<TimeSpan>(
+                        $"{propertyName} must be a finite TimeSpan value within the TimeSpan range."),
+                    Result<TimeSpan>.Success);
         }
 
         if (property.ValueKind == JsonValueKind.String &&
@@ -234,38 +213,92 @@ internal static class DslDocumentParser
     }
 
     private static Result<IReadOnlyDictionary<string, string>> ReadArgs(JsonElement element)
-    {
-        if (!element.TryGetProperty("args", out var args))
-        {
-            return Result<IReadOnlyDictionary<string, string>>.Success(
-                ImmutableDictionary<string, string>.Empty);
-        }
+        => ReadProperty(element, "args")
+            .Match(
+                () => Result<IReadOnlyDictionary<string, string>>.Success(
+                    ImmutableDictionary<string, string>.Empty),
+                ReadArgsObject);
 
+    private static Result<IReadOnlyDictionary<string, string>> ReadArgsObject(
+        JsonElement args)
+    {
         if (args.ValueKind != JsonValueKind.Object)
         {
             return Invalid<IReadOnlyDictionary<string, string>>(
                 "args must be a JSON object.");
         }
 
-        var builder = ImmutableDictionary.CreateBuilder<string, string>(
-            StringComparer.Ordinal);
+        return args
+            .EnumerateObject()
+            .Aggregate(
+                Result<ImmutableDictionary<string, string>>.Success(
+                    ImmutableDictionary<string, string>.Empty),
+                (current, item) =>
+                    from values in current
+                    from parsed in ReadArg(item)
+                    select values.SetItem(parsed.Key, parsed.Value))
+            .Map<IReadOnlyDictionary<string, string>>(values => values);
+    }
 
-        foreach (var item in args.EnumerateObject())
+    private static Result<KeyValuePair<string, string>> ReadArg(
+        JsonProperty item)
+    {
+        var arg = from key in RequireNonEmpty(
+                      item.Name,
+                      "args keys must not be empty.")
+                  from value in SelectJsonArgumentValue(item.Value)
+                  select new KeyValuePair<string, string>(key, value);
+
+        return arg.ToInvalidResult();
+    }
+
+    private static Option<JsonElement> ReadProperty(
+        JsonElement element,
+        string propertyName)
+    {
+        if (element.TryGetProperty(propertyName, out var property))
         {
-            if (string.IsNullOrWhiteSpace(item.Name))
-            {
-                return Invalid<IReadOnlyDictionary<string, string>>(
-                    "args keys must not be empty.");
-            }
-
-            builder[item.Name] = item.Value.ValueKind == JsonValueKind.String
-                ? item.Value.GetString() ?? string.Empty
-                : item.Value.GetRawText();
+            return Option<JsonElement>.Some(property);
         }
 
-        return Result<IReadOnlyDictionary<string, string>>.Success(
-            builder.ToImmutable());
+        return Option<JsonElement>.None();
     }
+
+    private static Either<string, JsonElement> RequireProperty(
+        JsonElement element,
+        string propertyName)
+        => ReadProperty(element, propertyName)
+            .Match(
+                () => Either<string, JsonElement>.FromLeft($"{propertyName} is required."),
+                Either<string, JsonElement>.FromRight);
+
+    private static Either<string, JsonElement> RequireValueKind(
+        JsonElement element,
+        JsonValueKind expected,
+        string message)
+        => element.ValueKind == expected
+            ? Either<string, JsonElement>.FromRight(element)
+            : Either<string, JsonElement>.FromLeft(message);
+
+    private static Either<string, string> RequireNonEmpty(
+        string? value,
+        string message)
+        => string.IsNullOrWhiteSpace(value)
+            ? Either<string, string>.FromLeft(message)
+            : Either<string, string>.FromRight(value);
+
+    private static Either<string, int> ReadInt32(
+        JsonElement element,
+        string message)
+        => element.TryGetInt32(out var value)
+            ? Either<string, int>.FromRight(value)
+            : Either<string, int>.FromLeft(message);
+
+    private static Either<string, string> SelectJsonArgumentValue(
+        JsonElement value)
+        => value.ValueKind == JsonValueKind.String
+            ? Either<string, string>.FromRight(value.GetString() ?? string.Empty)
+            : Either<string, string>.FromRight(value.GetRawText());
 
     private static Result<T> Invalid<T>(string message)
         => Result<T>.Fail(new ErrorContext(message, "INVALID_DSL", false)
@@ -277,4 +310,18 @@ internal static class DslDocumentParser
 
     private static Result<string> Invalid(string message)
         => Invalid<string>(message);
+}
+
+internal static class DslDocumentParserEitherExtensions
+{
+    public static Result<T> ToInvalidResult<T>(
+        this Either<string, T> value)
+        => value.Match(
+            left => Result<T>.Fail(new ErrorContext(left, "INVALID_DSL", false)
+            {
+                FailureKind = FailureKind.Reject,
+                OriginStep = OriginStep.KernelFacade,
+                SemanticSlot = SemanticSlot.T
+            }),
+            Result<T>.Success);
 }

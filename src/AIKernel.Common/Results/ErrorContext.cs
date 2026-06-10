@@ -1,31 +1,31 @@
 namespace AIKernel.Common.Results;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ErrorContext']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ErrorContext']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ErrorContext']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ErrorContext']/summary" />
 public sealed record ErrorContext(
     string Message,
     string Code,
     bool IsRetryable
 )
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.FailureKind']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.FailureKind']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.FailureKind']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.FailureKind']/summary" />
     public FailureKind? FailureKind { get; init; }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.OriginStep']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.OriginStep']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.OriginStep']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.OriginStep']/summary" />
     public OriginStep? OriginStep { get; init; }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.SemanticSlot']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.SemanticSlot']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.SemanticSlot']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.SemanticSlot']/summary" />
     public SemanticSlot? SemanticSlot { get; init; }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.string']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.string']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.string']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ErrorContext.string']/summary" />
     public IReadOnlyDictionary<string, string>? Metadata { get; init; }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ErrorContext.FromException']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ErrorContext.FromException']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ErrorContext.FromException']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ErrorContext.FromException']/summary" />
     public static ErrorContext FromException(Exception ex)
         => new(ex.Message, "UNHANDLED_EXCEPTION", false)
         {
@@ -35,13 +35,13 @@ public sealed record ErrorContext(
             }
         };
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ErrorContext.ToString']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ErrorContext.ToString']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ErrorContext.ToString']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ErrorContext.ToString']/summary" />
     public override string ToString() => $"{Code}: {Message}";
 }
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.FailureKind']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.FailureKind']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.FailureKind']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.FailureKind']/summary" />
 public enum FailureKind
 {
     /// <summary>Gets the FailClosed value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される FailClosed 値を取得します。</summary>
@@ -52,8 +52,8 @@ public enum FailureKind
     Quarantine
 }
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.OriginStep']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.OriginStep']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.OriginStep']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.OriginStep']/summary" />
 public enum OriginStep
 {
     /// <summary>Gets the Capability value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Capability 値を取得します。</summary>
@@ -70,8 +70,8 @@ public enum OriginStep
     KernelFacade
 }
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.SemanticSlot']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.SemanticSlot']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.SemanticSlot']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.SemanticSlot']/summary" />
 public enum SemanticSlot
 {
     /// <summary>Gets the G value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される G 値を取得します。</summary>

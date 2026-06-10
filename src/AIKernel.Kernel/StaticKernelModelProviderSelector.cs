@@ -6,14 +6,14 @@ using AIKernel.Abstractions.Providers;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Kernel;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.StaticKernelModelProviderSelector']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.StaticKernelModelProviderSelector']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.StaticKernelModelProviderSelector']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.StaticKernelModelProviderSelector']/summary" />
 public sealed class StaticKernelModelProviderSelector : IKernelModelProviderSelector
 {
     private readonly IReadOnlyDictionary<string, IModelProvider> _providers;
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.#ctor']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.#ctor']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.#ctor']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.#ctor']/summary" />
     public StaticKernelModelProviderSelector(IEnumerable<IModelProvider> providers)
     {
         ArgumentNullException.ThrowIfNull(providers);
@@ -21,8 +21,8 @@ public sealed class StaticKernelModelProviderSelector : IKernelModelProviderSele
         _providers = BuildProviderMap(providers);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.SelectAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.SelectAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.SelectAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.SelectAsync']/summary" />
     public Task<IModelProvider> SelectAsync(
         KernelRequest request,
         IContextSnapshot contextSnapshot,

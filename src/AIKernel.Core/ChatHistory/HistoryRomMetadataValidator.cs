@@ -5,43 +5,45 @@ using AIKernel.Common.Results;
 internal static class HistoryRomMetadataValidator
 {
     public static ErrorContext? ValidateCanonicalIdentity(HistoryRomMetadata metadata)
-    {
-        var parsed = HistoryRomPath.ParseRomId(metadata.RomId);
-        if (parsed.IsFailure)
-        {
-            return parsed.Error!;
-        }
+        => ValidateCanonicalIdentityResult(metadata)
+            .Match<ErrorContext?>(
+                error => error,
+                _ => null);
 
-        var expectedRomId = HistoryRomPath.CreateRomId(
-            metadata.Namespace,
-            metadata.Name);
-        if (expectedRomId.IsFailure)
-        {
-            return expectedRomId.Error!;
-        }
+    private static Result<bool> ValidateCanonicalIdentityResult(
+        HistoryRomMetadata metadata)
+        => from _ in HistoryRomPath.ParseRomId(metadata.RomId)
+           from __ in ValidateRomId(metadata)
+           from ___ in ValidatePath(metadata)
+           select true;
 
-        if (!string.Equals(
-                expectedRomId.Value,
+    private static Result<bool> ValidateRomId(
+        HistoryRomMetadata metadata)
+        => from expected in HistoryRomPath.CreateRomId(
+                metadata.Namespace,
+                metadata.Name)
+           from _ in RequireEqual(
+                expected,
                 metadata.RomId,
-                StringComparison.Ordinal))
-        {
-            return HistoryRomErrors.Error("History ROM id must match history://{namespace}/{name}.");
-        }
+                "History ROM id must match history://{namespace}/{name}.")
+           select true;
 
-        var expectedPath = HistoryRomPath.Create(metadata.Namespace, metadata.Name);
-        if (expectedPath.IsFailure)
-        {
-            return expectedPath.Error!;
-        }
-
-        if (!string.Equals(
-                expectedPath.Value,
+    private static Result<bool> ValidatePath(
+        HistoryRomMetadata metadata)
+        => from expected in HistoryRomPath.Create(
+                metadata.Namespace,
+                metadata.Name)
+           from _ in RequireEqual(
+                expected,
                 metadata.Path,
-                StringComparison.Ordinal))
-        {
-            return HistoryRomErrors.Error("History ROM path must match rom/history/{namespace}/{name}.md.");
-        }
+                "History ROM path must match rom/history/{namespace}/{name}.md.")
+           select true;
 
-        return null;
-    }
+    private static Result<bool> RequireEqual(
+        string expected,
+        string actual,
+        string message)
+        => string.Equals(expected, actual, StringComparison.Ordinal)
+            ? Result<bool>.Success(true)
+            : Result<bool>.Fail(HistoryRomErrors.Error(message));
 }

@@ -1,11 +1,11 @@
 namespace AIKernel.Common.IO;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.IO.PathUtil']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.IO.PathUtil']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.IO.PathUtil']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.IO.PathUtil']/summary" />
 public static class PathUtil
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Normalize']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Normalize']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Normalize']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Normalize']/summary" />
     public static string Normalize(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -21,8 +21,8 @@ public static class PathUtil
         return Path.GetFullPath(path);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Combine']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Combine']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Combine']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.IO.PathUtil.Combine']/summary" />
     public static string Combine(params string[] parts)
         => Path.Combine(parts);
 }

@@ -61,25 +61,26 @@ internal static class HistoryRomPath
             return Invalid("History ROM name is required.");
         }
 
-        try
-        {
-            var normalizedNamespace = VfsPathRules.Normalize(@namespace);
-            var normalizedName = VfsPathRules.Normalize(name);
-
-            if (normalizedNamespace.Contains('/', StringComparison.Ordinal) ||
-                normalizedName.Contains('/', StringComparison.Ordinal))
-            {
-                return Invalid("History ROM namespace and name must be single path segments.");
-            }
-
-            return Result<(string Namespace, string Name)>.Success(
-                (normalizedNamespace, normalizedName));
-        }
-        catch (ArgumentException ex)
-        {
-            return Invalid(ex.Message);
-        }
+        return
+            from normalizedNamespace in NormalizeSegment(@namespace)
+            from normalizedName in NormalizeSegment(name)
+            from identity in ValidateSingleSegments(normalizedNamespace, normalizedName)
+            select identity;
     }
+
+    private static Result<string> NormalizeSegment(string value)
+        => Try
+            .Run(() => VfsPathRules.Normalize(value))
+            .Match(error => Result<string>.Fail(HistoryRomErrors.Error(error.Message)), Result<string>.Success);
+
+    private static Result<(string Namespace, string Name)> ValidateSingleSegments(
+        string normalizedNamespace,
+        string normalizedName)
+        => normalizedNamespace.Contains('/', StringComparison.Ordinal) ||
+           normalizedName.Contains('/', StringComparison.Ordinal)
+            ? Invalid("History ROM namespace and name must be single path segments.")
+            : Result<(string Namespace, string Name)>.Success(
+                (normalizedNamespace, normalizedName));
 
     private static Result<(string Namespace, string Name)> Invalid(string message)
         => Result<(string Namespace, string Name)>.Fail(HistoryRomErrors.Error(message));

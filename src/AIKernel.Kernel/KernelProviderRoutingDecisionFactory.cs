@@ -2,12 +2,12 @@ namespace AIKernel.Kernel;
 
 using System.Collections.Immutable;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionFactory']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionFactory']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionFactory']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionFactory']/summary" />
 public static class KernelProviderRoutingDecisionFactory
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForProvider']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForProvider']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForProvider']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForProvider']/summary" />
     public static KernelProviderRoutingDecision ForProvider(
         string providerId,
         string requestedModelId,
@@ -23,8 +23,8 @@ public static class KernelProviderRoutingDecisionFactory
             null,
             metadata ?? ImmutableDictionary<string, string>.Empty);
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForCapabilityModule']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForCapabilityModule']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForCapabilityModule']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForCapabilityModule']/summary" />
     public static KernelProviderRoutingDecision ForCapabilityModule(
         string providerId,
         string requestedModelId,

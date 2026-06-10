@@ -2,19 +2,19 @@
 <doc>
   <members>
     <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.#ctor">
-      <summary>AIKernel の公開参照サーフェスとして #ctor 操作を実行します。</summary>
+      <summary>空の in-memory provider registry を作成します。</summary>
     </member>
     <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.GetRegisteredProviders">
-      <summary>AIKernel の公開参照サーフェスとして GetRegisteredProviders 操作を実行します。</summary>
+      <summary>登録済み provider identifier を決定論的順序で返します。</summary>
     </member>
     <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.RegisterProvider">
-      <summary>AIKernel の公開参照サーフェスとして RegisterProvider 操作を実行します。</summary>
+      <summary>明示された provider name で provider を登録します。</summary>
     </member>
     <member name="M:AIKernel.Core.Providers.InMemoryProviderRegistry.UnregisterProvider">
-      <summary>AIKernel の公開参照サーフェスとして UnregisterProvider 操作を実行します。</summary>
+      <summary>存在する場合に provider registration を name で削除します。</summary>
     </member>
     <member name="T:AIKernel.Core.Providers.InMemoryProviderRegistry">
-      <summary>AIKernel パッケージ利用者に公開される InMemoryProviderRegistry の参照サーフェスを表します。</summary>
+      <summary>Core host と CLI tooling が利用する in-memory provider / dynamic invoker registry です。</summary>
     </member>
   </members>
 </doc>

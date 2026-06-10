@@ -41,39 +41,27 @@ internal sealed class DslPipelineCompiler :
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var result = Compile(DslContractMapper.ToCore(document));
-        if (result.IsFailure)
-        {
-            throw new InvalidOperationException(result.Error!.Message);
-        }
-
-        if (result.Value is not AIKernel.Abstractions.Dsl.IKernelPipeline pipeline)
-        {
-            throw new InvalidOperationException(
-                "DSL compiler produced a pipeline that does not implement the contract interface.");
-        }
+        var pipeline = Compile(DslContractMapper.ToCore(document))
+            .Match(
+                error => throw new InvalidOperationException(error.Message),
+                value => value as AIKernel.Abstractions.Dsl.IKernelPipeline
+                    ?? throw new InvalidOperationException(
+                        "DSL compiler produced a pipeline that does not implement the contract interface."));
 
         return await Task.FromResult(pipeline).ConfigureAwait(false);
     }
 
     private Result<PipelineRootNode> ValidateRoot(PipelineNode root)
     {
-        if (root is null)
+        return root switch
         {
-            return Result<PipelineRootNode>.Fail(
-                CompileBoundaryFailure("Pipeline root is required."));
-        }
-
-        if (root is not PipelineRootNode pipeline)
-        {
-            return Result<PipelineRootNode>.Fail(
-                InvalidError("DSL root node must be a Pipeline."));
-        }
-
-        var result = ValidateNodes(pipeline.Steps);
-        return result.IsSuccess
-            ? Result<PipelineRootNode>.Success(pipeline)
-            : Result<PipelineRootNode>.Fail(result.Error!);
+            null => Result<PipelineRootNode>.Fail(
+                CompileBoundaryFailure("Pipeline root is required.")),
+            PipelineRootNode pipeline => ValidateNodes(pipeline.Steps)
+                .Map(_ => pipeline),
+            _ => Result<PipelineRootNode>.Fail(
+                InvalidError("DSL root node must be a Pipeline."))
+        };
     }
 
     private Result<bool> ValidateNode(PipelineNode node)
@@ -98,71 +86,56 @@ internal sealed class DslPipelineCompiler :
             return CompileBoundaryFailureResult("Pipeline node list is required.");
         }
 
-        foreach (var node in nodes)
-        {
-            var result = ValidateNode(node);
-            if (result.IsFailure)
-                return result;
-        }
-
-        return Result<bool>.Success(true);
+        return nodes.Aggregate(
+            Result<bool>.Success(true),
+            (current, node) => current.Bind(_ => ValidateNode(node)));
     }
 
     private Result<bool> ValidateLoop(
         int maxIterations,
         IReadOnlyList<PipelineNode> bodyNodes)
     {
-        if (maxIterations < 0)
-        {
-            return Invalid("maxIterations must be greater than or equal to zero.");
-        }
-
-        return ValidateNodes(bodyNodes);
+        return
+            from _ in ValidateNonNegative(
+                maxIterations,
+                "maxIterations must be greater than or equal to zero.")
+            from __ in ValidateNodes(bodyNodes)
+            select true;
     }
 
     private Result<bool> ValidateLoopUntil(LoopUntilNode node)
     {
-        if (node.Timeout < TimeSpan.Zero)
-        {
-            return Invalid("timeout must be greater than or equal to zero.");
-        }
-
-        return ValidateLoop(node.MaxIterations, node.BodyNodes);
+        return
+            from _ in ValidateNonNegative(
+                node.Timeout,
+                "timeout must be greater than or equal to zero.")
+            from __ in ValidateLoop(node.MaxIterations, node.BodyNodes)
+            select true;
     }
 
     private Result<bool> ValidateName(string value, string fieldName)
-    {
-        return string.IsNullOrWhiteSpace(value)
-            ? Invalid($"{fieldName} must not be empty.")
-            : Result<bool>.Success(true);
-    }
+        => RequireNonEmpty(value, $"{fieldName} must not be empty.")
+            .Map(_ => true)
+            .ToCompileResult();
 
     private Result<bool> ValidateCapability(CallCapabilityNode node)
     {
-        var name = node.Name;
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            return Invalid("Capability name must not be empty.");
-        }
-
-        var args = ValidateCapabilityArgs(node.Args);
-        if (args.IsFailure)
-        {
-            return args;
-        }
-
-        bool contains;
-        try
-        {
-            contains = _capabilityRegistry.Contains(name);
-        }
-        catch (Exception ex)
-        {
-            return Result<bool>.Fail(CapabilityResolutionException(name, ex));
-        }
-
-        return contains ? Result<bool>.Success(true) : Invalid($"Unknown capability: {name}.");
+        return
+            from _ in ValidateName(node.Name, "Capability name")
+            from __ in ValidateCapabilityArgs(node.Args)
+            from ___ in ValidateCapabilityExists(node.Name)
+            select true;
     }
+
+    private Result<bool> ValidateCapabilityExists(
+        string name)
+        => Try
+            .Run(() => _capabilityRegistry.Contains(name))
+            .Match(
+                error => Result<bool>.Fail(CapabilityResolutionFailure(name, error)),
+                exists => exists
+                    ? Result<bool>.Success(true)
+                    : Invalid($"Unknown capability: {name}."));
 
     private static Result<bool> ValidateCapabilityArgs(
         IReadOnlyDictionary<string, string> args)
@@ -172,26 +145,76 @@ internal sealed class DslPipelineCompiler :
             return CompileBoundaryFailureResult("Capability args are required.");
         }
 
-        foreach (var item in args)
+        return args.Aggregate(
+            Result<bool>.Success(true),
+            (current, item) =>
+                from _ in current
+                from __ in ValidateCapabilityArg(item)
+                select true);
+    }
+
+    private static Result<bool> ValidateCapabilityArg(
+        KeyValuePair<string, string> item)
+    {
+        return
+            from _ in ValidateCapabilityArgKey(item.Key)
+            from __ in ValidateCapabilityArgValue(item.Value)
+            select true;
+    }
+
+    private static Result<bool> ValidateCapabilityArgKey(
+        string key)
+    {
+        if (key is null)
         {
-            if (item.Key is null)
-            {
-                return CompileBoundaryFailureResult("Capability arg keys must not be null.");
-            }
-
-            if (string.IsNullOrWhiteSpace(item.Key))
-            {
-                return Invalid("Capability arg keys must not be empty.");
-            }
-
-            if (item.Value is null)
-            {
-                return CompileBoundaryFailureResult("Capability arg values must not be null.");
-            }
+            return CompileBoundaryFailureResult("Capability arg keys must not be null.");
         }
 
-        return Result<bool>.Success(true);
+        return RequireNonEmpty(key, "Capability arg keys must not be empty.")
+            .Map(_ => true)
+            .ToCompileResult();
     }
+
+    private static Result<bool> ValidateCapabilityArgValue(
+        string value)
+        => value is null
+            ? CompileBoundaryFailureResult("Capability arg values must not be null.")
+            : Result<bool>.Success(true);
+
+    private static Result<bool> ValidateNonNegative(
+        int value,
+        string message)
+        => RequireNonNegative(value, message)
+            .Map(_ => true)
+            .ToCompileResult();
+
+    private static Result<bool> ValidateNonNegative(
+        TimeSpan value,
+        string message)
+        => RequireNonNegative(value, message)
+            .Map(_ => true)
+            .ToCompileResult();
+
+    private static Either<string, string> RequireNonEmpty(
+        string value,
+        string message)
+        => string.IsNullOrWhiteSpace(value)
+            ? Either<string, string>.FromLeft(message)
+            : Either<string, string>.FromRight(value);
+
+    private static Either<string, int> RequireNonNegative(
+        int value,
+        string message)
+        => value < 0
+            ? Either<string, int>.FromLeft(message)
+            : Either<string, int>.FromRight(value);
+
+    private static Either<string, TimeSpan> RequireNonNegative(
+        TimeSpan value,
+        string message)
+        => value < TimeSpan.Zero
+            ? Either<string, TimeSpan>.FromLeft(message)
+            : Either<string, TimeSpan>.FromRight(value);
 
     private static Result<bool> Invalid(string message)
         => Result<bool>.Fail(InvalidError(message));
@@ -215,11 +238,10 @@ internal sealed class DslPipelineCompiler :
             SemanticSlot = SemanticSlot.T
         };
 
-    private static ErrorContext CapabilityResolutionException(
+    private static ErrorContext CapabilityResolutionFailure(
         string capabilityName,
-        Exception exception)
+        ErrorContext source)
     {
-        var source = ErrorContext.FromException(exception);
         var metadata = ImmutableDictionary.CreateBuilder<string, string>(
             StringComparer.Ordinal);
 
@@ -241,4 +263,18 @@ internal sealed class DslPipelineCompiler :
             Metadata = metadata.ToImmutable()
         };
     }
+}
+
+internal static class DslPipelineCompilerEitherExtensions
+{
+    public static Result<T> ToCompileResult<T>(
+        this Either<string, T> value)
+        => value.Match(
+            left => Result<T>.Fail(new ErrorContext(left, "DSL_COMPILE_ERROR", false)
+            {
+                FailureKind = FailureKind.Reject,
+                OriginStep = OriginStep.KernelFacade,
+                SemanticSlot = SemanticSlot.T
+            }),
+            Result<T>.Success);
 }

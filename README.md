@@ -57,6 +57,36 @@ AIKernel.NET Core is designed as an OS-like layered runtime.
 
 ---
 
+## OS Abstractions
+
+Core owns the AIKernel OS syscall surface. Provider implementations must depend
+on these contracts instead of defining their own copies.
+
+The OS abstraction surface now includes:
+
+- `AIKernel.Abstractions.Compute`: `IComputeProvider`, `ComputeBuffer`,
+  `ComputeKernel`
+- `AIKernel.Abstractions.Processes`: `ProcessId`, `ProcessState`, `IProcess`,
+  `IProcessHost`, `IProcessSupervisorProvider`
+- `AIKernel.Abstractions.Network`: `INetworkProvider`, `INetworkStream`,
+  `IHttpResponse`
+- `AIKernel.Abstractions.Logging`: `ILoggingProvider`, `LogLevel`
+- `AIKernel.Abstractions.Routing`: `ISemanticRouter`, `RouteResult`
+- `AIKernel.Vfs`: `IFileSystemProvider` as an alias over `IVfsProvider`
+- `AIKernel.Core.Control`: `IBonsaiRule`, `IBonsaiEngine`, `BonsaiEngine`,
+  `RuleEvaluator`
+
+The Control layer can consume OS events such as `ProcessStarted`,
+`ProcessStopped`, `ProcessCrashed`, `GpuKernelExecuted`, `FileAccessed`, and
+`NetworkRequest` through the shared EventBus abstraction. Providers and WASM
+runtimes publish those events; Core keeps the rule engine and routing
+contracts.
+
+This keeps Core as the contract and deterministic runtime layer, Providers as
+the host OS driver layer, and AIKernel.Wasm as the browser/WASM runtime layer.
+
+---
+
 ## Solution Structure
 
 This repository consists of runtime, provider, and verification layers.
@@ -97,6 +127,24 @@ VFS → ROM → Context → Execution
 ```
 
 This layer owns the Core runtime logic and separates implementation concerns from external Hosting and Provider boundaries.
+
+Core also owns the OS-level standard providers that do not call external
+services:
+
+- `MinimalRuntimeProvider` exposes `aikernel.runtime.ping` for deterministic
+  boot and capability-graph validation.
+- `LocalExecutionProvider` exposes `aikernel.local.execute` for inline DSL
+  pipeline execution through the existing Core DSL runtime.
+- `VfsProvider` exposes `aikernel.vfs` as a read-only VFS capability module for
+  file reads, directory listing, existence checks, and metadata summaries.
+- `SkillProvider` loads OpenAI-compatible `SKILL.md` files, converts them into
+  DSL pipeline descriptors, and registers them as capability modules.
+- `SystemInfoProvider` exposes `aikernel.system.info` for safe, read-only
+  introspection of providers, capabilities, VFS mount state, and runtime
+  versions.
+
+These providers are deterministic, side-effect free at the provider boundary,
+and do not depend on AIKernel.Tools or external provider packages.
 
 For Native Capability modules, the OS-independent MemoryRegion / MemoryMapper
 runtime surface is owned by AIKernel.Core in the 0.1.0 prototype validation
@@ -161,6 +209,9 @@ internals.
 ---
 
 ## Quick Start
+
+For a focused package usage walkthrough, see the
+[AIKernel.Core User Guide](docs/user-guide/index.md).
 
 ### 1. Install Packages
 
@@ -299,6 +350,17 @@ default. Hosts can register module descriptors for CLI, assembly-referenced,
 native, DSL ROM, or remote modules without granting execution by accident.
 Actual module execution should be supplied by a trusted Tools, Provider, or
 host package that replaces the default invoker.
+Core standard providers register their own safe inline capabilities during
+initialization. This gives a boot baseline for `runtime.ping`, local DSL
+execution, read-only VFS access, SKILL.md registration, and system
+introspection before external providers are loaded. Their invokers are also
+registered through the dynamic provider registry; `SkillProvider` is tracked as
+a provider-level invoker because its capabilities are discovered from
+`SKILL.md` files at runtime.
+Core also exposes `IDynamicProviderRegistry` as a Core-owned extension over the
+stable provider registry contract. Hosts and CLI tools can use it to load
+provider manifests, register capability metadata, and optionally load provider
+assemblies without adding external provider dependencies to Core.
 GPU and Native ABI implementations are external Capability packages. For
 example, `AIKernel.Cuda13.0.Libtorch2.12.win-x64` owns its native bridge, runtime version metadata,
 and CUDA-specific implementation while conforming to AIKernel Capability
@@ -517,6 +579,19 @@ AIKernel.Providers.*
 
 AIKernel.NET defines the contracts.  
 AIKernel.Core proves them through implementation.
+
+---
+
+## Contributor Guidelines
+
+Core changes must follow the shared AIKernel development discipline:
+
+- [AIKernel Development Guidelines](../AIKernel.NET/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES.md)
+- [AIKernel 開発ガイドライン](../AIKernel.NET/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES-jp.md)
+
+These guidelines define the required monadic LINQ style, fail-closed behavior,
+DRY/DGA rules, bilingual public documentation comments, tests, and release
+checks for package code.
 
 ---
 

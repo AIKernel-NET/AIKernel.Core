@@ -1,5 +1,6 @@
-﻿namespace AIKernel.Core.Vfs.Abstractions;
+namespace AIKernel.Core.Vfs.Abstractions;
 
+using AIKernel.Common.Results;
 using AIKernel.Dtos.Vfs;
 using AIKernel.Vfs;
 
@@ -36,7 +37,7 @@ internal sealed class VfsDirectorySnapshot : IVfsDirectory
     public Task<IReadOnlyList<IVfsFile>> GetFilesAsync(bool recursive = false)
     {
         // Side effect: none.
-        return Task.FromResult(recursive ? _recursiveFiles : _directFiles);
+        return Task.FromResult(SelectedFiles(recursive));
     }
 
     public Task<IReadOnlyList<IVfsDirectory>> GetDirectoriesAsync()
@@ -63,4 +64,12 @@ internal sealed class VfsDirectorySnapshot : IVfsDirectory
     }
 
     public IReadOnlyDictionary<string, string>? GetMetadata() => _metadata;
+
+    private IReadOnlyList<IVfsFile> SelectedFiles(bool recursive)
+        => FileSelection(recursive).Match(_ => _directFiles, _ => _recursiveFiles);
+
+    private static Either<string, string> FileSelection(bool recursive)
+        => recursive
+            ? Either<string, string>.FromRight("recursive")
+            : Either<string, string>.FromLeft("direct");
 }

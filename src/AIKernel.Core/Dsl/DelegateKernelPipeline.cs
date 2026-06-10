@@ -14,27 +14,22 @@ internal sealed class DelegateKernelPipeline : IKernelPipeline
 
     public ResultStep<DslPipelineState, DslPipelineValue> Execute(
         DslPipelineExecutionContext context)
-    {
-        try
-        {
-            return _execute(context);
-        }
-        catch (Exception ex)
-        {
-            return ResultStep<DslPipelineState, DslPipelineValue>
-                .Fail(
-                    DslPipelineState.Initial("dsl.pipeline.linq"),
-                    ErrorContext.FromException(ex) with
-                    {
-                        FailureKind = FailureKind.FailClosed,
-                        OriginStep = OriginStep.KernelFacade,
-                        SemanticSlot = SemanticSlot.T
-                    })
-                .WithSemanticDelta(DslSemanticDeltaFactory.CreateNodeDelta(
-                    "dsl.pipeline.linq",
-                    "fail_closed",
-                    "linq",
-                    "execute"));
-        }
-    }
+        => Try
+            .Run(() => _execute(context))
+            .Match(
+                error => ResultStep<DslPipelineState, DslPipelineValue>
+                    .Fail(
+                        DslPipelineState.Initial("dsl.pipeline.linq"),
+                        error with
+                        {
+                            FailureKind = FailureKind.FailClosed,
+                            OriginStep = OriginStep.KernelFacade,
+                            SemanticSlot = SemanticSlot.T
+                        })
+                    .WithSemanticDelta(DslSemanticDeltaFactory.CreateNodeDelta(
+                        "dsl.pipeline.linq",
+                        "fail_closed",
+                        "linq",
+                        "execute")),
+                result => result);
 }

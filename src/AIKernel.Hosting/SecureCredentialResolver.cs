@@ -5,8 +5,8 @@ using AIKernel.Core.Security;
 using AIKernel.Core.Time;
 using Microsoft.Extensions.Options;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureCredentialResolver']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureCredentialResolver']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureCredentialResolver']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureCredentialResolver']/summary" />
 public sealed class SecureCredentialResolver<TOptions>(
     ISecureCredentialProvider credentialProvider,
     IOptions<TOptions> options,
@@ -19,8 +19,8 @@ public sealed class SecureCredentialResolver<TOptions>(
             ?? throw new ArgumentNullException(nameof(options));
     private readonly IKernelClock _clock = clock ?? KernelClock.System();
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureCredentialResolver.ResolveAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureCredentialResolver.ResolveAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureCredentialResolver.ResolveAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureCredentialResolver.ResolveAsync']/summary" />
     public async ValueTask<TOptions> ResolveAsync(
         CancellationToken cancellationToken = default)
     {

@@ -4,8 +4,8 @@ using AIKernel.Core.Time;
 using AIKernel.Dtos.Vfs;
 using AIKernel.Vfs;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.FileProviderBase']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.FileProviderBase']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.FileProviderBase']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.FileProviderBase']/summary" />
 public abstract class FileProviderBase(
     string providerId,
     string name,
@@ -14,13 +14,16 @@ public abstract class FileProviderBase(
 {
     private long _sessionSequence;
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsNullOrWhiteSpace']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsNullOrWhiteSpace']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsNullOrWhiteSpace']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsNullOrWhiteSpace']/summary" />
     public string ProviderId { get; } = string.IsNullOrWhiteSpace(providerId)
             ? throw new ArgumentException("ProviderId is required.", nameof(providerId))
             : providerId;
 
-    /// <summary>Gets the Name value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Name 値を取得します。</summary>
+    /// <summary>
+    /// [EN] Gets the provider display name.
+    /// [JA] provider の表示名を取得します。
+    /// </summary>
     public string Name { get; } = string.IsNullOrWhiteSpace(name)
             ? throw new ArgumentException("Name is required.", nameof(name))
             : name;
@@ -38,8 +41,8 @@ public abstract class FileProviderBase(
     /// </summary>
     protected IKernelClock Clock { get; } = clock ?? KernelClock.System();
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.OpenSessionAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.OpenSessionAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.OpenSessionAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.OpenSessionAsync']/summary" />
     public Task<IVfsSession> OpenSessionAsync(IVfsCredentials credentials)
     {
         ArgumentNullException.ThrowIfNull(credentials);
@@ -54,15 +57,15 @@ public abstract class FileProviderBase(
         return OpenSessionCoreAsync(sessionId);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsAvailableAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsAvailableAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsAvailableAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsAvailableAsync']/summary" />
     public virtual Task<bool> IsAvailableAsync()
     {
         return Task.FromResult(false);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.GetHealthAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.GetHealthAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.GetHealthAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.GetHealthAsync']/summary" />
     public virtual Task<VfsProviderHealth> GetHealthAsync()
     {
         return Task.FromResult(new VfsProviderHealth

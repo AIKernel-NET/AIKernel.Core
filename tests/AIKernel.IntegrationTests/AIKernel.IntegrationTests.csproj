@@ -15,6 +15,7 @@ JA: Core、Kernel、Hosting、Provider を横断した AIKernel.NET ランタイ
     <PackageReference Include="AIKernel.Abstractions" Version="$(AIKernelPackageVersion)" />
     <PackageReference Include="AIKernel.Dtos" Version="$(AIKernelPackageVersion)" />
     <PackageReference Include="AIKernel.Enums" Version="$(AIKernelPackageVersion)" />
+    <PackageReference Include="AIKernel.Providers.MicrosoftAI" Version="[0.1.0-dev4]" />
     <PackageReference Include="coverlet.collector" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -35,7 +36,6 @@ JA: Core、Kernel、Hosting、Provider を横断した AIKernel.NET ランタイ
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIKernel.Kernel\AIKernel.Kernel.csproj" />
     <ProjectReference Include="..\..\src\AIKernel.Hosting\AIKernel.Hosting.csproj" />
-    <ProjectReference Include="..\..\src\Providers\AIKernel.Providers.MicrosoftAI\AIKernel.Providers.MicrosoftAI.csproj" />
   </ItemGroup>
 
 </Project>

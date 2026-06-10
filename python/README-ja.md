@@ -2,8 +2,8 @@
 
 [English](README.md)
 
-AIKernel.Core の functional primitives と managed assembly discovery のための
-Python binding です。
+AIKernel.Core の functional primitives、標準 Provider 契約、managed assembly
+discovery のための Python binding です。
 
 既定 package は CPU-only で、Windows / Linux 向け universal `py3-none-any` wheel
 として公開します。
@@ -54,6 +54,7 @@ LibTorch binary、GPU runtime は含みません。GPU integration は
 - sync / async monad composition helpers
 - `do(...)` と `async_do(...)` notation
 - managed AIKernel assembly discovery helpers
+- standard provider contract discovery helpers
 - package / runtime layout discovery
 
 提供しないもの:
@@ -80,6 +81,48 @@ Wrapper surface は意図的に小さく保ちます。
 - `managed_assemblies() -> ManagedAssemblySet`
 - `require_managed_assemblies() -> ManagedAssemblySet`
 - `runtime_layout() -> RuntimeLayout`
+
+- `standard_provider_contracts() -> tuple[StandardProviderContract, ...]`
+- `standard_provider(provider_id) -> StandardProviderContract`
+- `standard_capability(capability_id) -> CapabilityContract`
+- `standard_provider_managed_types() -> tuple[str, ...]`
+- `CapabilityContract`
+- `StandardProviderContract`
+- `ProviderCliManifest`
+- `ProviderManifest`
+- `CoreCapabilityModuleContract`
+- `provider_manifest_from_dict(...) -> ProviderManifest`
+- `load_provider_manifest(path) -> ProviderManifest`
+- `rom_storage_contract(...) -> CoreCapabilityModuleContract`
+- `vfs_git_contract(...) -> CoreCapabilityModuleContract`
+
+## Standard Providers
+
+Python package は Core 標準 Provider の contract surface を公開します。ただし、
+provider execution logic は Python 側で再実装しません。
+
+- `MINIMAL_RUNTIME_PROVIDER`
+- `LOCAL_EXECUTION_PROVIDER`
+- `VFS_PROVIDER`
+- `SKILL_PROVIDER`
+- `SYSTEM_INFO_PROVIDER`
+
+```python
+from aikernel_net import standard_provider, standard_capability
+
+runtime = standard_provider("aikernel.runtime.minimal")
+vfs = standard_capability("aikernel.vfs")
+```
+
+`SkillProvider` は `SKILL.md` を読み込んで Capability を動的生成するため、Python
+descriptor は固定の偽 Capability ID ではなく、provider identity と managed type
+information を公開します。C# の `SkillProvider` 自身が dynamic skill invocation を
+実装するため、managed invoker type も公開します。
+
+Provider manifest JSON file と Core-owned ROM / VFS Git contract の descriptor
+helper も含みます。これらは Core で使う contract shape を保つためのものであり、
+manifest-declared capability order と Core contract operation order も保持します。
+Python 側で assembly loading や provider execution は行いません。
 
 ## Monad Syntax
 

@@ -5,14 +5,14 @@ using AIKernel.Dtos.Kernel;
 using AIKernel.Kernel;
 using AIKernel.Vfs;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelVfsSessionFactory']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelVfsSessionFactory']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelVfsSessionFactory']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelVfsSessionFactory']/summary" />
 public sealed class KernelVfsSessionFactory : IKernelVfsSessionFactory
 {
     private readonly IReadOnlyDictionary<string, IVfsProvider> _providers;
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelVfsSessionFactory.#ctor']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelVfsSessionFactory.#ctor']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelVfsSessionFactory.#ctor']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelVfsSessionFactory.#ctor']/summary" />
     public KernelVfsSessionFactory(IEnumerable<IVfsProvider> providers)
     {
         ArgumentNullException.ThrowIfNull(providers);
@@ -22,8 +22,8 @@ public sealed class KernelVfsSessionFactory : IKernelVfsSessionFactory
             StringComparer.Ordinal);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelVfsSessionFactory.OpenSessionAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelVfsSessionFactory.OpenSessionAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelVfsSessionFactory.OpenSessionAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelVfsSessionFactory.OpenSessionAsync']/summary" />
     public async Task<IVfsSession> OpenSessionAsync(
         KernelRequest request,
         CancellationToken cancellationToken = default)
@@ -58,20 +58,20 @@ public sealed class KernelVfsSessionFactory : IKernelVfsSessionFactory
     private sealed class KernelVfsCredentialsAdapter(
         AIKernel.Dtos.Vfs.VfsCredentials credentials) : IVfsCredentials
     {
-        /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.Username']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.Username']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.Username']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.Username']/summary" />
         public string? Username => credentials.Username;
 
-        /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.ApiKey']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.ApiKey']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.ApiKey']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.ApiKey']/summary" />
         public string? ApiKey => credentials.ApiKey;
 
-        /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.Token']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.Token']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.Token']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.Token']/summary" />
         public string? Token => credentials.Token;
 
-        /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.object']" />
-        /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.object']" />
+        /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.object']/summary" />
+        /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Kernel.KernelVfsSessionFactory.object']/summary" />
         public IReadOnlyDictionary<string, object>? Parameters =>
             credentials.Parameters?.ToDictionary(
                 item => item.Key,

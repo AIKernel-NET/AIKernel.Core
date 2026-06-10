@@ -1,10 +1,10 @@
-﻿namespace AIKernel.Core.Vfs.Abstractions;
+namespace AIKernel.Core.Vfs.Abstractions;
 
+using AIKernel.Common.Results;
 using AIKernel.Dtos.Vfs;
 using AIKernel.Vfs;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 internal static class VfsEntryQueryEngine
 {
@@ -49,17 +49,21 @@ internal static class VfsEntryQueryEngine
         {
             if (query.Filters.TryGetValue("pathPrefix", out var prefix))
             {
-                string normalizedPrefix;
-                try
+                var normalizedPrefix = Try.Run(() => VfsPathRules.Normalize(prefix))
+                    .Match(
+                        error => Either<string, string>.FromLeft(error.Message),
+                        Either<string, string>.FromRight);
+                var filterError = normalizedPrefix.Match<string?>(
+                    error => error,
+                    valid =>
+                    {
+                        entries = entries.Where(x => VfsPathRules.IsUnder(valid, x.Path));
+                        return null;
+                    });
+                if (filterError is not null)
                 {
-                    normalizedPrefix = VfsPathRules.Normalize(prefix);
+                    return VfsQueryResultSnapshot.Failure(filterError);
                 }
-                catch (ArgumentException ex)
-                {
-                    return VfsQueryResultSnapshot.Failure(ex.Message);
-                }
-
-                entries = entries.Where(x => VfsPathRules.IsUnder(normalizedPrefix, x.Path));
             }
 
             if (query.Filters.TryGetValue("type", out var type))

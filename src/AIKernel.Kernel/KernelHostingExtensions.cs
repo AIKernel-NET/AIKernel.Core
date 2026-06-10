@@ -6,12 +6,12 @@ using AIKernel.Kernel.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelHostingExtensions']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelHostingExtensions']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelHostingExtensions']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelHostingExtensions']/summary" />
 public static class KernelHostingExtensions
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelHostingExtensions.AddAIKernelKernel']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelHostingExtensions.AddAIKernelKernel']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelHostingExtensions.AddAIKernelKernel']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelHostingExtensions.AddAIKernelKernel']/summary" />
     public static IServiceCollection AddAIKernelKernel(
         this IServiceCollection services)
     {

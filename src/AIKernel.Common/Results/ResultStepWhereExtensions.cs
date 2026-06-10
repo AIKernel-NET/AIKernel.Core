@@ -1,11 +1,11 @@
 namespace AIKernel.Common.Results;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultStepWhereExtensions']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultStepWhereExtensions']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultStepWhereExtensions']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultStepWhereExtensions']/summary" />
 public static class ResultStepWhereExtensions
 {
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStepWhereExtensions.TValue&gt;']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStepWhereExtensions.TValue&gt;']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStepWhereExtensions.TValue&gt;']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStepWhereExtensions.TValue&gt;']/summary" />
     public static ResultStep<TState, TValue> Where<TState, TValue>(
         this ResultStep<TState, TValue> step,
         Func<TValue, bool> predicate)
@@ -34,8 +34,8 @@ public static class ResultStepWhereExtensions
         }
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStepWhereExtensions.TValue&gt;']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStepWhereExtensions.TValue&gt;']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStepWhereExtensions.TValue&gt;']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStepWhereExtensions.TValue&gt;']/summary" />
     public static async Task<ResultStep<TState, TValue>> Where<TState, TValue>(
         this ResultStep<TState, TValue> step,
         Func<TValue, Task<bool>> predicate)

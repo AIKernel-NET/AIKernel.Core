@@ -1,22 +1,23 @@
 namespace AIKernel.Core.Rom;
 
 using AIKernel.Abstractions.Rom;
+using AIKernel.Common.Results;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Rom;
 using AIKernel.Vfs;
 using System.Collections.Immutable;
 using System.Text;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomLoader']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomLoader']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomLoader']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomLoader']/summary" />
 public sealed class RomLoader : IRomLoader
 {
     private readonly IMarkdownFrontMatterParser _frontMatterParser;
     private readonly IRomSignatureVerifier _signatureVerifier;
     private readonly IKernelClock _clock;
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.#ctor']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.#ctor']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.#ctor']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.#ctor']/summary" />
     public RomLoader(
         IMarkdownFrontMatterParser frontMatterParser,
         IRomSignatureVerifier signatureVerifier,
@@ -31,8 +32,8 @@ public sealed class RomLoader : IRomLoader
         _clock = clock ?? KernelClock.System();
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.LoadAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.LoadAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.LoadAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.LoadAsync']/summary" />
     public async Task<RomSnapshot> LoadAsync(
         IVfsSession session,
         string path,
@@ -118,106 +119,49 @@ public sealed class RomLoader : IRomLoader
         IReadOnlyDictionary<string, object?> frontMatter,
         string key,
         string sourcePath)
-    {
-        if (!frontMatter.TryGetValue(key, out var value) || value is null)
-        {
-            throw new RomRequiredMetadataMissingException(key, sourcePath);
-        }
-
-        var text = Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
-
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            throw new RomRequiredMetadataMissingException(key, sourcePath);
-        }
-
-        return text.Trim();
-    }
+        => RequireString(frontMatter, key)
+            .Match(
+                _ => throw new RomRequiredMetadataMissingException(key, sourcePath),
+                value => value);
 
     private static string GetRequiredNestedString(
         IReadOnlyDictionary<string, object?> frontMatter,
         string section,
         string key,
         string sourcePath)
-    {
-        if (!frontMatter.TryGetValue(section, out var sectionValue)
-            || sectionValue is not IReadOnlyDictionary<string, object?> map)
-        {
-            throw new RomRequiredMetadataMissingException($"{section}.{key}", sourcePath);
-        }
-
-        return GetRequiredString(map, key, sourcePath);
-    }
+        => ReadMap(frontMatter, section)
+            .Match(
+                () => throw new RomRequiredMetadataMissingException($"{section}.{key}", sourcePath),
+                map => GetRequiredString(map, key, sourcePath));
 
     private static ImmutableArray<string> ExtractSecurityTags(
         IReadOnlyDictionary<string, object?> frontMatter)
-    {
-        if (!frontMatter.TryGetValue("security", out var securityValue)
-            || securityValue is not IReadOnlyDictionary<string, object?> security)
-        {
-            return ImmutableArray<string>.Empty;
-        }
-
-        if (!security.TryGetValue("tags", out var tagsValue))
-        {
-            return ImmutableArray<string>.Empty;
-        }
-
-        return ToStringArray(tagsValue)
-            .Select(x => x.Trim())
-            .Where(x => x.Length > 0)
-            .Distinct(StringComparer.Ordinal)
-            .OrderBy(x => x, StringComparer.Ordinal)
-            .ToImmutableArray();
-    }
+        => ReadMap(frontMatter, "security")
+            .Bind(security => ReadObject(security, "tags"))
+            .Match(
+                () => ImmutableArray<string>.Empty,
+                tags => ToStringArray(tags)
+                    .Select(x => x.Trim())
+                    .Where(x => x.Length > 0)
+                    .Distinct(StringComparer.Ordinal)
+                    .OrderBy(x => x, StringComparer.Ordinal)
+                    .ToImmutableArray());
 
     private static ImmutableArray<RomRelationSnapshot> ExtractRelations(
         IReadOnlyDictionary<string, object?> frontMatter)
-    {
-        if (!frontMatter.TryGetValue("relations", out var relationsValue)
-            || relationsValue is not IEnumerable<object?> relationItems)
-        {
-            return ImmutableArray<RomRelationSnapshot>.Empty;
-        }
-
-        var builder = ImmutableArray.CreateBuilder<RomRelationSnapshot>();
-
-        foreach (var item in relationItems)
-        {
-            if (item is not IReadOnlyDictionary<string, object?> map)
-            {
-                continue;
-            }
-
-            if (!map.TryGetValue("target", out var targetValue))
-            {
-                continue;
-            }
-
-            var target = Convert.ToString(
-                targetValue,
-                System.Globalization.CultureInfo.InvariantCulture);
-
-            if (string.IsNullOrWhiteSpace(target))
-            {
-                continue;
-            }
-
-            var kind = map.TryGetValue("kind", out var kindValue)
-                ? Convert.ToString(kindValue, System.Globalization.CultureInfo.InvariantCulture)
-                : "related";
-
-            builder.Add(new RomRelationSnapshot(
-                TargetRomId: target.Trim(),
-                Kind: string.IsNullOrWhiteSpace(kind) ? "related" : kind.Trim()));
-        }
-
-        return builder
-            .Distinct()
-            .OrderBy(x => x.TargetRomId, StringComparer.Ordinal)
-            .ThenBy(x => x.Kind, StringComparer.Ordinal)
-            .ToImmutableArray();
-    }
+        => ReadItems(frontMatter, "relations")
+            .Match(
+                () => ImmutableArray<RomRelationSnapshot>.Empty,
+                relations => relations
+                    .OfType<IReadOnlyDictionary<string, object?>>()
+                    .Select(ReadRelation)
+                    .SelectMany(relation => relation.Match(
+                        Enumerable.Empty<RomRelationSnapshot>,
+                        value => [value]))
+                    .Distinct()
+                    .OrderBy(x => x.TargetRomId, StringComparer.Ordinal)
+                    .ThenBy(x => x.Kind, StringComparer.Ordinal)
+                    .ToImmutableArray());
 
     private static ImmutableDictionary<string, string> ExtractAdditionalMetadata(
         IReadOnlyDictionary<string, object?> frontMatter)
@@ -239,6 +183,80 @@ public sealed class RomLoader : IRomLoader
                     x.Value,
                     System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty,
                 StringComparer.Ordinal);
+    }
+
+    private static Either<string, string> RequireString(
+        IReadOnlyDictionary<string, object?> source,
+        string key)
+        => ReadOptionalString(source, key)
+            .Match(
+                () => Either<string, string>.FromLeft($"Metadata field '{key}' is missing."),
+                Either<string, string>.FromRight);
+
+    private static Option<RomRelationSnapshot> ReadRelation(
+        IReadOnlyDictionary<string, object?> map)
+        => ReadOptionalString(map, "target")
+            .Map(target => new RomRelationSnapshot(
+                TargetRomId: target,
+                Kind: ReadOptionalString(map, "kind").OrElse("related")));
+
+    private static Option<string> ReadOptionalString(
+        IReadOnlyDictionary<string, object?> source,
+        string key)
+        => ReadObject(source, key)
+            .Map(value => Convert.ToString(
+                value,
+                System.Globalization.CultureInfo.InvariantCulture))
+            .Bind(ReadNonEmpty);
+
+    private static Option<object> ReadObject(
+        IReadOnlyDictionary<string, object?> source,
+        string key)
+    {
+        if (source.TryGetValue(key, out var value) &&
+            value is not null)
+        {
+            return Option<object>.Some(value);
+        }
+
+        return Option<object>.None();
+    }
+
+    private static Option<IReadOnlyDictionary<string, object?>> ReadMap(
+        IReadOnlyDictionary<string, object?> source,
+        string key)
+    {
+        if (source.TryGetValue(key, out var value) &&
+            value is IReadOnlyDictionary<string, object?> map)
+        {
+            return Option<IReadOnlyDictionary<string, object?>>.Some(map);
+        }
+
+        return Option<IReadOnlyDictionary<string, object?>>.None();
+    }
+
+    private static Option<IEnumerable<object?>> ReadItems(
+        IReadOnlyDictionary<string, object?> source,
+        string key)
+    {
+        if (source.TryGetValue(key, out var value) &&
+            value is IEnumerable<object?> items)
+        {
+            return Option<IEnumerable<object?>>.Some(items);
+        }
+
+        return Option<IEnumerable<object?>>.None();
+    }
+
+    private static Option<string> ReadNonEmpty(
+        string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            return Option<string>.Some(value.Trim());
+        }
+
+        return Option<string>.None();
     }
 
     private static IEnumerable<string> ToStringArray(object? value)

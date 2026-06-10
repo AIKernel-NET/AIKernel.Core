@@ -2,8 +2,8 @@ namespace AIKernel.Core.Governance.ChatChain;
 
 using AIKernel.Abstractions.Governance.ChatChain;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier']/summary" />
 public sealed class ChatTurnChainVerifier(
     IChatTurnCanonicalizer canonicalizer,
     IChatTurnSemanticHasher hasher,
@@ -18,8 +18,8 @@ public sealed class ChatTurnChainVerifier(
     private readonly IChatTurnSignatureProvider _signatureProvider =
         signatureProvider ?? throw new ArgumentNullException(nameof(signatureProvider));
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyChain']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyChain']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyChain']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyChain']/summary" />
     public IChatTurnVerificationResult VerifyChain(IEnumerable<IHashChainNode> turns)
     {
         ArgumentNullException.ThrowIfNull(turns);
@@ -41,8 +41,8 @@ public sealed class ChatTurnChainVerifier(
         return ChatTurnVerificationResult.Success;
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyNextTurn']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyNextTurn']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyNextTurn']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyNextTurn']/summary" />
     public IChatTurnVerificationResult VerifyNextTurn(
         IHashChainNode nextTurn,
         string currentTailHash)

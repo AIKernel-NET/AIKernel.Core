@@ -6,8 +6,8 @@ using AIKernel.Common.Results;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Execution;
 
-/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutor']" />
-/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutor']" />
+/// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutor']/summary" />
+/// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutor']/summary" />
 public sealed class KernelExecutor : IKernelExecutor
 {
     private readonly IKernelClock _clock;
@@ -15,8 +15,8 @@ public sealed class KernelExecutor : IKernelExecutor
     private readonly KernelExecutionSuccessResultFactory _successResultFactory = new();
     private readonly KernelExecutionFailureResultFactory _failureResultFactory;
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.#ctor']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.#ctor']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.#ctor']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.#ctor']/summary" />
     public KernelExecutor(
         IPromptGenerator promptGenerator,
         IModelPromptCapabilityResolver capabilityResolver,
@@ -36,8 +36,8 @@ public sealed class KernelExecutor : IKernelExecutor
         _failureResultFactory = new KernelExecutionFailureResultFactory(_clock);
     }
 
-    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.ExecuteAsync']" />
-    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.ExecuteAsync']" />
+    /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.ExecuteAsync']/summary" />
+    /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.ExecuteAsync']/summary" />
     public async Task<KernelRequestExecutionResult> ExecuteAsync(
         IModelProvider provider,
         KernelExecutionRequest request,
@@ -55,23 +55,20 @@ public sealed class KernelExecutor : IKernelExecutor
             startedAt,
             executionSequence,
             cancellationToken).ConfigureAwait(false);
-        if (pipelineResult.IsFailure)
+        var failedPipeline = StopWhenPipelineFailed(
+            request,
+            pipelineResult)
+            .Match<KernelRequestExecutionResult?>(
+                () => null,
+                result => result);
+        if (failedPipeline is { } failureResult)
         {
-            return CreateStepFailureResult(
-                request,
-                pipelineResult.State.Capability,
-                pipelineResult.State.Prompt,
-                pipelineResult.State.StartedAt,
-                pipelineResult.State.ExecutionSequence,
-                WithStepMetadata(
-                    pipelineResult.Error!,
-                    pipelineResult.StepId,
-                    pipelineResult.SemanticDelta,
-                    pipelineResult.ReplayLog.Count,
-                    pipelineResult.ReplayLogHash));
+            return failureResult;
         }
 
-        var tokenStep = pipelineResult.Value!;
+        var tokenStep = pipelineResult.Match(
+            (_, error) => throw new InvalidOperationException(error.Message),
+            (_, value) => value);
         var completedAt = _clock.Now;
 
         var successResult = _successResultFactory.CreateSucceededResult(
@@ -88,30 +85,27 @@ public sealed class KernelExecutor : IKernelExecutor
             pipelineResult.ReplayLog.Count,
             pipelineResult.ReplayLogHash);
 
-        if (successResult.IsSuccess)
-        {
-            return successResult.Value!;
-        }
-
-        return CreateFailedResult(
-            request,
-            tokenStep.Capability,
-            tokenStep.Prompt,
-            startedAt,
-            executionSequence,
-            new ErrorContext(
-                successResult.Error!.Message,
-                "execution_id_generation_failed",
-                false)
-            {
-                FailureKind = FailureKind.FailClosed,
-                OriginStep = OriginStep.SemanticHash,
-                SemanticSlot = SemanticSlot.B,
-                Metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+        return successResult.Match(
+            error => CreateFailedResult(
+                request,
+                tokenStep.Capability,
+                tokenStep.Prompt,
+                startedAt,
+                executionSequence,
+                new ErrorContext(
+                    error.Message,
+                    "execution_id_generation_failed",
+                    false)
                 {
-                    [ResultMetadataKeys.SourceErrorCode] = successResult.Error.Code
-                }
-            });
+                    FailureKind = FailureKind.FailClosed,
+                    OriginStep = OriginStep.SemanticHash,
+                    SemanticSlot = SemanticSlot.B,
+                    Metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+                    {
+                        [ResultMetadataKeys.SourceErrorCode] = error.Code
+                    }
+                }),
+            value => value);
     }
 
     private KernelRequestExecutionResult CreateFailedResult(
@@ -158,6 +152,24 @@ public sealed class KernelExecutor : IKernelExecutor
             executionSequence,
             error));
     }
+
+    private Option<KernelRequestExecutionResult> StopWhenPipelineFailed(
+        KernelExecutionRequest request,
+        ResultStep<KernelExecutionPipelineState, KernelExecutionPipelineOutput> pipelineResult)
+        => pipelineResult.Match(
+            (state, error) => Option<KernelRequestExecutionResult>.Some(CreateStepFailureResult(
+                request,
+                state.Capability,
+                state.Prompt,
+                state.StartedAt,
+                state.ExecutionSequence,
+                WithStepMetadata(
+                    error,
+                    pipelineResult.StepId,
+                    pipelineResult.SemanticDelta,
+                    pipelineResult.ReplayLog.Count,
+                    pipelineResult.ReplayLogHash))),
+            (_, _) => Option<KernelRequestExecutionResult>.None());
 
     private static ErrorContext WithStepMetadata(
         ErrorContext error,

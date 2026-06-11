@@ -48,6 +48,21 @@ py -m build --wheel
 py -m twine check dist/aikernel_net-0.1.1-py3-none-any.whl
 ```
 
+PyPI publishing uses GitHub Actions Trusted Publishing. Before pushing a Python
+release tag, verify:
+
+- the package version in `python/pyproject.toml` is updated
+- the wheel and sdist build successfully
+- `.github/workflows/publish-pypi.yml` runs for the intended `v*`,
+  `py-all-*`, or `py-aikernel-net-*` tag
+- the publish job uses the `pypi` GitHub Environment
+- the publish job has `id-token: write`
+- the workflow contains no PyPI API token, `TWINE_USERNAME`, or
+  `TWINE_PASSWORD`
+- the PyPI file detail shows `Uploaded using Trusted Publishing? Yes` after
+  upload
+- `pip install aikernel-net==<version>` succeeds in a clean virtual environment
+
 ## NuGet Package Checks
 
 Before publishing, inspect the generated `.nupkg` files and verify:

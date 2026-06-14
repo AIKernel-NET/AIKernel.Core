@@ -17,6 +17,8 @@ line stabilizes.
 ## Development Guides
 
 - [User Guide](user-guide/index.md)
+- [CTG Governance Integration Guide](development/ctg-governance-integration.md)
+- [CTG Governance Integration Guide 日本語](development/ctg-governance-integration-jp.md)
 - [CUDA Capability Development Guide](development/cuda-capability-development-guide.md)
 - [CUDA Capability 開発ガイド](development/cuda-capability-development-guide-jp.md)
 - [AIKernel.Core Release Checklist](operations/release-checklist.md)
@@ -51,9 +53,10 @@ AIKernel.Core publishes the CPU/default package family:
 - `AIKernel.Core`
 - `AIKernel.Kernel`
 - `AIKernel.Hosting`
-- `AIKernel.Providers.MicrosoftAI`
 - `AIKernel.TestKit`
-- `aikernel-net` Python binding (`py3-none-any`, CPU-only; import `aikernel_net`)
+
+`AIKernel.Providers.MicrosoftAI` is consumed as an external provider package and
+remains on the provider package line until the provider repository is updated.
 
 CUDA support is optional and lives outside this repository. Default
 AIKernel.Core and AIKernel.Python installs do not require CUDA, LibTorch, or a
@@ -66,9 +69,12 @@ size limits.
 The supported distribution paths are:
 
 - Windows/Linux C# applications install the `AIKernel.*` NuGet packages.
-- Windows/Linux Python applications install the universal CPU-only `aikernel-net`
-  wheel from pip.
+- Python bindings are released separately when a Python release is explicitly
+  scheduled.
 - GPU/native execution is added only through explicit Capability packages.
+
+For the 0.1.1.1 CTG Core update, publish NuGet packages only. Do not create a
+PyPI package for this update line.
 
 `AIKernel.Vfs` is a Core implementation namespace, not a separate NuGet package.
 VFS contracts come from the AIKernel.NET contract packages and in-process VFS
@@ -104,11 +110,7 @@ Before publishing the Core package family, run:
 ```powershell
 dotnet test AIKernel.Core.slnx -c Release --no-restore
 dotnet pack AIKernel.Core.slnx -c Release --no-restore
-cd python
-py -m pytest
-py -m pip wheel . -w dist --no-deps
 ```
 
-The Python wheel should include `aikernel_net/managed/*.dll`, `py.typed`, and
-`dist-info/licenses/LICENSE`, should be tagged `py3-none-any`, and should not
-include CUDA, LibTorch, or native runtime assets.
+For 0.1.1.1, stop after NuGet package verification. Python/PyPI packaging is
+out of scope.

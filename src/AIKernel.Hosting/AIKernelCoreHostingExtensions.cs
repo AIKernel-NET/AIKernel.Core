@@ -10,6 +10,7 @@ using AIKernel.Core.Control;
 using AIKernel.Core.Context;
 using AIKernel.Core.Dsl;
 using AIKernel.Core.Execution;
+using AIKernel.Core.Governance;
 using AIKernel.Core.Governance.ChatChain;
 using AIKernel.Core.Providers;
 using AIKernel.Core.Providers.LocalExecutionProvider;
@@ -66,6 +67,50 @@ public static class AIKernelCoreHostingExtensions
         services.AddCoreRuntimeServices();
 
         return new AIKernelCoreBuilder(services, configuration);
+    }
+
+    /// <summary>
+    /// EN: Registers Core CTG governance services without replacing existing contract implementations. JA: 既存の契約実装を置き換えずに Core CTG 統治サービスを登録します。
+    /// </summary>
+    /// <param name="services">EN: The service collection. JA: サービスコレクションです。</param>
+    /// <returns>EN: The service collection. JA: サービスコレクションを返します。</returns>
+    public static IServiceCollection AddCtgGovernance(
+        this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        services.TryAddSingleton<CtgCouncilVoteExtractor>();
+        services.TryAddSingleton<CtgCouncilDecisionToGateInputAdapter>();
+        services.TryAddSingleton<CtgRejectReasonClassifier>();
+        services.TryAddSingleton<CtgCanonReferenceResolver>();
+        services.TryAddSingleton<CtgRomLocaleYamlAdapter>();
+        services.TryAddSingleton<ICtgCanonReferenceSource, CtgStaticCanonReferenceSource>();
+        services.TryAddSingleton<CtgGovernanceTraceBuilder>();
+        services.TryAddSingleton<CtgStepTraceAssembler>();
+        services.TryAddSingleton<CtgDecisionGateEvaluator>();
+        services.TryAddSingleton<AIKernel.Abstractions.Governance.IDecisionGate>(
+            serviceProvider => serviceProvider.GetRequiredService<CtgDecisionGateEvaluator>());
+        services.TryAddSingleton<CtgTrajectoryGateEvaluator>();
+        services.TryAddSingleton<AIKernel.Abstractions.Governance.ITrajectoryGate>(
+            serviceProvider => serviceProvider.GetRequiredService<CtgTrajectoryGateEvaluator>());
+        services.TryAddSingleton<ICtgGovernanceService, CtgGovernanceService>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// EN: Registers Core CTG governance services on an AIKernel Core builder. JA: AIKernel Core builder に Core CTG 統治サービスを登録します。
+    /// </summary>
+    /// <param name="builder">EN: The AIKernel Core builder. JA: AIKernel Core builder です。</param>
+    /// <returns>EN: The AIKernel Core builder. JA: AIKernel Core builder を返します。</returns>
+    public static AIKernelCoreBuilder AddCtgGovernance(
+        this AIKernelCoreBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        builder.Services.AddCtgGovernance();
+
+        return builder;
     }
 
     private static IServiceCollection AddKernelClockDefaults(
@@ -167,6 +212,7 @@ public static class AIKernelCoreHostingExtensions
             AlgorithmTaggedChatTurnSignatureProvider>();
         services.TryAddSingleton<AIKernel.Abstractions.Governance.ChatChain.IChatTurnChainVerifier,
             ChatTurnChainVerifier>();
+        services.AddCtgGovernance();
         services.TryAddSingleton<AIKernel.Abstractions.Routing.ICapabilityRegistry,
             InMemoryCapabilityRegistry>();
         services.TryAddSingleton<AIKernel.Abstractions.Routing.ISemanticRouter,

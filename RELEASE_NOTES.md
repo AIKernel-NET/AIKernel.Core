@@ -2,6 +2,34 @@
 
 [日本語](RELEASE_NOTES-ja.md)
 
+## 0.1.1.1
+
+**June 14th, 2026 - CTG core integration surface.**
+**2026年6月14日--CTG コア統合面。**
+
+AIKernel.Core 0.1.1.1 aligns with the AIKernel.NET 0.1.1.1 contract packages
+and adds the implementation-side Canonical Triadic Governance (CTG) core
+surface.
+
+- Add pure CTG governance evaluators for decision gates and trajectory gates.
+- Add council-vote extraction, council-decision-to-gate-input adaptation,
+  rejection reason classification, canon reference resolution, and governance
+  trace assembly.
+- Add `CtgStepTraceAssembler`, `ICtgGovernanceService`,
+  `CtgGovernanceService`, `ICtgCanonReferenceSource`, and
+  `CtgStaticCanonReferenceSource` as the Core integration surface that later
+  Control packages can call without reimplementing gate logic.
+- Add `CtgRomLocaleYamlAdapter` to adapt merged CTG locale YAML into
+  `CanonReference` carriers and fail-closed diagnostics without copying canon
+  rule text into DTOs.
+- Add `AddCtgGovernance()` and wire it into `AddAIKernelCore()` using
+  non-replacing DI registrations.
+- Add CTG truth table, fail-closed unknown-vote, reject reason serialization,
+  locale parity, VFS/ROM merge adapter, service, and hosting tests.
+
+Distribution note: the 0.1.1.1 line is NuGet-only. No PyPI package is created
+for this update.
+
 ## 0.1.1
 
 **June 10th, 2026 - Cohering the core runtime.**

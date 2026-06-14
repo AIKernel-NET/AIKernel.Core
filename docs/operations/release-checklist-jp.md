@@ -1,7 +1,13 @@
 # AIKernel.Core リリースチェックリスト
 
-このチェックリストは、2026-06-10 のプロトタイプ実証リリースラインとして
-AIKernel.Core 0.1.1 package family と CPU-only の Python binding を公開するためのものです。
+このチェックリストは、AIKernel.Core package family を公開するためのものです。
+
+0.1.1.1 の CTG Core 更新では NuGet packages のみを公開します。この更新ラインでは
+PyPI package を作成しません。Python / PyPI 手順は、Python release が別途明示的に
+予定された場合だけ適用します。
+
+0.1.1 release line では、2026-06-10 のプロトタイプ実証リリースとして
+CPU-only の Python binding も公開しました。
 
 0.0.x の設計実装フェーズは完了しました。0.1.1 では、プロトタイプアプリ、
 外部 Capability module、Control Plane 実行基盤を用いて runtime を実証します。
@@ -14,12 +20,14 @@ AIKernel.Core は以下の managed runtime packages を公開します。
 - `AIKernel.Core`
 - `AIKernel.Kernel`
 - `AIKernel.Hosting`
-- `AIKernel.Providers.MicrosoftAI`
 - `AIKernel.TestKit`
 
-安定版 Python binding は、`aikernel-net` package を PyPI に universal
-`py3-none-any` の CPU-only wheel として公開します。import package は
-`aikernel_net` です。PyPI の `aikernel` は別プロジェクトです。
+`AIKernel.Providers.MicrosoftAI` は integration test で外部 Provider package として利用し、
+その repository が更新されるまでは provider package line のまま扱います。
+
+安定版 Python binding は、Python release が明示的に予定された場合だけ、
+`aikernel-net` package を PyPI に universal `py3-none-any` の CPU-only wheel として
+公開します。import package は `aikernel_net` です。PyPI の `aikernel` は別プロジェクトです。
 
 開発版は GitHub Packages に分離し、`aikernel-net-dev` のような distribution name と
 `0.1.1-dev.1` 形式の version を使います。開発版は破壊的変更を許容し、
@@ -37,6 +45,8 @@ dotnet test AIKernel.Core.slnx -c Release --no-restore
 dotnet pack AIKernel.Core.slnx -c Release --no-restore
 ```
 
+0.1.1.1 ではここで停止し、生成済み NuGet packages のみを公開対象にします。
+
 `python/` で実行します。
 
 ```powershell
@@ -50,13 +60,13 @@ py -m twine check dist/aikernel_net-0.1.1-py3-none-any.whl
 
 公開前に生成済み `.nupkg` を確認します。
 
-- package id と version が `0.1.1`
+- Core package id と version が CTG Core 更新では `0.1.1.1`
 - license が `Apache-2.0`
 - repository metadata が AIKernel.Core repository を指す
 - README と icon assets が必要な package に含まれる
 - CUDA、LibTorch、Native ABI、外部 Capability binary が含まれない
 - `AIKernel.Vfs` package dependency が存在しない
-- AIKernel.NET contract packages 参照が `0.1.1`
+- AIKernel.NET contract packages 参照が CTG Core 更新では `0.1.1.1`
 
 ## 契約 migration notes
 
@@ -69,6 +79,8 @@ py -m twine check dist/aikernel_net-0.1.1-py3-none-any.whl
   `AIKernel.Dtos.Capabilities.CapabilityModuleDescriptor` を使用します。
 
 ## Python wheel 確認
+
+0.1.1.1 の CTG Core 更新では、この section は skip します。
 
 Python wheel について以下を確認します。
 
@@ -94,9 +106,10 @@ CUDA が既定でインストールされるような表現を避けます。
 
 1. AIKernel.NET contract packages を先に公開する。
 2. AIKernel.Core package family を公開する。
-3. CPU-only の安定版 `aikernel-net` Python package を PyPI に公開する。
-4. 外部 Capability metadata package は managed dependencies が利用可能になってから公開する。
-5. 外部 Capability full runtime package を GitHub Release に添付する。
+3. 外部 Provider package は、その repository が更新されるまで独自の release line に維持する。
+4. 0.1.1.1 CTG Core 更新では PyPI を skip する。
+5. 外部 Capability metadata package は managed dependencies が利用可能になってから公開する。
+6. 外部 Capability full runtime package を GitHub Release に添付する。
 
 ## 公開後 smoke check
 
@@ -104,12 +117,14 @@ clean な consumer project で確認します。
 
 ```powershell
 dotnet new console
-dotnet add package AIKernel.Core --version 0.1.1
-dotnet add package AIKernel.Kernel --version 0.1.1
+dotnet add package AIKernel.Core --version 0.1.1.1
+dotnet add package AIKernel.Kernel --version 0.1.1.1
 dotnet build
 ```
 
 安定版 Python:
+
+0.1.1.1 の CTG Core 更新では、この smoke check は skip します。
 
 ```powershell
 py -m venv .venv

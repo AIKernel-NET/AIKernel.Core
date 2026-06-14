@@ -1,7 +1,13 @@
 # AIKernel.Core Release Checklist
 
-This checklist is for publishing the AIKernel.Core 0.1.1 package family and the
-CPU-only Python binding on the 2026-06-10 prototype validation release line.
+This checklist is for publishing the AIKernel.Core package family.
+
+For the 0.1.1.1 CTG Core update, publish NuGet packages only. Do not create a
+PyPI package for this update line. Python/PyPI steps below apply only to a
+separately scheduled Python release.
+
+The 0.1.1 release line also published the CPU-only Python binding on the
+2026-06-10 prototype validation release line.
 
 The 0.0.x design-implementation phase is complete. The 0.1.1 release validates
 the runtime with prototype applications, external Capability modules, and
@@ -15,12 +21,15 @@ AIKernel.Core publishes the managed runtime packages:
 - `AIKernel.Core`
 - `AIKernel.Kernel`
 - `AIKernel.Hosting`
-- `AIKernel.Providers.MicrosoftAI`
 - `AIKernel.TestKit`
 
-The stable Python binding publishes the `aikernel-net` package to PyPI as a
-universal `py3-none-any` CPU-only wheel. Import it as `aikernel_net`. The PyPI
-package named `aikernel` is a different project.
+`AIKernel.Providers.MicrosoftAI` is consumed as an external provider package in
+integration tests and remains on the provider package line until that repository
+is updated.
+
+The stable Python binding publishes the `aikernel-net` package to PyPI only
+when a Python release is explicitly scheduled. Import it as `aikernel_net`. The
+PyPI package named `aikernel` is a different project.
 
 Development builds should use GitHub Packages with a separate distribution name
 such as `aikernel-net-dev` and versions like `0.1.1-dev.1`. Development
@@ -38,6 +47,8 @@ Run from the repository root:
 dotnet test AIKernel.Core.slnx -c Release --no-restore
 dotnet pack AIKernel.Core.slnx -c Release --no-restore
 ```
+
+For 0.1.1.1, stop here and publish only the generated NuGet packages.
 
 Run from `python/`:
 
@@ -67,13 +78,14 @@ release tag, verify:
 
 Before publishing, inspect the generated `.nupkg` files and verify:
 
-- package ids and versions are `0.1.1`
+- Core package ids and versions are `0.1.1.1` for the CTG Core update
 - license is `Apache-2.0`
 - repository metadata points at the AIKernel.Core repository
 - README and icon assets are included where expected
 - no CUDA, LibTorch, native ABI, or external Capability binaries are included
 - no `AIKernel.Vfs` package dependency exists
-- references to AIKernel.NET contract packages use `0.1.1`
+- references to AIKernel.NET contract packages use `0.1.1.1` for the CTG Core
+  update
 
 ## Contract Migration Notes
 
@@ -87,6 +99,8 @@ AIKernel.NET:
   manifests should use `AIKernel.Dtos.Capabilities.CapabilityModuleDescriptor`.
 
 ## Python Wheel Checks
+
+Skip this section for the 0.1.1.1 CTG Core update.
 
 Verify the Python wheel:
 
@@ -112,10 +126,12 @@ repository and should not imply that CUDA is installed by default.
 
 1. Publish AIKernel.NET contract packages first.
 2. Publish AIKernel.Core package family.
-3. Publish the CPU-only stable `aikernel-net` Python package to PyPI.
-4. Publish external Capability metadata packages only after their managed
+3. Keep external provider packages on their own release line until they are
+   updated.
+4. Skip PyPI for the 0.1.1.1 CTG Core update.
+5. Publish external Capability metadata packages only after their managed
    dependencies are available.
-5. Attach external Capability full runtime packages to their GitHub Releases.
+6. Attach external Capability full runtime packages to their GitHub Releases.
 
 ## Post-Publish Smoke Check
 
@@ -123,12 +139,14 @@ In a clean consumer project:
 
 ```powershell
 dotnet new console
-dotnet add package AIKernel.Core --version 0.1.1
-dotnet add package AIKernel.Kernel --version 0.1.1
+dotnet add package AIKernel.Core --version 0.1.1.1
+dotnet add package AIKernel.Kernel --version 0.1.1.1
 dotnet build
 ```
 
 For stable Python:
+
+Skip this smoke check for the 0.1.1.1 CTG Core update.
 
 ```powershell
 py -m venv .venv

@@ -100,9 +100,44 @@ the host OS driver layer, and AIKernel.Wasm as the browser/WASM runtime layer.
 
 ---
 
+## CTG Governance Core
+
+AIKernel.Core 0.1.1.1 includes the implementation-side Canonical Triadic
+Governance (CTG) kernel surface. CTG is implemented as deterministic Core
+services that consume the AIKernel.NET contract DTOs and enums without changing
+ROM, Canon, Council, Gate, RejectPolicy, YAML, or DTO semantics.
+
+The Core CTG surface includes:
+
+- vote extraction and `CouncilDecision` to `GateInput` adaptation
+- pure Decision Gate evaluation
+- pure Trajectory Gate aggregation
+- reject reason serialization and classification
+- canon reference resolution and locale YAML adaptation
+- step / trajectory governance trace assembly
+- `ICtgGovernanceService` as the Core-facing integration facade
+
+Register CTG services directly with:
+
+```csharp
+services.AddCtgGovernance();
+```
+
+`AddAIKernelCore()` also registers the CTG surface. Registrations are
+non-replacing for existing `IDecisionGate` and `ITrajectoryGate` services.
+
+Read the [CTG Governance Integration Guide](docs/development/ctg-governance-integration.md)
+for implementation boundaries.
+
+Distribution note: the 0.1.1.1 update is NuGet-only. No PyPI package is created
+for this update line.
+
+---
+
 ## Solution Structure
 
-This repository consists of runtime, provider, and verification layers.
+This repository consists of runtime, provider-integration, and verification
+layers.
 
 ```text
 src/
@@ -111,7 +146,7 @@ src/
   AIKernel.Kernel
   AIKernel.Hosting
   Providers/
-    AIKernel.Providers.MicrosoftAI
+    (external provider integration workspace)
 
 tests/
   AIKernel.TestKit
@@ -180,11 +215,14 @@ It provides `IServiceCollection` extensions and default wiring for ASP.NET Core 
 
 #### `Providers/`
 
-Provider implementations that connect AIKernel to external models and external services.
+Provider integration workspace for packages that connect AIKernel to external
+models and services. The 0.1.1.1 Core package line does not publish provider
+packages from this repository.
 
 ##### `AIKernel.Providers.MicrosoftAI`
 
-An OpenAI-compatible Provider implementation based on `Microsoft.Extensions.AI` (MEAI).
+An external OpenAI-compatible Provider package based on
+`Microsoft.Extensions.AI` (MEAI).
 
 It uses Microsoft’s AI abstraction layer to accelerate development while preserving AIKernel’s Capability-based execution model.
 
@@ -211,13 +249,15 @@ Integration tests that pass through multiple runtime layers.
 #### `AIKernel.Python`
 
 A thin Python binding for AIKernel.Core functional primitives and managed
-assembly discovery.
+assembly discovery. It is released only when a Python package release is
+explicitly scheduled.
 
-It installs as the `aikernel-net` Python package and is CPU-only by default. The
-package exposes Python monad helpers and managed assembly discovery; it does not
-ship CUDA, LibTorch, or the native `libtorch_bridge` ABI. The Python package
-does not reimplement OS-specific memory mapping, Kernel internals, or Capability
-internals.
+Previously published Python releases install as the `aikernel-net` package and
+are CPU-only by default. The package exposes Python monad helpers and managed
+assembly discovery; it does not ship CUDA, LibTorch, or the native
+`libtorch_bridge` ABI. The Python package does not reimplement OS-specific
+memory mapping, Kernel internals, or Capability internals. The 0.1.1.1 CTG Core
+update does not publish a PyPI package.
 
 ---
 
@@ -229,17 +269,22 @@ For a focused package usage walkthrough, see the
 ### 1. Install Packages
 
 ```bash
-dotnet add package AIKernel.Core --version 0.1.1
-dotnet add package AIKernel.Hosting --version 0.1.1
-dotnet add package AIKernel.Kernel --version 0.1.1
+dotnet add package AIKernel.Core --version 0.1.1.1
+dotnet add package AIKernel.Hosting --version 0.1.1.1
+dotnet add package AIKernel.Kernel --version 0.1.1.1
 dotnet add package AIKernel.Providers.MicrosoftAI --version 0.1.1
 ```
+
+`AIKernel.Providers.MicrosoftAI` remains on the 0.1.1 provider package line
+until the provider repository is updated. The 0.1.1.1 Core update is centered
+on Core, Hosting, Kernel, Common, TestKit, and the AIKernel.NET contract
+packages.
 
 For direct use of functional primitives and contract testing helpers:
 
 ```bash
-dotnet add package AIKernel.Common --version 0.1.1
-dotnet add package AIKernel.TestKit --version 0.1.1
+dotnet add package AIKernel.Common --version 0.1.1.1
+dotnet add package AIKernel.TestKit --version 0.1.1.1
 ```
 
 CUDA is optional and lives outside this repository. GPU hosts should install an
@@ -260,22 +305,23 @@ LLM / SLM developers who need direct CUDA integration should read
 Other CUDA versions, model runtimes, or Linux CUDA hosts should fork the CUDA
 Capability repository and publish a separate Capability module.
 
-For the optional Python language binding:
+For the previously published Python language binding:
 
 ```bash
 pip install aikernel-net
 ```
 
 The base Python package is a CPU-only universal `py3-none-any` wheel for
-Windows and Linux. Use NuGet packages from C# hosts, and use the `aikernel-net`
-distribution from Python hosts. Import it as `aikernel_net`. The PyPI package
-named `aikernel` is a different project. GPU/native runtimes remain explicit
-Capability installs.
+Windows and Linux. The 0.1.1.1 CTG Core update does not publish a PyPI package;
+existing Python hosts should stay on the latest published `aikernel-net`
+distribution until a Python release is scheduled. Import it as `aikernel_net`.
+The PyPI package named `aikernel` is a different project. GPU/native runtimes
+remain explicit Capability installs.
 
-Stable Python releases are published to PyPI as `aikernel-net`. Development
-builds may be used for CI/CD validation, but user-facing release notes describe
-only public package releases and fold development changes into the next public
-release entry.
+Stable Python releases are published to PyPI as `aikernel-net` only when a
+Python release is explicitly scheduled. Development builds may be used for
+CI/CD validation, but user-facing release notes describe only public package
+releases and fold development changes into the next public release entry.
 
 For source-based local validation, install from the repository subdirectory:
 
@@ -287,8 +333,9 @@ The default Python install is CPU-only/CUDA-free and does not include a native
 bridge. Install GPU integrations from the matching external Capability package
 and follow that Capability repository's distribution instructions.
 
-The v0.1.1 package family is aligned with the AIKernel.NET contract packages
-`AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums` v0.1.1.
+The v0.1.1.1 Core package family is aligned with the AIKernel.NET contract
+packages `AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums`
+v0.1.1.1.
 `AIKernel.Vfs` is no longer a separate package dependency; the VFS contracts are
 provided by `AIKernel.Abstractions`. The `AIKernel.Vfs` namespace remains as a
 Core implementation namespace for in-process VFS providers and stores; it is not
@@ -435,7 +482,7 @@ content.
 ## Target Boot Experience
 
 ```text
-[KERNEL] Initializing AIKernel.NET Core v0.1.1...
+[KERNEL] Initializing AIKernel.NET Core v0.1.1.1...
 [KERNEL] Loading VFS Provider: local... [OK]
 [KERNEL] Mounting ROM root... [OK]
 [KERNEL] Building ContextSnapshot... [OK]

@@ -14,11 +14,23 @@ AIOS distribution を構築するための安定した基盤です。
 Monolith は 0.1.x 系の安定化後に SDK layer を統合する reference system として
 位置づけられます。
 
+## リポジトリ横断整合
+
+共有の repository boundary、0.1.1.1 local NuGet versioning、この更新ラインでの
+NuGet-only / no-PyPI rule は
+[AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1-ja.md)
+で定義します。
+
+Core は deterministic kernel runtime と CTG evaluator implementation を所有します。
+Provider endpoint behavior、browser/WASM execution、scenario-specific mapping を
+Core に取り込みません。
+
 ## Development Guides
 
 - [User Guide](user-guide/index-ja.md)
 - [CTG Governance Integration Guide](development/ctg-governance-integration.md)
 - [CTG Governance Integration Guide 日本語](development/ctg-governance-integration-jp.md)
+- [Concept Elevation Notes / 概念昇格ノート](development/concept-elevation.md)
 - [CUDA Capability Development Guide](development/cuda-capability-development-guide.md)
 - [CUDA Capability 開発ガイド](development/cuda-capability-development-guide-jp.md)
 - [AIKernel.Core Release Checklist](operations/release-checklist.md)

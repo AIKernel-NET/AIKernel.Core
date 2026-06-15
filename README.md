@@ -25,6 +25,16 @@ GPU backends, and tools after the 0.1.x SDK line stabilizes.
 
 ---
 
+## Concept Elevation
+
+AIKernel.Core follows the common Concept Elevation naming policy maintained in
+AIKernel.NET. Core adds only concept-level facades and does not rename CTG
+contracts, GateInput, DTOs, enums, providers, mappers, adapters, or serializers.
+
+Repository notes: [docs/development/concept-elevation.md](docs/development/concept-elevation.md)
+
+---
+
 ## Architectural Discipline
 
 AIKernel.NET Core operates according to the following three canonical principles.

@@ -14,11 +14,22 @@ AIKernel.Monolith is the official AIOS distribution now in development. It is
 planned as the reference system that integrates the SDK layers after the 0.1.x
 line stabilizes.
 
+## Cross-Repository Alignment
+
+Shared repository boundaries, 0.1.1.1 local NuGet versioning, and the
+NuGet-only / no-PyPI rule for this update line are defined by
+[AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1.md).
+
+Core owns deterministic kernel runtime and CTG evaluator implementation. It
+must not absorb provider endpoint behavior, browser/WASM execution, or
+scenario-specific mapping.
+
 ## Development Guides
 
 - [User Guide](user-guide/index.md)
 - [CTG Governance Integration Guide](development/ctg-governance-integration.md)
 - [CTG Governance Integration Guide 日本語](development/ctg-governance-integration-jp.md)
+- [Concept Elevation Notes / 概念昇格ノート](development/concept-elevation.md)
 - [CUDA Capability Development Guide](development/cuda-capability-development-guide.md)
 - [CUDA Capability 開発ガイド](development/cuda-capability-development-guide-jp.md)
 - [AIKernel.Core Release Checklist](operations/release-checklist.md)

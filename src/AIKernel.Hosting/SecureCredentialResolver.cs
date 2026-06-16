@@ -5,7 +5,7 @@ using AIKernel.Core.Security;
 using AIKernel.Core.Time;
 using Microsoft.Extensions.Options;
 
-/// <summary>EN: Documentation for public API. JA: SecureCredentialResolver を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] SecureCredentialResolver を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureCredentialResolver']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureCredentialResolver']/summary" />
 public sealed class SecureCredentialResolver<TOptions>(
@@ -20,7 +20,7 @@ public sealed class SecureCredentialResolver<TOptions>(
             ?? throw new ArgumentNullException(nameof(options));
     private readonly IKernelClock _clock = clock ?? KernelClock.System();
 
-    /// <summary>EN: Documentation for public API. JA: ResolveAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ResolveAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureCredentialResolver.ResolveAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureCredentialResolver.ResolveAsync']/summary" />
     public async ValueTask<TOptions> ResolveAsync(

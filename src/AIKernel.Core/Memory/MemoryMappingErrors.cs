@@ -6,7 +6,7 @@ internal static class MemoryMappingErrors
 {
     /// <summary>
     /// EN: Executes Error.
-    /// EN: Documentation for public API. JA: Error を実行します。
+    /// [EN] Documents this public package API member. [JA] Error を実行します。
     /// </summary>
     public static ErrorContext Error(string message)
         => new(message, "MEMORY_MAPPING_ERROR", false)
@@ -17,7 +17,7 @@ internal static class MemoryMappingErrors
         };
     /// <summary>
     /// EN: Executes FromException.
-    /// EN: Documentation for public API. JA: FromException を実行します。
+    /// [EN] Documents this public package API member. [JA] FromException を実行します。
     /// </summary>
 
     public static ErrorContext FromException(Exception exception)
@@ -31,7 +31,7 @@ internal static class MemoryMappingErrors
         };
     /// <summary>
     /// EN: Executes FromContext.
-    /// EN: Documentation for public API. JA: FromContext を実行します。
+    /// [EN] Documents this public package API member. [JA] FromContext を実行します。
     /// </summary>
 
     public static ErrorContext FromContext(ErrorContext error)

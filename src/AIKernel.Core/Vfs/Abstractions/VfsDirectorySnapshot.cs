@@ -13,7 +13,7 @@ internal sealed class VfsDirectorySnapshot : IVfsDirectory
     private readonly IReadOnlyDictionary<string, string>? _metadata;
     /// <summary>
     /// EN: Gets VfsDirectorySnapshot.
-    /// EN: Documentation for public API. JA: VfsDirectorySnapshot を取得します。
+    /// [EN] Documents this public package API member. [JA] VfsDirectorySnapshot を取得します。
     /// </summary>
 
     public VfsDirectorySnapshot(
@@ -35,19 +35,19 @@ internal sealed class VfsDirectorySnapshot : IVfsDirectory
     }
     /// <summary>
     /// EN: Gets Name.
-    /// EN: Documentation for public API. JA: Name を取得します。
+    /// [EN] Documents this public package API member. [JA] Name を取得します。
     /// </summary>
 
     public string Name { get; }
     /// <summary>
     /// EN: Gets Path.
-    /// EN: Documentation for public API. JA: Path を取得します。
+    /// [EN] Documents this public package API member. [JA] Path を取得します。
     /// </summary>
 
     public string Path { get; }
     /// <summary>
     /// EN: Executes GetFilesAsync.
-    /// EN: Documentation for public API. JA: GetFilesAsync を実行します。
+    /// [EN] Documents this public package API member. [JA] GetFilesAsync を実行します。
     /// </summary>
 
     public Task<IReadOnlyList<IVfsFile>> GetFilesAsync(bool recursive = false)
@@ -57,7 +57,7 @@ internal sealed class VfsDirectorySnapshot : IVfsDirectory
     }
     /// <summary>
     /// EN: Executes GetDirectoriesAsync.
-    /// EN: Documentation for public API. JA: GetDirectoriesAsync を実行します。
+    /// [EN] Documents this public package API member. [JA] GetDirectoriesAsync を実行します。
     /// </summary>
 
     public Task<IReadOnlyList<IVfsDirectory>> GetDirectoriesAsync()
@@ -67,7 +67,7 @@ internal sealed class VfsDirectorySnapshot : IVfsDirectory
     }
     /// <summary>
     /// EN: Executes GetEntriesAsync.
-    /// EN: Documentation for public API. JA: GetEntriesAsync を実行します。
+    /// [EN] Documents this public package API member. [JA] GetEntriesAsync を実行します。
     /// </summary>
 
     public Task<IReadOnlyList<VfsEntry>> GetEntriesAsync()
@@ -77,7 +77,7 @@ internal sealed class VfsDirectorySnapshot : IVfsDirectory
     }
     /// <summary>
     /// EN: Executes GetSubdirectoryAsync.
-    /// EN: Documentation for public API. JA: GetSubdirectoryAsync を実行します。
+    /// [EN] Documents this public package API member. [JA] GetSubdirectoryAsync を実行します。
     /// </summary>
 
     public Task<IVfsDirectory?> GetSubdirectoryAsync(string name)
@@ -92,7 +92,7 @@ internal sealed class VfsDirectorySnapshot : IVfsDirectory
     }
     /// <summary>
     /// EN: Executes GetMetadata.
-    /// EN: Documentation for public API. JA: GetMetadata を実行します。
+    /// [EN] Documents this public package API member. [JA] GetMetadata を実行します。
     /// </summary>
 
     public IReadOnlyDictionary<string, string>? GetMetadata() => _metadata;

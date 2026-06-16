@@ -5,14 +5,14 @@ using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Enums;
 
-/// <summary>EN: Documentation for public API. JA: KernelExecutionIdFactory を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] KernelExecutionIdFactory を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutionIdFactory']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutionIdFactory']/summary" />
 public sealed class KernelExecutionIdFactory
 {
     private readonly SemanticStateHasher _semanticStateHasher = new();
 
-    /// <summary>EN: Documentation for public API. JA: CreateExecutionId を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] CreateExecutionId を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateExecutionId']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateExecutionId']/summary" />
     public string CreateExecutionId(
@@ -35,7 +35,7 @@ public sealed class KernelExecutionIdFactory
                 executionSequence));
     }
 
-    /// <summary>EN: Documentation for public API. JA: TryCreateExecutionId を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] TryCreateExecutionId を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateExecutionId']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateExecutionId']/summary" />
     public Result<string> TryCreateExecutionId(
@@ -55,7 +55,7 @@ public sealed class KernelExecutionIdFactory
             executionSequence);
     }
 
-    /// <summary>EN: Documentation for public API. JA: CreateFallbackExecutionId を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] CreateFallbackExecutionId を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateFallbackExecutionId']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.CreateFallbackExecutionId']/summary" />
     public string CreateFallbackExecutionId(
@@ -67,7 +67,7 @@ public sealed class KernelExecutionIdFactory
         return Unwrap(CreateFallbackExecutionIdResult(request, status));
     }
 
-    /// <summary>EN: Documentation for public API. JA: TryCreateFallbackExecutionId を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] TryCreateFallbackExecutionId を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateFallbackExecutionId']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutionIdFactory.TryCreateFallbackExecutionId']/summary" />
     public Result<string> TryCreateFallbackExecutionId(

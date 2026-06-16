@@ -13,7 +13,7 @@ internal sealed class KernelExecutionStepRunner
     private readonly ITokenizer _tokenizer;
     /// <summary>
     /// EN: Gets KernelExecutionStepRunner.
-    /// EN: Documentation for public API. JA: KernelExecutionStepRunner を取得します。
+    /// [EN] Documents this public package API member. [JA] KernelExecutionStepRunner を取得します。
     /// </summary>
 
     public KernelExecutionStepRunner(
@@ -27,7 +27,7 @@ internal sealed class KernelExecutionStepRunner
     }
     /// <summary>
     /// EN: Gets ResolveCapability.
-    /// EN: Documentation for public API. JA: ResolveCapability を取得します。
+    /// [EN] Documents this public package API member. [JA] ResolveCapability を取得します。
     /// </summary>
 
     public Result<ModelPromptCapability> ResolveCapability(
@@ -40,7 +40,7 @@ internal sealed class KernelExecutionStepRunner
                 Result<ModelPromptCapability>.Success);
     /// <summary>
     /// EN: Gets GeneratePromptAsync.
-    /// EN: Documentation for public API. JA: GeneratePromptAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] GeneratePromptAsync を取得します。
     /// </summary>
 
     public async Task<Result<GeneratedPrompt>> GeneratePromptAsync(
@@ -65,7 +65,7 @@ internal sealed class KernelExecutionStepRunner
     }
     /// <summary>
     /// EN: Gets GenerateOutputAsync.
-    /// EN: Documentation for public API. JA: GenerateOutputAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] GenerateOutputAsync を取得します。
     /// </summary>
 
     public async Task<Result<string>> GenerateOutputAsync(
@@ -88,7 +88,7 @@ internal sealed class KernelExecutionStepRunner
             .ToArray();
     /// <summary>
     /// EN: Executes CountOutputTokens.
-    /// EN: Documentation for public API. JA: CountOutputTokens を実行します。
+    /// [EN] Documents this public package API member. [JA] CountOutputTokens を実行します。
     /// </summary>
 
     public Result<int> CountOutputTokens(string output)

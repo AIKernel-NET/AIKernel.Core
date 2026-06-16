@@ -8,7 +8,7 @@ using AIKernel.Enums;
 using AIKernel.Vfs;
 using Microsoft.Extensions.Options;
 
-/// <summary>EN: Documentation for public API. JA: LocalFileProvider を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] LocalFileProvider を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Local.LocalFileProvider']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Local.LocalFileProvider']/summary" />
 public sealed class LocalFileProvider : FileProviderBase
@@ -16,7 +16,7 @@ public sealed class LocalFileProvider : FileProviderBase
     private readonly string _rootPath;
     private readonly bool _allowWrite;
 
-    /// <summary>EN: Documentation for public API. JA: LocalFileProvider を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] LocalFileProvider を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.#ctor']/summary" />
     public LocalFileProvider(
@@ -28,7 +28,7 @@ public sealed class LocalFileProvider : FileProviderBase
     {
     }
 
-    /// <summary>EN: Documentation for public API. JA: LocalFileProvider を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] LocalFileProvider を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.#ctor']/summary" />
     public LocalFileProvider(
@@ -46,7 +46,7 @@ public sealed class LocalFileProvider : FileProviderBase
         _allowWrite = options.AllowWrite;
     }
 
-    /// <summary>EN: Documentation for public API. JA: IsAvailableAsync を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] IsAvailableAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsAvailableAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsAvailableAsync']/summary" />
     public override Task<bool> IsAvailableAsync()
@@ -54,7 +54,7 @@ public sealed class LocalFileProvider : FileProviderBase
         return Task.FromResult(Directory.Exists(_rootPath));
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetHealthAsync を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetHealthAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetHealthAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetHealthAsync']/summary" />
     public override Task<VfsProviderHealth> GetHealthAsync()
@@ -101,14 +101,14 @@ public sealed class LocalFileProvider : FileProviderBase
         private readonly string _rootPath = rootPath ?? throw new ArgumentNullException(nameof(rootPath));
         private readonly IKernelClock _clock = clock ?? throw new ArgumentNullException(nameof(clock));
 
-        /// <summary>EN: Documentation for public API. JA: SessionId を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] SessionId を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsNullOrWhiteSpace']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.IsNullOrWhiteSpace']/summary" />
         public string SessionId { get; } = string.IsNullOrWhiteSpace(sessionId)
                 ? throw new ArgumentException("SessionId is required.", nameof(sessionId))
                 : sessionId;
 
-        /// <summary>EN: Documentation for public API. JA: ReadFileAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] ReadFileAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.ReadFileAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.ReadFileAsync']/summary" />
         public async Task<IVfsFile> ReadFileAsync(string path)
@@ -144,7 +144,7 @@ public sealed class LocalFileProvider : FileProviderBase
                 });
         }
 
-        /// <summary>EN: Documentation for public API. JA: WriteFileAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] WriteFileAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.WriteFileAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.WriteFileAsync']/summary" />
         public async Task WriteFileAsync(string path, byte[] content)
@@ -185,7 +185,7 @@ public sealed class LocalFileProvider : FileProviderBase
             File.SetLastWriteTimeUtc(fullPath, timestamp);
         }
 
-        /// <summary>EN: Documentation for public API. JA: GetDirectoryAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] GetDirectoryAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetDirectoryAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetDirectoryAsync']/summary" />
         public Task<IVfsDirectory> GetDirectoryAsync(string path)
@@ -251,7 +251,7 @@ public sealed class LocalFileProvider : FileProviderBase
                     entries: entries));
         }
 
-        /// <summary>EN: Documentation for public API. JA: ExistsAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] ExistsAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.ExistsAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.ExistsAsync']/summary" />
         public Task<bool> ExistsAsync(string path)
@@ -263,7 +263,7 @@ public sealed class LocalFileProvider : FileProviderBase
                 || Directory.Exists(fullPath));
         }
 
-        /// <summary>EN: Documentation for public API. JA: DeleteAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] DeleteAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.DeleteAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.DeleteAsync']/summary" />
         public Task DeleteAsync(string path)
@@ -289,7 +289,7 @@ public sealed class LocalFileProvider : FileProviderBase
             return Task.CompletedTask;
         }
 
-        /// <summary>EN: Documentation for public API. JA: QueryAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] QueryAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.QueryAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.QueryAsync']/summary" />
         public Task<IVfsQueryResult> QueryAsync(IVfsQuery query)
@@ -318,7 +318,7 @@ public sealed class LocalFileProvider : FileProviderBase
             return Task.FromResult(VfsEntryQueryEngine.Execute(entries, query));
         }
 
-        /// <summary>EN: Documentation for public API. JA: DisposeAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] DisposeAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.DisposeAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.DisposeAsync']/summary" />
         public ValueTask DisposeAsync()

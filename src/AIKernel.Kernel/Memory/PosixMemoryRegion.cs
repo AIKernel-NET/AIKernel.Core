@@ -9,7 +9,7 @@ internal sealed class PosixMemoryRegion : MemoryRegionBase
     private readonly int _fileDescriptor;
     /// <summary>
     /// EN: Gets PosixMemoryRegion.
-    /// EN: Documentation for public API. JA: PosixMemoryRegion を取得します。
+    /// [EN] Documents this public package API member. [JA] PosixMemoryRegion を取得します。
     /// </summary>
 
     public PosixMemoryRegion(

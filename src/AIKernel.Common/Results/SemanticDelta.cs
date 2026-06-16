@@ -1,6 +1,6 @@
 namespace AIKernel.Common.Results;
 
-/// <summary>EN: Documentation for public API. JA: SemanticDelta を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] SemanticDelta を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.SemanticDelta']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.SemanticDelta']/summary" />
 public sealed record SemanticDelta(
@@ -10,7 +10,7 @@ public sealed record SemanticDelta(
     IReadOnlyDictionary<string, string>? Metadata = null,
     string? Kind = null)
 {
-    /// <summary>EN: Documentation for public API. JA: Empty を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Empty を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.SemanticDelta.new']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.SemanticDelta.new']/summary" />
     public static SemanticDelta Empty { get; } = new("none");

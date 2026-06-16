@@ -1,61 +1,61 @@
 namespace AIKernel.Common.Results;
 
-/// <summary>EN: Documentation for public API. JA: ResultStep を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] ResultStep を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultStep']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultStep']/summary" />
 public readonly struct ResultStep<TState, TValue>
 {
-    /// <summary>EN: Documentation for public API. JA: IsSuccess を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] IsSuccess を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.IsSuccess']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.IsSuccess']/summary" />
     public bool IsSuccess { get; }
 
-    /// <summary>EN: Documentation for public API. JA: IsFailure を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] IsFailure を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.ResultStep.IsFailure']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.ResultStep.IsFailure']/summary" />
     public bool IsFailure => !IsSuccess;
 
-    /// <summary>EN: Documentation for public API. JA: IsSuspended を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] IsSuspended を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.ResultStep.IsSuspended']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.ResultStep.IsSuspended']/summary" />
     public bool IsSuspended => Error?.Code == PipelineStep.SuspendErrorCode;
 
-    /// <summary>EN: Documentation for public API. JA: State を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] State を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.State']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.State']/summary" />
     public TState State { get; }
 
-    /// <summary>EN: Documentation for public API. JA: Value を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Value を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.Value']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.Value']/summary" />
     public TValue? Value { get; }
 
-    /// <summary>EN: Documentation for public API. JA: Error を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Error を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.Error']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.Error']/summary" />
     public ErrorContext? Error { get; }
 
-    /// <summary>EN: Documentation for public API. JA: StepId を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] StepId を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.StepId']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.StepId']/summary" />
     public string StepId { get; }
 
-    /// <summary>EN: Documentation for public API. JA: SemanticDelta を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] SemanticDelta を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.SemanticDelta']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.SemanticDelta']/summary" />
     public SemanticDelta SemanticDelta { get; }
 
-    /// <summary>EN: Documentation for public API. JA: ParentStepId を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ParentStepId を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ParentStepId']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ParentStepId']/summary" />
     public string? ParentStepId { get; }
 
-    /// <summary>EN: Documentation for public API. JA: ReplayLog を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ReplayLog を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ReplayLog']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ReplayLog']/summary" />
     public IReadOnlyList<ResultStepReplayLogEntry> ReplayLog { get; }
 
-    /// <summary>EN: Documentation for public API. JA: ReplayLogHash を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ReplayLogHash を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ReplayLogHash']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ReplayLogHash']/summary" />
     public string ReplayLogHash { get; }
@@ -87,7 +87,7 @@ public readonly struct ResultStep<TState, TValue>
         ReplayLogHash = ResultStepIdentity.CreateReplayLogHash(ReplayLog);
     }
 
-    /// <summary>EN: Documentation for public API. JA: Success を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Success を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Success']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Success']/summary" />
     public static ResultStep<TState, TValue> Success(
@@ -103,7 +103,7 @@ public readonly struct ResultStep<TState, TValue>
             parentStepId: null,
             replayLog: null);
 
-    /// <summary>EN: Documentation for public API. JA: Fail を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Fail を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Fail']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Fail']/summary" />
     public static ResultStep<TState, TValue> Fail(
@@ -119,7 +119,7 @@ public readonly struct ResultStep<TState, TValue>
             parentStepId: null,
             replayLog: null);
 
-    /// <summary>EN: Documentation for public API. JA: FromResult を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] FromResult を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.FromResult']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.FromResult']/summary" />
     public static ResultStep<TState, TValue> FromResult(
@@ -129,7 +129,7 @@ public readonly struct ResultStep<TState, TValue>
             ? Success(state, result.Value!)
             : Fail(state, result.Error!);
 
-    /// <summary>EN: Documentation for public API. JA: WithState を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] WithState を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithState']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithState']/summary" />
     public ResultStep<TState, TValue> WithState(TState state)
@@ -153,7 +153,7 @@ public readonly struct ResultStep<TState, TValue>
                 ParentStepId,
                 ReplayLog);
 
-    /// <summary>EN: Documentation for public API. JA: WithSemanticDelta を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] WithSemanticDelta を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithSemanticDelta']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithSemanticDelta']/summary" />
     public ResultStep<TState, TValue> WithSemanticDelta(
@@ -186,7 +186,7 @@ public readonly struct ResultStep<TState, TValue>
             replayLog);
     }
 
-    /// <summary>EN: Documentation for public API. JA: MapState を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] MapState を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.MapState']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.MapState']/summary" />
     public ResultStep<TState, TValue> MapState(
@@ -213,7 +213,7 @@ public readonly struct ResultStep<TState, TValue>
         }
     }
 
-    /// <summary>EN: Documentation for public API. JA: Map&lt;TNext&gt; を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Map&lt;TNext&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Map&lt;TNext&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Map&lt;TNext&gt;']/summary" />
     public ResultStep<TState, TNext> Map<TNext>(
@@ -240,7 +240,7 @@ public readonly struct ResultStep<TState, TValue>
         }
     }
 
-    /// <summary>EN: Documentation for public API. JA: BindAsync&lt;TNext&gt; を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] BindAsync&lt;TNext&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.BindAsync&lt;TNext&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.BindAsync&lt;TNext&gt;']/summary" />
     public async Task<ResultStep<TState, TNext>> BindAsync<TNext>(
@@ -260,7 +260,7 @@ public readonly struct ResultStep<TState, TValue>
         }
     }
 
-    /// <summary>EN: Documentation for public API. JA: Bind&lt;TNext&gt; を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Bind&lt;TNext&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Bind&lt;TNext&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Bind&lt;TNext&gt;']/summary" />
     public ResultStep<TState, TNext> Bind<TNext>(
@@ -279,7 +279,7 @@ public readonly struct ResultStep<TState, TValue>
         }
     }
 
-    /// <summary>EN: Documentation for public API. JA: Tap を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Tap を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Tap']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Tap']/summary" />
     public ResultStep<TState, TValue> Tap(
@@ -299,7 +299,7 @@ public readonly struct ResultStep<TState, TValue>
         }
     }
 
-    /// <summary>EN: Documentation for public API. JA: ToResult を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ToResult を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.ToResult']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.ToResult']/summary" />
     public Result<TValue> ToResult()
@@ -322,7 +322,7 @@ public readonly struct ResultStep<TState, TValue>
             : failFunc(State, Error!);
     }
 
-    /// <summary>EN: Documentation for public API. JA: WithReplayLogPrefix を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] WithReplayLogPrefix を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithReplayLogPrefix']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.WithReplayLogPrefix']/summary" />
     public ResultStep<TState, TValue> WithReplayLogPrefix(
@@ -335,14 +335,14 @@ public readonly struct ResultStep<TState, TValue>
             : WithParentStepId(replayLogPrefix[^1].StepId, replayLogPrefix);
     }
 
-    /// <summary>EN: Documentation for public API. JA: Select&lt;TNext&gt; を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Select&lt;TNext&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Select&lt;TNext&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.Select&lt;TNext&gt;']/summary" />
     public ResultStep<TState, TNext> Select<TNext>(
         Func<TValue, TNext> selector)
         => Map(selector);
 
-    /// <summary>EN: Documentation for public API. JA: TResult&gt; を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] TResult&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.TResult&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.TResult&gt;']/summary" />
     public ResultStep<TState, TResult> SelectMany<TNext, TResult>(
@@ -350,7 +350,7 @@ public readonly struct ResultStep<TState, TValue>
         Func<TValue, TNext, TResult> projector)
         => Bind(value => binder(value).Map(next => projector(value, next)));
 
-    /// <summary>EN: Documentation for public API. JA: TResult&gt; を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] TResult&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.TResult&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultStep.TResult&gt;']/summary" />
     public async Task<ResultStep<TState, TResult>> SelectMany<TNext, TResult>(

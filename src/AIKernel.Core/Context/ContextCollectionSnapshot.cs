@@ -4,14 +4,14 @@ using AIKernel.Abstractions.Context;
 using AIKernel.Dtos.Context;
 using AIKernel.Enums;
 
-/// <summary>EN: Documentation for public API. JA: ContextCollectionSnapshot を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] ContextCollectionSnapshot を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.ContextCollectionSnapshot']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.ContextCollectionSnapshot']/summary" />
 public sealed class ContextCollectionSnapshot : IContextCollection
 {
     private readonly IReadOnlyList<ContextFragment> _fragments;
 
-    /// <summary>EN: Documentation for public API. JA: ContextCollectionSnapshot を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ContextCollectionSnapshot を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.#ctor']/summary" />
     public ContextCollectionSnapshot(IEnumerable<ContextFragment> fragments)
@@ -24,7 +24,7 @@ public sealed class ContextCollectionSnapshot : IContextCollection
             .ToArray();
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetAll を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetAll を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetAll']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetAll']/summary" />
     public IEnumerable<ContextFragment> GetAll()
@@ -32,7 +32,7 @@ public sealed class ContextCollectionSnapshot : IContextCollection
         return _fragments;
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetByCategory を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetByCategory を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetByCategory']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetByCategory']/summary" />
     public IEnumerable<ContextFragment> GetByCategory(ContextCategory category)
@@ -40,7 +40,7 @@ public sealed class ContextCollectionSnapshot : IContextCollection
         return _fragments.Where(x => x.Category == category);
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetOrchestrationBuffer を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetOrchestrationBuffer を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetOrchestrationBuffer']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetOrchestrationBuffer']/summary" />
     public OrchestrationBuffer GetOrchestrationBuffer()
@@ -48,7 +48,7 @@ public sealed class ContextCollectionSnapshot : IContextCollection
         return new OrchestrationBuffer(GetByCategory(ContextCategory.Orchestration));
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetExpressionBuffer を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetExpressionBuffer を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetExpressionBuffer']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetExpressionBuffer']/summary" />
     public ExpressionBuffer GetExpressionBuffer()
@@ -56,7 +56,7 @@ public sealed class ContextCollectionSnapshot : IContextCollection
         return new ExpressionBuffer(GetByCategory(ContextCategory.Expression).OfType<ExpressionFragment>());
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetMaterialBuffer を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetMaterialBuffer を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetMaterialBuffer']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetMaterialBuffer']/summary" />
     public MaterialBuffer GetMaterialBuffer()
@@ -64,7 +64,7 @@ public sealed class ContextCollectionSnapshot : IContextCollection
         return new MaterialBuffer(GetByCategory(ContextCategory.Material));
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetHistoryBuffer を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetHistoryBuffer を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetHistoryBuffer']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextCollectionSnapshot.GetHistoryBuffer']/summary" />
     public HistoryBuffer GetHistoryBuffer()

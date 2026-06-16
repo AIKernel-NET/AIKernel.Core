@@ -9,7 +9,7 @@ internal sealed class KernelExecutionPipeline
     private readonly KernelExecutionStepRunner _stepRunner;
     /// <summary>
     /// EN: Executes KernelExecutionPipeline.
-    /// EN: Documentation for public API. JA: KernelExecutionPipeline を実行します。
+    /// [EN] Documents this public package API member. [JA] KernelExecutionPipeline を実行します。
     /// </summary>
 
     public KernelExecutionPipeline(KernelExecutionStepRunner stepRunner)
@@ -18,7 +18,7 @@ internal sealed class KernelExecutionPipeline
     }
     /// <summary>
     /// EN: Gets ExecuteAsync.
-    /// EN: Documentation for public API. JA: ExecuteAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] ExecuteAsync を取得します。
     /// </summary>
 
     public async Task<ResultStep<KernelExecutionPipelineState, KernelExecutionPipelineOutput>> ExecuteAsync(

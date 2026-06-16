@@ -8,7 +8,7 @@ internal static class DslRomPath
     private const string CapabilityPrefix = "dsl://";
     /// <summary>
     /// EN: Executes Create.
-    /// EN: Documentation for public API. JA: Create を実行します。
+    /// [EN] Documents this public package API member. [JA] Create を実行します。
     /// </summary>
 
     public static Result<string> Create(string @namespace, string name)
@@ -18,7 +18,7 @@ internal static class DslRomPath
     }
     /// <summary>
     /// EN: Executes CreateCapabilityName.
-    /// EN: Documentation for public API. JA: CreateCapabilityName を実行します。
+    /// [EN] Documents this public package API member. [JA] CreateCapabilityName を実行します。
     /// </summary>
 
     public static Result<string> CreateCapabilityName(string @namespace, string name)
@@ -28,7 +28,7 @@ internal static class DslRomPath
     }
     /// <summary>
     /// EN: Executes IsDslCapability.
-    /// EN: Documentation for public API. JA: IsDslCapability を実行します。
+    /// [EN] Documents this public package API member. [JA] IsDslCapability を実行します。
     /// </summary>
 
     public static bool IsDslCapability(string capabilityName)
@@ -36,7 +36,7 @@ internal static class DslRomPath
            capabilityName.StartsWith(CapabilityPrefix, StringComparison.Ordinal);
     /// <summary>
     /// EN: Executes Result&lt;.
-    /// EN: Documentation for public API. JA: Result&lt; を実行します。
+    /// [EN] Documents this public package API member. [JA] Result&lt; を実行します。
     /// </summary>
 
     public static Result<(string Namespace, string Name)> ParseCapabilityName(
@@ -141,7 +141,7 @@ internal static class DslRomPathResultExtensions
 {
     /// <summary>
     /// EN: Executes Invalid&lt;T&gt;.
-    /// EN: Documentation for public API. JA: Invalid&lt;T&gt; を実行します。
+    /// [EN] Documents this public package API member. [JA] Invalid&lt;T&gt; を実行します。
     /// </summary>
     public static Result<T> Invalid<T>(string message)
         => Result<T>.Fail(new ErrorContext(
@@ -155,7 +155,7 @@ internal static class DslRomPathResultExtensions
         });
     /// <summary>
     /// EN: Gets MapRomPathError&lt;T&gt;.
-    /// EN: Documentation for public API. JA: MapRomPathError&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] MapRomPathError&lt;T&gt; を取得します。
     /// </summary>
 
     public static Result<T> MapRomPathError<T>(
@@ -171,7 +171,7 @@ internal static class DslRomPathResultExtensions
             Result<T>.Success);
     /// <summary>
     /// EN: Gets ToRomPathResult&lt;T&gt;.
-    /// EN: Documentation for public API. JA: ToRomPathResult&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] ToRomPathResult&lt;T&gt; を取得します。
     /// </summary>
 
     public static Result<T> ToRomPathResult<T>(

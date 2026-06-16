@@ -17,7 +17,7 @@ using AIKernel.Dtos.Kernel;
 using AIKernel.Dtos.Security;
 using AIKernel.Enums;
 
-/// <summary>EN: Documentation for public API. JA: Kernel を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] Kernel を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Kernel']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Kernel']/summary" />
 public sealed class Kernel : IKernel
@@ -34,7 +34,7 @@ public sealed class Kernel : IKernel
     private readonly IKernelClock _clock;
     private readonly KernelFailureResultFactory _failureResultFactory;
 
-    /// <summary>EN: Documentation for public API. JA: Kernel を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Kernel を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.#ctor']/summary" />
     public Kernel(
@@ -74,7 +74,7 @@ public sealed class Kernel : IKernel
         _failureResultFactory = new KernelFailureResultFactory(_clock);
     }
 
-    /// <summary>EN: Documentation for public API. JA: ExecuteAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ExecuteAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.ExecuteAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.ExecuteAsync']/summary" />
     public async Task<KernelRequestExecutionResult> ExecuteAsync(
@@ -216,7 +216,7 @@ public sealed class Kernel : IKernel
         };
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetVersion を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetVersion を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetVersion']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetVersion']/summary" />
     public string GetVersion()
@@ -228,7 +228,7 @@ public sealed class Kernel : IKernel
             ?? "0.0.0";
     }
 
-    /// <summary>EN: Documentation for public API. JA: ExecuteAsync を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ExecuteAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.ExecuteAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.ExecuteAsync']/summary" />
     public Task<KernelExecutionResult> ExecuteAsync(UnifiedContextDto contract)
@@ -245,7 +245,7 @@ public sealed class Kernel : IKernel
         });
     }
 
-    /// <summary>EN: Documentation for public API. JA: AnalyzeAttentionAsync を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] AnalyzeAttentionAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.AnalyzeAttentionAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.AnalyzeAttentionAsync']/summary" />
     public Task<AttentionAnalysis> AnalyzeAttentionAsync(OrchestrationContextDto contract)
@@ -268,7 +268,7 @@ public sealed class Kernel : IKernel
         });
     }
 
-    /// <summary>EN: Documentation for public API. JA: PreprocessMaterialAsync を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] PreprocessMaterialAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.PreprocessMaterialAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.PreprocessMaterialAsync']/summary" />
     public Task<MaterialContextDto> PreprocessMaterialAsync(MaterialContextDto material)
@@ -278,7 +278,7 @@ public sealed class Kernel : IKernel
         return Task.FromResult(material);
     }
 
-    /// <summary>EN: Documentation for public API. JA: PrepareExpressionAsync を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] PrepareExpressionAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.PrepareExpressionAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.PrepareExpressionAsync']/summary" />
     public Task<ExpressionContextDto> PrepareExpressionAsync(ExpressionContextDto expression)
@@ -288,7 +288,7 @@ public sealed class Kernel : IKernel
         return Task.FromResult(expression);
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetProviderRouter を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetProviderRouter を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetProviderRouter']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetProviderRouter']/summary" />
     public IProviderRouter GetProviderRouter()
@@ -296,7 +296,7 @@ public sealed class Kernel : IKernel
         return _providerRouter;
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetGuard を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetGuard を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetGuard']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetGuard']/summary" />
     public IGuard GetGuard()
@@ -304,7 +304,7 @@ public sealed class Kernel : IKernel
         return _guard;
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetPdp を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetPdp を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetPdp']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.GetPdp']/summary" />
     public IPdp GetPdp()

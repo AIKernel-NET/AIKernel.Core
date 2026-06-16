@@ -9,7 +9,7 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
     private static readonly DateTime StableRetrievedAt = DateTime.UnixEpoch;
     /// <summary>
     /// EN: Executes Instance.
-    /// EN: Documentation for public API. JA: Instance を実行します。
+    /// [EN] Documents this public package API member. [JA] Instance を実行します。
     /// </summary>
 
     public static FailClosedProviderRouter Instance { get; } = new();
@@ -19,7 +19,7 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
     }
     /// <summary>
     /// EN: Gets RetrieveAsync.
-    /// EN: Documentation for public API. JA: RetrieveAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] RetrieveAsync を取得します。
     /// </summary>
 
     public Task<MaterialContextDto> RetrieveAsync(
@@ -37,7 +37,7 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
     }
     /// <summary>
     /// EN: Gets RetrieveMultipleAsync.
-    /// EN: Documentation for public API. JA: RetrieveMultipleAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] RetrieveMultipleAsync を取得します。
     /// </summary>
 
     public Task<IReadOnlyList<MaterialContextDto>> RetrieveMultipleAsync(
@@ -61,7 +61,7 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
     }
     /// <summary>
     /// EN: Gets GetFromCacheAsync.
-    /// EN: Documentation for public API. JA: GetFromCacheAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] GetFromCacheAsync を取得します。
     /// </summary>
 
     public Task<MaterialContextDto?> GetFromCacheAsync(
@@ -71,7 +71,7 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
     }
     /// <summary>
     /// EN: Gets CacheMaterialAsync.
-    /// EN: Documentation for public API. JA: CacheMaterialAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] CacheMaterialAsync を取得します。
     /// </summary>
 
     public Task CacheMaterialAsync(
@@ -84,7 +84,7 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
     }
     /// <summary>
     /// EN: Gets RegisterProvider.
-    /// EN: Documentation for public API. JA: RegisterProvider を取得します。
+    /// [EN] Documents this public package API member. [JA] RegisterProvider を取得します。
     /// </summary>
 
     public void RegisterProvider(
@@ -96,7 +96,7 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
     }
     /// <summary>
     /// EN: Gets UnregisterProvider.
-    /// EN: Documentation for public API. JA: UnregisterProvider を取得します。
+    /// [EN] Documents this public package API member. [JA] UnregisterProvider を取得します。
     /// </summary>
 
     public bool UnregisterProvider(
@@ -108,7 +108,7 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
     }
     /// <summary>
     /// EN: Executes GetRegisteredProviders.
-    /// EN: Documentation for public API. JA: GetRegisteredProviders を実行します。
+    /// [EN] Documents this public package API member. [JA] GetRegisteredProviders を実行します。
     /// </summary>
 
     public IReadOnlyList<string> GetRegisteredProviders()

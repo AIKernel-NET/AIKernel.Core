@@ -15,7 +15,7 @@ internal sealed class CompiledDslPipeline :
     private readonly IKernelClock _clock;
     /// <summary>
     /// EN: Gets CompiledDslPipeline.
-    /// EN: Documentation for public API. JA: CompiledDslPipeline を取得します。
+    /// [EN] Documents this public package API member. [JA] CompiledDslPipeline を取得します。
     /// </summary>
 
     public CompiledDslPipeline(
@@ -29,7 +29,7 @@ internal sealed class CompiledDslPipeline :
     }
     /// <summary>
     /// EN: Gets Execute.
-    /// EN: Documentation for public API. JA: Execute を取得します。
+    /// [EN] Documents this public package API member. [JA] Execute を取得します。
     /// </summary>
 
     public ResultStep<DslPipelineState, DslPipelineValue> Execute(
@@ -484,7 +484,7 @@ internal static class CompiledDslPipelineEitherExtensions
 {
     /// <summary>
     /// EN: Gets ToPipelineValueResult&lt;T&gt;.
-    /// EN: Documentation for public API. JA: ToPipelineValueResult&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] ToPipelineValueResult&lt;T&gt; を取得します。
     /// </summary>
     public static Result<T> ToPipelineValueResult<T>(
         this Either<string, T> value,

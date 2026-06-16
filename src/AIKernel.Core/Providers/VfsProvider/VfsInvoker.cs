@@ -375,7 +375,7 @@ internal static class VfsInvokerOptionExtensions
 {
     /// <summary>
     /// EN: Gets OrElseOption&lt;T&gt;.
-    /// EN: Documentation for public API. JA: OrElseOption&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] OrElseOption&lt;T&gt; を取得します。
     /// </summary>
     public static Option<T> OrElseOption<T>(
         this Option<T> option,
@@ -385,7 +385,7 @@ internal static class VfsInvokerOptionExtensions
             Option<T>.Some);
     /// <summary>
     /// EN: Gets ToNullable&lt;T&gt;.
-    /// EN: Documentation for public API. JA: ToNullable&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] ToNullable&lt;T&gt; を取得します。
     /// </summary>
 
     public static T? ToNullable<T>(

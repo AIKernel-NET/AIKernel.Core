@@ -10,7 +10,7 @@ internal sealed class DslRomStore : AIKernel.Abstractions.Dsl.IDslRomStore
     private readonly IDslRomRegistry _registry;
     /// <summary>
     /// EN: Gets DslRomStore.
-    /// EN: Documentation for public API. JA: DslRomStore を取得します。
+    /// [EN] Documents this public package API member. [JA] DslRomStore を取得します。
     /// </summary>
 
     public DslRomStore(
@@ -22,7 +22,7 @@ internal sealed class DslRomStore : AIKernel.Abstractions.Dsl.IDslRomStore
     }
     /// <summary>
     /// EN: Gets SaveDslAsRomAsync.
-    /// EN: Documentation for public API. JA: SaveDslAsRomAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] SaveDslAsRomAsync を取得します。
     /// </summary>
 
     public async Task<Result<DslRomMetadata>> SaveDslAsRomAsync(
@@ -74,7 +74,7 @@ internal sealed class DslRomStore : AIKernel.Abstractions.Dsl.IDslRomStore
     }
     /// <summary>
     /// EN: Gets LoadDslRomAsync.
-    /// EN: Documentation for public API. JA: LoadDslRomAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] LoadDslRomAsync を取得します。
     /// </summary>
 
     public async Task<Result<DslRomMetadata>> LoadDslRomAsync(
@@ -246,7 +246,7 @@ internal static class DslRomStoreResultExtensions
 {
     /// <summary>
     /// EN: Gets ToStoreResult&lt;T&gt;.
-    /// EN: Documentation for public API. JA: ToStoreResult&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] ToStoreResult&lt;T&gt; を取得します。
     /// </summary>
     public static Result<T> ToStoreResult<T>(
         this Either<string, T> value)
@@ -260,7 +260,7 @@ internal static class DslRomStoreResultExtensions
             Result<T>.Success);
     /// <summary>
     /// EN: Gets MapStoreError&lt;T&gt;.
-    /// EN: Documentation for public API. JA: MapStoreError&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] MapStoreError&lt;T&gt; を取得します。
     /// </summary>
 
     public static Result<T> MapStoreError<T>(

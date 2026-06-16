@@ -4,12 +4,12 @@ using AIKernel.Abstractions.Execution;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Routing;
 
-/// <summary>EN: Documentation for public API. JA: PassThroughOutputPolisher を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] PassThroughOutputPolisher を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.PassThroughOutputPolisher']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.PassThroughOutputPolisher']/summary" />
 public sealed class PassThroughOutputPolisher : IOutputPolisher
 {
-    /// <summary>EN: Documentation for public API. JA: RequiredCapacity を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] RequiredCapacity を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PassThroughOutputPolisher.new']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PassThroughOutputPolisher.new']/summary" />
     public ModelCapacityVector RequiredCapacity { get; } = new(
@@ -19,7 +19,7 @@ public sealed class PassThroughOutputPolisher : IOutputPolisher
         fidelity: 1,
         latencyPerformance: 1);
 
-    /// <summary>EN: Documentation for public API. JA: RenderAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] RenderAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PassThroughOutputPolisher.RenderAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PassThroughOutputPolisher.RenderAsync']/summary" />
     public Task<string> RenderAsync(

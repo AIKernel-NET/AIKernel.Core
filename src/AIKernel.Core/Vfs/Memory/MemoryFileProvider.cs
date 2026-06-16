@@ -8,7 +8,7 @@ using AIKernel.Vfs;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 
-/// <summary>EN: Documentation for public API. JA: MemoryFileProvider を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] MemoryFileProvider を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Memory.MemoryFileProvider']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Memory.MemoryFileProvider']/summary" />
 public sealed class MemoryFileProvider(
@@ -22,7 +22,7 @@ public sealed class MemoryFileProvider(
     private readonly ConcurrentDictionary<string, MemoryFileState> _files =
         new(StringComparer.Ordinal);
 
-    /// <summary>EN: Documentation for public API. JA: MemoryFileProvider を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] MemoryFileProvider を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.#ctor']/summary" />
     public MemoryFileProvider(
@@ -34,7 +34,7 @@ public sealed class MemoryFileProvider(
     {
     }
 
-    /// <summary>EN: Documentation for public API. JA: Seed を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Seed を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.Seed']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.Seed']/summary" />
     public void Seed(string path, byte[] content)
@@ -52,7 +52,7 @@ public sealed class MemoryFileProvider(
             ModifiedAtUtc: now);
     }
 
-    /// <summary>EN: Documentation for public API. JA: IsAvailableAsync を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] IsAvailableAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsAvailableAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsAvailableAsync']/summary" />
     public override Task<bool> IsAvailableAsync()
@@ -60,7 +60,7 @@ public sealed class MemoryFileProvider(
         return Task.FromResult(true);
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetHealthAsync を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetHealthAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetHealthAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetHealthAsync']/summary" />
     public override Task<VfsProviderHealth> GetHealthAsync()
@@ -99,14 +99,14 @@ public sealed class MemoryFileProvider(
         private readonly ConcurrentDictionary<string, MemoryFileState> _files = files ?? throw new ArgumentNullException(nameof(files));
         private readonly IKernelClock _clock = clock ?? throw new ArgumentNullException(nameof(clock));
 
-        /// <summary>EN: Documentation for public API. JA: SessionId を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] SessionId を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsNullOrWhiteSpace']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.IsNullOrWhiteSpace']/summary" />
         public string SessionId { get; } = string.IsNullOrWhiteSpace(sessionId)
                 ? throw new ArgumentException("SessionId is required.", nameof(sessionId))
                 : sessionId;
 
-        /// <summary>EN: Documentation for public API. JA: ReadFileAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] ReadFileAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ReadFileAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ReadFileAsync']/summary" />
         public Task<IVfsFile> ReadFileAsync(string path)
@@ -129,7 +129,7 @@ public sealed class MemoryFileProvider(
                     modifiedAt: state.ModifiedAtUtc));
         }
 
-        /// <summary>EN: Documentation for public API. JA: WriteFileAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] WriteFileAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.WriteFileAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.WriteFileAsync']/summary" />
         public Task WriteFileAsync(string path, byte[] content)
@@ -160,7 +160,7 @@ public sealed class MemoryFileProvider(
             return Task.CompletedTask;
         }
 
-        /// <summary>EN: Documentation for public API. JA: GetDirectoryAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] GetDirectoryAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetDirectoryAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.GetDirectoryAsync']/summary" />
         public Task<IVfsDirectory> GetDirectoryAsync(string path)
@@ -209,7 +209,7 @@ public sealed class MemoryFileProvider(
                     entries: entries));
         }
 
-        /// <summary>EN: Documentation for public API. JA: ExistsAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] ExistsAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ExistsAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.ExistsAsync']/summary" />
         public Task<bool> ExistsAsync(string path)
@@ -223,7 +223,7 @@ public sealed class MemoryFileProvider(
             return Task.FromResult(exists);
         }
 
-        /// <summary>EN: Documentation for public API. JA: DeleteAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] DeleteAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DeleteAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DeleteAsync']/summary" />
         public Task DeleteAsync(string path)
@@ -235,7 +235,7 @@ public sealed class MemoryFileProvider(
             return Task.CompletedTask;
         }
 
-        /// <summary>EN: Documentation for public API. JA: QueryAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] QueryAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.QueryAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.QueryAsync']/summary" />
         public Task<IVfsQueryResult> QueryAsync(IVfsQuery query)
@@ -256,7 +256,7 @@ public sealed class MemoryFileProvider(
             return Task.FromResult(VfsEntryQueryEngine.Execute(entries, query));
         }
 
-        /// <summary>EN: Documentation for public API. JA: DisposeAsync を実行します。</summary>
+        /// <summary>[EN] Documents this public package API member. [JA] DisposeAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DisposeAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProvider.DisposeAsync']/summary" />
         public ValueTask DisposeAsync()

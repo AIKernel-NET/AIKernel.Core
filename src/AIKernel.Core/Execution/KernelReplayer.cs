@@ -4,12 +4,12 @@ using AIKernel.Abstractions.Execution;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.KernelContext;
 
-/// <summary>EN: Documentation for public API. JA: KernelReplayer を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] KernelReplayer を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelReplayer']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelReplayer']/summary" />
 public sealed class KernelReplayer : IKernelReplayer
 {
-    /// <summary>EN: Documentation for public API. JA: CanReplay を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] CanReplay を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.CanReplay']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.CanReplay']/summary" />
     public bool CanReplay(ReplayDump replayDump)
@@ -23,7 +23,7 @@ public sealed class KernelReplayer : IKernelReplayer
         && !string.IsNullOrWhiteSpace(replayDump.HashChain.HashAlgorithm);
     }
 
-    /// <summary>EN: Documentation for public API. JA: ReplayAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ReplayAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.ReplayAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.ReplayAsync']/summary" />
     public ValueTask<ExecutionResult> ReplayAsync(

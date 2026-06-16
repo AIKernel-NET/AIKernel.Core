@@ -6,7 +6,7 @@ using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Routing;
 using AIKernel.Dtos.Rules;
 
-/// <summary>EN: Documentation for public API. JA: InMemoryCapabilityRegistry を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] InMemoryCapabilityRegistry を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Routing.InMemoryCapabilityRegistry']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Routing.InMemoryCapabilityRegistry']/summary" />
 public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
@@ -14,7 +14,7 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
     private readonly ConcurrentDictionary<string, ModelCapacityVector> _capabilities =
         new(StringComparer.Ordinal);
 
-    /// <summary>EN: Documentation for public API. JA: InMemoryCapabilityRegistry を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] InMemoryCapabilityRegistry を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.#ctor']/summary" />
     public InMemoryCapabilityRegistry()
@@ -37,7 +37,7 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
         }
     }
 
-    /// <summary>EN: Documentation for public API. JA: RegisterCapabilityAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] RegisterCapabilityAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.RegisterCapabilityAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.RegisterCapabilityAsync']/summary" />
     public ValueTask RegisterCapabilityAsync(
@@ -51,7 +51,7 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
         return ValueTask.CompletedTask;
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetCapabilityAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetCapabilityAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.GetCapabilityAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.GetCapabilityAsync']/summary" />
     public ValueTask<ModelCapacityVector?> GetCapabilityAsync(
@@ -72,7 +72,7 @@ public sealed class InMemoryCapabilityRegistry : ICapabilityRegistry
         return ValueTask.FromResult(capacityVector);
     }
 
-    /// <summary>EN: Documentation for public API. JA: ResolveCandidatesAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ResolveCandidatesAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.ResolveCandidatesAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Routing.InMemoryCapabilityRegistry.ResolveCandidatesAsync']/summary" />
     public ValueTask<IReadOnlyList<string>> ResolveCandidatesAsync(

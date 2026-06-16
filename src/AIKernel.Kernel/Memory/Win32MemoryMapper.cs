@@ -4,7 +4,7 @@ using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
 using Microsoft.Win32.SafeHandles;
 
-/// <summary>EN: Documentation for public API. JA: Win32MemoryMapper を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] Win32MemoryMapper を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.Win32MemoryMapper']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.Win32MemoryMapper']/summary" />
 public sealed class Win32MemoryMapper : MemoryMapperBase

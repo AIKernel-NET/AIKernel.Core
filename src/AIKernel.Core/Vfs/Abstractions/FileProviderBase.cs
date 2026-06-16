@@ -4,7 +4,7 @@ using AIKernel.Core.Time;
 using AIKernel.Dtos.Vfs;
 using AIKernel.Vfs;
 
-/// <summary>EN: Documentation for public API. JA: FileProviderBase を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] FileProviderBase を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.FileProviderBase']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.FileProviderBase']/summary" />
 public abstract class FileProviderBase(
@@ -15,7 +15,7 @@ public abstract class FileProviderBase(
 {
     private long _sessionSequence;
 
-    /// <summary>EN: Documentation for public API. JA: ProviderId を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ProviderId を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsNullOrWhiteSpace']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsNullOrWhiteSpace']/summary" />
     public string ProviderId { get; } = string.IsNullOrWhiteSpace(providerId)
@@ -43,7 +43,7 @@ public abstract class FileProviderBase(
     /// </summary>
     protected IKernelClock Clock { get; } = clock ?? KernelClock.System();
 
-    /// <summary>EN: Documentation for public API. JA: OpenSessionAsync を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] OpenSessionAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.OpenSessionAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.OpenSessionAsync']/summary" />
     public Task<IVfsSession> OpenSessionAsync(IVfsCredentials credentials)
@@ -60,7 +60,7 @@ public abstract class FileProviderBase(
         return OpenSessionCoreAsync(sessionId);
     }
 
-    /// <summary>EN: Documentation for public API. JA: IsAvailableAsync を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] IsAvailableAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsAvailableAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.IsAvailableAsync']/summary" />
     public virtual Task<bool> IsAvailableAsync()
@@ -68,7 +68,7 @@ public abstract class FileProviderBase(
         return Task.FromResult(false);
     }
 
-    /// <summary>EN: Documentation for public API. JA: GetHealthAsync を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetHealthAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.GetHealthAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.FileProviderBase.GetHealthAsync']/summary" />
     public virtual Task<VfsProviderHealth> GetHealthAsync()

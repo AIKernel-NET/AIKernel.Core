@@ -6,7 +6,7 @@ internal static class DslPipelineLinqExtensions
 {
     /// <summary>
     /// EN: Gets Select.
-    /// EN: Documentation for public API. JA: Select を取得します。
+    /// [EN] Documents this public package API member. [JA] Select を取得します。
     /// </summary>
     public static IKernelPipeline Select(
         this IKernelPipeline pipeline,
@@ -20,7 +20,7 @@ internal static class DslPipelineLinqExtensions
     }
     /// <summary>
     /// EN: Gets Map.
-    /// EN: Documentation for public API. JA: Map を取得します。
+    /// [EN] Documents this public package API member. [JA] Map を取得します。
     /// </summary>
 
     public static IKernelPipeline Map(
@@ -29,7 +29,7 @@ internal static class DslPipelineLinqExtensions
         => Select(pipeline, mapper);
     /// <summary>
     /// EN: Gets Bind.
-    /// EN: Documentation for public API. JA: Bind を取得します。
+    /// [EN] Documents this public package API member. [JA] Bind を取得します。
     /// </summary>
 
     public static IKernelPipeline Bind(
@@ -53,7 +53,7 @@ internal static class DslPipelineLinqExtensions
     }
     /// <summary>
     /// EN: Gets SelectMany.
-    /// EN: Documentation for public API. JA: SelectMany を取得します。
+    /// [EN] Documents this public package API member. [JA] SelectMany を取得します。
     /// </summary>
 
     public static IKernelPipeline SelectMany(
@@ -81,7 +81,7 @@ internal static class DslPipelineLinqExtensions
     }
     /// <summary>
     /// EN: Gets Where.
-    /// EN: Documentation for public API. JA: Where を取得します。
+    /// [EN] Documents this public package API member. [JA] Where を取得します。
     /// </summary>
 
     public static IKernelPipeline Where(

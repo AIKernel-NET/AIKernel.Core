@@ -8,13 +8,13 @@ namespace AIKernel.Core.Time;
 /// 常に固定された UTC 時刻を返します。
 /// これにより、VFS Snapshot、Provider Health、Context assembly、起動時検証などに
 /// EN: 同一時刻を注入でき、同じ入力から同じ replay 結果を再現できます。
-/// EN: Documentation for public API. JA: ReplayKernelTimeProvider を表します。
+/// [EN] Documents this public package API member. [JA] ReplayKernelTimeProvider を表します。
 /// </summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.ReplayKernelTimeProvider']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.ReplayKernelTimeProvider']/summary" />
 public sealed class ReplayKernelTimeProvider : KernelTimeProvider
 {
-    /// <summary>EN: Documentation for public API. JA: ReplayKernelTimeProvider を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ReplayKernelTimeProvider を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.ReplayKernelTimeProvider.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.ReplayKernelTimeProvider.#ctor']/summary" />
     public ReplayKernelTimeProvider(DateTimeOffset fixedUtcNow)
@@ -22,7 +22,7 @@ public sealed class ReplayKernelTimeProvider : KernelTimeProvider
     {
     }
 
-    /// <summary>EN: Documentation for public API. JA: ReplayKernelTimeProvider を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ReplayKernelTimeProvider を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.ReplayKernelTimeProvider.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.ReplayKernelTimeProvider.#ctor']/summary" />
     public ReplayKernelTimeProvider(
@@ -36,12 +36,12 @@ public sealed class ReplayKernelTimeProvider : KernelTimeProvider
         FixedUtcDateTime = fixedUtcNow.ToUniversalTime();
     }
 
-    /// <summary>EN: Documentation for public API. JA: FixedUtcDateTime を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] FixedUtcDateTime を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.ReplayKernelTimeProvider.FixedUtcDateTime']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.ReplayKernelTimeProvider.FixedUtcDateTime']/summary" />
     public DateTimeOffset FixedUtcDateTime { get; }
 
-    /// <summary>EN: Documentation for public API. JA: GetLogicalTimestamp を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetLogicalTimestamp を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.ReplayKernelTimeProvider.GetLogicalTimestamp']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.ReplayKernelTimeProvider.GetLogicalTimestamp']/summary" />
     public override KernelTimestamp GetLogicalTimestamp()

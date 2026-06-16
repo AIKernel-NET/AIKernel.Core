@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
 
-/// <summary>EN: Documentation for public API. JA: PosixMemoryMapper を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] PosixMemoryMapper を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.PosixMemoryMapper']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.PosixMemoryMapper']/summary" />
 public sealed class PosixMemoryMapper : MemoryMapperBase

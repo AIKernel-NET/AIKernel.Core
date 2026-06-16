@@ -6,7 +6,7 @@ internal static class HistoryRomContractMapper
 {
     /// <summary>
     /// EN: Gets ToContract.
-    /// EN: Documentation for public API. JA: ToContract を取得します。
+    /// [EN] Documents this public package API member. [JA] ToContract を取得します。
     /// </summary>
     public static ContractHistory.HistoryRomMetadata ToContract(
         HistoryRomMetadata metadata)
@@ -19,7 +19,7 @@ internal static class HistoryRomContractMapper
             metadata.CreatedAtUtc);
     /// <summary>
     /// EN: Gets ToCore.
-    /// EN: Documentation for public API. JA: ToCore を取得します。
+    /// [EN] Documents this public package API member. [JA] ToCore を取得します。
     /// </summary>
 
     public static HistoryRomMetadata ToCore(
@@ -33,7 +33,7 @@ internal static class HistoryRomContractMapper
             metadata.CreatedAtUtc);
     /// <summary>
     /// EN: Gets ToContract.
-    /// EN: Documentation for public API. JA: ToContract を取得します。
+    /// [EN] Documents this public package API member. [JA] ToContract を取得します。
     /// </summary>
 
     public static ContractHistory.HistoryRomSnapshot ToContract(
@@ -44,7 +44,7 @@ internal static class HistoryRomContractMapper
             snapshot.Rom);
     /// <summary>
     /// EN: Gets ToCore.
-    /// EN: Documentation for public API. JA: ToCore を取得します。
+    /// [EN] Documents this public package API member. [JA] ToCore を取得します。
     /// </summary>
 
     public static IReadOnlyList<ChatHistoryRomRecord> ToCore(
@@ -57,7 +57,7 @@ internal static class HistoryRomContractMapper
             .ToArray();
     /// <summary>
     /// EN: Gets ToCore.
-    /// EN: Documentation for public API. JA: ToCore を取得します。
+    /// [EN] Documents this public package API member. [JA] ToCore を取得します。
     /// </summary>
 
     public static ChatHistoryRomOptions ToCore(

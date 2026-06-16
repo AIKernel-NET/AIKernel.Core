@@ -11,7 +11,7 @@ using AIKernel.Dtos.Execution;
 using AIKernel.Enums;
 using ExecutionModelMessage = AIKernel.Dtos.Execution.ModelMessage;
 
-/// <summary>EN: Documentation for public API. JA: DefaultPromptGenerator を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] DefaultPromptGenerator を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultPromptGenerator']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultPromptGenerator']/summary" />
 public sealed class DefaultPromptGenerator : IPromptGenerator
@@ -22,7 +22,7 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
     private readonly IContextPromptProjector _projector;
     private readonly ITokenizer _tokenizer;
 
-    /// <summary>EN: Documentation for public API. JA: DefaultPromptGenerator を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] DefaultPromptGenerator を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPromptGenerator.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPromptGenerator.#ctor']/summary" />
     public DefaultPromptGenerator(
@@ -33,7 +33,7 @@ public sealed class DefaultPromptGenerator : IPromptGenerator
         _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
     }
 
-    /// <summary>EN: Documentation for public API. JA: GenerateAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GenerateAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPromptGenerator.GenerateAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPromptGenerator.GenerateAsync']/summary" />
     public Task<GeneratedPrompt> GenerateAsync(

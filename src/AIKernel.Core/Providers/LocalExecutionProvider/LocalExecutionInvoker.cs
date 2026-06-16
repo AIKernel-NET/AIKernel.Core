@@ -513,7 +513,7 @@ internal static class LocalExecutionEitherExtensions
 {
     /// <summary>
     /// EN: Gets ToKeyValue.
-    /// EN: Documentation for public API. JA: ToKeyValue を取得します。
+    /// [EN] Documents this public package API member. [JA] ToKeyValue を取得します。
     /// </summary>
     public static Result<KeyValuePair<string, string>> ToKeyValue(
         this string value,
@@ -522,7 +522,7 @@ internal static class LocalExecutionEitherExtensions
             new KeyValuePair<string, string>(key, value));
     /// <summary>
     /// EN: Gets MapError&lt;T&gt;.
-    /// EN: Documentation for public API. JA: MapError&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] MapError&lt;T&gt; を取得します。
     /// </summary>
 
     public static Result<T> MapError<T>(
@@ -540,7 +540,7 @@ internal static class LocalExecutionEitherExtensions
             Result<T>.Success);
     /// <summary>
     /// EN: Gets ToLocalExecutionResult&lt;T&gt;.
-    /// EN: Documentation for public API. JA: ToLocalExecutionResult&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] ToLocalExecutionResult&lt;T&gt; を取得します。
     /// </summary>
 
     public static Result<T> ToLocalExecutionResult<T>(
@@ -558,7 +558,7 @@ internal static class LocalExecutionEitherExtensions
             Result<T>.Success);
     /// <summary>
     /// EN: Gets OrElseOption&lt;T&gt;.
-    /// EN: Documentation for public API. JA: OrElseOption&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] OrElseOption&lt;T&gt; を取得します。
     /// </summary>
 
     public static Option<T> OrElseOption<T>(

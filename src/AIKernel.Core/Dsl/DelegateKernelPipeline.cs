@@ -7,7 +7,7 @@ internal sealed class DelegateKernelPipeline : IKernelPipeline
     private readonly Func<DslPipelineExecutionContext, ResultStep<DslPipelineState, DslPipelineValue>> _execute;
     /// <summary>
     /// EN: Gets DelegateKernelPipeline.
-    /// EN: Documentation for public API. JA: DelegateKernelPipeline を取得します。
+    /// [EN] Documents this public package API member. [JA] DelegateKernelPipeline を取得します。
     /// </summary>
 
     public DelegateKernelPipeline(
@@ -17,7 +17,7 @@ internal sealed class DelegateKernelPipeline : IKernelPipeline
     }
     /// <summary>
     /// EN: Gets Execute.
-    /// EN: Documentation for public API. JA: Execute を取得します。
+    /// [EN] Documents this public package API member. [JA] Execute を取得します。
     /// </summary>
 
     public ResultStep<DslPipelineState, DslPipelineValue> Execute(

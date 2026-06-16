@@ -8,6 +8,13 @@ set(AIKERNEL_MANAGED_TFM "net10.0" CACHE STRING "AIKernel managed target framewo
 
 set(AIKERNEL_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/..")
 
+install(DIRECTORY
+  "${CMAKE_CURRENT_LIST_DIR}/src/aikernel_net/samples/"
+  DESTINATION aikernel_net/samples
+  FILES_MATCHING
+    PATTERN "*.md"
+    PATTERN "*.yaml")
+
 if(AIKERNEL_PYTHON_INCLUDE_MANAGED)
   find_program(DOTNET_EXECUTABLE dotnet REQUIRED)
 

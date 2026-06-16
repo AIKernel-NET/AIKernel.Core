@@ -3,12 +3,12 @@ namespace AIKernel.Core.Vfs.Memory;
 using AIKernel.Core.Time;
 using AIKernel.Core.Vfs.Abstractions;
 
-/// <summary>EN: Documentation for public API. JA: MemoryFileProviderOptions を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] MemoryFileProviderOptions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions']/summary" />
 public sealed class MemoryFileProviderOptions
 {
-    /// <summary>EN: Documentation for public API. JA: MemoryFileProviderOptions を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] MemoryFileProviderOptions を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.#ctor']/summary" />
     public MemoryFileProviderOptions()
@@ -31,22 +31,22 @@ public sealed class MemoryFileProviderOptions
         CredentialValidator = credentialValidator;
     }
 
-    /// <summary>EN: Documentation for public API. JA: ProviderId を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ProviderId を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.ProviderId']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.ProviderId']/summary" />
     public string ProviderId { get; set; } = "memory-file";
 
-    /// <summary>EN: Documentation for public API. JA: Name を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Name を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.Name']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.Name']/summary" />
     public string Name { get; set; } = "Memory File Provider";
 
-    /// <summary>EN: Documentation for public API. JA: Clock を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Clock を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.Clock']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.Clock']/summary" />
     public IKernelClock? Clock { get; set; }
 
-    /// <summary>EN: Documentation for public API. JA: CredentialValidator を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] CredentialValidator を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.CredentialValidator']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Memory.MemoryFileProviderOptions.CredentialValidator']/summary" />
     public VfsCredentialValidator? CredentialValidator { get; set; }

@@ -6,7 +6,7 @@ internal static class DslResultStepAppender
 {
     /// <summary>
     /// EN: Gets AppendLoopTransition.
-    /// EN: Documentation for public API. JA: AppendLoopTransition を取得します。
+    /// [EN] Documents this public package API member. [JA] AppendLoopTransition を取得します。
     /// </summary>
     public static ResultStep<DslPipelineState, DslPipelineValue> AppendLoopTransition(
         ResultStep<DslPipelineState, DslPipelineValue> current,
@@ -27,7 +27,7 @@ internal static class DslResultStepAppender
     }
     /// <summary>
     /// EN: Gets AppendSuccess.
-    /// EN: Documentation for public API. JA: AppendSuccess を取得します。
+    /// [EN] Documents this public package API member. [JA] AppendSuccess を取得します。
     /// </summary>
 
     public static ResultStep<DslPipelineState, DslPipelineValue> AppendSuccess(
@@ -43,7 +43,7 @@ internal static class DslResultStepAppender
     }
     /// <summary>
     /// EN: Gets AppendFailure.
-    /// EN: Documentation for public API. JA: AppendFailure を取得します。
+    /// [EN] Documents this public package API member. [JA] AppendFailure を取得します。
     /// </summary>
 
     public static ResultStep<DslPipelineState, DslPipelineValue> AppendFailure(

@@ -9,7 +9,7 @@ using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.KernelContext;
 
-/// <summary>EN: Documentation for public API. JA: PipelineOrchestrator を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] PipelineOrchestrator を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.PipelineOrchestrator']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.PipelineOrchestrator']/summary" />
 public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOrchestrator
@@ -17,7 +17,7 @@ public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOr
     private readonly IKernelReplayer _replayer =
         replayer ?? throw new ArgumentNullException(nameof(replayer));
 
-    /// <summary>EN: Documentation for public API. JA: InitializeAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] InitializeAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.InitializeAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.InitializeAsync']/summary" />
     public Task<InitializationResult> InitializeAsync(
@@ -36,7 +36,7 @@ public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOr
         });
     }
 
-    /// <summary>EN: Documentation for public API. JA: ExecuteAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ExecuteAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.ExecuteAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.ExecuteAsync']/summary" />
     public Task<ExecutionResult> ExecuteAsync(
@@ -60,7 +60,7 @@ public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOr
             context));
     }
 
-    /// <summary>EN: Documentation for public API. JA: ReplayFromDumpAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ReplayFromDumpAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.ReplayFromDumpAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.ReplayFromDumpAsync']/summary" />
     public async Task<ExecutionResult> ReplayFromDumpAsync(

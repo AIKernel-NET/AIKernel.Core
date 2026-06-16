@@ -12,7 +12,7 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
     private readonly IRomLoader _loader;
     /// <summary>
     /// EN: Gets HistoryRomStore.
-    /// EN: Documentation for public API. JA: HistoryRomStore を取得します。
+    /// [EN] Documents this public package API member. [JA] HistoryRomStore を取得します。
     /// </summary>
 
     public HistoryRomStore(
@@ -26,7 +26,7 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
     }
     /// <summary>
     /// EN: Gets SaveHistoryAsRomAsync.
-    /// EN: Documentation for public API. JA: SaveHistoryAsRomAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] SaveHistoryAsRomAsync を取得します。
     /// </summary>
 
     public async Task<Result<HistoryRomMetadata>> SaveHistoryAsRomAsync(
@@ -93,7 +93,7 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
     }
     /// <summary>
     /// EN: Gets SaveMarkdownAsRomAsync.
-    /// EN: Documentation for public API. JA: SaveMarkdownAsRomAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] SaveMarkdownAsRomAsync を取得します。
     /// </summary>
 
     public async Task<Result<HistoryRomMetadata>> SaveMarkdownAsRomAsync(
@@ -208,7 +208,7 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
     }
     /// <summary>
     /// EN: Gets LoadHistoryRomAsync.
-    /// EN: Documentation for public API. JA: LoadHistoryRomAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] LoadHistoryRomAsync を取得します。
     /// </summary>
 
     public async Task<Result<HistoryRomMetadata>> LoadHistoryRomAsync(

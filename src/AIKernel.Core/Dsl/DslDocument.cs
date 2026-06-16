@@ -7,7 +7,7 @@ internal sealed record DslDocument(PipelineNode Root)
 {
     /// <summary>
     /// EN: Executes FromJson.
-    /// EN: Documentation for public API. JA: FromJson を実行します。
+    /// [EN] Documents this public package API member. [JA] FromJson を実行します。
     /// </summary>
     public static Result<DslDocument> FromJson(string json)
         => DslDocumentParser.Parse(json);
@@ -42,13 +42,13 @@ internal sealed record DslPipelineValue(
 {
     /// <summary>
     /// EN: Gets Empty.
-    /// EN: Documentation for public API. JA: Empty を取得します。
+    /// [EN] Documents this public package API member. [JA] Empty を取得します。
     /// </summary>
     public static DslPipelineValue Empty { get; } = new(
         ImmutableDictionary<string, string>.Empty);
     /// <summary>
     /// EN: Executes With.
-    /// EN: Documentation for public API. JA: With を実行します。
+    /// [EN] Documents this public package API member. [JA] With を実行します。
     /// </summary>
 
     public DslPipelineValue With(string key, string value)
@@ -100,13 +100,13 @@ internal sealed record DslPipelineState(
 {
     /// <summary>
     /// EN: Executes Initial.
-    /// EN: Documentation for public API. JA: Initial を実行します。
+    /// [EN] Documents this public package API member. [JA] Initial を実行します。
     /// </summary>
     public static DslPipelineState Initial(string pipelineId)
         => new(pipelineId, "start", 0);
     /// <summary>
     /// EN: Executes Advance.
-    /// EN: Documentation for public API. JA: Advance を実行します。
+    /// [EN] Documents this public package API member. [JA] Advance を実行します。
     /// </summary>
 
     public DslPipelineState Advance(string nodeName)
@@ -123,7 +123,7 @@ internal sealed record DslPipelineExecutionContext(
 {
     /// <summary>
     /// EN: Executes Create.
-    /// EN: Documentation for public API. JA: Create を実行します。
+    /// [EN] Documents this public package API member. [JA] Create を実行します。
     /// </summary>
     public static DslPipelineExecutionContext Create(DslPipelineValue? input = null)
         => new(input ?? DslPipelineValue.Empty, DateTimeOffset.UnixEpoch);

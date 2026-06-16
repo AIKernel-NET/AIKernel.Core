@@ -5,7 +5,7 @@ using AIKernel.Abstractions.Capabilities;
 using AIKernel.Common.Results;
 using AIKernel.Dtos.Capabilities;
 
-/// <summary>EN: Documentation for public API. JA: InMemoryCapabilityModuleRegistry を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] InMemoryCapabilityModuleRegistry を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry']/summary" />
 public sealed class InMemoryCapabilityModuleRegistry : ICapabilityModuleRegistry
@@ -13,7 +13,7 @@ public sealed class InMemoryCapabilityModuleRegistry : ICapabilityModuleRegistry
     private readonly ConcurrentDictionary<string, CapabilityModuleDescriptor> _descriptors =
         new(StringComparer.Ordinal);
 
-    /// <summary>EN: Documentation for public API. JA: RegisterAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] RegisterAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.RegisterAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.RegisterAsync']/summary" />
     public ValueTask RegisterAsync(
@@ -35,7 +35,7 @@ public sealed class InMemoryCapabilityModuleRegistry : ICapabilityModuleRegistry
         return ValueTask.CompletedTask;
     }
 
-    /// <summary>EN: Documentation for public API. JA: ResolveAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ResolveAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ResolveAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ResolveAsync']/summary" />
     public ValueTask<CapabilityModuleDescriptor?> ResolveAsync(
@@ -51,7 +51,7 @@ public sealed class InMemoryCapabilityModuleRegistry : ICapabilityModuleRegistry
             CloneOrNull(descriptor));
     }
 
-    /// <summary>EN: Documentation for public API. JA: ListAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ListAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ListAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Capabilities.InMemoryCapabilityModuleRegistry.ListAsync']/summary" />
     public ValueTask<IReadOnlyList<CapabilityModuleDescriptor>> ListAsync(

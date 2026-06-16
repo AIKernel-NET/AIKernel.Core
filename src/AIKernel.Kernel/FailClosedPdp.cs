@@ -8,7 +8,7 @@ internal sealed class FailClosedPdp : IPdp
 {
     /// <summary>
     /// EN: Executes Instance.
-    /// EN: Documentation for public API. JA: Instance を実行します。
+    /// [EN] Documents this public package API member. [JA] Instance を実行します。
     /// </summary>
     public static FailClosedPdp Instance { get; } = new();
 
@@ -17,7 +17,7 @@ internal sealed class FailClosedPdp : IPdp
     }
     /// <summary>
     /// EN: Gets EvaluateAsync.
-    /// EN: Documentation for public API. JA: EvaluateAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] EvaluateAsync を取得します。
     /// </summary>
 
     public Task<AccessDecision> EvaluateAsync(
@@ -31,7 +31,7 @@ internal sealed class FailClosedPdp : IPdp
     }
     /// <summary>
     /// EN: Gets AddPolicy.
-    /// EN: Documentation for public API. JA: AddPolicy を取得します。
+    /// [EN] Documents this public package API member. [JA] AddPolicy を取得します。
     /// </summary>
 
     public void AddPolicy(
@@ -41,7 +41,7 @@ internal sealed class FailClosedPdp : IPdp
     }
     /// <summary>
     /// EN: Gets RemovePolicy.
-    /// EN: Documentation for public API. JA: RemovePolicy を取得します。
+    /// [EN] Documents this public package API member. [JA] RemovePolicy を取得します。
     /// </summary>
 
     public bool RemovePolicy(
@@ -53,7 +53,7 @@ internal sealed class FailClosedPdp : IPdp
     }
     /// <summary>
     /// EN: Executes GetPolicies.
-    /// EN: Documentation for public API. JA: GetPolicies を実行します。
+    /// [EN] Documents this public package API member. [JA] GetPolicies を実行します。
     /// </summary>
 
     public IReadOnlyList<IPolicy> GetPolicies()
@@ -62,7 +62,7 @@ internal sealed class FailClosedPdp : IPdp
     }
     /// <summary>
     /// EN: Gets EvaluatePoliciesAsync.
-    /// EN: Documentation for public API. JA: EvaluatePoliciesAsync を取得します。
+    /// [EN] Documents this public package API member. [JA] EvaluatePoliciesAsync を取得します。
     /// </summary>
 
     public Task<PolicyEvaluationResult> EvaluatePoliciesAsync(

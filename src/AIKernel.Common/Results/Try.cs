@@ -1,11 +1,11 @@
 namespace AIKernel.Common.Results;
 
-/// <summary>EN: Documentation for public API. JA: Try を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] Try を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.Try']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.Try']/summary" />
 public static class Try
 {
-    /// <summary>EN: Documentation for public API. JA: Run&lt;T&gt; を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Run&lt;T&gt; を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Try.Run&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Try.Run&lt;T&gt;']/summary" />
     public static Result<T> Run<T>(Func<T> func)
@@ -20,7 +20,7 @@ public static class Try
         }
     }
 
-    /// <summary>EN: Documentation for public API. JA: RunAsync&lt;T&gt; を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] RunAsync&lt;T&gt; を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Try.RunAsync&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Try.RunAsync&lt;T&gt;']/summary" />
     public static async Task<Result<T>> RunAsync<T>(Func<Task<T>> func)
@@ -39,7 +39,7 @@ public static class Try
     // Functional Extensions
     // -------------------------
 
-    /// <summary>EN: Documentation for public API. JA: U&gt; を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] U&gt; を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Try.U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Try.U&gt;']/summary" />
     public static Result<U> Map<T, U>(this Result<T> result, Func<T, U> mapper)

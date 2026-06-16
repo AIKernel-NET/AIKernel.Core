@@ -16,22 +16,24 @@ after the 0.1.x line stabilizes.
 ## Install Packages
 
 ```bash
-dotnet add package AIKernel.Common --version 0.1.1.1
-dotnet add package AIKernel.Core --version 0.1.1.1
-dotnet add package AIKernel.Hosting --version 0.1.1.1
-dotnet add package AIKernel.Kernel --version 0.1.1.1
+dotnet add package AIKernel.Common --version 0.1.2
+dotnet add package AIKernel.Core --version 0.1.2
+dotnet add package AIKernel.Hosting --version 0.1.2
+dotnet add package AIKernel.Kernel --version 0.1.2
 ```
 
-Python bindings are not published for the 0.1.1.1 validation line. Existing
-Python consumers should remain on the previously published `aikernel-net`
-package until the next official v0.1.2 canonical series refreshes the PyPI
-package family.
+During local integration, use `0.1.2-dev{buildNumber}` NuGet packages instead
+of stable `0.1.2` packages until the release task opens publication.
 
-Existing Python package:
+Python package:
 
 ```bash
 pip install aikernel-net
 ```
+
+During local Python validation, use `0.1.2.dev{buildNumber}` wheels instead of
+stable `0.1.2` wheels. The package exposes the generated managed API catalog and
+the bundled CTG-ROM sample asset helpers.
 
 ## Register Core Services
 

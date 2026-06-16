@@ -1,11 +1,11 @@
 namespace AIKernel.Common.Results;
 
-/// <summary>EN: Documentation for public API. JA: ResultWhereExtensions を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] ResultWhereExtensions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultWhereExtensions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.ResultWhereExtensions']/summary" />
 public static class ResultWhereExtensions
 {
-    /// <summary>EN: Documentation for public API. JA: Where&lt;T&gt; を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Where&lt;T&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultWhereExtensions.Where&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.ResultWhereExtensions.Where&lt;T&gt;']/summary" />
     public static Result<T> Where<T>(

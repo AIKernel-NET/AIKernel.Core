@@ -19,7 +19,7 @@ internal static class VfsEntryQueryEngine
     ];
     /// <summary>
     /// EN: Executes Execute.
-    /// EN: Documentation for public API. JA: Execute を実行します。
+    /// [EN] Documents this public package API member. [JA] Execute を実行します。
     /// </summary>
 
     public static IVfsQueryResult Execute(IEnumerable<VfsEntry> source, IVfsQuery query)

@@ -8,7 +8,7 @@ internal static class ResultStepIdentity
 {
     /// <summary>
     /// EN: Gets Create.
-    /// EN: Documentation for public API. JA: Create を取得します。
+    /// [EN] Documents this public package API member. [JA] Create を取得します。
     /// </summary>
     public static string Create(
         string? parentStepId,
@@ -27,7 +27,7 @@ internal static class ResultStepIdentity
     }
     /// <summary>
     /// EN: Gets CreateReplayLogHash.
-    /// EN: Documentation for public API. JA: CreateReplayLogHash を取得します。
+    /// [EN] Documents this public package API member. [JA] CreateReplayLogHash を取得します。
     /// </summary>
 
     public static string CreateReplayLogHash(

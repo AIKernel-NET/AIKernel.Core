@@ -12,13 +12,10 @@
 JA: Core、Kernel、Hosting、Provider を横断した AIKernel.NET ランタイムのエンドツーエンド動作を検証する結合テストです。</Description>
   </PropertyGroup>
 
-  <!-- AIKernel.Providers.MicrosoftAI intentionally remains on the 0.1.1 provider line until that repository is updated. -->
-
   <ItemGroup>
     <PackageReference Include="AIKernel.Abstractions" Version="$(AIKernelContractPackageVersion)" />
     <PackageReference Include="AIKernel.Dtos" Version="$(AIKernelContractPackageVersion)" />
     <PackageReference Include="AIKernel.Enums" Version="$(AIKernelContractPackageVersion)" />
-    <PackageReference Include="AIKernel.Providers.MicrosoftAI" Version="$(AIKernelProviderPackageVersion)" />
     <PackageReference Include="coverlet.collector" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

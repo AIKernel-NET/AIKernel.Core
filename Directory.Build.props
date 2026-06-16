@@ -4,8 +4,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
-    <StablePackageVersion>0.1.1.1</StablePackageVersion>
-    <LocalPackageVersionPrefix>0.1.1.1</LocalPackageVersionPrefix>
+    <StablePackageVersion>0.1.2</StablePackageVersion>
+    <LocalPackageVersionPrefix>0.1.2</LocalPackageVersionPrefix>
     <LocalPackageBuildNumber Condition="'$(LocalPackageBuildNumber)' == ''">0</LocalPackageBuildNumber>
     <UseLocalPackageVersion Condition="'$(UseLocalPackageVersion)' == ''">false</UseLocalPackageVersion>
     <PackageVersion Condition="'$(UseLocalPackageVersion)' == 'true'">$(LocalPackageVersionPrefix)-dev$(LocalPackageBuildNumber)</PackageVersion>
@@ -15,7 +15,7 @@
     <FileVersion>$(StablePackageVersion)</FileVersion>
     <InformationalVersion>$(PackageVersion)</InformationalVersion>
     <AIKernelContractPackageVersion Condition="'$(AIKernelContractPackageVersion)' == ''">[$(StablePackageVersion)]</AIKernelContractPackageVersion>
-    <AIKernelProviderPackageVersion Condition="'$(AIKernelProviderPackageVersion)' == ''">[0.1.1]</AIKernelProviderPackageVersion>
+    <AIKernelProviderPackageVersion Condition="'$(AIKernelProviderPackageVersion)' == ''">[0.1.2]</AIKernelProviderPackageVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <Authors>Takuya Sogawa</Authors>
@@ -26,7 +26,7 @@
     <Copyright>Copyright © 2026 Takuya Sogawa of AIKernel-NET</Copyright>
     <PackageTags>aikernel;aikernel-core;ai-os;kernel;provider;hosting;rom;vfs;context;execution;immutability;fail-closed;capability-modules;dynamicslm;seedslm;hatl;admissibility;semantic-compilation</PackageTags>
     <PackageReleaseNotes>
-      AIKernel.Core package family v0.1.1.1 - Release build aligned with official AIKernel.NET contract packages v0.1.1.1. This package line is NuGet-only and uses 0.1.1.1-dev{build-number} for local development package outputs.
+      AIKernel.Core package family v0.1.2 - Release build aligned with official AIKernel.NET contract packages v0.1.2, synchronized Python wrapper package aikernel-net v0.1.2, and local development package outputs using 0.1.2-dev{build-number}.
     </PackageReleaseNotes>
   </PropertyGroup>
 

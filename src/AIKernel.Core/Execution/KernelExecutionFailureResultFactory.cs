@@ -12,7 +12,7 @@ internal sealed class KernelExecutionFailureResultFactory
     private readonly KernelExecutionIdFactory _executionIdFactory = new();
     /// <summary>
     /// EN: Executes KernelExecutionFailureResultFactory.
-    /// EN: Documentation for public API. JA: KernelExecutionFailureResultFactory を実行します。
+    /// [EN] Documents this public package API member. [JA] KernelExecutionFailureResultFactory を実行します。
     /// </summary>
 
     public KernelExecutionFailureResultFactory(IKernelClock clock)
@@ -21,7 +21,7 @@ internal sealed class KernelExecutionFailureResultFactory
     }
     /// <summary>
     /// EN: Gets CreateFailedResult.
-    /// EN: Documentation for public API. JA: CreateFailedResult を取得します。
+    /// [EN] Documents this public package API member. [JA] CreateFailedResult を取得します。
     /// </summary>
 
     public Result<KernelRequestExecutionResult> CreateFailedResult(
@@ -48,7 +48,7 @@ internal sealed class KernelExecutionFailureResultFactory
     }
     /// <summary>
     /// EN: Gets CreateFailedResult.
-    /// EN: Documentation for public API. JA: CreateFailedResult を取得します。
+    /// [EN] Documents this public package API member. [JA] CreateFailedResult を取得します。
     /// </summary>
 
     public Result<KernelRequestExecutionResult> CreateFailedResult(
@@ -74,7 +74,7 @@ internal sealed class KernelExecutionFailureResultFactory
     }
     /// <summary>
     /// EN: Gets CreateCanceledResult.
-    /// EN: Documentation for public API. JA: CreateCanceledResult を取得します。
+    /// [EN] Documents this public package API member. [JA] CreateCanceledResult を取得します。
     /// </summary>
 
     public Result<KernelRequestExecutionResult> CreateCanceledResult(
@@ -98,7 +98,7 @@ internal sealed class KernelExecutionFailureResultFactory
     }
     /// <summary>
     /// EN: Gets CreateCanceledResult.
-    /// EN: Documentation for public API. JA: CreateCanceledResult を取得します。
+    /// [EN] Documents this public package API member. [JA] CreateCanceledResult を取得します。
     /// </summary>
 
     public Result<KernelRequestExecutionResult> CreateCanceledResult(
@@ -124,7 +124,7 @@ internal sealed class KernelExecutionFailureResultFactory
     }
     /// <summary>
     /// EN: Gets Resolve.
-    /// EN: Documentation for public API. JA: Resolve を取得します。
+    /// [EN] Documents this public package API member. [JA] Resolve を取得します。
     /// </summary>
 
     public KernelRequestExecutionResult Resolve(

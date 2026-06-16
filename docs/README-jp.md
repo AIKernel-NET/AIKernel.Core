@@ -16,10 +16,12 @@ Monolith は 0.1.x 系の安定化後に SDK layer を統合する reference sys
 
 ## リポジトリ横断整合
 
-共有の repository boundary、0.1.1.1 local NuGet versioning、この検証ラインでの
-NuGet-only / no-PyPI rule、v0.1.2 の NuGet + PyPI release assumption は
+共有の repository boundary、v0.1.2 development versioning、依存関係順、
+PyPI Trusted Publishing、Python wrapper scope は
+[Package Release Alignment v0.1.2](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/package-release-alignment-v0.1.2-ja.md)
+で定義します。履歴としての v0.1.1.1 validation rule は
 [AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1-ja.md)
-で定義します。
+に残します。
 複数 repository をまたぐ変更を行う場合は、まず
 [リポジトリ横断開発者ガイド v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/cross-repository-developer-guide-v0.1.1.1-ja.md)
 を読んでください。
@@ -81,13 +83,14 @@ module を明示的に install / register します。
 対応する distribution path:
 
 - Windows/Linux C# application は `AIKernel.*` NuGet packages を install します。
-- Python binding は 0.1.1.1 validation 中は既存公開 line のまま維持し、次の公式
-  v0.1.2 正典シリーズで更新する前提です。
+- Python consumer は `aikernel-net` を install します。この package は薄い managed
+  assembly loading helper、generated managed API catalog、example 向けの CTG-ROM
+  sample asset を提供します。
 - GPU/native execution は明示的な Capability package でのみ追加します。
 
-0.1.1.1 の CTG Core 更新では NuGet packages のみを公開します。この検証ラインでは
-PyPI package を作成しません。次の公式 v0.1.2 正典シリーズでは、NuGet と PyPI の
-package family を同期して公開する前提です。
+v0.1.2 development では、NuGet は `0.1.2-dev{buildNumber}`、Python は
+`0.1.2.dev{buildNumber}` のような local development version を使います。公開手順が
+stable release step を明示するまで、stable `0.1.2` artifact は作成しません。
 
 `AIKernel.Vfs` は Core implementation namespace であり、独立 NuGet package ではありません。
 VFS contract は AIKernel.NET contract packages にあり、in-process VFS provider は
@@ -122,5 +125,6 @@ dotnet test AIKernel.Core.slnx -c Release --no-restore
 dotnet pack AIKernel.Core.slnx -c Release --no-restore
 ```
 
-0.1.1.1 では NuGet package verification までで停止します。Python / PyPI packaging は、
-次の公式 v0.1.2 正典 release line まで対象外です。
+v0.1.2 integration では、`python/README-ja.md` の Python package checks も実行します。
+stable package artifact は、AIKernel.NET contract packages が利用可能になった後、
+依存関係順に作成します。

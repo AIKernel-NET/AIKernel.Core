@@ -9,7 +9,7 @@ internal static class DslDocumentParser
 {
     /// <summary>
     /// EN: Executes Parse.
-    /// EN: Documentation for public API. JA: Parse を実行します。
+    /// [EN] Documents this public package API member. [JA] Parse を実行します。
     /// </summary>
     public static Result<DslDocument> Parse(string json)
     {
@@ -320,7 +320,7 @@ internal static class DslDocumentParserEitherExtensions
 {
     /// <summary>
     /// EN: Gets ToInvalidResult&lt;T&gt;.
-    /// EN: Documentation for public API. JA: ToInvalidResult&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] ToInvalidResult&lt;T&gt; を取得します。
     /// </summary>
     public static Result<T> ToInvalidResult<T>(
         this Either<string, T> value)

@@ -8,7 +8,7 @@ internal static class HistoryRomPath
     private const string HistoryPrefix = "history://";
     /// <summary>
     /// EN: Executes Create.
-    /// EN: Documentation for public API. JA: Create を実行します。
+    /// [EN] Documents this public package API member. [JA] Create を実行します。
     /// </summary>
 
     public static Result<string> Create(string @namespace, string name)
@@ -18,7 +18,7 @@ internal static class HistoryRomPath
     }
     /// <summary>
     /// EN: Executes CreateRomId.
-    /// EN: Documentation for public API. JA: CreateRomId を実行します。
+    /// [EN] Documents this public package API member. [JA] CreateRomId を実行します。
     /// </summary>
 
     public static Result<string> CreateRomId(string @namespace, string name)
@@ -28,7 +28,7 @@ internal static class HistoryRomPath
     }
     /// <summary>
     /// EN: Executes IsHistoryRomId.
-    /// EN: Documentation for public API. JA: IsHistoryRomId を実行します。
+    /// [EN] Documents this public package API member. [JA] IsHistoryRomId を実行します。
     /// </summary>
 
     public static bool IsHistoryRomId(string romId)
@@ -36,7 +36,7 @@ internal static class HistoryRomPath
            romId.StartsWith(HistoryPrefix, StringComparison.Ordinal);
     /// <summary>
     /// EN: Executes Result&lt;.
-    /// EN: Documentation for public API. JA: Result&lt; を実行します。
+    /// [EN] Documents this public package API member. [JA] Result&lt; を実行します。
     /// </summary>
 
     public static Result<(string Namespace, string Name)> ParseRomId(string romId)

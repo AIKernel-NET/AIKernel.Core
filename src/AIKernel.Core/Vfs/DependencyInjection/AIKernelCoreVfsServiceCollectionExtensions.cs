@@ -10,12 +10,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-/// <summary>EN: Documentation for public API. JA: AIKernelCoreVfsServiceCollectionExtensions を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] AIKernelCoreVfsServiceCollectionExtensions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions']/summary" />
 public static class AIKernelCoreVfsServiceCollectionExtensions
 {
-    /// <summary>EN: Documentation for public API. JA: AddAIKernelCoreVfsProviders を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] AddAIKernelCoreVfsProviders を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']/summary" />
     public static IServiceCollection AddAIKernelCoreVfsProviders(
@@ -34,7 +34,7 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
             .AddWebGetFileProvider(webGet);
     }
 
-    /// <summary>EN: Documentation for public API. JA: AddAIKernelCoreVfsProviders を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] AddAIKernelCoreVfsProviders を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelCoreVfsProviders']/summary" />
     public static IServiceCollection AddAIKernelCoreVfsProviders(
@@ -53,7 +53,7 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
             .AddWebGetFileProvider(section.GetSection("WebGetFile"));
     }
 
-    /// <summary>EN: Documentation for public API. JA: AddAIKernelBrowserVfsProviders を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] AddAIKernelBrowserVfsProviders を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']/summary" />
     public static IServiceCollection AddAIKernelBrowserVfsProviders(
@@ -65,7 +65,7 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services.AddMemoryFileProvider(memory);
     }
 
-    /// <summary>EN: Documentation for public API. JA: AddAIKernelBrowserVfsProviders を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] AddAIKernelBrowserVfsProviders を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddAIKernelBrowserVfsProviders']/summary" />
     public static IServiceCollection AddAIKernelBrowserVfsProviders(
@@ -81,7 +81,7 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
             .AddWebGetFileProvider(webGet);
     }
 
-    /// <summary>EN: Documentation for public API. JA: AddMemoryFileProvider を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] AddMemoryFileProvider を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']/summary" />
     public static IServiceCollection AddMemoryFileProvider(
@@ -100,7 +100,7 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services;
     }
 
-    /// <summary>EN: Documentation for public API. JA: AddMemoryFileProvider を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] AddMemoryFileProvider を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddMemoryFileProvider']/summary" />
     public static IServiceCollection AddMemoryFileProvider(
@@ -120,7 +120,7 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services;
     }
 
-    /// <summary>EN: Documentation for public API. JA: AddLocalFileProvider を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] AddLocalFileProvider を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']/summary" />
     public static IServiceCollection AddLocalFileProvider(
@@ -140,7 +140,7 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services;
     }
 
-    /// <summary>EN: Documentation for public API. JA: AddLocalFileProvider を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] AddLocalFileProvider を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddLocalFileProvider']/summary" />
     public static IServiceCollection AddLocalFileProvider(
@@ -160,7 +160,7 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services;
     }
 
-    /// <summary>EN: Documentation for public API. JA: AddWebGetFileProvider を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] AddWebGetFileProvider を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']/summary" />
     public static IServiceCollection AddWebGetFileProvider(
@@ -181,7 +181,7 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
         return services;
     }
 
-    /// <summary>EN: Documentation for public API. JA: AddWebGetFileProvider を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] AddWebGetFileProvider を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.DependencyInjection.AIKernelCoreVfsServiceCollectionExtensions.AddWebGetFileProvider']/summary" />
     public static IServiceCollection AddWebGetFileProvider(

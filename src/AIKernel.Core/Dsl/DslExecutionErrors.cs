@@ -7,7 +7,7 @@ internal static class DslExecutionErrors
 {
     /// <summary>
     /// EN: Executes InvalidRuntime.
-    /// EN: Documentation for public API. JA: InvalidRuntime を実行します。
+    /// [EN] Documents this public package API member. [JA] InvalidRuntime を実行します。
     /// </summary>
     public static ErrorContext InvalidRuntime(string message)
         => new(message, "DSL_RUNTIME_ERROR", false)
@@ -18,7 +18,7 @@ internal static class DslExecutionErrors
         };
     /// <summary>
     /// EN: Executes PredicateRejected.
-    /// EN: Documentation for public API. JA: PredicateRejected を実行します。
+    /// [EN] Documents this public package API member. [JA] PredicateRejected を実行します。
     /// </summary>
 
     public static ErrorContext PredicateRejected(string message)
@@ -30,7 +30,7 @@ internal static class DslExecutionErrors
         };
     /// <summary>
     /// EN: Gets CapabilityException.
-    /// EN: Documentation for public API. JA: CapabilityException を取得します。
+    /// [EN] Documents this public package API member. [JA] CapabilityException を取得します。
     /// </summary>
 
     public static ErrorContext CapabilityException(
@@ -39,7 +39,7 @@ internal static class DslExecutionErrors
         => CapabilityException(capabilityName, ErrorContext.FromException(exception));
     /// <summary>
     /// EN: Gets CapabilityException.
-    /// EN: Documentation for public API. JA: CapabilityException を取得します。
+    /// [EN] Documents this public package API member. [JA] CapabilityException を取得します。
     /// </summary>
 
     public static ErrorContext CapabilityException(
@@ -69,7 +69,7 @@ internal static class DslExecutionErrors
     }
     /// <summary>
     /// EN: Gets CapabilityReturnedNull.
-    /// EN: Documentation for public API. JA: CapabilityReturnedNull を取得します。
+    /// [EN] Documents this public package API member. [JA] CapabilityReturnedNull を取得します。
     /// </summary>
 
     public static ErrorContext CapabilityReturnedNull(
@@ -82,7 +82,7 @@ internal static class DslExecutionErrors
     }
     /// <summary>
     /// EN: Gets InvalidPipelineValue.
-    /// EN: Documentation for public API. JA: InvalidPipelineValue を取得します。
+    /// [EN] Documents this public package API member. [JA] InvalidPipelineValue を取得します。
     /// </summary>
 
     public static ErrorContext InvalidPipelineValue(
@@ -108,7 +108,7 @@ internal static class DslExecutionErrors
     }
     /// <summary>
     /// EN: Gets ClockException.
-    /// EN: Documentation for public API. JA: ClockException を取得します。
+    /// [EN] Documents this public package API member. [JA] ClockException を取得します。
     /// </summary>
 
     public static ErrorContext ClockException(
@@ -117,7 +117,7 @@ internal static class DslExecutionErrors
         => ClockException(ErrorContext.FromException(exception), loopDelta);
     /// <summary>
     /// EN: Gets ClockException.
-    /// EN: Documentation for public API. JA: ClockException を取得します。
+    /// [EN] Documents this public package API member. [JA] ClockException を取得します。
     /// </summary>
 
     public static ErrorContext ClockException(

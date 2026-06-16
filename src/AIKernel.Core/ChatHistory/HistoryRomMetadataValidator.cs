@@ -6,7 +6,7 @@ internal static class HistoryRomMetadataValidator
 {
     /// <summary>
     /// EN: Executes ValidateCanonicalIdentity.
-    /// EN: Documentation for public API. JA: ValidateCanonicalIdentity を実行します。
+    /// [EN] Documents this public package API member. [JA] ValidateCanonicalIdentity を実行します。
     /// </summary>
     public static ErrorContext? ValidateCanonicalIdentity(HistoryRomMetadata metadata)
         => ValidateCanonicalIdentityResult(metadata)

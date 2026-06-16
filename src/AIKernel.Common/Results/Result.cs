@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AIKernel.Common.Results;
 
-/// <summary>EN: Documentation for public API. JA: Result を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] Result を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.Result']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.Result']/summary" />
 public readonly struct Result<T>
@@ -11,22 +11,22 @@ public readonly struct Result<T>
     // Core State
     // -------------------------
 
-    /// <summary>EN: Documentation for public API. JA: IsSuccess を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] IsSuccess を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Result.IsSuccess']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Result.IsSuccess']/summary" />
     public bool IsSuccess { get; }
 
-    /// <summary>EN: Documentation for public API. JA: IsFailure を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] IsFailure を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.Result.IsFailure']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.Result.IsFailure']/summary" />
     public bool IsFailure => !IsSuccess;
 
-    /// <summary>EN: Documentation for public API. JA: Value を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Value を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Result.Value']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Result.Value']/summary" />
     public T? Value { get; }
 
-    /// <summary>EN: Documentation for public API. JA: Error を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Error を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Result.Error']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Result.Error']/summary" />
     public ErrorContext? Error { get; }
@@ -53,7 +53,7 @@ public readonly struct Result<T>
     // Constructors
     // -------------------------
 
-    /// <summary>EN: Documentation for public API. JA: Success を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Success を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Success']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Success']/summary" />
     public static Result<T> Success(T value)
@@ -66,7 +66,7 @@ public readonly struct Result<T>
     public static Result<T> Ok(T value)
         => Success(value);
 
-    /// <summary>EN: Documentation for public API. JA: Fail を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Fail を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Fail']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Fail']/summary" />
     public static Result<T> Fail(string message)
@@ -83,7 +83,7 @@ public readonly struct Result<T>
     // Functional Extensions
     // -------------------------
 
-    /// <summary>EN: Documentation for public API. JA: Map&lt;U&gt; を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Map&lt;U&gt; を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Map&lt;U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Map&lt;U&gt;']/summary" />
     public Result<U> Map<U>(Func<T, U> mapper)
@@ -101,7 +101,7 @@ public readonly struct Result<T>
         }
     }
 
-    /// <summary>EN: Documentation for public API. JA: Bind&lt;U&gt; を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Bind&lt;U&gt; を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Bind&lt;U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Bind&lt;U&gt;']/summary" />
     public Result<U> Bind<U>(Func<T, Result<U>> binder)
@@ -119,7 +119,7 @@ public readonly struct Result<T>
         }
     }
 
-    /// <summary>EN: Documentation for public API. JA: Tap を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Tap を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Tap']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Tap']/summary" />
     public Result<T> Tap(Action<T> action)
@@ -170,13 +170,13 @@ public readonly struct Result<T>
     // LINQ Support
     // -------------------------
 
-    /// <summary>EN: Documentation for public API. JA: Select&lt;U&gt; を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Select&lt;U&gt; を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Select&lt;U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.Select&lt;U&gt;']/summary" />
     public Result<U> Select<U>(Func<T, U> selector)
         => Map(selector);
 
-    /// <summary>EN: Documentation for public API. JA: V&gt; を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] V&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.V&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.V&gt;']/summary" />
     public Result<V> SelectMany<U, V>(
@@ -184,7 +184,7 @@ public readonly struct Result<T>
         Func<T, U, V> projector)
         => Bind(value => binder(value).Map(bound => projector(value, bound)));
 
-    /// <summary>EN: Documentation for public API. JA: ToString を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ToString を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.ToString']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.ToString']/summary" />
     public override string ToString()

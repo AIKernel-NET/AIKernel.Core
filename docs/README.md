@@ -16,9 +16,10 @@ line stabilizes.
 
 ## Cross-Repository Alignment
 
-Shared repository boundaries, 0.1.1.1 local NuGet versioning, the
-NuGet-only / no-PyPI rule for this validation line, and the v0.1.2
-NuGet + PyPI release assumption are defined by
+Shared repository boundaries, v0.1.2 development versioning, dependency order,
+PyPI Trusted Publishing, and Python wrapper scope are defined by
+[Package Release Alignment v0.1.2](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/package-release-alignment-v0.1.2.md).
+The historical v0.1.1.1 validation rules remain available in
 [AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1.md).
 When a change crosses repositories, start with the
 [Cross-Repository Developer Guide v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/cross-repository-developer-guide-v0.1.1.1.md).
@@ -83,14 +84,15 @@ size limits.
 The supported distribution paths are:
 
 - Windows/Linux C# applications install the `AIKernel.*` NuGet packages.
-- Python bindings stay on the previously published line during 0.1.1.1
-  validation and are expected to refresh with the next official v0.1.2
-  canonical series.
+- Python consumers install `aikernel-net`, which exposes thin managed assembly
+  loading helpers, the generated managed API catalog, and bundled CTG-ROM sample
+  assets for examples.
 - GPU/native execution is added only through explicit Capability packages.
 
-For the 0.1.1.1 CTG Core update, publish NuGet packages only. Do not create a
-PyPI package for this validation line. The next official v0.1.2 canonical
-series is expected to publish synchronized NuGet and PyPI package families.
+For v0.1.2 development, use local NuGet versions such as
+`0.1.2-dev{buildNumber}` and Python versions such as `0.1.2.dev{buildNumber}`.
+Do not create stable `0.1.2` artifacts until the publication task explicitly
+opens the release step.
 
 `AIKernel.Vfs` is a Core implementation namespace, not a separate NuGet package.
 VFS contracts come from the AIKernel.NET contract packages and in-process VFS
@@ -128,5 +130,6 @@ dotnet test AIKernel.Core.slnx -c Release --no-restore
 dotnet pack AIKernel.Core.slnx -c Release --no-restore
 ```
 
-For 0.1.1.1, stop after NuGet package verification. Python/PyPI packaging is
-out of scope until the next official v0.1.2 canonical release line.
+During v0.1.2 integration, also run the Python package checks from
+`python/README.md`. Stable package artifacts are created later in dependency
+order after AIKernel.NET contract packages are available.

@@ -5,17 +5,17 @@ using System.Text;
 using AIKernel.Abstractions.Rom;
 using AIKernel.Dtos.Rom;
 
-/// <summary>EN: Documentation for public API. JA: Sha256SemanticHasher を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] Sha256SemanticHasher を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.Sha256SemanticHasher']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.Sha256SemanticHasher']/summary" />
 public sealed class Sha256SemanticHasher : ISemanticHasher
 {
-    /// <summary>EN: Documentation for public API. JA: Algorithm を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Algorithm を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Rom.Sha256SemanticHasher.Algorithm']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Rom.Sha256SemanticHasher.Algorithm']/summary" />
     public string Algorithm => "sha256";
 
-    /// <summary>EN: Documentation for public API. JA: ComputeHash を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ComputeHash を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.Sha256SemanticHasher.ComputeHash']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.Sha256SemanticHasher.ComputeHash']/summary" />
     public string ComputeHash(CanonicalizedRomDto canonicalized)
@@ -28,7 +28,7 @@ public sealed class Sha256SemanticHasher : ISemanticHasher
         return "sha256:" + Convert.ToHexString(hash).ToLowerInvariant();
     }
 
-    /// <summary>EN: Documentation for public API. JA: ComputeHashAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ComputeHashAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.Sha256SemanticHasher.ComputeHashAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.Sha256SemanticHasher.ComputeHashAsync']/summary" />
     public Task<string> ComputeHashAsync(
@@ -39,7 +39,7 @@ public sealed class Sha256SemanticHasher : ISemanticHasher
         return Task.FromResult(ComputeHash(canonicalized));
     }
 
-    /// <summary>EN: Documentation for public API. JA: VerifyHash を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] VerifyHash を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.Sha256SemanticHasher.VerifyHash']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.Sha256SemanticHasher.VerifyHash']/summary" />
     public bool VerifyHash(
@@ -54,7 +54,7 @@ public sealed class Sha256SemanticHasher : ISemanticHasher
             StringComparison.Ordinal);
     }
 
-    /// <summary>EN: Documentation for public API. JA: VerifyHashAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] VerifyHashAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.Sha256SemanticHasher.VerifyHashAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.Sha256SemanticHasher.VerifyHashAsync']/summary" />
     public async Task<bool> VerifyHashAsync(

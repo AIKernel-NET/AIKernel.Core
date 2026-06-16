@@ -17,7 +17,7 @@ using AIKernel.Dtos.Time;
 ///
 /// v0.1.0 では標準 TimeProvider への委譲と固定時刻 replay を提供します。
 /// EN: v0.2.0 以降で HLC、署名付き時刻、外部時刻証明などを追加する席をここに確保します。
-/// EN: Documentation for public API. JA: KernelTimeProvider を表します。
+/// [EN] Documents this public package API member. [JA] KernelTimeProvider を表します。
 /// </summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.KernelTimeProvider']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.KernelTimeProvider']/summary" />
@@ -45,7 +45,7 @@ public abstract class KernelTimeProvider : TimeProvider
 
     /// <summary>
     /// EN: 決定論的リプレイ中かどうかを表します。
-    /// EN: Documentation for public API. JA: IsReplaying を取得します。
+    /// [EN] Documents this public package API member. [JA] IsReplaying を取得します。
     /// </summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.KernelTimeProvider.IsReplaying']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.KernelTimeProvider.IsReplaying']/summary" />
@@ -57,13 +57,13 @@ public abstract class KernelTimeProvider : TimeProvider
     /// v0.1.0 では 1.0 を返します。
     /// 将来的に NTP、署名付き時刻、外部監査時刻などを導入した場合、
     /// EN: その信頼性をここで表現します。
-    /// EN: Documentation for public API. JA: ReliabilityScore を取得します。
+    /// [EN] Documents this public package API member. [JA] ReliabilityScore を取得します。
     /// </summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.ReliabilityScore']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.ReliabilityScore']/summary" />
     public virtual double ReliabilityScore => 1.0;
 
-    /// <summary>EN: Documentation for public API. JA: GetUtcNow を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetUtcNow を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetUtcNow']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetUtcNow']/summary" />
     public override DateTimeOffset GetUtcNow()
@@ -76,17 +76,17 @@ public abstract class KernelTimeProvider : TimeProvider
         return BaseProvider.GetUtcNow();
     }
 
-    /// <summary>EN: Documentation for public API. JA: LocalTimeZone を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] LocalTimeZone を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.LocalTimeZone']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.LocalTimeZone']/summary" />
     public override TimeZoneInfo LocalTimeZone => BaseProvider.LocalTimeZone;
 
-    /// <summary>EN: Documentation for public API. JA: TimestampFrequency を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] TimestampFrequency を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.TimestampFrequency']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelTimeProvider.TimestampFrequency']/summary" />
     public override long TimestampFrequency => BaseProvider.TimestampFrequency;
 
-    /// <summary>EN: Documentation for public API. JA: GetTimestamp を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] GetTimestamp を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetTimestamp']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetTimestamp']/summary" />
     public override long GetTimestamp()
@@ -94,7 +94,7 @@ public abstract class KernelTimeProvider : TimeProvider
         return BaseProvider.GetTimestamp();
     }
 
-    /// <summary>EN: Documentation for public API. JA: CreateTimer を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] CreateTimer を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.CreateTimer']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.CreateTimer']/summary" />
     public override ITimer CreateTimer(
@@ -111,7 +111,7 @@ public abstract class KernelTimeProvider : TimeProvider
     ///
     /// v0.1.0 では GetUtcNow() を単純にラップします。
     /// EN: 将来的に HLC や署名付き時刻を導入しても、利用側はこの API を使い続けられます。
-    /// EN: Documentation for public API. JA: GetLogicalTimestamp を実行します。
+    /// [EN] Documents this public package API member. [JA] GetLogicalTimestamp を実行します。
     /// </summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetLogicalTimestamp']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelTimeProvider.GetLogicalTimestamp']/summary" />

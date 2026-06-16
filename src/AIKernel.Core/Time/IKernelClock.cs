@@ -26,7 +26,7 @@ namespace AIKernel.Core.Time;
 ///   装置は壊れても、法は揺らがない。
 ///   TimeProvider がどのような物理時刻を返すかは環境依存ですが、
 /// EN:   AIKernel の replay / audit / snapshot における時間の扱いは IKernelClock に集約します。
-/// EN: Documentation for public API. JA: IKernelClock contract を定義します。
+/// [EN] Documents this public package API member. [JA] IKernelClock contract を定義します。
 /// </summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.IKernelClock']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.IKernelClock']/summary" />

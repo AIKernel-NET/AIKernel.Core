@@ -25,7 +25,7 @@ internal sealed class ChatHistoryRomExporter :
     private const string SourceKind = "chat_history";
     /// <summary>
     /// EN: Gets ToRomMarkdown.
-    /// EN: Documentation for public API. JA: ToRomMarkdown を取得します。
+    /// [EN] Documents this public package API member. [JA] ToRomMarkdown を取得します。
     /// </summary>
 
     public static Result<string> ToRomMarkdown(
@@ -249,12 +249,12 @@ internal sealed class ChatHistoryRomExporter :
     {
         /// <summary>
         /// EN: Gets EntityId.
-        /// EN: Documentation for public API. JA: EntityId を取得します。
+        /// [EN] Documents this public package API member. [JA] EntityId を取得します。
         /// </summary>
         public string EntityId => candidate.RomId.Value;
         /// <summary>
         /// EN: Gets EntityType.
-        /// EN: Documentation for public API. JA: EntityType を取得します。
+        /// [EN] Documents this public package API member. [JA] EntityType を取得します。
         /// </summary>
 
         public string EntityType =>
@@ -263,7 +263,7 @@ internal sealed class ChatHistoryRomExporter :
                 : "conversation";
         /// <summary>
         /// EN: Gets Version.
-        /// EN: Documentation for public API. JA: Version を取得します。
+        /// [EN] Documents this public package API member. [JA] Version を取得します。
         /// </summary>
 
         public string Version =>
@@ -272,25 +272,25 @@ internal sealed class ChatHistoryRomExporter :
                 : "1";
         /// <summary>
         /// EN: Gets Body.
-        /// EN: Documentation for public API. JA: Body を取得します。
+        /// [EN] Documents this public package API member. [JA] Body を取得します。
         /// </summary>
 
         public string Body => candidate.Body;
         /// <summary>
         /// EN: Gets Metadata.
-        /// EN: Documentation for public API. JA: Metadata を取得します。
+        /// [EN] Documents this public package API member. [JA] Metadata を取得します。
         /// </summary>
 
         public IReadOnlyDictionary<string, string> Metadata => candidate.AdditionalMetadata;
         /// <summary>
         /// EN: Gets RelationReferences.
-        /// EN: Documentation for public API. JA: RelationReferences を取得します。
+        /// [EN] Documents this public package API member. [JA] RelationReferences を取得します。
         /// </summary>
 
         public IReadOnlyList<string> RelationReferences => [];
         /// <summary>
         /// EN: Executes GetSemanticHashAsync.
-        /// EN: Documentation for public API. JA: GetSemanticHashAsync を実行します。
+        /// [EN] Documents this public package API member. [JA] GetSemanticHashAsync を実行します。
         /// </summary>
 
         public Task<string> GetSemanticHashAsync()
@@ -298,7 +298,7 @@ internal sealed class ChatHistoryRomExporter :
                 .ComputeHash(new DefaultRomCanonicalizer().Canonicalize(this)));
         /// <summary>
         /// EN: Executes CanonicalizeAsync.
-        /// EN: Documentation for public API. JA: CanonicalizeAsync を実行します。
+        /// [EN] Documents this public package API member. [JA] CanonicalizeAsync を実行します。
         /// </summary>
 
         public Task<CanonicalizedRomDto> CanonicalizeAsync()

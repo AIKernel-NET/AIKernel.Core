@@ -6,12 +6,12 @@ internal sealed class FailClosedDslCapabilityRegistry : IDslCapabilityRegistry
 {
     /// <summary>
     /// EN: Executes Contains.
-    /// EN: Documentation for public API. JA: Contains を実行します。
+    /// [EN] Documents this public package API member. [JA] Contains を実行します。
     /// </summary>
     public bool Contains(string name) => false;
     /// <summary>
     /// EN: Gets Invoke.
-    /// EN: Documentation for public API. JA: Invoke を取得します。
+    /// [EN] Documents this public package API member. [JA] Invoke を取得します。
     /// </summary>
 
     public Result<DslPipelineValue> Invoke(

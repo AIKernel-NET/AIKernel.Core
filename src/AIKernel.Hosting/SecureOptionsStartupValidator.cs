@@ -7,39 +7,34 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 /// <summary>
-/// ISecureOptions を実装する Options 型に対して、
-/// 起動時に秘密情報を解決し、推論リクエストが発生する前に検証するための基底 Startup Validator です。
+/// [EN] Base startup validator that resolves and validates secure options before inference requests can run.
+/// [JA] ISecureOptions を実装する Options 型に対して、起動時に秘密情報を解決し、推論リクエストが発生する前に検証するための基底 Startup Validator です。
 ///
-/// このクラスは Provider 固有の追加検証を許可するため、意図的に public かつ non-sealed にしています。
+/// [EN] The type is intentionally public and non-sealed so provider packages can add provider-specific validation.
+/// [JA] このクラスは Provider 固有の追加検証を許可するため、意図的に public かつ non-sealed にしています。
 ///
-/// 派生クラスを作成する場合は、通常 <see cref="ValidateCoreAsync"/> を override してください。
-/// StartAsync 自体を override する必要は基本的にありません。
+/// [EN] Derived classes normally override <see cref="ValidateCoreAsync"/> instead of replacing <see cref="StartAsync"/>.
+/// [JA] 派生クラスを作成する場合は、通常 <see cref="ValidateCoreAsync"/> を override してください。StartAsync 自体を override する必要は基本的にありません。
 ///
-/// 設計意図:
-/// - Hosting 層は Provider 固有の Options 型を知らない。
-/// - Provider 側は、このクラスを継承することで独自検証を追加できる。
-/// - 検証失敗時は SecureCredentialException 系列、またはそれを起点とする例外を投げ、
-///   Host 起動を停止させることで Fail-Closed を維持する。
+/// [EN] Design intent: Hosting does not know provider-specific options; providers extend this type; validation failures stop host startup to preserve fail-closed behavior.
+/// [JA] 設計意図: Hosting 層は Provider 固有の Options 型を知らず、Provider 側はこのクラスを継承して独自検証を追加し、検証失敗時は Host 起動を停止させることで Fail-Closed を維持します。
 ///
-/// ロギング方針:
-/// - LoggerMessage.Define によってログテンプレートを static delegate として事前構築する。
-/// - StartAsync 内では IsEnabled でログレベルを確認してから delegate を呼び出す。
-/// - typeof(TOptions).FullName のような引数評価も、ログレベルが有効な場合だけ実行する。
+/// [EN] Logging uses static LoggerMessage delegates and IsEnabled guards so disabled log levels do not evaluate message arguments.
+/// [JA] ログ出力では LoggerMessage.Define による static delegate と IsEnabled guard を使い、ログ無効時に引数評価が走らないようにします。
 ///
-/// これにより、通常時に不要な文字列生成・テンプレート解析・ボックス化・引数配列生成を避ける。
-/// EN: 高頻度起動や多数 Provider の検証が走る環境でも、ログ無効時のオーバーヘッドを最小化できる。
-/// EN: Documentation for public API. JA: SecureOptionsStartupValidator を表します。
+/// [EN] This minimizes string creation, template processing, boxing, and argument array allocation when many providers are validated.
+/// [JA] これにより、多数 Provider の検証が走る環境でも不要な文字列生成、テンプレート解析、ボックス化、引数配列生成を避けられます。
 /// </summary>
-/// <typeparam name="TOptions">EN:  JA: TOptions 型パラメーターです。
-/// 秘密情報の解決対象となる Options 型。
-/// 必ず ISecureOptions を実装する必要があります。
+/// <typeparam name="TOptions">
+/// [EN] Options type whose secrets are resolved and validated; it must implement <see cref="ISecureOptions"/>.
+/// [JA] 秘密情報の解決対象となる Options 型です。必ず <see cref="ISecureOptions"/> を実装する必要があります。
 /// </typeparam>
 /// <remarks>
-/// 派生クラスから追加サービスを受け取りやすくするため、
-/// 基底クラスの依存関係は最小限にしています。
+/// [EN] The base dependency set is intentionally small so provider validators can add services such as ILogger, HttpClient, options monitors, or provider clients.
+/// [JA] 派生クラスから ILogger、HttpClient、IOptionsMonitor、独自 Client などの追加サービスを受け取りやすくするため、基底クラスの依存関係は最小限にしています。
 ///
-/// Provider 固有 Validator では、このコンストラクタを呼び出したうえで、
-/// ILogger、HttpClient、IOptionsMonitor、独自 Client などを追加注入してください。
+/// [EN] Provider-specific validators should call this constructor and add their own validation in <see cref="ValidateCoreAsync"/>.
+/// [JA] Provider 固有 Validator では、このコンストラクタを呼び出したうえで、<see cref="ValidateCoreAsync"/> に独自検証を追加してください。
 /// </remarks>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureOptionsStartupValidator']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureOptionsStartupValidator']/summary" />
@@ -110,7 +105,7 @@ public class SecureOptionsStartupValidator<TOptions>(
     /// 1. SecureCredentialResolver により秘密情報を解決する。
     /// 2. 解決済み Options に対して ValidateCoreAsync を呼び出す。
     /// EN: 3. 例外が発生した場合は握りつぶさず、Host 起動を Fail-Closed させる。
-    /// EN: Documentation for public API. JA: StartAsync を実行します。
+    /// [EN] Documents this public package API member. [JA] StartAsync を実行します。
     /// </summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StartAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StartAsync']/summary" />
@@ -151,7 +146,7 @@ public class SecureOptionsStartupValidator<TOptions>(
     ///
     /// 派生クラスが外部接続や独自 Client を所有する場合は、
     /// EN: 必要に応じて override してください。
-    /// EN: Documentation for public API. JA: StopAsync を実行します。
+    /// [EN] Documents this public package API member. [JA] StopAsync を実行します。
     /// </summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StopAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StopAsync']/summary" />

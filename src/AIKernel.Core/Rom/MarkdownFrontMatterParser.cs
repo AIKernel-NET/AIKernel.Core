@@ -6,14 +6,14 @@ using AIKernel.Common.Results;
 using AIKernel.Dtos.Rom;
 using YamlDotNet.Serialization;
 
-/// <summary>EN: Documentation for public API. JA: MarkdownFrontMatterParser を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] MarkdownFrontMatterParser を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.MarkdownFrontMatterParser']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.MarkdownFrontMatterParser']/summary" />
 public sealed class MarkdownFrontMatterParser : IMarkdownFrontMatterParser
 {
     private readonly IDeserializer _deserializer;
 
-    /// <summary>EN: Documentation for public API. JA: MarkdownFrontMatterParser を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] MarkdownFrontMatterParser を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.#ctor']/summary" />
     public MarkdownFrontMatterParser()
@@ -21,7 +21,7 @@ public sealed class MarkdownFrontMatterParser : IMarkdownFrontMatterParser
     {
     }
 
-    /// <summary>EN: Documentation for public API. JA: MarkdownFrontMatterParser を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] MarkdownFrontMatterParser を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.#ctor']/summary" />
     public MarkdownFrontMatterParser(IDeserializer deserializer)
@@ -30,7 +30,7 @@ public sealed class MarkdownFrontMatterParser : IMarkdownFrontMatterParser
             ?? throw new ArgumentNullException(nameof(deserializer));
     }
 
-    /// <summary>EN: Documentation for public API. JA: Parse を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Parse を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.Parse']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.MarkdownFrontMatterParser.Parse']/summary" />
     public MarkdownFrontMatterDocument Parse(

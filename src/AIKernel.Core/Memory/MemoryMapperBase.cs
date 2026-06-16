@@ -2,12 +2,12 @@ using AIKernel.Common.Results;
 
 namespace AIKernel.Core.Memory;
 
-/// <summary>EN: Documentation for public API. JA: MemoryMapperBase を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] MemoryMapperBase を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']/summary" />
 public abstract class MemoryMapperBase : IMemoryMapper
 {
-    /// <summary>EN: Documentation for public API. JA: Open を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Open を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']/summary" />
     public IMemoryRegion Open(
@@ -18,7 +18,7 @@ public abstract class MemoryMapperBase : IMemoryMapper
                 error => throw new InvalidOperationException(error.Message),
                 region => region);
 
-    /// <summary>EN: Documentation for public API. JA: OpenResult を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] OpenResult を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult']/summary" />
     public Result<IMemoryRegion> OpenResult(

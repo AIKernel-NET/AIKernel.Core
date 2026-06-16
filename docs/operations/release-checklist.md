@@ -1,18 +1,14 @@
 # AIKernel.Core Release Checklist
 
-This checklist is for publishing the AIKernel.Core package family.
+[日本語](release-checklist-jp.md)
 
-For the 0.1.1.1 CTG Core update, publish NuGet packages only. Do not create a
-PyPI package for this validation line. Python/PyPI steps below are retained for
-the next official v0.1.2 canonical series, where synchronized NuGet and PyPI
-package families are expected.
+This checklist is for preparing AIKernel.Core packages for the v0.1.2 canonical
+series. Do not create stable `0.1.2` packages until the maintainer explicitly
+opens the publication step.
 
-The 0.1.1 release line also published the CPU-only Python binding on the
-2026-06-10 prototype validation release line.
-
-The 0.0.x design-implementation phase is complete. The 0.1.1 release validates
-the runtime with prototype applications, external Capability modules, and
-control-plane execution scaffolding.
+Shared release order, versioning, Python wrapper rules, and PyPI Trusted
+Publishing requirements are defined by
+[Package Release Alignment v0.1.2](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/package-release-alignment-v0.1.2.md).
 
 ## Package Scope
 
@@ -24,22 +20,23 @@ AIKernel.Core publishes the managed runtime packages:
 - `AIKernel.Hosting`
 - `AIKernel.TestKit`
 
-`AIKernel.Providers.MicrosoftAI` is consumed as an external provider package in
-integration tests and remains on the provider package line until that repository
-is updated.
-
-The next Python binding update is expected on the official v0.1.2 canonical
-series. Import it as `aikernel_net`. The PyPI package named `aikernel` is a
-different project.
-
-Development Python builds for the v0.1.2 canonical series should use GitHub
-Packages with a separate distribution name such as `aikernel-net-dev` and
-versions like `0.1.2.dev1`. Development packages may contain breaking changes
-and are intended for CI/CD validation.
+The Python distribution is `aikernel-net` and imports as `aikernel_net`.
+It exposes thin managed assembly loading helpers, the generated managed API
+catalog, and sample CTG-ROM assets for development and education.
 
 AIKernel.Core does not publish CUDA, LibTorch, native ABI, GPU runtime, or
 Capability-specific binaries. GPU support is supplied by external Capability
 repositories.
+
+## Development Versioning
+
+Use development package versions during local integration:
+
+- NuGet: `0.1.2-dev{buildNumber}`
+- Python: `0.1.2.dev{buildNumber}`
+
+Stable `0.1.2` artifacts are created later in dependency order after the
+AIKernel.NET contract packages are finalized.
 
 ## Preflight
 
@@ -47,7 +44,9 @@ Run from the repository root:
 
 ```powershell
 dotnet test AIKernel.Core.slnx -c Release --no-restore
-dotnet pack AIKernel.Core.slnx -c Release --no-restore
+dotnet pack AIKernel.Core.slnx -c Release --no-restore `
+  -p:UseLocalPackageVersion=true `
+  -p:LocalPackageBuildNumber=<buildNumber>
 ```
 
 Run from the shared workspace root:
@@ -56,59 +55,32 @@ Run from the shared workspace root:
 py AIKernel.NET\tools\check_bilingual_xml_docs.py AIKernel.Core\src
 ```
 
-For 0.1.1.1, stop here and publish only the generated NuGet packages.
-
 Run from `python/`:
 
 ```powershell
 py -m compileall src tests
 py -m pytest
 py -m build --wheel
-py -m twine check dist/aikernel_net-0.1.1-py3-none-any.whl
+py -m twine check dist\aikernel_net-0.1.2*.whl
 ```
-
-PyPI publishing uses GitHub Actions Trusted Publishing. Before pushing a Python
-release tag, verify:
-
-- the package version in `python/pyproject.toml` is updated
-- the wheel and sdist build successfully
-- `.github/workflows/publish-pypi.yml` runs for the intended `v*`,
-  `py-all-*`, or `py-aikernel-net-*` tag
-- the publish job uses the `pypi` GitHub Environment
-- the publish job has `id-token: write`
-- the workflow contains no PyPI API token, `TWINE_USERNAME`, or
-  `TWINE_PASSWORD`
-- the PyPI file detail shows `Uploaded using Trusted Publishing? Yes` after
-  upload
-- `pip install aikernel-net==<version>` succeeds in a clean virtual environment
 
 ## NuGet Package Checks
 
-Before publishing, inspect the generated `.nupkg` files and verify:
+Before publishing or consuming local packages, inspect the generated `.nupkg`
+files and verify:
 
-- Core package ids and versions are `0.1.1.1` for the CTG Core update
+- package ids match the Core package family
+- development packages use `0.1.2-dev{buildNumber}`
+- stable packages, when explicitly requested, use `0.1.2`
 - license is `Apache-2.0`
 - repository metadata points at the AIKernel.Core repository
 - README and icon assets are included where expected
 - no CUDA, LibTorch, native ABI, or external Capability binaries are included
 - no `AIKernel.Vfs` package dependency exists
-- references to AIKernel.NET contract packages use `0.1.1.1` for the CTG Core
-  update
-
-## Contract Migration Notes
-
-The 0.1.1 contract promotion pass keeps the stable contract surface in
-AIKernel.NET:
-
-- `KernelTimestamp` is supplied by `AIKernel.Dtos.Time`; Core no longer owns a
-  duplicate timestamp DTO.
-- Control removes unused implementation-side descriptor remnants such as
-  `ControlCapabilityDescriptor` and `GpuControlDescriptor`; shared capability
-  manifests should use `AIKernel.Dtos.Capabilities.CapabilityModuleDescriptor`.
+- references to AIKernel.NET contract packages resolve to the matching v0.1.2
+  contract package line
 
 ## Python Wheel Checks
-
-Skip this section for the 0.1.1.1 CTG Core update.
 
 Verify the Python wheel:
 
@@ -116,31 +88,30 @@ Verify the Python wheel:
 - includes `aikernel_net/py.typed`
 - includes `dist-info/licenses/LICENSE`
 - includes managed assemblies under `aikernel_net/managed/`
+- includes the generated `api_catalog.py`
+- includes CTG-ROM sample assets under `aikernel_net/samples/ctg_rom/`
 - does not include CUDA, LibTorch, native ABI, or GPU runtime files
 - exposes Result / Option / Either / Try helpers and DSL pipeline helpers
 
-## External Capability Boundary
+## Trusted Publishing Checks
 
-CUDA Capability packages are not part of this release. The reference CUDA
-Capability uses split distribution:
+Before pushing a Python release tag, verify:
 
-- NuGet.org receives a small metadata package with managed AIKernel dependencies
-- GitHub Releases receive the full runtime `.nupkg`
-
-Core documentation should refer GPU users to the matching external Capability
-repository and should not imply that CUDA is installed by default.
+- `.github/workflows/publish-pypi.yml` runs for the intended stable tag
+- the publish job uses the `pypi` GitHub Environment
+- the publish job has `id-token: write`
+- the workflow uses `pypa/gh-action-pypi-publish@release/v1`
+- the workflow contains no PyPI API token, `TWINE_USERNAME`, or
+  `TWINE_PASSWORD`
+- build and publish steps remain separated
 
 ## Publish Order
 
 1. Publish AIKernel.NET contract packages first.
 2. Publish AIKernel.Core package family.
-3. Keep external provider packages on their own release line until they are
-   updated.
-4. Skip PyPI for the 0.1.1.1 CTG Core update and prepare Python packaging for
-   the next official v0.1.2 canonical series.
-5. Publish external Capability metadata packages only after their managed
-   dependencies are available.
-6. Attach external Capability full runtime packages to their GitHub Releases.
+3. Publish `aikernel-net`.
+4. Continue with Control, Providers, CUDA, Wasm, and Tools in the shared
+   dependency order.
 
 ## Post-Publish Smoke Check
 
@@ -148,20 +119,15 @@ In a clean consumer project:
 
 ```powershell
 dotnet new console
-dotnet add package AIKernel.Core --version 0.1.1.1
-dotnet add package AIKernel.Kernel --version 0.1.1.1
+dotnet add package AIKernel.Core --version 0.1.2
+dotnet add package AIKernel.Kernel --version 0.1.2
 dotnet build
 ```
 
 For stable Python:
 
-Skip this smoke check for the 0.1.1.1 CTG Core update.
-
 ```powershell
 py -m venv .venv
-.\.venv\Scripts\python -m pip install aikernel-net==0.1.1
+.\.venv\Scripts\python -m pip install aikernel-net==0.1.2
 .\.venv\Scripts\python -c "import aikernel_net; print(aikernel_net.__version__)"
 ```
-
-Do not use `aikernel-net-dev` for user-facing documentation or stable release
-smoke checks.

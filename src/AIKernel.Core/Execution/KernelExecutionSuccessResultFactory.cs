@@ -10,7 +10,7 @@ internal sealed class KernelExecutionSuccessResultFactory
     private readonly KernelExecutionIdFactory _executionIdFactory = new();
     /// <summary>
     /// EN: Gets CreateSucceededResult.
-    /// EN: Documentation for public API. JA: CreateSucceededResult を取得します。
+    /// [EN] Documents this public package API member. [JA] CreateSucceededResult を取得します。
     /// </summary>
 
     public Result<KernelRequestExecutionResult> CreateSucceededResult(

@@ -12,7 +12,7 @@ internal sealed class DslRomCapabilityRegistry :
     private readonly IDslRomRegistry _romRegistry;
     /// <summary>
     /// EN: Gets DslRomCapabilityRegistry.
-    /// EN: Documentation for public API. JA: DslRomCapabilityRegistry を取得します。
+    /// [EN] Documents this public package API member. [JA] DslRomCapabilityRegistry を取得します。
     /// </summary>
 
     public DslRomCapabilityRegistry(
@@ -24,7 +24,7 @@ internal sealed class DslRomCapabilityRegistry :
     }
     /// <summary>
     /// EN: Executes Contains.
-    /// EN: Documentation for public API. JA: Contains を実行します。
+    /// [EN] Documents this public package API member. [JA] Contains を実行します。
     /// </summary>
 
     public bool Contains(string name)
@@ -33,7 +33,7 @@ internal sealed class DslRomCapabilityRegistry :
             : _inner.Contains(name);
     /// <summary>
     /// EN: Gets Invoke.
-    /// EN: Documentation for public API. JA: Invoke を取得します。
+    /// [EN] Documents this public package API member. [JA] Invoke を取得します。
     /// </summary>
 
     public Result<DslPipelineValue> Invoke(
@@ -375,7 +375,7 @@ internal static class DslRomCapabilityRegistryEitherExtensions
 {
     /// <summary>
     /// EN: Gets ToRomCapabilityResult&lt;T&gt;.
-    /// EN: Documentation for public API. JA: ToRomCapabilityResult&lt;T&gt; を取得します。
+    /// [EN] Documents this public package API member. [JA] ToRomCapabilityResult&lt;T&gt; を取得します。
     /// </summary>
     public static Result<T> ToRomCapabilityResult<T>(
         this Either<string, T> value,
@@ -391,7 +391,7 @@ internal static class DslRomCapabilityRegistryError
 {
     /// <summary>
     /// EN: Gets Create.
-    /// EN: Documentation for public API. JA: Create を取得します。
+    /// [EN] Documents this public package API member. [JA] Create を取得します。
     /// </summary>
     public static ErrorContext Create(
         string message)
@@ -403,7 +403,7 @@ internal static class DslRomCapabilityRegistryError
         };
     /// <summary>
     /// EN: Gets Attach.
-    /// EN: Documentation for public API. JA: Attach を取得します。
+    /// [EN] Documents this public package API member. [JA] Attach を取得します。
     /// </summary>
 
     public static ErrorContext Attach(

@@ -6,7 +6,7 @@ internal static class DslRomMetadataValidator
 {
     /// <summary>
     /// EN: Executes ValidateCanonicalIdentity.
-    /// EN: Documentation for public API. JA: ValidateCanonicalIdentity を実行します。
+    /// [EN] Documents this public package API member. [JA] ValidateCanonicalIdentity を実行します。
     /// </summary>
     public static ErrorContext? ValidateCanonicalIdentity(DslRomMetadata metadata)
         => ValidateCanonicalIdentityResult(metadata)

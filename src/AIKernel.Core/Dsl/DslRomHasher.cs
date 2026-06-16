@@ -7,7 +7,7 @@ internal static class DslRomHasher
 {
     /// <summary>
     /// EN: Executes ComputeHash.
-    /// EN: Documentation for public API. JA: ComputeHash を実行します。
+    /// [EN] Documents this public package API member. [JA] ComputeHash を実行します。
     /// </summary>
     public static string ComputeHash(string jsonDsl)
     {

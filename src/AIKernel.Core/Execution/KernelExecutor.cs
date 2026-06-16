@@ -6,7 +6,7 @@ using AIKernel.Common.Results;
 using AIKernel.Core.Time;
 using AIKernel.Dtos.Execution;
 
-/// <summary>EN: Documentation for public API. JA: KernelExecutor を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] KernelExecutor を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutor']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.KernelExecutor']/summary" />
 public sealed class KernelExecutor : IKernelExecutor
@@ -16,7 +16,7 @@ public sealed class KernelExecutor : IKernelExecutor
     private readonly KernelExecutionSuccessResultFactory _successResultFactory = new();
     private readonly KernelExecutionFailureResultFactory _failureResultFactory;
 
-    /// <summary>EN: Documentation for public API. JA: KernelExecutor を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] KernelExecutor を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.#ctor']/summary" />
     public KernelExecutor(
@@ -38,7 +38,7 @@ public sealed class KernelExecutor : IKernelExecutor
         _failureResultFactory = new KernelExecutionFailureResultFactory(_clock);
     }
 
-    /// <summary>EN: Documentation for public API. JA: ExecuteAsync を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ExecuteAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.ExecuteAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelExecutor.ExecuteAsync']/summary" />
     public async Task<KernelRequestExecutionResult> ExecuteAsync(

@@ -13,7 +13,7 @@ internal sealed class HistoryRomProvider
 {
     /// <summary>
     /// EN: Gets CreateSnapshot.
-    /// EN: Documentation for public API. JA: CreateSnapshot を取得します。
+    /// [EN] Documents this public package API member. [JA] CreateSnapshot を取得します。
     /// </summary>
     public Result<HistoryRomSnapshot> CreateSnapshot(
         string @namespace,

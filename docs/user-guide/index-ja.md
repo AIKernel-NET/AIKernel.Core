@@ -15,21 +15,24 @@ Monolith は 0.1.x 系の安定化後に SDK layer を統合する標準 referen
 ## Install Packages
 
 ```bash
-dotnet add package AIKernel.Common --version 0.1.1.1
-dotnet add package AIKernel.Core --version 0.1.1.1
-dotnet add package AIKernel.Hosting --version 0.1.1.1
-dotnet add package AIKernel.Kernel --version 0.1.1.1
+dotnet add package AIKernel.Common --version 0.1.2
+dotnet add package AIKernel.Core --version 0.1.2
+dotnet add package AIKernel.Hosting --version 0.1.2
+dotnet add package AIKernel.Kernel --version 0.1.2
 ```
 
-0.1.1.1 validation line では Python binding / PyPI package は公開しません。既存の
-Python 利用者は、次の公式 v0.1.2 正典シリーズで PyPI package family が更新されるまで、
-公開済みの `aikernel-net` package を利用してください。
+local integration では、release task が公開を開始するまで stable `0.1.2` ではなく
+`0.1.2-dev{buildNumber}` の NuGet package を使います。
 
-既存 Python package:
+Python package:
 
 ```bash
 pip install aikernel-net
 ```
+
+local Python validation では、stable `0.1.2` wheel ではなく `0.1.2.dev{buildNumber}`
+wheel を使います。この package は generated managed API catalog と同梱 CTG-ROM sample
+asset helper を公開します。
 
 ## Register Core Services
 

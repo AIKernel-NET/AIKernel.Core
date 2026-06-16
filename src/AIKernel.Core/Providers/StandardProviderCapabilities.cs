@@ -11,7 +11,7 @@ internal sealed class StandardProviderCapabilities : IProviderCapabilities
     private readonly IReadOnlyList<string> _dataTypes;
     /// <summary>
     /// EN: Gets StandardProviderCapabilities.
-    /// EN: Documentation for public API. JA: StandardProviderCapabilities を取得します。
+    /// [EN] Documents this public package API member. [JA] StandardProviderCapabilities を取得します。
     /// </summary>
 
     public StandardProviderCapabilities(
@@ -27,31 +27,31 @@ internal sealed class StandardProviderCapabilities : IProviderCapabilities
     }
     /// <summary>
     /// EN: Gets SupportedOperations.
-    /// EN: Documentation for public API. JA: SupportedOperations を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportedOperations を取得します。
     /// </summary>
 
     public IReadOnlyList<string> SupportedOperations => _operations;
     /// <summary>
     /// EN: Gets SupportedDataTypes.
-    /// EN: Documentation for public API. JA: SupportedDataTypes を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportedDataTypes を取得します。
     /// </summary>
 
     public IReadOnlyList<string> SupportedDataTypes => _dataTypes;
     /// <summary>
     /// EN: Gets MaxConcurrentConnections.
-    /// EN: Documentation for public API. JA: MaxConcurrentConnections を取得します。
+    /// [EN] Documents this public package API member. [JA] MaxConcurrentConnections を取得します。
     /// </summary>
 
     public int MaxConcurrentConnections => 1;
     /// <summary>
     /// EN: Gets RateLimit.
-    /// EN: Documentation for public API. JA: RateLimit を取得します。
+    /// [EN] Documents this public package API member. [JA] RateLimit を取得します。
     /// </summary>
 
     public RateLimitInfo? RateLimit => null;
     /// <summary>
     /// EN: Gets Vector.
-    /// EN: Documentation for public API. JA: Vector を取得します。
+    /// [EN] Documents this public package API member. [JA] Vector を取得します。
     /// </summary>
 
     public ModelCapacityVector Vector => new(
@@ -62,7 +62,7 @@ internal sealed class StandardProviderCapabilities : IProviderCapabilities
         latencyPerformance: 1f);
     /// <summary>
     /// EN: Gets GetDynamicCapacities.
-    /// EN: Documentation for public API. JA: GetDynamicCapacities を取得します。
+    /// [EN] Documents this public package API member. [JA] GetDynamicCapacities を取得します。
     /// </summary>
 
     public IDictionary<string, float>? GetDynamicCapacities(
@@ -72,7 +72,7 @@ internal sealed class StandardProviderCapabilities : IProviderCapabilities
     }
     /// <summary>
     /// EN: Executes GetCapabilityProfile.
-    /// EN: Documentation for public API. JA: GetCapabilityProfile を実行します。
+    /// [EN] Documents this public package API member. [JA] GetCapabilityProfile を実行します。
     /// </summary>
 
     public ICapabilityProfile? GetCapabilityProfile()
@@ -81,7 +81,7 @@ internal sealed class StandardProviderCapabilities : IProviderCapabilities
     }
     /// <summary>
     /// EN: Gets SupportsOperation.
-    /// EN: Documentation for public API. JA: SupportsOperation を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportsOperation を取得します。
     /// </summary>
 
     public bool SupportsOperation(
@@ -91,7 +91,7 @@ internal sealed class StandardProviderCapabilities : IProviderCapabilities
     }
     /// <summary>
     /// EN: Gets SupportsDataType.
-    /// EN: Documentation for public API. JA: SupportsDataType を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportsDataType を取得します。
     /// </summary>
 
     public bool SupportsDataType(
@@ -101,7 +101,7 @@ internal sealed class StandardProviderCapabilities : IProviderCapabilities
     }
     /// <summary>
     /// EN: Gets SupportsQuantization.
-    /// EN: Documentation for public API. JA: SupportsQuantization を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportsQuantization を取得します。
     /// </summary>
 
     public bool SupportsQuantization(
@@ -111,37 +111,37 @@ internal sealed class StandardProviderCapabilities : IProviderCapabilities
     }
     /// <summary>
     /// EN: Gets SupportsQueryAugmentation.
-    /// EN: Documentation for public API. JA: SupportsQueryAugmentation を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportsQueryAugmentation を取得します。
     /// </summary>
 
     public bool SupportsQueryAugmentation => false;
     /// <summary>
     /// EN: Gets SupportsQueryDecomposition.
-    /// EN: Documentation for public API. JA: SupportsQueryDecomposition を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportsQueryDecomposition を取得します。
     /// </summary>
 
     public bool SupportsQueryDecomposition => false;
     /// <summary>
     /// EN: Gets SupportsQueryRouting.
-    /// EN: Documentation for public API. JA: SupportsQueryRouting を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportsQueryRouting を取得します。
     /// </summary>
 
     public bool SupportsQueryRouting => false;
     /// <summary>
     /// EN: Gets MaxQueryParts.
-    /// EN: Documentation for public API. JA: MaxQueryParts を取得します。
+    /// [EN] Documents this public package API member. [JA] MaxQueryParts を取得します。
     /// </summary>
 
     public int MaxQueryParts => 0;
     /// <summary>
     /// EN: Gets SupportedQueryProcessingOperations.
-    /// EN: Documentation for public API. JA: SupportedQueryProcessingOperations を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportedQueryProcessingOperations を取得します。
     /// </summary>
 
     public IReadOnlyList<string> SupportedQueryProcessingOperations => [];
     /// <summary>
     /// EN: Gets SupportsQueryProcessingOperation.
-    /// EN: Documentation for public API. JA: SupportsQueryProcessingOperation を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportsQueryProcessingOperation を取得します。
     /// </summary>
 
     public bool SupportsQueryProcessingOperation(
@@ -151,19 +151,19 @@ internal sealed class StandardProviderCapabilities : IProviderCapabilities
     }
     /// <summary>
     /// EN: Gets SupportsEmbedding.
-    /// EN: Documentation for public API. JA: SupportsEmbedding を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportsEmbedding を取得します。
     /// </summary>
 
     public bool SupportsEmbedding => false;
     /// <summary>
     /// EN: Gets EmbeddingDimensions.
-    /// EN: Documentation for public API. JA: EmbeddingDimensions を取得します。
+    /// [EN] Documents this public package API member. [JA] EmbeddingDimensions を取得します。
     /// </summary>
 
     public int? EmbeddingDimensions => null;
     /// <summary>
     /// EN: Gets SupportedEmbeddingModels.
-    /// EN: Documentation for public API. JA: SupportedEmbeddingModels を取得します。
+    /// [EN] Documents this public package API member. [JA] SupportedEmbeddingModels を取得します。
     /// </summary>
 
     public IReadOnlyList<string> SupportedEmbeddingModels => [];

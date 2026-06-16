@@ -21,7 +21,7 @@ internal sealed class HistoryRomRegistry :
         new(StringComparer.Ordinal);
     /// <summary>
     /// EN: Executes Register.
-    /// EN: Documentation for public API. JA: Register を実行します。
+    /// [EN] Documents this public package API member. [JA] Register を実行します。
     /// </summary>
 
     public Result<HistoryRomMetadata> Register(HistoryRomSnapshot snapshot)
@@ -128,7 +128,7 @@ internal sealed class HistoryRomRegistry :
     }
     /// <summary>
     /// EN: Executes Contains.
-    /// EN: Documentation for public API. JA: Contains を実行します。
+    /// [EN] Documents this public package API member. [JA] Contains を実行します。
     /// </summary>
 
     public bool Contains(string romId)
@@ -138,7 +138,7 @@ internal sealed class HistoryRomRegistry :
                 _ => _snapshots.ContainsKey(romId));
     /// <summary>
     /// EN: Executes Resolve.
-    /// EN: Documentation for public API. JA: Resolve を実行します。
+    /// [EN] Documents this public package API member. [JA] Resolve を実行します。
     /// </summary>
 
     public Result<HistoryRomSnapshot> Resolve(string romId)

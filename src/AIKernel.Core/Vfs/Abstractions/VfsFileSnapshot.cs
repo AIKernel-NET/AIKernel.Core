@@ -11,7 +11,7 @@ internal sealed class VfsFileSnapshot : IVfsFile
     private readonly IReadOnlyDictionary<string, string>? _metadata;
     /// <summary>
     /// EN: Gets VfsFileSnapshot.
-    /// EN: Documentation for public API. JA: VfsFileSnapshot を取得します。
+    /// [EN] Documents this public package API member. [JA] VfsFileSnapshot を取得します。
     /// </summary>
 
     public VfsFileSnapshot(
@@ -34,37 +34,37 @@ internal sealed class VfsFileSnapshot : IVfsFile
     }
     /// <summary>
     /// EN: Gets Name.
-    /// EN: Documentation for public API. JA: Name を取得します。
+    /// [EN] Documents this public package API member. [JA] Name を取得します。
     /// </summary>
 
     public string Name { get; }
     /// <summary>
     /// EN: Gets Path.
-    /// EN: Documentation for public API. JA: Path を取得します。
+    /// [EN] Documents this public package API member. [JA] Path を取得します。
     /// </summary>
 
     public string Path { get; }
     /// <summary>
     /// EN: Gets Size.
-    /// EN: Documentation for public API. JA: Size を取得します。
+    /// [EN] Documents this public package API member. [JA] Size を取得します。
     /// </summary>
 
     public long Size { get; }
     /// <summary>
     /// EN: Gets CreatedAt.
-    /// EN: Documentation for public API. JA: CreatedAt を取得します。
+    /// [EN] Documents this public package API member. [JA] CreatedAt を取得します。
     /// </summary>
 
     public DateTime CreatedAt { get; }
     /// <summary>
     /// EN: Gets ModifiedAt.
-    /// EN: Documentation for public API. JA: ModifiedAt を取得します。
+    /// [EN] Documents this public package API member. [JA] ModifiedAt を取得します。
     /// </summary>
 
     public DateTime ModifiedAt { get; }
     /// <summary>
     /// EN: Executes ReadAsync.
-    /// EN: Documentation for public API. JA: ReadAsync を実行します。
+    /// [EN] Documents this public package API member. [JA] ReadAsync を実行します。
     /// </summary>
 
     public Task<byte[]> ReadAsync()
@@ -75,7 +75,7 @@ internal sealed class VfsFileSnapshot : IVfsFile
     }
     /// <summary>
     /// EN: Executes ReadAsTextAsync.
-    /// EN: Documentation for public API. JA: ReadAsTextAsync を実行します。
+    /// [EN] Documents this public package API member. [JA] ReadAsTextAsync を実行します。
     /// </summary>
 
     public async Task<string> ReadAsTextAsync()
@@ -85,7 +85,7 @@ internal sealed class VfsFileSnapshot : IVfsFile
     }
     /// <summary>
     /// EN: Executes GetMetadata.
-    /// EN: Documentation for public API. JA: GetMetadata を実行します。
+    /// [EN] Documents this public package API member. [JA] GetMetadata を実行します。
     /// </summary>
 
     public IReadOnlyDictionary<string, string>? GetMetadata() => _metadata;

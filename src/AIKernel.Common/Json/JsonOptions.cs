@@ -3,12 +3,12 @@ using System.Text.Json;
 
 namespace AIKernel.Common.Json;
 
-/// <summary>EN: Documentation for public API. JA: JsonOptions を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] JsonOptions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Json.JsonOptions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Json.JsonOptions']/summary" />
 public static class JsonOptions
 {
-    /// <summary>EN: Documentation for public API. JA: Default を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Default を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Json.JsonOptions.new']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Json.JsonOptions.new']/summary" />
     public static readonly JsonSerializerOptions Default = new()
@@ -18,7 +18,7 @@ public static class JsonOptions
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
-    /// <summary>EN: Documentation for public API. JA: Indented を実行します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Indented を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Json.JsonOptions.new']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Json.JsonOptions.new']/summary" />
     public static readonly JsonSerializerOptions Indented = new()

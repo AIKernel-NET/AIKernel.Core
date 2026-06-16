@@ -5,7 +5,7 @@ using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Enums;
 
-/// <summary>EN: Documentation for public API. JA: SemanticStateMaterial を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] SemanticStateMaterial を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.SemanticStateMaterial']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.SemanticStateMaterial']/summary" />
 public sealed record SemanticStateMaterial
@@ -22,17 +22,17 @@ public sealed record SemanticStateMaterial
             ?? throw new ArgumentNullException(nameof(canonicalPayload));
     }
 
-    /// <summary>EN: Documentation for public API. JA: Domain を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] Domain を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.Domain']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.Domain']/summary" />
     public string Domain { get; }
 
-    /// <summary>EN: Documentation for public API. JA: CanonicalPayload を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] CanonicalPayload を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.CanonicalPayload']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Execution.SemanticStateMaterial.CanonicalPayload']/summary" />
     public string CanonicalPayload { get; }
 
-    /// <summary>EN: Documentation for public API. JA: FromKernelExecution を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] FromKernelExecution を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelExecution']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelExecution']/summary" />
     public static SemanticStateMaterial FromKernelExecution(
@@ -53,7 +53,7 @@ public sealed record SemanticStateMaterial
                 executionSequence));
     }
 
-    /// <summary>EN: Documentation for public API. JA: CreateKernelExecutionResult を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] CreateKernelExecutionResult を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelExecutionResult']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelExecutionResult']/summary" />
     public static Result<SemanticStateMaterial> CreateKernelExecutionResult(
@@ -97,7 +97,7 @@ public sealed record SemanticStateMaterial
             payload));
     }
 
-    /// <summary>EN: Documentation for public API. JA: FromKernelFallback を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] FromKernelFallback を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelFallback']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.FromKernelFallback']/summary" />
     public static SemanticStateMaterial FromKernelFallback(
@@ -107,7 +107,7 @@ public sealed record SemanticStateMaterial
         return Unwrap(CreateKernelFallbackResult(request, status));
     }
 
-    /// <summary>EN: Documentation for public API. JA: CreateKernelFallbackResult を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] CreateKernelFallbackResult を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelFallbackResult']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SemanticStateMaterial.CreateKernelFallbackResult']/summary" />
     public static Result<SemanticStateMaterial> CreateKernelFallbackResult(

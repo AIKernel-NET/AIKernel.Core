@@ -18,7 +18,7 @@ internal sealed class KernelFailureResultFactory
     private readonly KernelExecutionIdFactory _executionIdFactory = new();
     /// <summary>
     /// EN: Executes KernelFailureResultFactory.
-    /// EN: Documentation for public API. JA: KernelFailureResultFactory を実行します。
+    /// [EN] Documents this public package API member. [JA] KernelFailureResultFactory を実行します。
     /// </summary>
 
     public KernelFailureResultFactory(IKernelClock clock)
@@ -27,7 +27,7 @@ internal sealed class KernelFailureResultFactory
     }
     /// <summary>
     /// EN: Gets CreateRejectedResult.
-    /// EN: Documentation for public API. JA: CreateRejectedResult を取得します。
+    /// [EN] Documents this public package API member. [JA] CreateRejectedResult を取得します。
     /// </summary>
 
     public KernelRequestExecutionResult CreateRejectedResult(
@@ -61,7 +61,7 @@ internal sealed class KernelFailureResultFactory
     }
     /// <summary>
     /// EN: Gets CreateFailedResult.
-    /// EN: Documentation for public API. JA: CreateFailedResult を取得します。
+    /// [EN] Documents this public package API member. [JA] CreateFailedResult を取得します。
     /// </summary>
 
     public KernelRequestExecutionResult CreateFailedResult(
@@ -95,7 +95,7 @@ internal sealed class KernelFailureResultFactory
     }
     /// <summary>
     /// EN: Gets CreateCanceledResult.
-    /// EN: Documentation for public API. JA: CreateCanceledResult を取得します。
+    /// [EN] Documents this public package API member. [JA] CreateCanceledResult を取得します。
     /// </summary>
 
     public KernelRequestExecutionResult CreateCanceledResult(

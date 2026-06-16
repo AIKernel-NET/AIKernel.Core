@@ -2,12 +2,12 @@ namespace AIKernel.Kernel;
 
 using System.Collections.Immutable;
 
-/// <summary>EN: Documentation for public API. JA: KernelProviderRoutingDecisionFactory を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] KernelProviderRoutingDecisionFactory を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionFactory']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionFactory']/summary" />
 public static class KernelProviderRoutingDecisionFactory
 {
-    /// <summary>EN: Documentation for public API. JA: ForProvider を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ForProvider を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForProvider']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForProvider']/summary" />
     public static KernelProviderRoutingDecision ForProvider(
@@ -25,7 +25,7 @@ public static class KernelProviderRoutingDecisionFactory
             null,
             metadata ?? ImmutableDictionary<string, string>.Empty);
 
-    /// <summary>EN: Documentation for public API. JA: ForCapabilityModule を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ForCapabilityModule を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForCapabilityModule']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionFactory.ForCapabilityModule']/summary" />
     public static KernelProviderRoutingDecision ForCapabilityModule(

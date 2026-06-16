@@ -7,7 +7,7 @@ internal sealed class WebGetFileProviderOptionsValidator : IValidateOptions<WebG
 {
     /// <summary>
     /// EN: Executes Validate.
-    /// EN: Documentation for public API. JA: Validate を実行します。
+    /// [EN] Documents this public package API member. [JA] Validate を実行します。
     /// </summary>
     public ValidateOptionsResult Validate(string? name, WebGetFileProviderOptions options)
     {

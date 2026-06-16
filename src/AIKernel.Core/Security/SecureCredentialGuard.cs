@@ -2,12 +2,12 @@ namespace AIKernel.Core.Security;
 
 using AIKernel.Core.Time;
 
-/// <summary>EN: Documentation for public API. JA: SecureCredentialGuard を表します。</summary>
+/// <summary>[EN] Documents this public package API member. [JA] SecureCredentialGuard を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Security.SecureCredentialGuard']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Security.SecureCredentialGuard']/summary" />
 public static class SecureCredentialGuard
 {
-    /// <summary>EN: Documentation for public API. JA: ValidateSecret を取得します。</summary>
+    /// <summary>[EN] Documents this public package API member. [JA] ValidateSecret を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Security.SecureCredentialGuard.ValidateSecret']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Security.SecureCredentialGuard.ValidateSecret']/summary" />
     public static void ValidateSecret(

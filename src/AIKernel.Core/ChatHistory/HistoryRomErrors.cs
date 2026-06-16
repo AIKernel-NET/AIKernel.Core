@@ -6,7 +6,7 @@ internal static class HistoryRomErrors
 {
     /// <summary>
     /// EN: Executes Error.
-    /// EN: Documentation for public API. JA: Error を実行します。
+    /// [EN] Documents this public package API member. [JA] Error を実行します。
     /// </summary>
     public static ErrorContext Error(string message)
         => new(message, "HISTORY_ROM_ERROR", false)

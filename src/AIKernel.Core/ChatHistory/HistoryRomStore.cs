@@ -10,6 +10,10 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
     private readonly HistoryRomProvider _provider;
     private readonly IHistoryRomRegistry _registry;
     private readonly IRomLoader _loader;
+    /// <summary>
+    /// EN: Gets HistoryRomStore.
+    /// EN: Documentation for public API. JA: HistoryRomStore を取得します。
+    /// </summary>
 
     public HistoryRomStore(
         HistoryRomProvider provider,
@@ -20,6 +24,10 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
         _loader = loader ?? throw new ArgumentNullException(nameof(loader));
     }
+    /// <summary>
+    /// EN: Gets SaveHistoryAsRomAsync.
+    /// EN: Documentation for public API. JA: SaveHistoryAsRomAsync を取得します。
+    /// </summary>
 
     public async Task<Result<HistoryRomMetadata>> SaveHistoryAsRomAsync(
         IVfsSession session,
@@ -83,6 +91,10 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
             error => throw new InvalidOperationException(error.Message),
             HistoryRomContractMapper.ToContract);
     }
+    /// <summary>
+    /// EN: Gets SaveMarkdownAsRomAsync.
+    /// EN: Documentation for public API. JA: SaveMarkdownAsRomAsync を取得します。
+    /// </summary>
 
     public async Task<Result<HistoryRomMetadata>> SaveMarkdownAsRomAsync(
         IVfsSession session,
@@ -194,6 +206,10 @@ internal sealed class HistoryRomStore : AIKernel.Abstractions.History.IHistoryRo
             error => throw new InvalidOperationException(error.Message),
             HistoryRomContractMapper.ToContract);
     }
+    /// <summary>
+    /// EN: Gets LoadHistoryRomAsync.
+    /// EN: Documentation for public API. JA: LoadHistoryRomAsync を取得します。
+    /// </summary>
 
     public async Task<Result<HistoryRomMetadata>> LoadHistoryRomAsync(
         IVfsSession session,

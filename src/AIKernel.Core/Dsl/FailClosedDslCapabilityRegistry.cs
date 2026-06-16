@@ -4,7 +4,15 @@ using AIKernel.Common.Results;
 
 internal sealed class FailClosedDslCapabilityRegistry : IDslCapabilityRegistry
 {
+    /// <summary>
+    /// EN: Executes Contains.
+    /// EN: Documentation for public API. JA: Contains を実行します。
+    /// </summary>
     public bool Contains(string name) => false;
+    /// <summary>
+    /// EN: Gets Invoke.
+    /// EN: Documentation for public API. JA: Invoke を取得します。
+    /// </summary>
 
     public Result<DslPipelineValue> Invoke(
         string name,

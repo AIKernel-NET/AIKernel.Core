@@ -4,6 +4,10 @@ using AIKernel.Common.Results;
 
 internal static class DslResultStepAppender
 {
+    /// <summary>
+    /// EN: Gets AppendLoopTransition.
+    /// EN: Documentation for public API. JA: AppendLoopTransition を取得します。
+    /// </summary>
     public static ResultStep<DslPipelineState, DslPipelineValue> AppendLoopTransition(
         ResultStep<DslPipelineState, DslPipelineValue> current,
         int iteration,
@@ -21,6 +25,10 @@ internal static class DslResultStepAppender
             (state, error) => AppendFailure(current, state, error, delta),
             (state, value) => AppendSuccess(current, state, value, delta));
     }
+    /// <summary>
+    /// EN: Gets AppendSuccess.
+    /// EN: Documentation for public API. JA: AppendSuccess を取得します。
+    /// </summary>
 
     public static ResultStep<DslPipelineState, DslPipelineValue> AppendSuccess(
         ResultStep<DslPipelineState, DslPipelineValue> current,
@@ -33,6 +41,10 @@ internal static class DslResultStepAppender
             .WithReplayLogPrefix(current.ReplayLog)
             .WithSemanticDelta(delta, LastStepId(current));
     }
+    /// <summary>
+    /// EN: Gets AppendFailure.
+    /// EN: Documentation for public API. JA: AppendFailure を取得します。
+    /// </summary>
 
     public static ResultStep<DslPipelineState, DslPipelineValue> AppendFailure(
         ResultStep<DslPipelineState, DslPipelineValue> current,

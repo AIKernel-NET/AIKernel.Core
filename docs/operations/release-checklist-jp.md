@@ -25,13 +25,13 @@ AIKernel.Core は以下の managed runtime packages を公開します。
 `AIKernel.Providers.MicrosoftAI` は integration test で外部 Provider package として利用し、
 その repository が更新されるまでは provider package line のまま扱います。
 
-安定版 Python binding は、Python release が明示的に予定された場合だけ、
+次の Python binding 更新は、公式 v0.1.2 正典シリーズで行う前提です。
 `aikernel-net` package を PyPI に universal `py3-none-any` の CPU-only wheel として
 公開します。import package は `aikernel_net` です。PyPI の `aikernel` は別プロジェクトです。
 
-開発版は GitHub Packages に分離し、`aikernel-net-dev` のような distribution name と
-`0.1.1-dev.1` 形式の version を使います。開発版は破壊的変更を許容し、
-CI/CD 検証向けとします。
+v0.1.2 正典シリーズ向けの Python 開発版は GitHub Packages に分離し、
+`aikernel-net-dev` のような distribution name と `0.1.2.dev1` 形式の version を
+使います。開発版は破壊的変更を許容し、CI/CD 検証向けとします。
 
 AIKernel.Core は CUDA、LibTorch、Native ABI、GPU runtime、Capability 固有 binary を
 公開しません。GPU 対応は外部 Capability repository から提供します。
@@ -43,6 +43,12 @@ repository root で実行します。
 ```powershell
 dotnet test AIKernel.Core.slnx -c Release --no-restore
 dotnet pack AIKernel.Core.slnx -c Release --no-restore
+```
+
+shared workspace root で実行します。
+
+```powershell
+py AIKernel.NET\tools\check_bilingual_xml_docs.py AIKernel.Core\src
 ```
 
 0.1.1.1 ではここで停止し、生成済み NuGet packages のみを公開対象にします。
@@ -107,7 +113,7 @@ CUDA が既定でインストールされるような表現を避けます。
 1. AIKernel.NET contract packages を先に公開する。
 2. AIKernel.Core package family を公開する。
 3. 外部 Provider package は、その repository が更新されるまで独自の release line に維持する。
-4. 0.1.1.1 CTG Core 更新では PyPI を skip する。
+4. 0.1.1.1 CTG Core 更新では PyPI を skip し、次の公式 v0.1.2 正典シリーズに向けて Python packaging を準備する。
 5. 外部 Capability metadata package は managed dependencies が利用可能になってから公開する。
 6. 外部 Capability full runtime package を GitHub Release に添付する。
 

@@ -16,11 +16,19 @@ internal sealed class KernelFailureResultFactory
 {
     private readonly IKernelClock _clock;
     private readonly KernelExecutionIdFactory _executionIdFactory = new();
+    /// <summary>
+    /// EN: Executes KernelFailureResultFactory.
+    /// EN: Documentation for public API. JA: KernelFailureResultFactory を実行します。
+    /// </summary>
 
     public KernelFailureResultFactory(IKernelClock clock)
     {
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
     }
+    /// <summary>
+    /// EN: Gets CreateRejectedResult.
+    /// EN: Documentation for public API. JA: CreateRejectedResult を取得します。
+    /// </summary>
 
     public KernelRequestExecutionResult CreateRejectedResult(
         KernelRequest request,
@@ -51,6 +59,10 @@ internal sealed class KernelFailureResultFactory
                 semanticDeltaLabel: "kernel.facade.reject",
                 providerId: providerId));
     }
+    /// <summary>
+    /// EN: Gets CreateFailedResult.
+    /// EN: Documentation for public API. JA: CreateFailedResult を取得します。
+    /// </summary>
 
     public KernelRequestExecutionResult CreateFailedResult(
         KernelRequest request,
@@ -81,6 +93,10 @@ internal sealed class KernelFailureResultFactory
                 semanticDeltaLabel: "kernel.facade.fail",
                 providerId: providerId));
     }
+    /// <summary>
+    /// EN: Gets CreateCanceledResult.
+    /// EN: Documentation for public API. JA: CreateCanceledResult を取得します。
+    /// </summary>
 
     public KernelRequestExecutionResult CreateCanceledResult(
         KernelRequest request,

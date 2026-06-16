@@ -3,16 +3,19 @@ using System.Threading.Tasks;
 
 namespace AIKernel.Common.Results;
 
+/// <summary>EN: Documentation for public API. JA: TaskResultExtensions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskResultExtensions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskResultExtensions']/summary" />
 public static class TaskResultExtensions
 {
+    /// <summary>EN: Documentation for public API. JA: AsTask&lt;T&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.AsTask&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.AsTask&lt;T&gt;']/summary" />
     public static Task<Result<T>> AsTask<T>(
         this Result<T> result)
         => Task.FromResult(result);
 
+    /// <summary>EN: Documentation for public API. JA: Tap&lt;T&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.Tap&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.Tap&lt;T&gt;']/summary" />
     public static async Task<Result<T>> Tap<T>(
@@ -30,6 +33,7 @@ public static class TaskResultExtensions
         }
     }
 
+    /// <summary>EN: Documentation for public API. JA: Tap&lt;T&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.Tap&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.Tap&lt;T&gt;']/summary" />
     public static async Task<Result<T>> Tap<T>(
@@ -56,6 +60,7 @@ public static class TaskResultExtensions
     // -------------------------
     // Map（Select）
     // -------------------------
+    /// <summary>EN: Documentation for public API. JA: U&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']/summary" />
     public static async Task<Result<U>> Map<T, U>(
@@ -76,6 +81,7 @@ public static class TaskResultExtensions
     // -------------------------
     // Bind（SelectMany）
     // -------------------------
+    /// <summary>EN: Documentation for public API. JA: U&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']/summary" />
     public static async Task<Result<U>> Bind<T, U>(
@@ -95,6 +101,7 @@ public static class TaskResultExtensions
         }
     }
 
+    /// <summary>EN: Documentation for public API. JA: U&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']/summary" />
     public static Task<Result<U>> Select<T, U>(
@@ -102,6 +109,7 @@ public static class TaskResultExtensions
         Func<T, U> selector)
         => task.Map(selector);
 
+    /// <summary>EN: Documentation for public API. JA: U&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']/summary" />
     public static async Task<Result<U>> Bind<T, U>(
@@ -122,6 +130,7 @@ public static class TaskResultExtensions
         }
     }
 
+    /// <summary>EN: Documentation for public API. JA: U&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.U&gt;']/summary" />
     public static async Task<Result<U>> Bind<T, U>(
@@ -139,6 +148,7 @@ public static class TaskResultExtensions
         }
     }
 
+    /// <summary>EN: Documentation for public API. JA: V&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']/summary" />
     public static async Task<Result<V>> SelectMany<T, U, V>(
@@ -149,6 +159,7 @@ public static class TaskResultExtensions
             .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
+    /// <summary>EN: Documentation for public API. JA: V&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']/summary" />
     public static async Task<Result<V>> SelectMany<T, U, V>(
@@ -159,6 +170,7 @@ public static class TaskResultExtensions
             .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
+    /// <summary>EN: Documentation for public API. JA: V&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultExtensions.V&gt;']/summary" />
     public static async Task<Result<V>> SelectMany<T, U, V>(

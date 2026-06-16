@@ -11,6 +11,10 @@ internal sealed class KernelExecutionStepRunner
     private readonly IPromptGenerator _promptGenerator;
     private readonly IModelPromptCapabilityResolver _capabilityResolver;
     private readonly ITokenizer _tokenizer;
+    /// <summary>
+    /// EN: Gets KernelExecutionStepRunner.
+    /// EN: Documentation for public API. JA: KernelExecutionStepRunner を取得します。
+    /// </summary>
 
     public KernelExecutionStepRunner(
         IPromptGenerator promptGenerator,
@@ -21,6 +25,10 @@ internal sealed class KernelExecutionStepRunner
         _capabilityResolver = capabilityResolver ?? throw new ArgumentNullException(nameof(capabilityResolver));
         _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
     }
+    /// <summary>
+    /// EN: Gets ResolveCapability.
+    /// EN: Documentation for public API. JA: ResolveCapability を取得します。
+    /// </summary>
 
     public Result<ModelPromptCapability> ResolveCapability(
         IModelProvider provider,
@@ -30,6 +38,10 @@ internal sealed class KernelExecutionStepRunner
             .Match(
                 error => Result<ModelPromptCapability>.Fail(ToExecutionError(error, OriginStep.Capability)),
                 Result<ModelPromptCapability>.Success);
+    /// <summary>
+    /// EN: Gets GeneratePromptAsync.
+    /// EN: Documentation for public API. JA: GeneratePromptAsync を取得します。
+    /// </summary>
 
     public async Task<Result<GeneratedPrompt>> GeneratePromptAsync(
         KernelExecutionRequest request,
@@ -51,6 +63,10 @@ internal sealed class KernelExecutionStepRunner
                 error => Result<GeneratedPrompt>.Fail(ToExecutionError(error, OriginStep.Prompt)),
                 Result<GeneratedPrompt>.Success);
     }
+    /// <summary>
+    /// EN: Gets GenerateOutputAsync.
+    /// EN: Documentation for public API. JA: GenerateOutputAsync を取得します。
+    /// </summary>
 
     public async Task<Result<string>> GenerateOutputAsync(
         IModelProvider provider,
@@ -70,6 +86,10 @@ internal sealed class KernelExecutionStepRunner
         => messages
             .Select(message => new ProviderModelMessage(message.Role, message.Content))
             .ToArray();
+    /// <summary>
+    /// EN: Executes CountOutputTokens.
+    /// EN: Documentation for public API. JA: CountOutputTokens を実行します。
+    /// </summary>
 
     public Result<int> CountOutputTokens(string output)
         => Try

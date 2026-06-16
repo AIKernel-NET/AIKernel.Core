@@ -16,9 +16,12 @@ line stabilizes.
 
 ## Cross-Repository Alignment
 
-Shared repository boundaries, 0.1.1.1 local NuGet versioning, and the
-NuGet-only / no-PyPI rule for this update line are defined by
+Shared repository boundaries, 0.1.1.1 local NuGet versioning, the
+NuGet-only / no-PyPI rule for this validation line, and the v0.1.2
+NuGet + PyPI release assumption are defined by
 [AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1.md).
+When a change crosses repositories, start with the
+[Cross-Repository Developer Guide v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/cross-repository-developer-guide-v0.1.1.1.md).
 
 Core owns deterministic kernel runtime and CTG evaluator implementation. It
 must not absorb provider endpoint behavior, browser/WASM execution, or
@@ -80,12 +83,14 @@ size limits.
 The supported distribution paths are:
 
 - Windows/Linux C# applications install the `AIKernel.*` NuGet packages.
-- Python bindings are released separately when a Python release is explicitly
-  scheduled.
+- Python bindings stay on the previously published line during 0.1.1.1
+  validation and are expected to refresh with the next official v0.1.2
+  canonical series.
 - GPU/native execution is added only through explicit Capability packages.
 
 For the 0.1.1.1 CTG Core update, publish NuGet packages only. Do not create a
-PyPI package for this update line.
+PyPI package for this validation line. The next official v0.1.2 canonical
+series is expected to publish synchronized NuGet and PyPI package families.
 
 `AIKernel.Vfs` is a Core implementation namespace, not a separate NuGet package.
 VFS contracts come from the AIKernel.NET contract packages and in-process VFS
@@ -124,4 +129,4 @@ dotnet pack AIKernel.Core.slnx -c Release --no-restore
 ```
 
 For 0.1.1.1, stop after NuGet package verification. Python/PyPI packaging is
-out of scope.
+out of scope until the next official v0.1.2 canonical release line.

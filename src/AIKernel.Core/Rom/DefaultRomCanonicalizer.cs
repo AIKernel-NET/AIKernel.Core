@@ -4,10 +4,12 @@ using System.Text.Json;
 using AIKernel.Abstractions.Rom;
 using AIKernel.Dtos.Rom;
 
+/// <summary>EN: Documentation for public API. JA: DefaultRomCanonicalizer を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.DefaultRomCanonicalizer']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.DefaultRomCanonicalizer']/summary" />
 public sealed class DefaultRomCanonicalizer : IRomCanonicalizer
 {
+    /// <summary>EN: Documentation for public API. JA: Canonicalize を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.DefaultRomCanonicalizer.Canonicalize']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.DefaultRomCanonicalizer.Canonicalize']/summary" />
     public CanonicalizedRomDto Canonicalize(IRomDocument document)
@@ -70,6 +72,7 @@ public sealed class DefaultRomCanonicalizer : IRomCanonicalizer
         };
     }
 
+    /// <summary>EN: Documentation for public API. JA: CanonicalizeAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.DefaultRomCanonicalizer.CanonicalizeAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.DefaultRomCanonicalizer.CanonicalizeAsync']/summary" />
     public Task<CanonicalizedRomDto> CanonicalizeAsync(

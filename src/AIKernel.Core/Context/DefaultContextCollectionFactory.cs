@@ -5,10 +5,12 @@ using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Rom;
 using AIKernel.Enums;
 
+/// <summary>EN: Documentation for public API. JA: DefaultContextCollectionFactory を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextCollectionFactory']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextCollectionFactory']/summary" />
 public sealed class DefaultContextCollectionFactory : IContextCollectionFactory
 {
+    /// <summary>EN: Documentation for public API. JA: Create を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextCollectionFactory.Create']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextCollectionFactory.Create']/summary" />
     public IContextCollection Create(

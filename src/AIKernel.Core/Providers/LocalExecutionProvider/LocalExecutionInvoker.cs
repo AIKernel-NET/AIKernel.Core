@@ -511,11 +511,19 @@ public sealed class LocalExecutionInvoker : ICapabilityModuleInvoker
 
 internal static class LocalExecutionEitherExtensions
 {
+    /// <summary>
+    /// EN: Gets ToKeyValue.
+    /// EN: Documentation for public API. JA: ToKeyValue を取得します。
+    /// </summary>
     public static Result<KeyValuePair<string, string>> ToKeyValue(
         this string value,
         string key)
         => Result<KeyValuePair<string, string>>.Success(
             new KeyValuePair<string, string>(key, value));
+    /// <summary>
+    /// EN: Gets MapError&lt;T&gt;.
+    /// EN: Documentation for public API. JA: MapError&lt;T&gt; を取得します。
+    /// </summary>
 
     public static Result<T> MapError<T>(
         this Result<T> result,
@@ -530,6 +538,10 @@ internal static class LocalExecutionEitherExtensions
                 SemanticSlot = SemanticSlot.T
             }),
             Result<T>.Success);
+    /// <summary>
+    /// EN: Gets ToLocalExecutionResult&lt;T&gt;.
+    /// EN: Documentation for public API. JA: ToLocalExecutionResult&lt;T&gt; を取得します。
+    /// </summary>
 
     public static Result<T> ToLocalExecutionResult<T>(
         this Either<string, T> value)
@@ -544,6 +556,10 @@ internal static class LocalExecutionEitherExtensions
                 SemanticSlot = SemanticSlot.T
             }),
             Result<T>.Success);
+    /// <summary>
+    /// EN: Gets OrElseOption&lt;T&gt;.
+    /// EN: Documentation for public API. JA: OrElseOption&lt;T&gt; を取得します。
+    /// </summary>
 
     public static Option<T> OrElseOption<T>(
         this Option<T> option,

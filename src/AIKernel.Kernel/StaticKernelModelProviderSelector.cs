@@ -6,12 +6,14 @@ using AIKernel.Abstractions.Providers;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Kernel;
 
+/// <summary>EN: Documentation for public API. JA: StaticKernelModelProviderSelector を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.StaticKernelModelProviderSelector']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.StaticKernelModelProviderSelector']/summary" />
 public sealed class StaticKernelModelProviderSelector : IKernelModelProviderSelector
 {
     private readonly IReadOnlyDictionary<string, IModelProvider> _providers;
 
+    /// <summary>EN: Documentation for public API. JA: StaticKernelModelProviderSelector を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.#ctor']/summary" />
     public StaticKernelModelProviderSelector(IEnumerable<IModelProvider> providers)
@@ -21,6 +23,7 @@ public sealed class StaticKernelModelProviderSelector : IKernelModelProviderSele
         _providers = BuildProviderMap(providers);
     }
 
+    /// <summary>EN: Documentation for public API. JA: SelectAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.SelectAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.StaticKernelModelProviderSelector.SelectAsync']/summary" />
     public Task<IModelProvider> SelectAsync(

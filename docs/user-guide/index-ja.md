@@ -21,9 +21,9 @@ dotnet add package AIKernel.Hosting --version 0.1.1.1
 dotnet add package AIKernel.Kernel --version 0.1.1.1
 ```
 
-0.1.1.1 更新ラインでは Python binding / PyPI package は公開しません。既存の
-Python 利用者は、後続の Python release が明示されるまで公開済みの
-`aikernel-net` package を利用してください。
+0.1.1.1 validation line では Python binding / PyPI package は公開しません。既存の
+Python 利用者は、次の公式 v0.1.2 正典シリーズで PyPI package family が更新されるまで、
+公開済みの `aikernel-net` package を利用してください。
 
 既存 Python package:
 

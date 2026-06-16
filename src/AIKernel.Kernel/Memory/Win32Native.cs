@@ -5,9 +5,25 @@ using Microsoft.Win32.SafeHandles;
 
 internal static class Win32Native
 {
+    /// <summary>
+    /// EN: Gets the PageReadonly constant.
+    /// EN: Documentation for public API. JA: PageReadonly 定数を取得します。
+    /// </summary>
     public const uint PageReadonly = 0x02;
+    /// <summary>
+    /// EN: Gets the PageReadWrite constant.
+    /// EN: Documentation for public API. JA: PageReadWrite 定数を取得します。
+    /// </summary>
     public const uint PageReadWrite = 0x04;
+    /// <summary>
+    /// EN: Gets the FileMapWrite constant.
+    /// EN: Documentation for public API. JA: FileMapWrite 定数を取得します。
+    /// </summary>
     public const uint FileMapWrite = 0x0002;
+    /// <summary>
+    /// EN: Gets the FileMapRead constant.
+    /// EN: Documentation for public API. JA: FileMapRead 定数を取得します。
+    /// </summary>
     public const uint FileMapRead = 0x0004;
 
     [DllImport(

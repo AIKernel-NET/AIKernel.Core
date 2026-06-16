@@ -11,6 +11,10 @@ internal sealed record HistoryRomSnapshot(
 
 internal sealed class HistoryRomProvider
 {
+    /// <summary>
+    /// EN: Gets CreateSnapshot.
+    /// EN: Documentation for public API. JA: CreateSnapshot を取得します。
+    /// </summary>
     public Result<HistoryRomSnapshot> CreateSnapshot(
         string @namespace,
         string name,

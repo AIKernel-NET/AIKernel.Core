@@ -2,10 +2,12 @@ namespace AIKernel.Core.Vfs.Abstractions;
 
 using AIKernel.Common.Results;
 
+/// <summary>EN: Documentation for public API. JA: VfsPathRules を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.VfsPathRules']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Abstractions.VfsPathRules']/summary" />
 public static class VfsPathRules
 {
+    /// <summary>EN: Documentation for public API. JA: Normalize を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.Normalize']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.Normalize']/summary" />
     public static string Normalize(string path)
@@ -47,6 +49,7 @@ public static class VfsPathRules
         return string.Join('/', result);
     }
 
+    /// <summary>EN: Documentation for public API. JA: GetName を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.GetName']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.GetName']/summary" />
     public static string GetName(string path)
@@ -62,6 +65,7 @@ public static class VfsPathRules
         return NameFromIndex(normalized, index);
     }
 
+    /// <summary>EN: Documentation for public API. JA: IsUnder を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsUnder']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsUnder']/summary" />
     public static bool IsUnder(string parent, string child)
@@ -74,6 +78,7 @@ public static class VfsPathRules
             || child.StartsWith(parent + "/", StringComparison.Ordinal);
     }
 
+    /// <summary>EN: Documentation for public API. JA: IsDirectChild を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsDirectChild']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Abstractions.VfsPathRules.IsDirectChild']/summary" />
     public static bool IsDirectChild(string parent, string child)

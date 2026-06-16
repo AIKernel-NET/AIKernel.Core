@@ -10,11 +10,19 @@ internal sealed record DslRomSnapshot(
 internal sealed class DslRomProvider
 {
     private readonly IDslPipelineCompiler _compiler;
+    /// <summary>
+    /// EN: Executes DslRomProvider.
+    /// EN: Documentation for public API. JA: DslRomProvider を実行します。
+    /// </summary>
 
     public DslRomProvider(IDslPipelineCompiler compiler)
     {
         _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
     }
+    /// <summary>
+    /// EN: Gets CreateSnapshot.
+    /// EN: Documentation for public API. JA: CreateSnapshot を取得します。
+    /// </summary>
 
     public Result<DslRomSnapshot> CreateSnapshot(
         string @namespace,
@@ -118,6 +126,10 @@ internal sealed class DslRomProvider
 
 internal static class DslRomProviderEitherExtensions
 {
+    /// <summary>
+    /// EN: Gets ToRomProviderResult&lt;T&gt;.
+    /// EN: Documentation for public API. JA: ToRomProviderResult&lt;T&gt; を取得します。
+    /// </summary>
     public static Result<T> ToRomProviderResult<T>(
         this Either<string, T> value)
         => value.Match(

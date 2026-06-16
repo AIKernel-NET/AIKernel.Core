@@ -7,6 +7,10 @@ using AIKernel.Core.Memory;
 internal sealed class PosixMemoryRegion : MemoryRegionBase
 {
     private readonly int _fileDescriptor;
+    /// <summary>
+    /// EN: Gets PosixMemoryRegion.
+    /// EN: Documentation for public API. JA: PosixMemoryRegion を取得します。
+    /// </summary>
 
     public PosixMemoryRegion(
         MemoryRegionInfo info,

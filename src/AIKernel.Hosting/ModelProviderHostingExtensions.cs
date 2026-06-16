@@ -4,10 +4,12 @@ using AIKernel.Abstractions.Providers;
 using AIKernel.Dtos.Execution;
 using Microsoft.Extensions.DependencyInjection;
 
+/// <summary>EN: Documentation for public API. JA: ModelProviderHostingExtensions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.ModelProviderHostingExtensions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.ModelProviderHostingExtensions']/summary" />
 public static class ModelProviderHostingExtensions
 {
+    /// <summary>EN: Documentation for public API. JA: WithModelProvider&lt;TProvider&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
@@ -28,6 +30,7 @@ public static class ModelProviderHostingExtensions
         return builder;
     }
 
+    /// <summary>EN: Documentation for public API. JA: WithModelProvider&lt;TProvider&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
@@ -48,6 +51,7 @@ public static class ModelProviderHostingExtensions
         return builder;
     }
 
+    /// <summary>EN: Documentation for public API. JA: WithModelProvider&lt;TProvider&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
@@ -74,6 +78,7 @@ public static class ModelProviderHostingExtensions
         return builder;
     }
 
+    /// <summary>EN: Documentation for public API. JA: WithModelProvider&lt;TProvider&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
@@ -93,6 +98,7 @@ public static class ModelProviderHostingExtensions
         return builder;
     }
 
+    /// <summary>EN: Documentation for public API. JA: WithModelProvider&lt;TProvider&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
@@ -112,6 +118,7 @@ public static class ModelProviderHostingExtensions
         return builder;
     }
 
+    /// <summary>EN: Documentation for public API. JA: WithModelProvider&lt;TProvider&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.WithModelProvider&lt;TProvider&gt;']/summary" />
     public static AIKernelCoreBuilder WithModelProvider<TProvider>(
@@ -189,6 +196,7 @@ public static class ModelProviderHostingExtensions
         private readonly Lock _gate = new();
         private TProvider? _instance;
 
+        /// <summary>EN: Documentation for public API. JA: Get を取得します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.Get']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.ModelProviderHostingExtensions.Get']/summary" />
         public TProvider Get(

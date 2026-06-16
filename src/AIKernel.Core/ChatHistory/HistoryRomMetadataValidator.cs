@@ -4,6 +4,10 @@ using AIKernel.Common.Results;
 
 internal static class HistoryRomMetadataValidator
 {
+    /// <summary>
+    /// EN: Executes ValidateCanonicalIdentity.
+    /// EN: Documentation for public API. JA: ValidateCanonicalIdentity を実行します。
+    /// </summary>
     public static ErrorContext? ValidateCanonicalIdentity(HistoryRomMetadata metadata)
         => ValidateCanonicalIdentityResult(metadata)
             .Match<ErrorContext?>(

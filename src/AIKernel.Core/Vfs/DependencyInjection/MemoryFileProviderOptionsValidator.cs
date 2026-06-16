@@ -5,6 +5,10 @@ using Microsoft.Extensions.Options;
 
 internal sealed class MemoryFileProviderOptionsValidator : IValidateOptions<MemoryFileProviderOptions>
 {
+    /// <summary>
+    /// EN: Executes Validate.
+    /// EN: Documentation for public API. JA: Validate を実行します。
+    /// </summary>
     public ValidateOptionsResult Validate(string? name, MemoryFileProviderOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);

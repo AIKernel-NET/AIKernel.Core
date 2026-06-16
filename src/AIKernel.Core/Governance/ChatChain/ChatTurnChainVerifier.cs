@@ -2,6 +2,7 @@ namespace AIKernel.Core.Governance.ChatChain;
 
 using AIKernel.Abstractions.Governance.ChatChain;
 
+/// <summary>EN: Documentation for public API. JA: ChatTurnChainVerifier を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier']/summary" />
 public sealed class ChatTurnChainVerifier(
@@ -18,6 +19,7 @@ public sealed class ChatTurnChainVerifier(
     private readonly IChatTurnSignatureProvider _signatureProvider =
         signatureProvider ?? throw new ArgumentNullException(nameof(signatureProvider));
 
+    /// <summary>EN: Documentation for public API. JA: VerifyChain を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyChain']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyChain']/summary" />
     public IChatTurnVerificationResult VerifyChain(IEnumerable<IHashChainNode> turns)
@@ -41,6 +43,7 @@ public sealed class ChatTurnChainVerifier(
         return ChatTurnVerificationResult.Success;
     }
 
+    /// <summary>EN: Documentation for public API. JA: VerifyNextTurn を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyNextTurn']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Governance.ChatChain.ChatTurnChainVerifier.VerifyNextTurn']/summary" />
     public IChatTurnVerificationResult VerifyNextTurn(

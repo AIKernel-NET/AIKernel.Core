@@ -6,22 +6,38 @@ using AIKernel.Core.Vfs.Abstractions;
 internal static class DslRomPath
 {
     private const string CapabilityPrefix = "dsl://";
+    /// <summary>
+    /// EN: Executes Create.
+    /// EN: Documentation for public API. JA: Create を実行します。
+    /// </summary>
 
     public static Result<string> Create(string @namespace, string name)
     {
         var identity = ValidateIdentity(@namespace, name);
         return identity.Map(value => $"rom/dsl/{value.Namespace}/{value.Name}.json");
     }
+    /// <summary>
+    /// EN: Executes CreateCapabilityName.
+    /// EN: Documentation for public API. JA: CreateCapabilityName を実行します。
+    /// </summary>
 
     public static Result<string> CreateCapabilityName(string @namespace, string name)
     {
         var identity = ValidateIdentity(@namespace, name);
         return identity.Map(value => $"{CapabilityPrefix}{value.Namespace}/{value.Name}");
     }
+    /// <summary>
+    /// EN: Executes IsDslCapability.
+    /// EN: Documentation for public API. JA: IsDslCapability を実行します。
+    /// </summary>
 
     public static bool IsDslCapability(string capabilityName)
         => capabilityName is not null &&
            capabilityName.StartsWith(CapabilityPrefix, StringComparison.Ordinal);
+    /// <summary>
+    /// EN: Executes Result&lt;.
+    /// EN: Documentation for public API. JA: Result&lt; を実行します。
+    /// </summary>
 
     public static Result<(string Namespace, string Name)> ParseCapabilityName(
         string capabilityName)
@@ -123,6 +139,10 @@ internal static class DslRomPath
 
 internal static class DslRomPathResultExtensions
 {
+    /// <summary>
+    /// EN: Executes Invalid&lt;T&gt;.
+    /// EN: Documentation for public API. JA: Invalid&lt;T&gt; を実行します。
+    /// </summary>
     public static Result<T> Invalid<T>(string message)
         => Result<T>.Fail(new ErrorContext(
             message,
@@ -133,6 +153,10 @@ internal static class DslRomPathResultExtensions
             OriginStep = OriginStep.KernelFacade,
             SemanticSlot = SemanticSlot.G
         });
+    /// <summary>
+    /// EN: Gets MapRomPathError&lt;T&gt;.
+    /// EN: Documentation for public API. JA: MapRomPathError&lt;T&gt; を取得します。
+    /// </summary>
 
     public static Result<T> MapRomPathError<T>(
         this Result<T> value)
@@ -145,6 +169,10 @@ internal static class DslRomPathResultExtensions
                 SemanticSlot = SemanticSlot.G
             }),
             Result<T>.Success);
+    /// <summary>
+    /// EN: Gets ToRomPathResult&lt;T&gt;.
+    /// EN: Documentation for public API. JA: ToRomPathResult&lt;T&gt; を取得します。
+    /// </summary>
 
     public static Result<T> ToRomPathResult<T>(
         this Either<string, T> value)

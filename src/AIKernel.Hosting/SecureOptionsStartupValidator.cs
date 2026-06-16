@@ -27,9 +27,10 @@ using Microsoft.Extensions.Logging;
 /// - typeof(TOptions).FullName のような引数評価も、ログレベルが有効な場合だけ実行する。
 ///
 /// これにより、通常時に不要な文字列生成・テンプレート解析・ボックス化・引数配列生成を避ける。
-/// 高頻度起動や多数 Provider の検証が走る環境でも、ログ無効時のオーバーヘッドを最小化できる。
+/// EN: 高頻度起動や多数 Provider の検証が走る環境でも、ログ無効時のオーバーヘッドを最小化できる。
+/// EN: Documentation for public API. JA: SecureOptionsStartupValidator を表します。
 /// </summary>
-/// <typeparam name="TOptions">
+/// <typeparam name="TOptions">EN:  JA: TOptions 型パラメーターです。
 /// 秘密情報の解決対象となる Options 型。
 /// 必ず ISecureOptions を実装する必要があります。
 /// </typeparam>
@@ -108,7 +109,8 @@ public class SecureOptionsStartupValidator<TOptions>(
     /// StartAsync の責務:
     /// 1. SecureCredentialResolver により秘密情報を解決する。
     /// 2. 解決済み Options に対して ValidateCoreAsync を呼び出す。
-    /// 3. 例外が発生した場合は握りつぶさず、Host 起動を Fail-Closed させる。
+    /// EN: 3. 例外が発生した場合は握りつぶさず、Host 起動を Fail-Closed させる。
+    /// EN: Documentation for public API. JA: StartAsync を実行します。
     /// </summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StartAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StartAsync']/summary" />
@@ -148,7 +150,8 @@ public class SecureOptionsStartupValidator<TOptions>(
     /// Stop 時に解放すべきリソースは基底クラスでは保持していないため、何もしません。
     ///
     /// 派生クラスが外部接続や独自 Client を所有する場合は、
-    /// 必要に応じて override してください。
+    /// EN: 必要に応じて override してください。
+    /// EN: Documentation for public API. JA: StopAsync を実行します。
     /// </summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StopAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureOptionsStartupValidator.StopAsync']/summary" />

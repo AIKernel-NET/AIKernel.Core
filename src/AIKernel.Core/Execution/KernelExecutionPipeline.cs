@@ -7,11 +7,19 @@ using AIKernel.Dtos.Execution;
 internal sealed class KernelExecutionPipeline
 {
     private readonly KernelExecutionStepRunner _stepRunner;
+    /// <summary>
+    /// EN: Executes KernelExecutionPipeline.
+    /// EN: Documentation for public API. JA: KernelExecutionPipeline を実行します。
+    /// </summary>
 
     public KernelExecutionPipeline(KernelExecutionStepRunner stepRunner)
     {
         _stepRunner = stepRunner ?? throw new ArgumentNullException(nameof(stepRunner));
     }
+    /// <summary>
+    /// EN: Gets ExecuteAsync.
+    /// EN: Documentation for public API. JA: ExecuteAsync を取得します。
+    /// </summary>
 
     public async Task<ResultStep<KernelExecutionPipelineState, KernelExecutionPipelineOutput>> ExecuteAsync(
         IModelProvider provider,

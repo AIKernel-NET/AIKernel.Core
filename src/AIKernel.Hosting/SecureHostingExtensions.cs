@@ -7,10 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
+/// <summary>EN: Documentation for public API. JA: SecureHostingExtensions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureHostingExtensions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureHostingExtensions']/summary" />
 public static class SecureHostingExtensions
 {
+    /// <summary>EN: Documentation for public API. JA: WithSecureOptions&lt;TOptions&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureHostingExtensions.WithSecureOptions&lt;TOptions&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureHostingExtensions.WithSecureOptions&lt;TOptions&gt;']/summary" />
     public static AIKernelCoreBuilder WithSecureOptions<TOptions>(
@@ -31,6 +33,7 @@ public static class SecureHostingExtensions
         return builder;
     }
 
+    /// <summary>EN: Documentation for public API. JA: WithSecureOptions&lt;TOptions&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureHostingExtensions.WithSecureOptions&lt;TOptions&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureHostingExtensions.WithSecureOptions&lt;TOptions&gt;']/summary" />
     public static AIKernelCoreBuilder WithSecureOptions<TOptions>(
@@ -51,6 +54,7 @@ public static class SecureHostingExtensions
         return builder;
     }
 
+    /// <summary>EN: Documentation for public API. JA: AddSecureCredentialResolution&lt;TOptions&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureHostingExtensions.AddSecureCredentialResolution&lt;TOptions&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.SecureHostingExtensions.AddSecureCredentialResolution&lt;TOptions&gt;']/summary" />
     public static IServiceCollection AddSecureCredentialResolution<TOptions>(

@@ -373,12 +373,20 @@ public sealed class VfsInvoker : ICapabilityModuleInvoker
 
 internal static class VfsInvokerOptionExtensions
 {
+    /// <summary>
+    /// EN: Gets OrElseOption&lt;T&gt;.
+    /// EN: Documentation for public API. JA: OrElseOption&lt;T&gt; を取得します。
+    /// </summary>
     public static Option<T> OrElseOption<T>(
         this Option<T> option,
         Option<T> fallback)
         => option.Match(
             () => fallback,
             Option<T>.Some);
+    /// <summary>
+    /// EN: Gets ToNullable&lt;T&gt;.
+    /// EN: Documentation for public API. JA: ToNullable&lt;T&gt; を取得します。
+    /// </summary>
 
     public static T? ToNullable<T>(
         this Option<T> option)

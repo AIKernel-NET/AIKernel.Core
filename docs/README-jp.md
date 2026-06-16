@@ -16,10 +16,13 @@ Monolith は 0.1.x 系の安定化後に SDK layer を統合する reference sys
 
 ## リポジトリ横断整合
 
-共有の repository boundary、0.1.1.1 local NuGet versioning、この更新ラインでの
-NuGet-only / no-PyPI rule は
+共有の repository boundary、0.1.1.1 local NuGet versioning、この検証ラインでの
+NuGet-only / no-PyPI rule、v0.1.2 の NuGet + PyPI release assumption は
 [AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1-ja.md)
 で定義します。
+複数 repository をまたぐ変更を行う場合は、まず
+[リポジトリ横断開発者ガイド v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/cross-repository-developer-guide-v0.1.1.1-ja.md)
+を読んでください。
 
 Core は deterministic kernel runtime と CTG evaluator implementation を所有します。
 Provider endpoint behavior、browser/WASM execution、scenario-specific mapping を
@@ -78,11 +81,13 @@ module を明示的に install / register します。
 対応する distribution path:
 
 - Windows/Linux C# application は `AIKernel.*` NuGet packages を install します。
-- Python binding は、Python release が明示的に予定された場合に別途公開します。
+- Python binding は 0.1.1.1 validation 中は既存公開 line のまま維持し、次の公式
+  v0.1.2 正典シリーズで更新する前提です。
 - GPU/native execution は明示的な Capability package でのみ追加します。
 
-0.1.1.1 の CTG Core 更新では NuGet packages のみを公開します。この更新ラインでは
-PyPI package を作成しません。
+0.1.1.1 の CTG Core 更新では NuGet packages のみを公開します。この検証ラインでは
+PyPI package を作成しません。次の公式 v0.1.2 正典シリーズでは、NuGet と PyPI の
+package family を同期して公開する前提です。
 
 `AIKernel.Vfs` は Core implementation namespace であり、独立 NuGet package ではありません。
 VFS contract は AIKernel.NET contract packages にあり、in-process VFS provider は
@@ -117,4 +122,5 @@ dotnet test AIKernel.Core.slnx -c Release --no-restore
 dotnet pack AIKernel.Core.slnx -c Release --no-restore
 ```
 
-0.1.1.1 では NuGet package verification までで停止します。Python / PyPI packaging は対象外です。
+0.1.1.1 では NuGet package verification までで停止します。Python / PyPI packaging は、
+次の公式 v0.1.2 正典 release line まで対象外です。

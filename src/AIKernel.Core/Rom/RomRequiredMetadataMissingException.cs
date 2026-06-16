@@ -1,9 +1,11 @@
 namespace AIKernel.Core.Rom;
 
+/// <summary>EN: Documentation for public API. JA: RomRequiredMetadataMissingException を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomRequiredMetadataMissingException']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomRequiredMetadataMissingException']/summary" />
 public sealed class RomRequiredMetadataMissingException : RomLoadException
 {
+    /// <summary>EN: Documentation for public API. JA: RomRequiredMetadataMissingException を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomRequiredMetadataMissingException.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomRequiredMetadataMissingException.#ctor']/summary" />
     public RomRequiredMetadataMissingException(string metadataKey, string sourcePath)
@@ -13,10 +15,12 @@ public sealed class RomRequiredMetadataMissingException : RomLoadException
         SourcePath = sourcePath;
     }
 
+    /// <summary>EN: Documentation for public API. JA: MetadataKey を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Rom.RomRequiredMetadataMissingException.MetadataKey']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Rom.RomRequiredMetadataMissingException.MetadataKey']/summary" />
     public string MetadataKey { get; }
 
+    /// <summary>EN: Documentation for public API. JA: SourcePath を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Rom.RomRequiredMetadataMissingException.SourcePath']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Rom.RomRequiredMetadataMissingException.SourcePath']/summary" />
     public string SourcePath { get; }

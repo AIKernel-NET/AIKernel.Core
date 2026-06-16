@@ -22,9 +22,10 @@ dotnet add package AIKernel.Hosting --version 0.1.1.1
 dotnet add package AIKernel.Kernel --version 0.1.1.1
 ```
 
-Python bindings are not published for the 0.1.1.1 update line. Existing Python
-consumers should remain on the previously published `aikernel-net` package
-until a later Python release is explicitly announced.
+Python bindings are not published for the 0.1.1.1 validation line. Existing
+Python consumers should remain on the previously published `aikernel-net`
+package until the next official v0.1.2 canonical series refreshes the PyPI
+package family.
 
 Existing Python package:
 

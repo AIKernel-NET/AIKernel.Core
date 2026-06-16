@@ -27,10 +27,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
+/// <summary>EN: Documentation for public API. JA: AIKernelCoreHostingExtensions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.AIKernelCoreHostingExtensions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.AIKernelCoreHostingExtensions']/summary" />
 public static class AIKernelCoreHostingExtensions
 {
+    /// <summary>EN: Documentation for public API. JA: AddAIKernelCore を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']/summary" />
     public static AIKernelCoreBuilder AddAIKernelCore(
@@ -47,6 +49,7 @@ public static class AIKernelCoreHostingExtensions
         return new AIKernelCoreBuilder(services, configuration);
     }
 
+    /// <summary>EN: Documentation for public API. JA: AddAIKernelCore を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Hosting.AIKernelCoreHostingExtensions.AddAIKernelCore']/summary" />
     public static AIKernelCoreBuilder AddAIKernelCore(

@@ -11,6 +11,10 @@ internal sealed class VfsDirectorySnapshot : IVfsDirectory
     private readonly IReadOnlyList<IVfsDirectory> _directories;
     private readonly IReadOnlyList<VfsEntry> _entries;
     private readonly IReadOnlyDictionary<string, string>? _metadata;
+    /// <summary>
+    /// EN: Gets VfsDirectorySnapshot.
+    /// EN: Documentation for public API. JA: VfsDirectorySnapshot を取得します。
+    /// </summary>
 
     public VfsDirectorySnapshot(
         string name,
@@ -29,28 +33,52 @@ internal sealed class VfsDirectorySnapshot : IVfsDirectory
         _entries = entries;
         _metadata = metadata;
     }
+    /// <summary>
+    /// EN: Gets Name.
+    /// EN: Documentation for public API. JA: Name を取得します。
+    /// </summary>
 
     public string Name { get; }
+    /// <summary>
+    /// EN: Gets Path.
+    /// EN: Documentation for public API. JA: Path を取得します。
+    /// </summary>
 
     public string Path { get; }
+    /// <summary>
+    /// EN: Executes GetFilesAsync.
+    /// EN: Documentation for public API. JA: GetFilesAsync を実行します。
+    /// </summary>
 
     public Task<IReadOnlyList<IVfsFile>> GetFilesAsync(bool recursive = false)
     {
         // Side effect: none.
         return Task.FromResult(SelectedFiles(recursive));
     }
+    /// <summary>
+    /// EN: Executes GetDirectoriesAsync.
+    /// EN: Documentation for public API. JA: GetDirectoriesAsync を実行します。
+    /// </summary>
 
     public Task<IReadOnlyList<IVfsDirectory>> GetDirectoriesAsync()
     {
         // Side effect: none.
         return Task.FromResult(_directories);
     }
+    /// <summary>
+    /// EN: Executes GetEntriesAsync.
+    /// EN: Documentation for public API. JA: GetEntriesAsync を実行します。
+    /// </summary>
 
     public Task<IReadOnlyList<VfsEntry>> GetEntriesAsync()
     {
         // Side effect: none.
         return Task.FromResult(_entries);
     }
+    /// <summary>
+    /// EN: Executes GetSubdirectoryAsync.
+    /// EN: Documentation for public API. JA: GetSubdirectoryAsync を実行します。
+    /// </summary>
 
     public Task<IVfsDirectory?> GetSubdirectoryAsync(string name)
     {
@@ -62,6 +90,10 @@ internal sealed class VfsDirectorySnapshot : IVfsDirectory
         var directory = _directories.FirstOrDefault(x => x.Name == name);
         return Task.FromResult(directory);
     }
+    /// <summary>
+    /// EN: Executes GetMetadata.
+    /// EN: Documentation for public API. JA: GetMetadata を実行します。
+    /// </summary>
 
     public IReadOnlyDictionary<string, string>? GetMetadata() => _metadata;
 

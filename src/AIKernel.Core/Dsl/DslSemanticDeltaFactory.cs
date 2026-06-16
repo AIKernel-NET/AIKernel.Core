@@ -6,6 +6,10 @@ using AIKernel.Common.Results;
 
 internal static class DslSemanticDeltaFactory
 {
+    /// <summary>
+    /// EN: Gets CreateLoopDelta.
+    /// EN: Documentation for public API. JA: CreateLoopDelta を取得します。
+    /// </summary>
     public static SemanticDelta CreateLoopDelta(
         int iteration,
         string decision)
@@ -20,6 +24,10 @@ internal static class DslSemanticDeltaFactory
                 .Add(PipelineStepMetadataKeys.LoopDecision, decision),
             Kind: "loop");
     }
+    /// <summary>
+    /// EN: Gets CreateLoopUntilDelta.
+    /// EN: Documentation for public API. JA: CreateLoopUntilDelta を取得します。
+    /// </summary>
 
     public static SemanticDelta CreateLoopUntilDelta(
         int iteration,
@@ -45,6 +53,10 @@ internal static class DslSemanticDeltaFactory
             metadata,
             Kind: "loop");
     }
+    /// <summary>
+    /// EN: Gets CreateNodeDelta.
+    /// EN: Documentation for public API. JA: CreateNodeDelta を取得します。
+    /// </summary>
 
     public static SemanticDelta CreateNodeDelta(
         string label,

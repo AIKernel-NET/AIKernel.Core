@@ -11,6 +11,7 @@ using AIKernel.Dtos.Capabilities;
 using AIKernel.Enums;
 using Microsoft.Extensions.DependencyInjection;
 
+/// <summary>EN: Documentation for public API. JA: InMemoryProviderRegistry を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Providers.InMemoryProviderRegistry']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Providers.InMemoryProviderRegistry']/summary" />
 public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
@@ -23,6 +24,7 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
         new(JsonSerializerDefaults.Web);
     private readonly ICapabilityModuleRegistry? _capabilityModuleRegistry;
 
+    /// <summary>EN: Documentation for public API. JA: InMemoryProviderRegistry を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.#ctor']/summary" />
     public InMemoryProviderRegistry()
@@ -89,6 +91,7 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
         }
     }
 
+    /// <summary>EN: Documentation for public API. JA: RegisterProvider を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.RegisterProvider']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.RegisterProvider']/summary" />
     public void RegisterProvider(string name, IProvider provider)
@@ -201,6 +204,7 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
         return LoadProviderFromAssembly(assemblyPath);
     }
 
+    /// <summary>EN: Documentation for public API. JA: UnregisterProvider を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.UnregisterProvider']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.UnregisterProvider']/summary" />
     public bool UnregisterProvider(string name)
@@ -213,6 +217,7 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
         return _providers.TryRemove(NormalizeName(name), out _);
     }
 
+    /// <summary>EN: Documentation for public API. JA: GetRegisteredProviders を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.GetRegisteredProviders']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.GetRegisteredProviders']/summary" />
     public IReadOnlyList<string> GetRegisteredProviders()
@@ -236,27 +241,27 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
 /// [EN] Describes an external provider manifest that can be converted into a capability module descriptor.
 /// [JA] capability module descriptor へ変換できる外部 provider manifest を表します。
 /// </summary>
-/// <param name="ProviderId">
+/// <param name="ProviderId">EN:  JA: ProviderId パラメーターです。
 /// [EN] Stable provider identifier declared by the manifest.
 /// [JA] manifest で宣言された安定した provider identifier です。
 /// </param>
-/// <param name="Name">
+/// <param name="Name">EN:  JA: Name パラメーターです。
 /// [EN] Human-readable provider name.
 /// [JA] 人間が読める provider name です。
 /// </param>
-/// <param name="Version">
+/// <param name="Version">EN:  JA: Version パラメーターです。
 /// [EN] Provider version declared by the manifest.
 /// [JA] manifest で宣言された provider version です。
 /// </param>
-/// <param name="Capabilities">
+/// <param name="Capabilities">EN:  JA: Capabilities パラメーターです。
 /// [EN] Capability identifiers exposed by the provider.
 /// [JA] provider が公開する capability identifier です。
 /// </param>
-/// <param name="Metadata">
+/// <param name="Metadata">EN:  JA: Metadata パラメーターです。
 /// [EN] Provider metadata used for endpoint, model, and CLI configuration projection.
 /// [JA] endpoint、model、CLI configuration projection に使う provider metadata です。
 /// </param>
-/// <param name="Assembly">
+/// <param name="Assembly">EN:  JA: Assembly パラメーターです。
 /// [EN] Optional relative or absolute assembly path to load after reading the manifest.
 /// [JA] manifest 読み込み後に load する任意の relative/absolute assembly path です。
 /// </param>
@@ -272,7 +277,7 @@ public sealed record ProviderManifest(
     /// [EN] Converts the manifest into the runtime capability module descriptor shape.
     /// [JA] manifest を runtime capability module descriptor の形に変換します。
     /// </summary>
-    /// <returns>
+    /// <returns>EN:  JA: 結果を返します。
     /// [EN] Capability module descriptor derived from the manifest.
     /// [JA] manifest から派生した capability module descriptor です。
     /// </returns>
@@ -376,19 +381,19 @@ public sealed record ProviderManifest(
 /// [EN] Describes CLI-facing settings embedded in a provider manifest.
 /// [JA] provider manifest に埋め込まれた CLI 向け setting を表します。
 /// </summary>
-/// <param name="Command">
+/// <param name="Command">EN:  JA: Command パラメーターです。
 /// [EN] CLI command or provider alias used to install or invoke the provider.
 /// [JA] provider の install または invoke に使う CLI command または provider alias です。
 /// </param>
-/// <param name="DefaultOperation">
+/// <param name="DefaultOperation">EN:  JA: DefaultOperation パラメーターです。
 /// [EN] Default operation used when the CLI does not receive an explicit operation.
 /// [JA] CLI が明示的な operation を受け取らない場合に使う default operation です。
 /// </param>
-/// <param name="ConfigKeys">
+/// <param name="ConfigKeys">EN:  JA: ConfigKeys パラメーターです。
 /// [EN] Configuration keys accepted by the provider command.
 /// [JA] provider command が受け付ける configuration key です。
 /// </param>
-/// <param name="RequiredEnvironment">
+/// <param name="RequiredEnvironment">EN:  JA: RequiredEnvironment パラメーターです。
 /// [EN] Environment variable names required by the provider command.
 /// [JA] provider command が必要とする environment variable name です。
 /// </param>

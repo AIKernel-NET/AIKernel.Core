@@ -5,6 +5,10 @@ using AIKernel.Common.Results;
 
 internal static class DslExecutionErrors
 {
+    /// <summary>
+    /// EN: Executes InvalidRuntime.
+    /// [EN] Documents this public package API member. [JA] InvalidRuntime を実行します。
+    /// </summary>
     public static ErrorContext InvalidRuntime(string message)
         => new(message, "DSL_RUNTIME_ERROR", false)
         {
@@ -12,6 +16,10 @@ internal static class DslExecutionErrors
             OriginStep = OriginStep.KernelFacade,
             SemanticSlot = SemanticSlot.T
         };
+    /// <summary>
+    /// EN: Executes PredicateRejected.
+    /// [EN] Documents this public package API member. [JA] PredicateRejected を実行します。
+    /// </summary>
 
     public static ErrorContext PredicateRejected(string message)
         => new(message, "DSL_PREDICATE_REJECTED", false)
@@ -20,11 +28,19 @@ internal static class DslExecutionErrors
             OriginStep = OriginStep.KernelFacade,
             SemanticSlot = SemanticSlot.T
         };
+    /// <summary>
+    /// EN: Gets CapabilityException.
+    /// [EN] Documents this public package API member. [JA] CapabilityException を取得します。
+    /// </summary>
 
     public static ErrorContext CapabilityException(
         string capabilityName,
         Exception exception)
         => CapabilityException(capabilityName, ErrorContext.FromException(exception));
+    /// <summary>
+    /// EN: Gets CapabilityException.
+    /// [EN] Documents this public package API member. [JA] CapabilityException を取得します。
+    /// </summary>
 
     public static ErrorContext CapabilityException(
         string capabilityName,
@@ -51,6 +67,10 @@ internal static class DslExecutionErrors
             Metadata = metadata.ToImmutable()
         };
     }
+    /// <summary>
+    /// EN: Gets CapabilityReturnedNull.
+    /// [EN] Documents this public package API member. [JA] CapabilityReturnedNull を取得します。
+    /// </summary>
 
     public static ErrorContext CapabilityReturnedNull(
         string capabilityName)
@@ -60,6 +80,10 @@ internal static class DslExecutionErrors
             OriginStep.Capability,
             capabilityName);
     }
+    /// <summary>
+    /// EN: Gets InvalidPipelineValue.
+    /// [EN] Documents this public package API member. [JA] InvalidPipelineValue を取得します。
+    /// </summary>
 
     public static ErrorContext InvalidPipelineValue(
         string message,
@@ -82,11 +106,19 @@ internal static class DslExecutionErrors
             Metadata = metadata.ToImmutable()
         };
     }
+    /// <summary>
+    /// EN: Gets ClockException.
+    /// [EN] Documents this public package API member. [JA] ClockException を取得します。
+    /// </summary>
 
     public static ErrorContext ClockException(
         Exception exception,
         SemanticDelta loopDelta)
         => ClockException(ErrorContext.FromException(exception), loopDelta);
+    /// <summary>
+    /// EN: Gets ClockException.
+    /// [EN] Documents this public package API member. [JA] ClockException を取得します。
+    /// </summary>
 
     public static ErrorContext ClockException(
         ErrorContext source,

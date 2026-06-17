@@ -113,6 +113,7 @@ public sealed class BonsaiEngine : IBonsaiEngine
         _eventBus = eventBus;
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] RegisterRule を実行します。</summary>
     /// <inheritdoc />
     public void RegisterRule(IBonsaiRule rule)
     {
@@ -120,6 +121,7 @@ public sealed class BonsaiEngine : IBonsaiEngine
         _rules.Add(rule);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] EvaluateAsync を実行します。</summary>
     /// <inheritdoc />
     public async Task<BonsaiRuleResult> EvaluateAsync(string input, CancellationToken cancellationToken = default)
         => RequireSuccess(await TryEvaluateAsync(input, cancellationToken).ConfigureAwait(false));

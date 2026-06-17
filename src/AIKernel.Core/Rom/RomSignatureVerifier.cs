@@ -3,6 +3,7 @@ namespace AIKernel.Core.Rom;
 using AIKernel.Abstractions.Rom;
 using AIKernel.Dtos.Rom;
 
+/// <summary>[EN] Documents this public package API member. [JA] RomSignatureVerifier を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomSignatureVerifier']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomSignatureVerifier']/summary" />
 public sealed class RomSignatureVerifier : IRomSignatureVerifier
@@ -10,6 +11,7 @@ public sealed class RomSignatureVerifier : IRomSignatureVerifier
     private readonly IRomCanonicalizer _canonicalizer;
     private readonly ISemanticHasher _semanticHasher;
 
+    /// <summary>[EN] Documents this public package API member. [JA] RomSignatureVerifier を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.#ctor']/summary" />
     public RomSignatureVerifier(
@@ -23,6 +25,7 @@ public sealed class RomSignatureVerifier : IRomSignatureVerifier
             ?? throw new ArgumentNullException(nameof(semanticHasher));
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] VerifyAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.VerifyAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomSignatureVerifier.VerifyAsync']/summary" />
     public async Task<RomSignatureVerificationResult> VerifyAsync(

@@ -10,6 +10,10 @@ internal sealed class DslRomCapabilityRegistry :
 {
     private readonly IDslCapabilityRegistry _inner;
     private readonly IDslRomRegistry _romRegistry;
+    /// <summary>
+    /// EN: Gets DslRomCapabilityRegistry.
+    /// [EN] Documents this public package API member. [JA] DslRomCapabilityRegistry を取得します。
+    /// </summary>
 
     public DslRomCapabilityRegistry(
         IDslCapabilityRegistry inner,
@@ -18,11 +22,19 @@ internal sealed class DslRomCapabilityRegistry :
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
         _romRegistry = romRegistry ?? throw new ArgumentNullException(nameof(romRegistry));
     }
+    /// <summary>
+    /// EN: Executes Contains.
+    /// [EN] Documents this public package API member. [JA] Contains を実行します。
+    /// </summary>
 
     public bool Contains(string name)
         => DslRomPath.IsDslCapability(name)
             ? _romRegistry.Contains(name)
             : _inner.Contains(name);
+    /// <summary>
+    /// EN: Gets Invoke.
+    /// [EN] Documents this public package API member. [JA] Invoke を取得します。
+    /// </summary>
 
     public Result<DslPipelineValue> Invoke(
         string name,
@@ -361,6 +373,10 @@ internal sealed class DslRomCapabilityRegistry :
 
 internal static class DslRomCapabilityRegistryEitherExtensions
 {
+    /// <summary>
+    /// EN: Gets ToRomCapabilityResult&lt;T&gt;.
+    /// [EN] Documents this public package API member. [JA] ToRomCapabilityResult&lt;T&gt; を取得します。
+    /// </summary>
     public static Result<T> ToRomCapabilityResult<T>(
         this Either<string, T> value,
         DslRomMetadata metadata)
@@ -373,6 +389,10 @@ internal static class DslRomCapabilityRegistryEitherExtensions
 
 internal static class DslRomCapabilityRegistryError
 {
+    /// <summary>
+    /// EN: Gets Create.
+    /// [EN] Documents this public package API member. [JA] Create を取得します。
+    /// </summary>
     public static ErrorContext Create(
         string message)
         => new(message, "DSL_ROM_ERROR", false)
@@ -381,6 +401,10 @@ internal static class DslRomCapabilityRegistryError
             OriginStep = OriginStep.Capability,
             SemanticSlot = SemanticSlot.T
         };
+    /// <summary>
+    /// EN: Gets Attach.
+    /// [EN] Documents this public package API member. [JA] Attach を取得します。
+    /// </summary>
 
     public static ErrorContext Attach(
         ErrorContext error,

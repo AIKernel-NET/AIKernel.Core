@@ -16,25 +16,28 @@ The PyPI package named `aikernel` belongs to another project. AIKernel.NET uses
 the distribution name `aikernel-net` to avoid that collision. Import the module
 as `aikernel_net`.
 
-See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the current `0.1.1` stable release notes.
+See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the current release notes.
 
 ## Release Channels
 
 Stable user releases are published to PyPI:
 
 - distribution: `aikernel-net`
-- versions: `0.1.1`, then later stable releases
+- versions: `0.1.2`, then later stable releases
 - policy: stable releases only
 
-Development releases are reserved for CI/CD and developer validation through
-GitHub Packages:
+Development releases are reserved for CI/CD and developer validation:
 
-- distribution: `aikernel-net-dev`
-- versions: `0.1.1-dev.1` style prereleases
-- policy: breaking changes are allowed
+- distribution: `aikernel-net`
+- versions: `0.1.2.dev{buildNumber}` style prereleases
+- policy: local validation and CI/CD only
 
 User documentation defaults to the PyPI stable package. Use development
 packages only for CI/CD or integration testing.
+
+The v0.1.2 package also exposes the generated managed API catalog through
+`managed_api_catalog()`, `managed_api_summary()`, `managed_type_names()`, and
+`find_managed_type(full_name)`.
 
 For source-based local validation, install directly from GitHub:
 
@@ -126,8 +129,24 @@ managed assemblies can be bundled into `aikernel_net/managed`:
 
 ```bash
 python -m build --wheel
-python -m twine check dist/aikernel_net-0.1.1-py3-none-any.whl
+python -m twine check dist/aikernel_net-0.1.2-py3-none-any.whl
 ```
+
+## Bundled CTG-ROM Sample
+
+`aikernel-net` includes the minimal Monolith CTG-ROM as a sample asset so Python
+users can inspect the same Canon, Council, Gate, RejectPolicy, and locale layout
+used by the C# packages without cloning every repository:
+
+```python
+import aikernel_net
+
+root = aikernel_net.ctg_rom_sample_path()
+files = aikernel_net.ctg_rom_sample_files()
+```
+
+The sample is copied from the canonical AIKernel.NET ROM tree and is distributed
+as data only. The Python package does not execute CTG Gate logic.
 
 ## API
 

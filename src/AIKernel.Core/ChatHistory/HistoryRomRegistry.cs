@@ -19,6 +19,10 @@ internal sealed class HistoryRomRegistry :
 {
     private readonly ConcurrentDictionary<string, HistoryRomSnapshot> _snapshots =
         new(StringComparer.Ordinal);
+    /// <summary>
+    /// EN: Executes Register.
+    /// [EN] Documents this public package API member. [JA] Register を実行します。
+    /// </summary>
 
     public Result<HistoryRomMetadata> Register(HistoryRomSnapshot snapshot)
     {
@@ -122,12 +126,20 @@ internal sealed class HistoryRomRegistry :
 
         return Result<HistoryRomMetadata>.Success(existing.Metadata);
     }
+    /// <summary>
+    /// EN: Executes Contains.
+    /// [EN] Documents this public package API member. [JA] Contains を実行します。
+    /// </summary>
 
     public bool Contains(string romId)
         => HistoryRomPath.ParseRomId(romId)
             .Match(
                 _ => false,
                 _ => _snapshots.ContainsKey(romId));
+    /// <summary>
+    /// EN: Executes Resolve.
+    /// [EN] Documents this public package API member. [JA] Resolve を実行します。
+    /// </summary>
 
     public Result<HistoryRomSnapshot> Resolve(string romId)
         => from _ in HistoryRomPath.ParseRomId(romId)

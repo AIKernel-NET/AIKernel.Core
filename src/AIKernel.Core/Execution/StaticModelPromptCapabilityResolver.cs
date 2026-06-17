@@ -5,12 +5,14 @@ using AIKernel.Abstractions.Providers;
 using AIKernel.Common.Results;
 using AIKernel.Dtos.Execution;
 
+/// <summary>[EN] Documents this public package API member. [JA] StaticModelPromptCapabilityResolver を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver']/summary" />
 public sealed class StaticModelPromptCapabilityResolver : IModelPromptCapabilityResolver
 {
     private readonly IReadOnlyDictionary<string, ModelPromptCapability> _capabilities;
 
+    /// <summary>[EN] Documents this public package API member. [JA] StaticModelPromptCapabilityResolver を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.#ctor']/summary" />
     public StaticModelPromptCapabilityResolver(IEnumerable<ModelPromptCapability> capabilities)
@@ -20,6 +22,7 @@ public sealed class StaticModelPromptCapabilityResolver : IModelPromptCapability
         _capabilities = BuildCapabilityMap(capabilities);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Resolve を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.Resolve']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.StaticModelPromptCapabilityResolver.Resolve']/summary" />
     public ModelPromptCapability Resolve(

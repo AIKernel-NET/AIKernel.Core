@@ -8,6 +8,10 @@ internal sealed class DslRomStore : AIKernel.Abstractions.Dsl.IDslRomStore
 {
     private readonly DslRomProvider _provider;
     private readonly IDslRomRegistry _registry;
+    /// <summary>
+    /// EN: Gets DslRomStore.
+    /// [EN] Documents this public package API member. [JA] DslRomStore を取得します。
+    /// </summary>
 
     public DslRomStore(
         DslRomProvider provider,
@@ -16,6 +20,10 @@ internal sealed class DslRomStore : AIKernel.Abstractions.Dsl.IDslRomStore
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
     }
+    /// <summary>
+    /// EN: Gets SaveDslAsRomAsync.
+    /// [EN] Documents this public package API member. [JA] SaveDslAsRomAsync を取得します。
+    /// </summary>
 
     public async Task<Result<DslRomMetadata>> SaveDslAsRomAsync(
         IVfsSession session,
@@ -64,6 +72,10 @@ internal sealed class DslRomStore : AIKernel.Abstractions.Dsl.IDslRomStore
             error => throw new InvalidOperationException(error.Message),
             DslContractMapper.ToContract);
     }
+    /// <summary>
+    /// EN: Gets LoadDslRomAsync.
+    /// [EN] Documents this public package API member. [JA] LoadDslRomAsync を取得します。
+    /// </summary>
 
     public async Task<Result<DslRomMetadata>> LoadDslRomAsync(
         IVfsSession session,
@@ -232,6 +244,10 @@ internal sealed class DslRomStore : AIKernel.Abstractions.Dsl.IDslRomStore
 
 internal static class DslRomStoreResultExtensions
 {
+    /// <summary>
+    /// EN: Gets ToStoreResult&lt;T&gt;.
+    /// [EN] Documents this public package API member. [JA] ToStoreResult&lt;T&gt; を取得します。
+    /// </summary>
     public static Result<T> ToStoreResult<T>(
         this Either<string, T> value)
         => value.Match(
@@ -242,6 +258,10 @@ internal static class DslRomStoreResultExtensions
                 SemanticSlot = SemanticSlot.G
             }),
             Result<T>.Success);
+    /// <summary>
+    /// EN: Gets MapStoreError&lt;T&gt;.
+    /// [EN] Documents this public package API member. [JA] MapStoreError&lt;T&gt; を取得します。
+    /// </summary>
 
     public static Result<T> MapStoreError<T>(
         this Result<T> value)

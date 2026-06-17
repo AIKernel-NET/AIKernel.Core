@@ -16,17 +16,24 @@ after the 0.1.x line stabilizes.
 ## Install Packages
 
 ```bash
-dotnet add package AIKernel.Common --version 0.1.1
-dotnet add package AIKernel.Core --version 0.1.1
-dotnet add package AIKernel.Hosting --version 0.1.1
-dotnet add package AIKernel.Kernel --version 0.1.1
+dotnet add package AIKernel.Common --version 0.1.2
+dotnet add package AIKernel.Core --version 0.1.2
+dotnet add package AIKernel.Hosting --version 0.1.2
+dotnet add package AIKernel.Kernel --version 0.1.2
 ```
 
-Python:
+During local integration, use `0.1.2-dev{buildNumber}` NuGet packages instead
+of stable `0.1.2` packages until the release task opens publication.
+
+Python package:
 
 ```bash
 pip install aikernel-net
 ```
+
+During local Python validation, use `0.1.2.dev{buildNumber}` wheels instead of
+stable `0.1.2` wheels. The package exposes the generated managed API catalog and
+the bundled CTG-ROM sample asset helpers.
 
 ## Register Core Services
 
@@ -47,6 +54,56 @@ Core registration includes the standard provider baseline:
 - VfsProvider
 - SkillProvider
 - SystemInfoProvider
+
+Core registration also includes the CTG governance integration surface.
+Use `AddCtgGovernance()` directly when a host needs only CTG services:
+
+```csharp
+using AIKernel.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddCtgGovernance();
+```
+
+`AddCtgGovernance()` registers CTG evaluators and adapters without replacing an
+already registered `IDecisionGate` or `ITrajectoryGate`.
+
+## Use CTG Governance
+
+Core provides the deterministic CTG kernel surface:
+
+- `CtgCouncilVoteExtractor`
+- `CtgCouncilDecisionToGateInputAdapter`
+- `CtgDecisionGateEvaluator`
+- `CtgTrajectoryGateEvaluator`
+- `CtgRejectReasonClassifier`
+- `CtgGovernanceTraceBuilder`
+- `CtgStepTraceAssembler`
+- `CtgRomLocaleYamlAdapter`
+- `ICtgGovernanceService`
+
+Decision Gate evaluation reads only `GateInput.Logos`, `GateInput.Ethos`, and
+`GateInput.Pathos`. Continuous carriers such as confidence, risk score,
+diagnostics, and metadata scores are trace material, not gate inputs.
+
+```csharp
+using AIKernel.Core.Governance;
+using AIKernel.Dtos.Governance;
+using AIKernel.Enums.Governance;
+using Microsoft.Extensions.DependencyInjection;
+
+var ctg = provider.GetRequiredService<ICtgGovernanceService>();
+
+var decision = await ctg.EvaluateDecisionGateAsync(
+    new GateInput
+    {
+        Logos = CouncilVoteValue.Approve,
+        Ethos = CouncilVoteValue.Approve,
+        Pathos = CouncilVoteValue.Abstain
+    },
+    cancellationToken);
+```
 
 ## Use Standard Capabilities
 

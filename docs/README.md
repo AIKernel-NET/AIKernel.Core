@@ -14,9 +14,26 @@ AIKernel.Monolith is the official AIOS distribution now in development. It is
 planned as the reference system that integrates the SDK layers after the 0.1.x
 line stabilizes.
 
+## Cross-Repository Alignment
+
+Shared repository boundaries, v0.1.2 development versioning, dependency order,
+PyPI Trusted Publishing, and Python wrapper scope are defined by
+[Package Release Alignment v0.1.2](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/package-release-alignment-v0.1.2.md).
+The historical v0.1.1.1 validation rules remain available in
+[AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1.md).
+When a change crosses repositories, start with the
+[Cross-Repository Developer Guide v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/cross-repository-developer-guide-v0.1.1.1.md).
+
+Core owns deterministic kernel runtime and CTG evaluator implementation. It
+must not absorb provider endpoint behavior, browser/WASM execution, or
+scenario-specific mapping.
+
 ## Development Guides
 
 - [User Guide](user-guide/index.md)
+- [CTG Governance Integration Guide](development/ctg-governance-integration.md)
+- [CTG Governance Integration Guide 日本語](development/ctg-governance-integration-jp.md)
+- [Concept Elevation Notes / 概念昇格ノート](development/concept-elevation.md)
 - [CUDA Capability Development Guide](development/cuda-capability-development-guide.md)
 - [CUDA Capability 開発ガイド](development/cuda-capability-development-guide-jp.md)
 - [AIKernel.Core Release Checklist](operations/release-checklist.md)
@@ -51,9 +68,10 @@ AIKernel.Core publishes the CPU/default package family:
 - `AIKernel.Core`
 - `AIKernel.Kernel`
 - `AIKernel.Hosting`
-- `AIKernel.Providers.MicrosoftAI`
 - `AIKernel.TestKit`
-- `aikernel-net` Python binding (`py3-none-any`, CPU-only; import `aikernel_net`)
+
+`AIKernel.Providers.MicrosoftAI` is consumed as an external provider package and
+remains on the provider package line until the provider repository is updated.
 
 CUDA support is optional and lives outside this repository. Default
 AIKernel.Core and AIKernel.Python installs do not require CUDA, LibTorch, or a
@@ -66,9 +84,15 @@ size limits.
 The supported distribution paths are:
 
 - Windows/Linux C# applications install the `AIKernel.*` NuGet packages.
-- Windows/Linux Python applications install the universal CPU-only `aikernel-net`
-  wheel from pip.
+- Python consumers install `aikernel-net`, which exposes thin managed assembly
+  loading helpers, the generated managed API catalog, and bundled CTG-ROM sample
+  assets for examples.
 - GPU/native execution is added only through explicit Capability packages.
+
+For v0.1.2 development, use local NuGet versions such as
+`0.1.2-dev{buildNumber}` and Python versions such as `0.1.2.dev{buildNumber}`.
+Do not create stable `0.1.2` artifacts until the publication task explicitly
+opens the release step.
 
 `AIKernel.Vfs` is a Core implementation namespace, not a separate NuGet package.
 VFS contracts come from the AIKernel.NET contract packages and in-process VFS
@@ -104,11 +128,8 @@ Before publishing the Core package family, run:
 ```powershell
 dotnet test AIKernel.Core.slnx -c Release --no-restore
 dotnet pack AIKernel.Core.slnx -c Release --no-restore
-cd python
-py -m pytest
-py -m pip wheel . -w dist --no-deps
 ```
 
-The Python wheel should include `aikernel_net/managed/*.dll`, `py.typed`, and
-`dist-info/licenses/LICENSE`, should be tagged `py3-none-any`, and should not
-include CUDA, LibTorch, or native runtime assets.
+During v0.1.2 integration, also run the Python package checks from
+`python/README.md`. Stable package artifacts are created later in dependency
+order after AIKernel.NET contract packages are available.

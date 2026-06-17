@@ -3,16 +3,19 @@ namespace AIKernel.Kernel;
 using System.Collections.Immutable;
 using AIKernel.Dtos.Kernel;
 
+/// <summary>[EN] Documents this public package API member. [JA] KernelProviderRoutingDecisionExtensions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions']/summary" />
 public static class KernelProviderRoutingDecisionExtensions
 {
+    /// <summary>[EN] Documents this public package API member. [JA] ToMetadata を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ToMetadata']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ToMetadata']/summary" />
     public static ImmutableDictionary<string, string> ToMetadata(
         this KernelProviderRoutingDecision decision)
         => decision.ApplyTo(ImmutableDictionary<string, string>.Empty);
 
+    /// <summary>[EN] Documents this public package API member. [JA] ApplyToRequest を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyToRequest']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyToRequest']/summary" />
     public static KernelRequest ApplyToRequest(
@@ -29,6 +32,7 @@ public static class KernelProviderRoutingDecisionExtensions
         };
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] ApplyTo を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyTo']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.KernelProviderRoutingDecisionExtensions.ApplyTo']/summary" />
     public static ImmutableDictionary<string, string> ApplyTo(

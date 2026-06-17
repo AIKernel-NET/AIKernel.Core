@@ -7,10 +7,12 @@ using AIKernel.Abstractions.Context;
 using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Rom;
 
+/// <summary>[EN] Documents this public package API member. [JA] DefaultContextHashCalculator を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextHashCalculator']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.DefaultContextHashCalculator']/summary" />
 public sealed class DefaultContextHashCalculator : IContextHashCalculator
 {
+    /// <summary>[EN] Documents this public package API member. [JA] ComputeHash を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextHashCalculator.ComputeHash']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.DefaultContextHashCalculator.ComputeHash']/summary" />
     public string ComputeHash(

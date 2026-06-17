@@ -1,0 +1,55 @@
+id: "ctg.monolith.minimal"
+version: "0.1.2"
+canonVersion: "0.1.2"
+schemaVersion: "0.1.2"
+locale: "ja-JP"
+createdAt: "2026-06-14T00:00:00+09:00"
+
+canon:
+  path: "rom/governance/ctg.monolith.canon.ja.md"
+  canonReference: "Canon.CTG.Monolith.Canon"
+
+councils:
+  - kind: "Logos"
+    id: "council.logos"
+    rulesSummary: "論理的一貫性と追跡可能性を保証する。"
+    rulesPath: "rom/governance/council.logos.monolith.ja.md"
+    canonReference: "Canon.CTG.Monolith.Council.Logos"
+  - kind: "Ethos"
+    id: "council.ethos"
+    rulesSummary: "安全性・無害性・尊厳・透明性・可逆性・正典の整合性を保証し、絶対的な拒否権を行使する。"
+    rulesPath: "rom/governance/council.ethos.monolith.ja.md"
+    canonReference: "Canon.CTG.Monolith.Council.Ethos"
+  - kind: "Pathos"
+    id: "council.pathos"
+    rulesSummary: "人間の文脈・感情状態・尊厳を尊重し、操作を行わない。"
+    rulesPath: "rom/governance/council.pathos.monolith.ja.md"
+    canonReference: "Canon.CTG.Monolith.Council.Pathos"
+
+decisionGate:
+  id: "gate.decision"
+  policyPath: "rom/governance/gate.decision.monolith.ja.md"
+  canonReference: "Canon.CTG.Monolith.Gate.Decision"
+  defaultDecision: "Deny"
+  failClosed: true
+
+trajectoryGate:
+  id: "gate.trajectory"
+  policyPath: "rom/governance/gate.trajectory.monolith.ja.md"
+  canonReference: "Canon.CTG.Monolith.Gate.Trajectory"
+  allowLongRunning: false
+  explicitAllowanceRequired: true
+  explicitAllowanceReferenceKind: "CanonReference"
+  requireAuditTrail: true
+
+rejectPolicy:
+  id: "reject.minimal"
+  rulesPath: "rom/governance/reject.policy.monolith.ja.md"
+  canonReference: "Canon.CTG.Monolith.RejectPolicy"
+  defaultReasonKind: "IMPLICIT_DENY"
+
+telemetry:
+  enableGovernanceTrace: true
+  includeCouncilDiagnostics: true
+  includeGateContinuousValues: false
+  includeRiskScore: false

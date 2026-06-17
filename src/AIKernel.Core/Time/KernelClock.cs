@@ -8,7 +8,8 @@ using AIKernel.Dtos.Time;
 ///
 /// Physical と Logical を明示的に保持し、利用側には Now を統一 API として公開します。
 /// 通常実行では SystemKernelTimeProvider を、Replay 実行では ReplayKernelTimeProvider を
-/// Logical として渡します。
+/// EN: Logical として渡します。
+/// [EN] Documents this public package API member. [JA] KernelClock を表します。
 /// </summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.KernelClock']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.KernelClock']/summary" />
@@ -16,6 +17,7 @@ public sealed class KernelClock :
     IKernelClock,
     AIKernel.Abstractions.Time.IKernelClock
 {
+    /// <summary>[EN] Documents this public package API member. [JA] KernelClock を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelClock.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelClock.#ctor']/summary" />
     public KernelClock(
@@ -26,14 +28,17 @@ public sealed class KernelClock :
         Logical = logical ?? throw new ArgumentNullException(nameof(logical));
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Physical を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.KernelClock.Physical']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.KernelClock.Physical']/summary" />
     public TimeProvider Physical { get; }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Logical を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.KernelClock.Logical']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Time.KernelClock.Logical']/summary" />
     public KernelTimeProvider Logical { get; }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Now を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelClock.Now']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelClock.Now']/summary" />
     public DateTimeOffset Now
@@ -50,14 +55,17 @@ public sealed class KernelClock :
             ? Option<DateTimeOffset>.None()
             : Option<DateTimeOffset>.Some(logicalNow);
 
+    /// <summary>[EN] Documents this public package API member. [JA] IsReplaying を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelClock.IsReplaying']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelClock.IsReplaying']/summary" />
     public bool IsReplaying => Logical.IsReplaying;
 
+    /// <summary>[EN] Documents this public package API member. [JA] ReliabilityScore を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelClock.ReliabilityScore']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Time.KernelClock.ReliabilityScore']/summary" />
     public double ReliabilityScore => Logical.ReliabilityScore;
 
+    /// <summary>[EN] Documents this public package API member. [JA] GetLogicalTimestamp を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelClock.GetLogicalTimestamp']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelClock.GetLogicalTimestamp']/summary" />
     public KernelTimestamp GetLogicalTimestamp()
@@ -70,6 +78,7 @@ public sealed class KernelClock :
         return GetLogicalTimestamp();
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] System を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelClock.System']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelClock.System']/summary" />
     public static KernelClock System()
@@ -80,6 +89,7 @@ public sealed class KernelClock :
         return new KernelClock(physical, logical);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Replay を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelClock.Replay']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Time.KernelClock.Replay']/summary" />
     public static KernelClock Replay(DateTimeOffset fixedUtcNow)

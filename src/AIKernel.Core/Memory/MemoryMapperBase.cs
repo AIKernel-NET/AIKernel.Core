@@ -2,10 +2,12 @@ using AIKernel.Common.Results;
 
 namespace AIKernel.Core.Memory;
 
+/// <summary>[EN] Documents this public package API member. [JA] MemoryMapperBase を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']/summary" />
 public abstract class MemoryMapperBase : IMemoryMapper
 {
+    /// <summary>[EN] Documents this public package API member. [JA] Open を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']/summary" />
     public IMemoryRegion Open(
@@ -16,6 +18,7 @@ public abstract class MemoryMapperBase : IMemoryMapper
                 error => throw new InvalidOperationException(error.Message),
                 region => region);
 
+    /// <summary>[EN] Documents this public package API member. [JA] OpenResult を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.OpenResult']/summary" />
     public Result<IMemoryRegion> OpenResult(
@@ -36,7 +39,7 @@ public abstract class MemoryMapperBase : IMemoryMapper
             select region;
     }
 
-    /// <summary>Executes the OpenCore operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで OpenCore 操作を実行します。</summary>
+    /// <summary>EN: Executes the OpenCore operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで OpenCore 操作を実行します。</summary>
     protected abstract Result<IMemoryRegion> OpenCore(
         string path,
         MemoryAccessMode accessMode);

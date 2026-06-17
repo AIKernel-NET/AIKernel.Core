@@ -15,17 +15,24 @@ Monolith は 0.1.x 系の安定化後に SDK layer を統合する標準 referen
 ## Install Packages
 
 ```bash
-dotnet add package AIKernel.Common --version 0.1.1
-dotnet add package AIKernel.Core --version 0.1.1
-dotnet add package AIKernel.Hosting --version 0.1.1
-dotnet add package AIKernel.Kernel --version 0.1.1
+dotnet add package AIKernel.Common --version 0.1.2
+dotnet add package AIKernel.Core --version 0.1.2
+dotnet add package AIKernel.Hosting --version 0.1.2
+dotnet add package AIKernel.Kernel --version 0.1.2
 ```
 
-Python:
+local integration では、release task が公開を開始するまで stable `0.1.2` ではなく
+`0.1.2-dev{buildNumber}` の NuGet package を使います。
+
+Python package:
 
 ```bash
 pip install aikernel-net
 ```
+
+local Python validation では、stable `0.1.2` wheel ではなく `0.1.2.dev{buildNumber}`
+wheel を使います。この package は generated managed API catalog と同梱 CTG-ROM sample
+asset helper を公開します。
 
 ## Register Core Services
 
@@ -46,6 +53,56 @@ Core registration には standard provider baseline が含まれます。
 - VfsProvider
 - SkillProvider
 - SystemInfoProvider
+
+Core registration には CTG governance integration surface も含まれます。
+CTG service だけが必要な host は `AddCtgGovernance()` を直接使えます。
+
+```csharp
+using AIKernel.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddCtgGovernance();
+```
+
+`AddCtgGovernance()` は CTG evaluator / adapter を登録しますが、すでに登録済みの
+`IDecisionGate` や `ITrajectoryGate` は置き換えません。
+
+## Use CTG Governance
+
+Core は deterministic CTG kernel surface を提供します。
+
+- `CtgCouncilVoteExtractor`
+- `CtgCouncilDecisionToGateInputAdapter`
+- `CtgDecisionGateEvaluator`
+- `CtgTrajectoryGateEvaluator`
+- `CtgRejectReasonClassifier`
+- `CtgGovernanceTraceBuilder`
+- `CtgStepTraceAssembler`
+- `CtgRomLocaleYamlAdapter`
+- `ICtgGovernanceService`
+
+Decision Gate が読むのは `GateInput.Logos`、`GateInput.Ethos`、
+`GateInput.Pathos` だけです。confidence、risk score、diagnostics、metadata score
+のような continuous carrier は trace material であり、gate input ではありません。
+
+```csharp
+using AIKernel.Core.Governance;
+using AIKernel.Dtos.Governance;
+using AIKernel.Enums.Governance;
+using Microsoft.Extensions.DependencyInjection;
+
+var ctg = provider.GetRequiredService<ICtgGovernanceService>();
+
+var decision = await ctg.EvaluateDecisionGateAsync(
+    new GateInput
+    {
+        Logos = CouncilVoteValue.Approve,
+        Ethos = CouncilVoteValue.Approve,
+        Pathos = CouncilVoteValue.Abstain
+    },
+    cancellationToken);
+```
 
 ## Use Standard Capabilities
 

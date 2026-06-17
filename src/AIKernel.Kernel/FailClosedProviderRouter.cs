@@ -7,12 +7,20 @@ using AIKernel.Dtos.Context;
 internal sealed class FailClosedProviderRouter : IProviderRouter
 {
     private static readonly DateTime StableRetrievedAt = DateTime.UnixEpoch;
+    /// <summary>
+    /// EN: Executes Instance.
+    /// [EN] Documents this public package API member. [JA] Instance を実行します。
+    /// </summary>
 
     public static FailClosedProviderRouter Instance { get; } = new();
 
     private FailClosedProviderRouter()
     {
     }
+    /// <summary>
+    /// EN: Gets RetrieveAsync.
+    /// [EN] Documents this public package API member. [JA] RetrieveAsync を取得します。
+    /// </summary>
 
     public Task<MaterialContextDto> RetrieveAsync(
         string source,
@@ -27,6 +35,10 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
             RetrievedAt = StableRetrievedAt
         });
     }
+    /// <summary>
+    /// EN: Gets RetrieveMultipleAsync.
+    /// [EN] Documents this public package API member. [JA] RetrieveMultipleAsync を取得します。
+    /// </summary>
 
     public Task<IReadOnlyList<MaterialContextDto>> RetrieveMultipleAsync(
         IReadOnlyList<string> sources,
@@ -47,12 +59,20 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
 
         return Task.FromResult(materials);
     }
+    /// <summary>
+    /// EN: Gets GetFromCacheAsync.
+    /// [EN] Documents this public package API member. [JA] GetFromCacheAsync を取得します。
+    /// </summary>
 
     public Task<MaterialContextDto?> GetFromCacheAsync(
         string cacheKey)
     {
         return Task.FromResult<MaterialContextDto?>(null);
     }
+    /// <summary>
+    /// EN: Gets CacheMaterialAsync.
+    /// [EN] Documents this public package API member. [JA] CacheMaterialAsync を取得します。
+    /// </summary>
 
     public Task CacheMaterialAsync(
         string cacheKey,
@@ -62,6 +82,10 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
 
         return Task.CompletedTask;
     }
+    /// <summary>
+    /// EN: Gets RegisterProvider.
+    /// [EN] Documents this public package API member. [JA] RegisterProvider を取得します。
+    /// </summary>
 
     public void RegisterProvider(
         string name,
@@ -70,6 +94,10 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(provider);
     }
+    /// <summary>
+    /// EN: Gets UnregisterProvider.
+    /// [EN] Documents this public package API member. [JA] UnregisterProvider を取得します。
+    /// </summary>
 
     public bool UnregisterProvider(
         string name)
@@ -78,6 +106,10 @@ internal sealed class FailClosedProviderRouter : IProviderRouter
 
         return false;
     }
+    /// <summary>
+    /// EN: Executes GetRegisteredProviders.
+    /// [EN] Documents this public package API member. [JA] GetRegisteredProviders を実行します。
+    /// </summary>
 
     public IReadOnlyList<string> GetRegisteredProviders()
     {

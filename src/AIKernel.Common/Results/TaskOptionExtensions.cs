@@ -1,15 +1,18 @@
 namespace AIKernel.Common.Results;
 
+/// <summary>[EN] Documents this public package API member. [JA] TaskOptionExtensions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskOptionExtensions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskOptionExtensions']/summary" />
 public static class TaskOptionExtensions
 {
+    /// <summary>[EN] Documents this public package API member. [JA] AsTask&lt;T&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.AsTask&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.AsTask&lt;T&gt;']/summary" />
     public static Task<Option<T>> AsTask<T>(
         this Option<T> option)
         => Task.FromResult(option);
 
+    /// <summary>[EN] Documents this public package API member. [JA] Tap&lt;T&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.Tap&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.Tap&lt;T&gt;']/summary" />
     public static async Task<Option<T>> Tap<T>(
@@ -20,6 +23,7 @@ public static class TaskOptionExtensions
         return option.Tap(action);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Tap&lt;T&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.Tap&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.Tap&lt;T&gt;']/summary" />
     public static async Task<Option<T>> Tap<T>(
@@ -34,6 +38,7 @@ public static class TaskOptionExtensions
         return option;
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] V&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.V&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.V&gt;']/summary" />
     public static async Task<Option<V>> SelectMany<T, U, V>(
@@ -44,6 +49,7 @@ public static class TaskOptionExtensions
             .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
+    /// <summary>[EN] Documents this public package API member. [JA] U&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;']/summary" />
     public static async Task<Option<U>> Map<T, U>(
@@ -54,6 +60,7 @@ public static class TaskOptionExtensions
         return opt.Map(selector);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] U&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;']/summary" />
     public static Task<Option<U>> Select<T, U>(
@@ -61,6 +68,7 @@ public static class TaskOptionExtensions
         Func<T, U> selector)
         => task.Map(selector);
 
+    /// <summary>[EN] Documents this public package API member. [JA] U&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;']/summary" />
     public static async Task<Option<U>> Bind<T, U>(
@@ -73,6 +81,7 @@ public static class TaskOptionExtensions
         return await binder(option.Value!).ConfigureAwait(false);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] U&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;']/summary" />
     public static async Task<Option<U>> Bind<T, U>(
@@ -86,6 +95,7 @@ public static class TaskOptionExtensions
         return await binder(option.Value!).ConfigureAwait(false);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] U&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.U&gt;']/summary" />
     public static async Task<Option<U>> Bind<T, U>(
@@ -96,6 +106,7 @@ public static class TaskOptionExtensions
         return option.Bind(binder);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] V&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.V&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.V&gt;']/summary" />
     public static async Task<Option<V>> SelectMany<T, U, V>(
@@ -106,6 +117,7 @@ public static class TaskOptionExtensions
             .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
+    /// <summary>[EN] Documents this public package API member. [JA] V&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.V&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.V&gt;']/summary" />
     public static async Task<Option<V>> SelectMany<T, U, V>(
@@ -116,6 +128,7 @@ public static class TaskOptionExtensions
             .Bind(value => binder(value).Map(bound => projector(value, bound)))
             .ConfigureAwait(false);
 
+    /// <summary>[EN] Documents this public package API member. [JA] Where&lt;T&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.Where&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.Where&lt;T&gt;']/summary" />
     public static async Task<Option<T>> Where<T>(
@@ -131,6 +144,7 @@ public static class TaskOptionExtensions
             : Option<T>.None();
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Where&lt;T&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.Where&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskOptionExtensions.Where&lt;T&gt;']/summary" />
     public static async Task<Option<T>> Where<T>(

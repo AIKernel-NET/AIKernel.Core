@@ -7,6 +7,10 @@ using AIKernel.Common.Results;
 
 internal static class DslDocumentParser
 {
+    /// <summary>
+    /// EN: Executes Parse.
+    /// [EN] Documents this public package API member. [JA] Parse を実行します。
+    /// </summary>
     public static Result<DslDocument> Parse(string json)
     {
         if (string.IsNullOrWhiteSpace(json))
@@ -314,6 +318,10 @@ internal static class DslDocumentParser
 
 internal static class DslDocumentParserEitherExtensions
 {
+    /// <summary>
+    /// EN: Gets ToInvalidResult&lt;T&gt;.
+    /// [EN] Documents this public package API member. [JA] ToInvalidResult&lt;T&gt; を取得します。
+    /// </summary>
     public static Result<T> ToInvalidResult<T>(
         this Either<string, T> value)
         => value.Match(

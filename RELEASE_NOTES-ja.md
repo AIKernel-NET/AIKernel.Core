@@ -2,33 +2,13 @@
 
 [English](RELEASE_NOTES.md)
 
-## 0.1.1
+## 0.1.2
 
-**June 10th, 2026 - Cohering the core runtime.**
-**2026年6月10日--コアランタイムを一貫化する。**
+**2026年6月16日 - 正典 Runtime line。**
 
-Cohering the core runtime: execution, context, and semantic state form a
-governed kernel circuit. コアランタイムの一貫化--Execution・Context・Semantic
-State が統治されたカーネル回路を形成する。
+AIKernel.Core 0.1.2 は、決定論的 runtime package を AIKernel.NET 0.1.2 に揃えます。
 
-AIKernel.Core 0.1.1 は、AIKernel Semantic OS package family の同期された実行可能
-runtime baseline です。
-
-- AIKernel.NET 0.1.1 の Abstractions、DTO、Enum、Control、routing、memory、DSL、History ROM、Capability ROM、governance contract と整合します。
-- `AIKernel.Common`、`AIKernel.Core`、`AIKernel.Kernel`、`AIKernel.Hosting`、`AIKernel.Providers.MicrosoftAI`、`AIKernel.TestKit` の runtime family を提供します。
-- Result、Option、Either、ResultStep、LINQ composition、ReplayLog、SemanticDelta、DSL execution、ROM registration、fail-closed Kernel boundary を安定化します。
-- 0.1.1 release line 向けに Core 標準 Provider surface を追加します:
-  `MinimalRuntimeProvider`、`LocalExecutionProvider`、`VfsProvider`、
-  `SkillProvider`、`SystemInfoProvider`。これらの組み込み Provider は、
-  Tools や外部 Provider に依存せず、決定論的 boot、local DSL execution、read-only VFS、
-  OpenAI 互換 `SKILL.md` registration、安全な system introspection capability を公開します。
-- Provider manifest loading、dynamic capability metadata registration、任意の assembly
-  loading、CLI 向け provider setting のために、Core-owned `IDynamicProviderRegistry`
-  extension surface を追加します。
-- Core は既定で CUDA-free です。Native/GPU execution は opt-in external Capability として扱います。
-- Python binding は `aikernel-net` として公開し、`import aikernel_net` を stable Python namespace とします。
-  Python surface は C# execution logic を再実装せず、Core 標準 Provider、provider manifest、
-  ROM storage、VFS Git の contract descriptor を公開します。
-
-この release は Core runtime、contract、standard provider surface、Python binding
-metadata を横断して 0.1.1 の semantic circuit を同期します。
+- `AIKernel.Common`、`AIKernel.Core`、`AIKernel.Hosting`、`AIKernel.Kernel` を同期された Core package family として公開します。
+- CTG runtime documentation と Python wrapper guidance を 0.1.2 public release flow に揃えます。
+- Provider 実装は Core の外に置き、provider-owned capability は AIKernel.Providers に委譲します。
+- deterministic CTG evaluator behavior を維持しつつ、Control と Tools が必要とする runtime surface を公開します。

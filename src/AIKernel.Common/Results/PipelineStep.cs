@@ -3,14 +3,17 @@ namespace AIKernel.Common.Results;
 using System.Collections.Immutable;
 using System.Globalization;
 
+/// <summary>[EN] Documents this public package API member. [JA] PipelineStep を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.PipelineStep']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.PipelineStep']/summary" />
 public static class PipelineStep
 {
+    /// <summary>[EN] Documents this public package API member. [JA] SuspendErrorCode 定数を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.PipelineStep.SuspendErrorCode']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.PipelineStep.SuspendErrorCode']/summary" />
     public const string SuspendErrorCode = "SUSPENDED";
 
+    /// <summary>[EN] Documents this public package API member. [JA] TValue&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']/summary" />
     public static ResultStep<TState, TValue> Loop<TState, TValue>(
@@ -58,6 +61,7 @@ public static class PipelineStep
         return current;
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] TValue&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']/summary" />
     public static ResultStep<TState, TValue> LoopUntil<TState, TValue>(
@@ -138,6 +142,7 @@ public static class PipelineStep
                 decision: "max_iterations_reached"));
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] TValue&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']/summary" />
     public static ResultStep<TState, TValue> Suspend<TState, TValue>(
@@ -171,6 +176,7 @@ public static class PipelineStep
                 Kind: "suspend"));
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] TValue&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.PipelineStep.TValue&gt;']/summary" />
     public static ResultStep<TState, TValue> Resume<TState, TValue>(

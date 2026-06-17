@@ -3,18 +3,22 @@ namespace AIKernel.Core.Execution;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Dtos.Tokenization;
 
+/// <summary>[EN] Documents this public package API member. [JA] SimpleTokenizer を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.SimpleTokenizer']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.SimpleTokenizer']/summary" />
 public sealed class SimpleTokenizer : ITokenizer
 {
+    /// <summary>[EN] Documents this public package API member. [JA] TokenizerProfileId を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Execution.SimpleTokenizer.TokenizerProfileId']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Execution.SimpleTokenizer.TokenizerProfileId']/summary" />
     public string TokenizerProfileId => "aikernel.simple";
 
+    /// <summary>[EN] Documents this public package API member. [JA] Name を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Core.Execution.SimpleTokenizer.Name']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Core.Execution.SimpleTokenizer.Name']/summary" />
     public string Name => "AIKernel Simple Tokenizer";
 
+    /// <summary>[EN] Documents this public package API member. [JA] Tokenize を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.Tokenize']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.Tokenize']/summary" />
     public IReadOnlyList<Token> Tokenize(string text)
@@ -46,6 +50,7 @@ public sealed class SimpleTokenizer : ITokenizer
         return tokens;
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] CountTokens を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.CountTokens']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.CountTokens']/summary" />
     public int CountTokens(string text)
@@ -53,6 +58,7 @@ public sealed class SimpleTokenizer : ITokenizer
         return Tokenize(text).Count;
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Decode を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.Decode']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.Decode']/summary" />
     public string Decode(IReadOnlyList<Token> tokens)
@@ -62,6 +68,7 @@ public sealed class SimpleTokenizer : ITokenizer
         return string.Join(" ", tokens.Select(x => x.Value));
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] GetStatistics を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.GetStatistics']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.GetStatistics']/summary" />
     public TokenizerStatistics GetStatistics()
@@ -76,6 +83,7 @@ public sealed class SimpleTokenizer : ITokenizer
         };
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] SupportsModel を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.SupportsModel']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.SupportsModel']/summary" />
     public bool SupportsModel(string modelName)
@@ -83,6 +91,7 @@ public sealed class SimpleTokenizer : ITokenizer
         return !string.IsNullOrWhiteSpace(modelName);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] GetPhysicalCardinality を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.GetPhysicalCardinality']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.GetPhysicalCardinality']/summary" />
     public int GetPhysicalCardinality(int logicalTokenCount, string deviceType)
@@ -90,6 +99,7 @@ public sealed class SimpleTokenizer : ITokenizer
         return Math.Max(0, logicalTokenCount);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] GetPaddingInfo を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.GetPaddingInfo']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.SimpleTokenizer.GetPaddingInfo']/summary" />
     public PaddingInfo GetPaddingInfo(int logicalTokenCount, int physicalCardinality)

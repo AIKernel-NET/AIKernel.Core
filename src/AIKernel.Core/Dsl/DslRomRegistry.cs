@@ -21,6 +21,10 @@ internal sealed class DslRomRegistry :
         new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, AIKernel.Dtos.Dsl.DslRomSnapshot>
         _contractSnapshots = new(StringComparer.Ordinal);
+    /// <summary>
+    /// EN: Executes Register.
+    /// [EN] Documents this public package API member. [JA] Register を実行します。
+    /// </summary>
 
     public Result<DslRomMetadata> Register(DslRomSnapshot snapshot)
     {
@@ -131,6 +135,10 @@ internal sealed class DslRomRegistry :
             ? Result<bool>.Success(true)
             : Result<bool>.Fail(Error("DSL ROM hash does not match JSON content."));
     }
+    /// <summary>
+    /// EN: Executes Contains.
+    /// [EN] Documents this public package API member. [JA] Contains を実行します。
+    /// </summary>
 
     public bool Contains(string capabilityName)
         => DslRomPath.ParseCapabilityName(capabilityName)
@@ -139,6 +147,10 @@ internal sealed class DslRomRegistry :
                 _ => FindSnapshotOption(capabilityName).Match(
                     () => false,
                     __ => true));
+    /// <summary>
+    /// EN: Executes Resolve.
+    /// [EN] Documents this public package API member. [JA] Resolve を実行します。
+    /// </summary>
 
     public Result<DslRomSnapshot> Resolve(string capabilityName)
     {
@@ -276,6 +288,10 @@ internal sealed class DslRomRegistry :
 
 internal static class DslRomRegistryEitherExtensions
 {
+    /// <summary>
+    /// EN: Gets ToRomResult&lt;T&gt;.
+    /// [EN] Documents this public package API member. [JA] ToRomResult&lt;T&gt; を取得します。
+    /// </summary>
     public static Result<T> ToRomResult<T>(
         this Either<string, T> value)
         => value.Match(

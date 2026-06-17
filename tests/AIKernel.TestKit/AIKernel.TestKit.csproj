@@ -29,9 +29,9 @@ JA: AIKernel.NET 実装向けの Contract Test ツールキットです。Provid
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AIKernel.Abstractions" Version="$(AIKernelPackageVersion)" />
-    <PackageReference Include="AIKernel.Dtos" Version="$(AIKernelPackageVersion)" />
-    <PackageReference Include="AIKernel.Enums" Version="$(AIKernelPackageVersion)" />
+    <PackageReference Include="AIKernel.Abstractions" Version="$(AIKernelContractPackageVersion)" />
+    <PackageReference Include="AIKernel.Dtos" Version="$(AIKernelContractPackageVersion)" />
+    <PackageReference Include="AIKernel.Enums" Version="$(AIKernelContractPackageVersion)" />
     <PackageReference Include="YamlDotNet" Version="18.0.0" />
   </ItemGroup>
 

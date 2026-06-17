@@ -5,6 +5,14 @@ Public package surface for the aikernel-net Python binding.
 aikernel-net Python binding の公開 package surface です。
 """
 
+from .api_catalog import (
+    ManagedMemberDescriptor,
+    ManagedTypeDescriptor,
+    find_managed_type,
+    managed_api_catalog,
+    managed_api_summary,
+    managed_type_names,
+)
 from .managed import (
     ManagedAssemblySet,
     RuntimeLayout,
@@ -56,8 +64,18 @@ from .provider_manifest import (
     load_provider_manifest,
     provider_manifest_from_dict,
 )
+from .samples import (
+    ctg_rom_sample_files,
+    ctg_rom_sample_path,
+)
 
 __all__ = [
+    "ManagedMemberDescriptor",
+    "ManagedTypeDescriptor",
+    "find_managed_type",
+    "managed_api_catalog",
+    "managed_api_summary",
+    "managed_type_names",
     "AsyncEither",
     "AsyncOption",
     "AsyncResult",
@@ -68,6 +86,8 @@ __all__ = [
     "CoreCapabilityModuleContract",
     "ManagedAssemblySet",
     "MINIMAL_RUNTIME_PROVIDER",
+    "ctg_rom_sample_files",
+    "ctg_rom_sample_path",
     "Nothing",
     "Option",
     "ProviderCliManifest",
@@ -101,4 +121,4 @@ __all__ = [
     "vfs_git_contract",
 ]
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"

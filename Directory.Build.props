@@ -4,12 +4,18 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
-    <Version>0.1.1</Version>
-    <PackageVersion>0.1.1</PackageVersion>
-    <AssemblyVersion>0.1.1.0</AssemblyVersion>
-    <FileVersion>0.1.1.0</FileVersion>
-    <InformationalVersion>0.1.1</InformationalVersion>
-    <AIKernelPackageVersion>[0.1.1]</AIKernelPackageVersion>
+    <StablePackageVersion>0.1.2</StablePackageVersion>
+    <LocalPackageVersionPrefix>0.1.2</LocalPackageVersionPrefix>
+    <LocalPackageBuildNumber Condition="'$(LocalPackageBuildNumber)' == ''">0</LocalPackageBuildNumber>
+    <UseLocalPackageVersion Condition="'$(UseLocalPackageVersion)' == ''">false</UseLocalPackageVersion>
+    <PackageVersion Condition="'$(UseLocalPackageVersion)' == 'true'">$(LocalPackageVersionPrefix)-dev$(LocalPackageBuildNumber)</PackageVersion>
+    <PackageVersion Condition="'$(UseLocalPackageVersion)' != 'true'">$(StablePackageVersion)</PackageVersion>
+    <Version>$(PackageVersion)</Version>
+    <AssemblyVersion>$(StablePackageVersion)</AssemblyVersion>
+    <FileVersion>$(StablePackageVersion)</FileVersion>
+    <InformationalVersion>$(PackageVersion)</InformationalVersion>
+    <AIKernelContractPackageVersion Condition="'$(AIKernelContractPackageVersion)' == ''">[$(StablePackageVersion)]</AIKernelContractPackageVersion>
+    <AIKernelProviderPackageVersion Condition="'$(AIKernelProviderPackageVersion)' == ''">[0.1.2]</AIKernelProviderPackageVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <Authors>Takuya Sogawa</Authors>
@@ -20,7 +26,7 @@
     <Copyright>Copyright © 2026 Takuya Sogawa of AIKernel-NET</Copyright>
     <PackageTags>aikernel;aikernel-core;ai-os;kernel;provider;hosting;rom;vfs;context;execution;immutability;fail-closed;capability-modules;dynamicslm;seedslm;hatl;admissibility;semantic-compilation</PackageTags>
     <PackageReleaseNotes>
-      AIKernel.Core package family v0.1.1 - Release build aligned with official AIKernel.NET contract packages v0.1.1. Adds Core-owned ROM storage and VFS Git capability contracts, built-in SkillProvider, LocalExecutionProvider, MinimalRuntimeProvider, VfsProvider, SystemInfoProvider, dynamic provider registry surfaces, matching Python descriptors, broader monadic DSL/ROM/VFS parsing, validation, invocation, metadata boundaries, ResultStep Match projection, safer DSL/ROM/Kernel execution branching, and additional Result/Either/Option adapter projection cleanup.
+      AIKernel.Core package family v0.1.2 - Release build aligned with official AIKernel.NET contract packages v0.1.2, synchronized Python wrapper package aikernel-net v0.1.2, and local development package outputs using 0.1.2-dev{build-number}.
     </PackageReleaseNotes>
   </PropertyGroup>
 

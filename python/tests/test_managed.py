@@ -64,7 +64,7 @@ def test_managed_assemblies_resolve_from_nuget_cache(
         "AIKernel.Dtos.dll": "AIKernel.Dtos",
         "AIKernel.Enums.dll": "AIKernel.Enums",
     }.items():
-        version = "0.1.1"
+        version = "0.1.2"
         assembly_path = nuget_root / package_name.lower() / version / "lib" / "net10.0" / assembly_name
         assembly_path.parent.mkdir(parents=True, exist_ok=True)
         assembly_path.write_text("", encoding="utf-8")
@@ -90,6 +90,17 @@ def test_managed_api_is_exported() -> None:
     assert "require_managed_assemblies" in aikernel_net.__all__
     assert "runtime_layout" in aikernel_net.__all__
     assert aikernel_net.managed_assemblies().root.name == "managed"
+
+
+def test_managed_api_catalog_covers_contract_and_core_types() -> None:
+    names = set(aikernel_net.managed_type_names())
+    summary = aikernel_net.managed_api_summary()
+
+    assert "AIKernel.Abstractions.Governance.ICtgDecisionGate" in names
+    assert "AIKernel.Dtos.Governance.GateInput" in names
+    assert "AIKernel.Core.Governance.CtgDecisionGateEvaluator" in names
+    assert summary["AIKernel.Abstractions"] > 0
+    assert summary["AIKernel.Core"] > 0
 
 
 def test_package_declares_inline_types() -> None:

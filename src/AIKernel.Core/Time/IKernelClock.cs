@@ -25,27 +25,28 @@ namespace AIKernel.Core.Time;
 /// 設計思想:
 ///   装置は壊れても、法は揺らがない。
 ///   TimeProvider がどのような物理時刻を返すかは環境依存ですが、
-///   AIKernel の replay / audit / snapshot における時間の扱いは IKernelClock に集約します。
+/// EN:   AIKernel の replay / audit / snapshot における時間の扱いは IKernelClock に集約します。
+/// [EN] Documents this public package API member. [JA] IKernelClock contract を定義します。
 /// </summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.IKernelClock']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.IKernelClock']/summary" />
 public interface IKernelClock
 {
-    /// <summary>Gets the Physical value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Physical 値を取得します。</summary>
+    /// <summary>EN: Gets the Physical value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Physical 値を取得します。</summary>
     TimeProvider Physical { get; }
 
-    /// <summary>Gets the Logical value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Logical 値を取得します。</summary>
+    /// <summary>EN: Gets the Logical value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Logical 値を取得します。</summary>
     KernelTimeProvider Logical { get; }
 
-    /// <summary>Gets the Now value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Now 値を取得します。</summary>
+    /// <summary>EN: Gets the Now value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Now 値を取得します。</summary>
     DateTimeOffset Now { get; }
 
-    /// <summary>Gets the IsReplaying value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される IsReplaying 値を取得します。</summary>
+    /// <summary>EN: Gets the IsReplaying value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される IsReplaying 値を取得します。</summary>
     bool IsReplaying { get; }
 
-    /// <summary>Gets the ReliabilityScore value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される ReliabilityScore 値を取得します。</summary>
+    /// <summary>EN: Gets the ReliabilityScore value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される ReliabilityScore 値を取得します。</summary>
     double ReliabilityScore { get; }
 
-    /// <summary>Executes the GetLogicalTimestamp operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで GetLogicalTimestamp 操作を実行します。</summary>
+    /// <summary>EN: Executes the GetLogicalTimestamp operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで GetLogicalTimestamp 操作を実行します。</summary>
     KernelTimestamp GetLogicalTimestamp();
 }

@@ -4,10 +4,12 @@ using AIKernel.Abstractions.Execution;
 using AIKernel.Common.Results;
 using AIKernel.Dtos.Execution;
 
+/// <summary>[EN] Documents this public package API member. [JA] DefaultPolisherValidator を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultPolisherValidator']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultPolisherValidator']/summary" />
 public sealed class DefaultPolisherValidator : IPolisherValidator
 {
+    /// <summary>[EN] Documents this public package API member. [JA] ValidateLogicPreservationAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPolisherValidator.ValidateLogicPreservationAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPolisherValidator.ValidateLogicPreservationAsync']/summary" />
     public Task<PolisherValidationResult> ValidateLogicPreservationAsync(
@@ -31,6 +33,7 @@ public sealed class DefaultPolisherValidator : IPolisherValidator
         });
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] AnalyzeDivergenceAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPolisherValidator.AnalyzeDivergenceAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultPolisherValidator.AnalyzeDivergenceAsync']/summary" />
     public Task<LogicDivergenceAnalysis> AnalyzeDivergenceAsync(

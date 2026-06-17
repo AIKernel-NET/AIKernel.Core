@@ -14,9 +14,28 @@ AIOS distribution を構築するための安定した基盤です。
 Monolith は 0.1.x 系の安定化後に SDK layer を統合する reference system として
 位置づけられます。
 
+## リポジトリ横断整合
+
+共有の repository boundary、v0.1.2 development versioning、依存関係順、
+PyPI Trusted Publishing、Python wrapper scope は
+[Package Release Alignment v0.1.2](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/package-release-alignment-v0.1.2-ja.md)
+で定義します。履歴としての v0.1.1.1 validation rule は
+[AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1-ja.md)
+に残します。
+複数 repository をまたぐ変更を行う場合は、まず
+[リポジトリ横断開発者ガイド v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/cross-repository-developer-guide-v0.1.1.1-ja.md)
+を読んでください。
+
+Core は deterministic kernel runtime と CTG evaluator implementation を所有します。
+Provider endpoint behavior、browser/WASM execution、scenario-specific mapping を
+Core に取り込みません。
+
 ## Development Guides
 
 - [User Guide](user-guide/index-ja.md)
+- [CTG Governance Integration Guide](development/ctg-governance-integration.md)
+- [CTG Governance Integration Guide 日本語](development/ctg-governance-integration-jp.md)
+- [Concept Elevation Notes / 概念昇格ノート](development/concept-elevation.md)
 - [CUDA Capability Development Guide](development/cuda-capability-development-guide.md)
 - [CUDA Capability 開発ガイド](development/cuda-capability-development-guide-jp.md)
 - [AIKernel.Core Release Checklist](operations/release-checklist.md)
@@ -51,9 +70,10 @@ AIKernel.Core は CPU/default package family を公開します。
 - `AIKernel.Core`
 - `AIKernel.Kernel`
 - `AIKernel.Hosting`
-- `AIKernel.Providers.MicrosoftAI`
 - `AIKernel.TestKit`
-- `aikernel-net` Python binding（`py3-none-any`, CPU-only, import `aikernel_net`）
+
+`AIKernel.Providers.MicrosoftAI` は外部 Provider package として利用し、Provider
+repository が更新されるまでは provider package line のまま扱います。
 
 CUDA support は optional で、この repository の外側にあります。既定の
 AIKernel.Core と AIKernel.Python install は CUDA、LibTorch、native bridge を要求しません。
@@ -63,8 +83,14 @@ module を明示的に install / register します。
 対応する distribution path:
 
 - Windows/Linux C# application は `AIKernel.*` NuGet packages を install します。
-- Windows/Linux Python application は universal CPU-only `aikernel-net` wheel を pip から install します。
+- Python consumer は `aikernel-net` を install します。この package は薄い managed
+  assembly loading helper、generated managed API catalog、example 向けの CTG-ROM
+  sample asset を提供します。
 - GPU/native execution は明示的な Capability package でのみ追加します。
+
+v0.1.2 development では、NuGet は `0.1.2-dev{buildNumber}`、Python は
+`0.1.2.dev{buildNumber}` のような local development version を使います。公開手順が
+stable release step を明示するまで、stable `0.1.2` artifact は作成しません。
 
 `AIKernel.Vfs` は Core implementation namespace であり、独立 NuGet package ではありません。
 VFS contract は AIKernel.NET contract packages にあり、in-process VFS provider は
@@ -97,11 +123,8 @@ Core package family 公開前に実行します。
 ```powershell
 dotnet test AIKernel.Core.slnx -c Release --no-restore
 dotnet pack AIKernel.Core.slnx -c Release --no-restore
-cd python
-py -m pytest
-py -m pip wheel . -w dist --no-deps
 ```
 
-Python wheel は `aikernel_net/managed/*.dll`、`py.typed`、
-`dist-info/licenses/LICENSE` を含み、`py3-none-any` tag である必要があります。
-CUDA、LibTorch、native runtime asset は含めません。
+v0.1.2 integration では、`python/README-ja.md` の Python package checks も実行します。
+stable package artifact は、AIKernel.NET contract packages が利用可能になった後、
+依存関係順に作成します。

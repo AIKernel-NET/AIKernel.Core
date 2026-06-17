@@ -11,6 +11,7 @@ using AIKernel.Dtos.Capabilities;
 using AIKernel.Enums;
 using Microsoft.Extensions.DependencyInjection;
 
+/// <summary>[EN] Documents this public package API member. [JA] InMemoryProviderRegistry を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Providers.InMemoryProviderRegistry']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Providers.InMemoryProviderRegistry']/summary" />
 public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
@@ -23,6 +24,7 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
         new(JsonSerializerDefaults.Web);
     private readonly ICapabilityModuleRegistry? _capabilityModuleRegistry;
 
+    /// <summary>[EN] Documents this public package API member. [JA] InMemoryProviderRegistry を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.#ctor']/summary" />
     public InMemoryProviderRegistry()
@@ -89,6 +91,7 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
         }
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] RegisterProvider を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.RegisterProvider']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.RegisterProvider']/summary" />
     public void RegisterProvider(string name, IProvider provider)
@@ -201,6 +204,7 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
         return LoadProviderFromAssembly(assemblyPath);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] UnregisterProvider を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.UnregisterProvider']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.UnregisterProvider']/summary" />
     public bool UnregisterProvider(string name)
@@ -213,6 +217,7 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
         return _providers.TryRemove(NormalizeName(name), out _);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] GetRegisteredProviders を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.GetRegisteredProviders']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.GetRegisteredProviders']/summary" />
     public IReadOnlyList<string> GetRegisteredProviders()

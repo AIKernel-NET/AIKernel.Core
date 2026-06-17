@@ -4,11 +4,12 @@ using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
 using Microsoft.Win32.SafeHandles;
 
+/// <summary>[EN] Documents this public package API member. [JA] Win32MemoryMapper を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.Win32MemoryMapper']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.Win32MemoryMapper']/summary" />
 public sealed class Win32MemoryMapper : MemoryMapperBase
 {
-    /// <summary>Executes the OpenCore operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで OpenCore 操作を実行します。</summary>
+    /// <summary>EN: Executes the OpenCore operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで OpenCore 操作を実行します。</summary>
     protected override Result<IMemoryRegion> OpenCore(
         string path,
         MemoryAccessMode accessMode)

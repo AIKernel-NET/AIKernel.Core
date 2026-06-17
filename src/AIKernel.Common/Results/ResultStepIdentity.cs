@@ -6,6 +6,10 @@ using System.Text;
 
 internal static class ResultStepIdentity
 {
+    /// <summary>
+    /// EN: Gets Create.
+    /// [EN] Documents this public package API member. [JA] Create を取得します。
+    /// </summary>
     public static string Create(
         string? parentStepId,
         SemanticDelta delta,
@@ -21,6 +25,10 @@ internal static class ResultStepIdentity
 
         return "step:sha256:" + Convert.ToHexStringLower(bytes);
     }
+    /// <summary>
+    /// EN: Gets CreateReplayLogHash.
+    /// [EN] Documents this public package API member. [JA] CreateReplayLogHash を取得します。
+    /// </summary>
 
     public static string CreateReplayLogHash(
         IReadOnlyList<ResultStepReplayLogEntry> replayLog)

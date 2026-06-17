@@ -2,6 +2,17 @@
 
 [日本語](RELEASE_NOTES-ja.md)
 
+## 0.1.2 — Canonical package surface alignment
+
+- Aligns the Python distribution with the v0.1.2 canonical package family.
+- Adds the generated managed API catalog for AIKernel.NET contracts and
+  AIKernel.Core public managed types.
+- Bundles the v0.1.2 Monolith CTG-ROM sample assets for examples and validation.
+- Keeps Python as a thin wrapper over managed assemblies and does not
+  reimplement CTG Gate, trajectory, or provider semantics.
+- Uses `0.1.2.dev{buildNumber}` versions for local development wheels until
+  stable publication is explicitly opened.
+
 ## 0.1.1 — Core release alignment
 
 - Promotes the Python binding metadata to the AIKernel.Core 0.1.1 release line.

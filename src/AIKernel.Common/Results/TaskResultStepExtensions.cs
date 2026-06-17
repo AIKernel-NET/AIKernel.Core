@@ -1,9 +1,11 @@
 namespace AIKernel.Common.Results;
 
+/// <summary>[EN] Documents this public package API member. [JA] TaskResultStepExtensions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskResultStepExtensions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.TaskResultStepExtensions']/summary" />
 public static class TaskResultStepExtensions
 {
+    /// <summary>[EN] Documents this public package API member. [JA] TValue&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TValue&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TValue&gt;']/summary" />
     public static Task<ResultStep<TState, TValue>> AsTask<TState, TValue>(
@@ -22,6 +24,7 @@ public static class TaskResultStepExtensions
         return step.Tap(action);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] TValue&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TValue&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TValue&gt;']/summary" />
     public static async Task<ResultStep<TState, TValue>> Tap<TState, TValue>(
@@ -43,6 +46,7 @@ public static class TaskResultStepExtensions
         }
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] TNext&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TNext&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TNext&gt;']/summary" />
     public static async Task<ResultStep<TState, TNext>> Map<TState, TValue, TNext>(
@@ -53,6 +57,7 @@ public static class TaskResultStepExtensions
         return step.Map(selector);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] TValue&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TValue&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TValue&gt;']/summary" />
     public static async Task<ResultStep<TState, TValue>> Where<TState, TValue>(
@@ -63,6 +68,7 @@ public static class TaskResultStepExtensions
         return step.Where(predicate);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] TValue&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TValue&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TValue&gt;']/summary" />
     public static async Task<ResultStep<TState, TValue>> Where<TState, TValue>(
@@ -73,6 +79,7 @@ public static class TaskResultStepExtensions
         return await step.Where(predicate).ConfigureAwait(false);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] TNext&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TNext&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TNext&gt;']/summary" />
     public static Task<ResultStep<TState, TNext>> Select<TState, TValue, TNext>(
@@ -80,6 +87,7 @@ public static class TaskResultStepExtensions
         Func<TValue, TNext> selector)
         => task.Map(selector);
 
+    /// <summary>[EN] Documents this public package API member. [JA] TNext&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TNext&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TNext&gt;']/summary" />
     public static async Task<ResultStep<TState, TNext>> Bind<TState, TValue, TNext>(
@@ -90,6 +98,7 @@ public static class TaskResultStepExtensions
         return await step.BindAsync(binder).ConfigureAwait(false);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] TNext&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TNext&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TNext&gt;']/summary" />
     public static async Task<ResultStep<TState, TNext>> Bind<TState, TValue, TNext>(
@@ -100,6 +109,7 @@ public static class TaskResultStepExtensions
         return step.Bind(binder);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] TResult&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TResult&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TResult&gt;']/summary" />
     public static async Task<ResultStep<TState, TResult>> SelectMany<TState, TValue, TNext, TResult>(
@@ -110,6 +120,7 @@ public static class TaskResultStepExtensions
             .Bind(value => binder(value).Map(next => projector(value, next)))
             .ConfigureAwait(false);
 
+    /// <summary>[EN] Documents this public package API member. [JA] TResult&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TResult&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.TaskResultStepExtensions.TResult&gt;']/summary" />
     public static async Task<ResultStep<TState, TResult>> SelectMany<TState, TValue, TNext, TResult>(

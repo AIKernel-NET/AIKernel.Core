@@ -23,6 +23,10 @@ internal sealed class ChatHistoryRomExporter :
     AIKernel.Abstractions.History.IChatHistoryRomExporter
 {
     private const string SourceKind = "chat_history";
+    /// <summary>
+    /// EN: Gets ToRomMarkdown.
+    /// [EN] Documents this public package API member. [JA] ToRomMarkdown を取得します。
+    /// </summary>
 
     public static Result<string> ToRomMarkdown(
         IReadOnlyList<ChatHistoryRomRecord> records,
@@ -243,27 +247,59 @@ internal sealed class ChatHistoryRomExporter :
     private sealed class ChatHistoryRomDocument(
         RomSnapshotCandidate candidate) : AIKernel.Abstractions.Rom.IRomDocument
     {
+        /// <summary>
+        /// EN: Gets EntityId.
+        /// [EN] Documents this public package API member. [JA] EntityId を取得します。
+        /// </summary>
         public string EntityId => candidate.RomId.Value;
+        /// <summary>
+        /// EN: Gets EntityType.
+        /// [EN] Documents this public package API member. [JA] EntityType を取得します。
+        /// </summary>
 
         public string EntityType =>
             candidate.AdditionalMetadata.TryGetValue("entity_type", out var entityType)
                 ? entityType
                 : "conversation";
+        /// <summary>
+        /// EN: Gets Version.
+        /// [EN] Documents this public package API member. [JA] Version を取得します。
+        /// </summary>
 
         public string Version =>
             candidate.AdditionalMetadata.TryGetValue("version", out var version)
                 ? version
                 : "1";
+        /// <summary>
+        /// EN: Gets Body.
+        /// [EN] Documents this public package API member. [JA] Body を取得します。
+        /// </summary>
 
         public string Body => candidate.Body;
+        /// <summary>
+        /// EN: Gets Metadata.
+        /// [EN] Documents this public package API member. [JA] Metadata を取得します。
+        /// </summary>
 
         public IReadOnlyDictionary<string, string> Metadata => candidate.AdditionalMetadata;
+        /// <summary>
+        /// EN: Gets RelationReferences.
+        /// [EN] Documents this public package API member. [JA] RelationReferences を取得します。
+        /// </summary>
 
         public IReadOnlyList<string> RelationReferences => [];
+        /// <summary>
+        /// EN: Executes GetSemanticHashAsync.
+        /// [EN] Documents this public package API member. [JA] GetSemanticHashAsync を実行します。
+        /// </summary>
 
         public Task<string> GetSemanticHashAsync()
             => Task.FromResult(new Sha256SemanticHasher()
                 .ComputeHash(new DefaultRomCanonicalizer().Canonicalize(this)));
+        /// <summary>
+        /// EN: Executes CanonicalizeAsync.
+        /// [EN] Documents this public package API member. [JA] CanonicalizeAsync を実行します。
+        /// </summary>
 
         public Task<CanonicalizedRomDto> CanonicalizeAsync()
             => new DefaultRomCanonicalizer().CanonicalizeAsync(this);

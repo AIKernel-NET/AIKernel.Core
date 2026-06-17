@@ -13,6 +13,10 @@ internal sealed class CompiledDslPipeline :
     private readonly PipelineNode _root;
     private readonly IDslCapabilityRegistry _capabilityRegistry;
     private readonly IKernelClock _clock;
+    /// <summary>
+    /// EN: Gets CompiledDslPipeline.
+    /// [EN] Documents this public package API member. [JA] CompiledDslPipeline を取得します。
+    /// </summary>
 
     public CompiledDslPipeline(
         PipelineNode root,
@@ -23,6 +27,10 @@ internal sealed class CompiledDslPipeline :
         _capabilityRegistry = capabilityRegistry ?? throw new ArgumentNullException(nameof(capabilityRegistry));
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
     }
+    /// <summary>
+    /// EN: Gets Execute.
+    /// [EN] Documents this public package API member. [JA] Execute を取得します。
+    /// </summary>
 
     public ResultStep<DslPipelineState, DslPipelineValue> Execute(
         DslPipelineExecutionContext context)
@@ -474,6 +482,10 @@ internal sealed class CompiledDslPipeline :
 
 internal static class CompiledDslPipelineEitherExtensions
 {
+    /// <summary>
+    /// EN: Gets ToPipelineValueResult&lt;T&gt;.
+    /// [EN] Documents this public package API member. [JA] ToPipelineValueResult&lt;T&gt; を取得します。
+    /// </summary>
     public static Result<T> ToPipelineValueResult<T>(
         this Either<string, T> value,
         OriginStep originStep,

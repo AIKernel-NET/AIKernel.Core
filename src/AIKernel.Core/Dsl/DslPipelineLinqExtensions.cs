@@ -4,6 +4,10 @@ using AIKernel.Common.Results;
 
 internal static class DslPipelineLinqExtensions
 {
+    /// <summary>
+    /// EN: Gets Select.
+    /// [EN] Documents this public package API member. [JA] Select を取得します。
+    /// </summary>
     public static IKernelPipeline Select(
         this IKernelPipeline pipeline,
         Func<DslPipelineValue, DslPipelineValue> selector)
@@ -14,11 +18,19 @@ internal static class DslPipelineLinqExtensions
         return new DelegateKernelPipeline(context =>
             pipeline.Execute(context).Map(selector));
     }
+    /// <summary>
+    /// EN: Gets Map.
+    /// [EN] Documents this public package API member. [JA] Map を取得します。
+    /// </summary>
 
     public static IKernelPipeline Map(
         this IKernelPipeline pipeline,
         Func<DslPipelineValue, DslPipelineValue> mapper)
         => Select(pipeline, mapper);
+    /// <summary>
+    /// EN: Gets Bind.
+    /// [EN] Documents this public package API member. [JA] Bind を取得します。
+    /// </summary>
 
     public static IKernelPipeline Bind(
         this IKernelPipeline pipeline,
@@ -39,6 +51,10 @@ internal static class DslPipelineLinqExtensions
                 return nextPipeline.Execute(CreateContinuationContext(context, value));
             }));
     }
+    /// <summary>
+    /// EN: Gets SelectMany.
+    /// [EN] Documents this public package API member. [JA] SelectMany を取得します。
+    /// </summary>
 
     public static IKernelPipeline SelectMany(
         this IKernelPipeline pipeline,
@@ -63,6 +79,10 @@ internal static class DslPipelineLinqExtensions
                     .Map(next => projector(value, next));
             }));
     }
+    /// <summary>
+    /// EN: Gets Where.
+    /// [EN] Documents this public package API member. [JA] Where を取得します。
+    /// </summary>
 
     public static IKernelPipeline Where(
         this IKernelPipeline pipeline,

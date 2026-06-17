@@ -8,6 +8,7 @@ using AIKernel.Vfs;
 using System.Collections.Immutable;
 using System.Text;
 
+/// <summary>[EN] Documents this public package API member. [JA] RomLoader を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomLoader']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Rom.RomLoader']/summary" />
 public sealed class RomLoader : IRomLoader
@@ -16,6 +17,7 @@ public sealed class RomLoader : IRomLoader
     private readonly IRomSignatureVerifier _signatureVerifier;
     private readonly IKernelClock _clock;
 
+    /// <summary>[EN] Documents this public package API member. [JA] RomLoader を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.#ctor']/summary" />
     public RomLoader(
@@ -32,6 +34,7 @@ public sealed class RomLoader : IRomLoader
         _clock = clock ?? KernelClock.System();
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] LoadAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.LoadAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.LoadAsync']/summary" />
     public async Task<RomSnapshot> LoadAsync(

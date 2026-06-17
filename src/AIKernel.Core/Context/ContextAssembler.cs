@@ -8,6 +8,7 @@ using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Rom;
 using AIKernel.Vfs;
 
+/// <summary>[EN] Documents this public package API member. [JA] ContextAssembler を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.ContextAssembler']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.ContextAssembler']/summary" />
 public sealed class ContextAssembler : IContextAssembler
@@ -19,6 +20,7 @@ public sealed class ContextAssembler : IContextAssembler
     private readonly IContextHashCalculator _hashCalculator;
     private readonly IKernelClock _clock;
 
+    /// <summary>[EN] Documents this public package API member. [JA] ContextAssembler を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.#ctor']/summary" />
     public ContextAssembler(
@@ -37,6 +39,7 @@ public sealed class ContextAssembler : IContextAssembler
         _clock = clock ?? KernelClock.System();
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] AssembleAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AssembleAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AssembleAsync']/summary" />
     public async Task<IContextSnapshot> AssembleAsync(
@@ -195,6 +198,7 @@ public sealed class ContextAssembler : IContextAssembler
         private readonly HashSet<RomId> _loading = [];
         private readonly List<RomContextEdge> _edges = [];
 
+        /// <summary>[EN] Documents this public package API member. [JA] AssemblyState を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AssemblyState']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AssemblyState']/summary" />
         public AssemblyState(ContextAssemblyRequest request)
@@ -202,18 +206,22 @@ public sealed class ContextAssembler : IContextAssembler
             Request = request;
         }
 
+        /// <summary>[EN] Documents this public package API member. [JA] Request を取得します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Context.ContextAssembler.Request']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Context.ContextAssembler.Request']/summary" />
         public ContextAssemblyRequest Request { get; }
 
+        /// <summary>[EN] Documents this public package API member. [JA] IsLoaded を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.IsLoaded']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.IsLoaded']/summary" />
         public bool IsLoaded(RomId romId) => _loaded.ContainsKey(romId);
 
+        /// <summary>[EN] Documents this public package API member. [JA] IsLoading を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.IsLoading']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.IsLoading']/summary" />
         public bool IsLoading(RomId romId) => _loading.Contains(romId);
 
+        /// <summary>[EN] Documents this public package API member. [JA] MarkLoading を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.MarkLoading']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.MarkLoading']/summary" />
         public void MarkLoading(RomId romId)
@@ -221,6 +229,7 @@ public sealed class ContextAssembler : IContextAssembler
             _loading.Add(romId);
         }
 
+        /// <summary>[EN] Documents this public package API member. [JA] MarkCompleted を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.MarkCompleted']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.MarkCompleted']/summary" />
         public void MarkCompleted(RomId romId)
@@ -228,6 +237,7 @@ public sealed class ContextAssembler : IContextAssembler
             _loading.Remove(romId);
         }
 
+        /// <summary>[EN] Documents this public package API member. [JA] AddLoaded を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AddLoaded']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AddLoaded']/summary" />
         public void AddLoaded(RomSnapshot rom)
@@ -235,6 +245,7 @@ public sealed class ContextAssembler : IContextAssembler
             _loaded.Add(rom.RomId, rom);
         }
 
+        /// <summary>[EN] Documents this public package API member. [JA] AddEdge を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AddEdge']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.AddEdge']/summary" />
         public void AddEdge(RomContextEdge edge)
@@ -245,6 +256,7 @@ public sealed class ContextAssembler : IContextAssembler
             }
         }
 
+        /// <summary>[EN] Documents this public package API member. [JA] GetRomsInDeterministicOrder を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.GetRomsInDeterministicOrder']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.GetRomsInDeterministicOrder']/summary" />
         public IReadOnlyList<RomSnapshot> GetRomsInDeterministicOrder()
@@ -254,6 +266,7 @@ public sealed class ContextAssembler : IContextAssembler
                 .ToArray();
         }
 
+        /// <summary>[EN] Documents this public package API member. [JA] GetEdgesInDeterministicOrder を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.GetEdgesInDeterministicOrder']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.ContextAssembler.GetEdgesInDeterministicOrder']/summary" />
         public IReadOnlyList<RomContextEdge> GetEdgesInDeterministicOrder()

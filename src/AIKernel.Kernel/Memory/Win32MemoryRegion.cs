@@ -8,6 +8,10 @@ using Microsoft.Win32.SafeHandles;
 internal sealed class Win32MemoryRegion : MemoryRegionBase
 {
     private readonly SafeFileHandle _mappingHandle;
+    /// <summary>
+    /// EN: Gets Win32MemoryRegion.
+    /// [EN] Documents this public package API member. [JA] Win32MemoryRegion を取得します。
+    /// </summary>
 
     public Win32MemoryRegion(
         MemoryRegionInfo info,

@@ -4,12 +4,14 @@ using AIKernel.Abstractions.Context;
 using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Rom;
 
+/// <summary>[EN] Documents this public package API member. [JA] SecurityTagContextAssemblyPolicy を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy']/summary" />
 public sealed class SecurityTagContextAssemblyPolicy : IContextAssemblyGovernancePolicy
 {
     private readonly IReadOnlySet<string> _allowedSecurityTags;
 
+    /// <summary>[EN] Documents this public package API member. [JA] SecurityTagContextAssemblyPolicy を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy.#ctor']/summary" />
     public SecurityTagContextAssemblyPolicy(IEnumerable<string> allowedSecurityTags)
@@ -22,6 +24,7 @@ public sealed class SecurityTagContextAssemblyPolicy : IContextAssemblyGovernanc
             .ToHashSet(StringComparer.Ordinal);
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] EvaluateAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy.EvaluateAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.SecurityTagContextAssemblyPolicy.EvaluateAsync']/summary" />
     public ValueTask<ContextAssemblyDecision> EvaluateAsync(

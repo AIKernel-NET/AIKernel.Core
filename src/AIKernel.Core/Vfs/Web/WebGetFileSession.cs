@@ -5,6 +5,7 @@ using AIKernel.Core.Vfs.Abstractions;
 using AIKernel.Vfs;
 using System.Net;
 
+/// <summary>[EN] Documents this public package API member. [JA] WebGetFileSession を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Web.WebGetFileSession']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Web.WebGetFileSession']/summary" />
 public sealed class WebGetFileSession : IVfsSession
@@ -13,6 +14,7 @@ public sealed class WebGetFileSession : IVfsSession
     private readonly HttpClient _httpClient;
     private readonly IKernelClock _clock;
 
+    /// <summary>[EN] Documents this public package API member. [JA] WebGetFileSession を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.#ctor']/summary" />
     public WebGetFileSession(
@@ -30,10 +32,12 @@ public sealed class WebGetFileSession : IVfsSession
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] SessionId を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileSession.SessionId']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileSession.SessionId']/summary" />
     public string SessionId { get; }
 
+    /// <summary>[EN] Documents this public package API member. [JA] ReadFileAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.ReadFileAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.ReadFileAsync']/summary" />
     public async Task<IVfsFile> ReadFileAsync(string path)
@@ -84,6 +88,7 @@ public sealed class WebGetFileSession : IVfsSession
             });
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] WriteFileAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.WriteFileAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.WriteFileAsync']/summary" />
     public Task WriteFileAsync(string path, byte[] content)
@@ -92,6 +97,7 @@ public sealed class WebGetFileSession : IVfsSession
             "WebGetFileProvider is GET-only and does not support write.");
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] GetDirectoryAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.GetDirectoryAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.GetDirectoryAsync']/summary" />
     public Task<IVfsDirectory> GetDirectoryAsync(string path)
@@ -100,6 +106,7 @@ public sealed class WebGetFileSession : IVfsSession
             "WebGetFileProvider does not expose directory enumeration.");
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] ExistsAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.ExistsAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.ExistsAsync']/summary" />
     public async Task<bool> ExistsAsync(string path)
@@ -124,6 +131,7 @@ public sealed class WebGetFileSession : IVfsSession
         return response.IsSuccessStatusCode;
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] DeleteAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.DeleteAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.DeleteAsync']/summary" />
     public Task DeleteAsync(string path)
@@ -132,6 +140,7 @@ public sealed class WebGetFileSession : IVfsSession
             "WebGetFileProvider is GET-only and does not support delete.");
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] QueryAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.QueryAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.QueryAsync']/summary" />
     public Task<IVfsQueryResult> QueryAsync(IVfsQuery query)
@@ -143,6 +152,7 @@ public sealed class WebGetFileSession : IVfsSession
                 "WebGetFileProvider does not support VFS entry queries."));
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] DisposeAsync を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.DisposeAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileSession.DisposeAsync']/summary" />
     public ValueTask DisposeAsync()

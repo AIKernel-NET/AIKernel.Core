@@ -5,10 +5,12 @@ using AIKernel.Abstractions.Execution;
 using AIKernel.Dtos.Execution;
 using AIKernel.Enums;
 
+/// <summary>[EN] Documents this public package API member. [JA] DefaultContextPromptProjector を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultContextPromptProjector']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Execution.DefaultContextPromptProjector']/summary" />
 public sealed class DefaultContextPromptProjector : IContextPromptProjector
 {
+    /// <summary>[EN] Documents this public package API member. [JA] Project を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultContextPromptProjector.Project']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.DefaultContextPromptProjector.Project']/summary" />
     public IReadOnlyList<ContextPromptBlock> Project(

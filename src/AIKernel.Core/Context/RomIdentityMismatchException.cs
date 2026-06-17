@@ -2,10 +2,12 @@ namespace AIKernel.Core.Context;
 
 using AIKernel.Dtos.Rom;
 
+/// <summary>[EN] Documents this public package API member. [JA] RomIdentityMismatchException を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.RomIdentityMismatchException']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Context.RomIdentityMismatchException']/summary" />
 public sealed class RomIdentityMismatchException : ContextAssemblyException
 {
+    /// <summary>[EN] Documents this public package API member. [JA] RomIdentityMismatchException を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.RomIdentityMismatchException.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Context.RomIdentityMismatchException.#ctor']/summary" />
     public RomIdentityMismatchException(RomId requested, RomId actual, string path)
@@ -16,14 +18,17 @@ public sealed class RomIdentityMismatchException : ContextAssemblyException
         Path = path;
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Requested を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Context.RomIdentityMismatchException.Requested']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Context.RomIdentityMismatchException.Requested']/summary" />
     public RomId Requested { get; }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Actual を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Context.RomIdentityMismatchException.Actual']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Context.RomIdentityMismatchException.Actual']/summary" />
     public RomId Actual { get; }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Path を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Context.RomIdentityMismatchException.Path']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Context.RomIdentityMismatchException.Path']/summary" />
     public string Path { get; }

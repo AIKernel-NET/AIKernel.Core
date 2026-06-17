@@ -3,10 +3,12 @@ namespace AIKernel.Core.Vfs.Web;
 using AIKernel.Core.Time;
 using AIKernel.Core.Vfs.Abstractions;
 
+/// <summary>[EN] Documents this public package API member. [JA] WebGetFileProviderOptions を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions']/summary" />
 public sealed class WebGetFileProviderOptions
 {
+    /// <summary>[EN] Documents this public package API member. [JA] WebGetFileProviderOptions を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.#ctor']/summary" />
     public WebGetFileProviderOptions()
@@ -35,30 +37,37 @@ public sealed class WebGetFileProviderOptions
         CredentialValidator = credentialValidator;
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] BaseUri を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.BaseUri']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.BaseUri']/summary" />
     public Uri? BaseUri { get; set; }
 
+    /// <summary>[EN] Documents this public package API member. [JA] ProviderId を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.ProviderId']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.ProviderId']/summary" />
     public string ProviderId { get; set; } = "web-get-file";
 
+    /// <summary>[EN] Documents this public package API member. [JA] Name を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.Name']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.Name']/summary" />
     public string Name { get; set; } = "Web GET File Provider";
 
+    /// <summary>[EN] Documents this public package API member. [JA] ProbePath を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.ProbePath']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.ProbePath']/summary" />
     public string? ProbePath { get; set; }
 
+    /// <summary>[EN] Documents this public package API member. [JA] Timeout を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.FromSeconds']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.FromSeconds']/summary" />
     public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(30);
 
+    /// <summary>[EN] Documents this public package API member. [JA] Clock を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.Clock']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.Clock']/summary" />
     public IKernelClock? Clock { get; set; }
 
+    /// <summary>[EN] Documents this public package API member. [JA] CredentialValidator を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.CredentialValidator']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Web.WebGetFileProviderOptions.CredentialValidator']/summary" />
     public VfsCredentialValidator? CredentialValidator { get; set; }

@@ -1,19 +1,24 @@
 namespace AIKernel.Common.Results;
 
+/// <summary>[EN] Documents this public package API member. [JA] Either を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.Either']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Common.Results.Either']/summary" />
 public readonly struct Either<L, R>
 {
+    /// <summary>[EN] Documents this public package API member. [JA] IsRight を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Either.IsRight']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Either.IsRight']/summary" />
     public bool IsRight { get; }
+    /// <summary>[EN] Documents this public package API member. [JA] IsLeft を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.Either.IsLeft']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='F:AIKernel.Common.Results.Either.IsLeft']/summary" />
     public bool IsLeft => !IsRight;
 
+    /// <summary>[EN] Documents this public package API member. [JA] Left を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Either.Left']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Either.Left']/summary" />
     public L? Left { get; }
+    /// <summary>[EN] Documents this public package API member. [JA] Right を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Either.Right']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.Either.Right']/summary" />
     public R? Right { get; }
@@ -25,11 +30,13 @@ public readonly struct Either<L, R>
         Right = right;
     }
 
+    /// <summary>[EN] Documents this public package API member. [JA] FromLeft を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.FromLeft']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.FromLeft']/summary" />
     public static Either<L, R> FromLeft(L value)
         => new(false, value, default);
 
+    /// <summary>[EN] Documents this public package API member. [JA] FromRight を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.FromRight']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.FromRight']/summary" />
     public static Either<L, R> FromRight(R value)
@@ -39,11 +46,13 @@ public readonly struct Either<L, R>
     // Functional Extensions
     // -------------------------
 
+    /// <summary>[EN] Documents this public package API member. [JA] Match&lt;T&gt; を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.Match&lt;T&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.Match&lt;T&gt;']/summary" />
     public T Match<T>(Func<L, T> leftFunc, Func<R, T> rightFunc)
         => IsRight ? rightFunc(Right!) : leftFunc(Left!);
 
+    /// <summary>[EN] Documents this public package API member. [JA] Map&lt;U&gt; を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.Map&lt;U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.Map&lt;U&gt;']/summary" />
     public Either<L, U> Map<U>(Func<R, U> mapper)
@@ -51,6 +60,7 @@ public readonly struct Either<L, R>
             ? Either<L, U>.FromRight(mapper(Right!))
             : Either<L, U>.FromLeft(Left!);
 
+    /// <summary>[EN] Documents this public package API member. [JA] Bind&lt;U&gt; を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.Bind&lt;U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.Bind&lt;U&gt;']/summary" />
     public Either<L, U> Bind<U>(Func<R, Either<L, U>> binder)
@@ -58,6 +68,7 @@ public readonly struct Either<L, R>
             ? binder(Right!)
             : Either<L, U>.FromLeft(Left!);
 
+    /// <summary>[EN] Documents this public package API member. [JA] Tap を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.Tap']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.Tap']/summary" />
     public Either<L, R> Tap(Action<R> action)
@@ -74,11 +85,13 @@ public readonly struct Either<L, R>
     // LINQ Support
     // -------------------------
 
+    /// <summary>[EN] Documents this public package API member. [JA] Select&lt;U&gt; を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.Select&lt;U&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.Select&lt;U&gt;']/summary" />
     public Either<L, U> Select<U>(Func<R, U> selector)
         => Map(selector);
 
+    /// <summary>[EN] Documents this public package API member. [JA] V&gt; を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.V&gt;']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.V&gt;']/summary" />
     public Either<L, V> SelectMany<U, V>(
@@ -86,6 +99,7 @@ public readonly struct Either<L, R>
         Func<R, U, V> projector)
         => Bind(value => binder(value).Map(bound => projector(value, bound)));
 
+    /// <summary>[EN] Documents this public package API member. [JA] ToString を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.ToString']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Either.ToString']/summary" />
     public override string ToString()

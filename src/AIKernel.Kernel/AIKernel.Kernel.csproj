@@ -20,9 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AIKernel.Abstractions" Version="$(AIKernelPackageVersion)" />
-    <PackageReference Include="AIKernel.Dtos" Version="$(AIKernelPackageVersion)" />
-    <PackageReference Include="AIKernel.Enums" Version="$(AIKernelPackageVersion)" />
+    <PackageReference Include="AIKernel.Abstractions" Version="$(AIKernelContractPackageVersion)" />
+    <PackageReference Include="AIKernel.Dtos" Version="$(AIKernelContractPackageVersion)" />
+    <PackageReference Include="AIKernel.Enums" Version="$(AIKernelContractPackageVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
   </ItemGroup>
 

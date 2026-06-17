@@ -10,13 +10,33 @@ internal sealed record HistoryRomMetadata(
 
 internal static class HistoryRomMetadataKeys
 {
+    /// <summary>
+    /// EN: Gets the RomHash constant.
+    /// [EN] Documents this public package API member. [JA] RomHash 定数を取得します。
+    /// </summary>
     public const string RomHash = "history_rom_hash";
+    /// <summary>
+    /// EN: Gets the RomId constant.
+    /// [EN] Documents this public package API member. [JA] RomId 定数を取得します。
+    /// </summary>
 
     public const string RomId = "history_rom_id";
+    /// <summary>
+    /// EN: Gets the RomPath constant.
+    /// [EN] Documents this public package API member. [JA] RomPath 定数を取得します。
+    /// </summary>
 
     public const string RomPath = "history_rom_path";
+    /// <summary>
+    /// EN: Gets the RomNamespace constant.
+    /// [EN] Documents this public package API member. [JA] RomNamespace 定数を取得します。
+    /// </summary>
 
     public const string RomNamespace = "history_rom_namespace";
+    /// <summary>
+    /// EN: Gets the RomName constant.
+    /// [EN] Documents this public package API member. [JA] RomName 定数を取得します。
+    /// </summary>
 
     public const string RomName = "history_rom_name";
 }

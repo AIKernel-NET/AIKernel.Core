@@ -17,6 +17,10 @@ internal static class VfsEntryQueryEngine
         "CreatedAtUtc",
         "ModifiedAtUtc"
     ];
+    /// <summary>
+    /// EN: Executes Execute.
+    /// [EN] Documents this public package API member. [JA] Execute を実行します。
+    /// </summary>
 
     public static IVfsQueryResult Execute(IEnumerable<VfsEntry> source, IVfsQuery query)
     {

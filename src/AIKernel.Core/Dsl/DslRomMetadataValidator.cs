@@ -4,6 +4,10 @@ using AIKernel.Common.Results;
 
 internal static class DslRomMetadataValidator
 {
+    /// <summary>
+    /// EN: Executes ValidateCanonicalIdentity.
+    /// [EN] Documents this public package API member. [JA] ValidateCanonicalIdentity を実行します。
+    /// </summary>
     public static ErrorContext? ValidateCanonicalIdentity(DslRomMetadata metadata)
         => ValidateCanonicalIdentityResult(metadata)
             .Match<ErrorContext?>(

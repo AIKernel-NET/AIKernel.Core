@@ -58,5 +58,16 @@ jobs:
           name: pypi-dist-aikernel-net
           path: dist
 
+      - name: Show trusted publisher claims
+        run: |
+          echo "PyPI project: aikernel-net"
+          echo "Expected owner: AIKernel-NET"
+          echo "Expected repository: AIKernel.Core"
+          echo "Expected workflow: publish-pypi.yml"
+          echo "Expected environment: pypi"
+          echo "Actual repository: ${GITHUB_REPOSITORY}"
+          echo "Actual workflow ref: ${GITHUB_WORKFLOW_REF}"
+          echo "Actual ref: ${GITHUB_REF}"
+
       - name: Publish distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

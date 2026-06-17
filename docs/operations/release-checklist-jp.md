@@ -102,6 +102,21 @@ Python release tag を push する前に確認します。
 - workflow に PyPI API token、`TWINE_USERNAME`、`TWINE_PASSWORD` が含まれない
 - build と publish step が分離されている
 
+`aikernel-net` project の PyPI Trusted Publisher は、この repository が発行する
+GitHub OIDC claims と一致している必要があります。
+
+| Field | Value |
+| --- | --- |
+| PyPI project | `aikernel-net` |
+| Owner | `AIKernel-NET` |
+| Repository | `AIKernel.Core` |
+| Workflow | `publish-pypi.yml` |
+| Environment | `pypi` |
+
+PyPI が `invalid-publisher` を返す場合、workflow を token credential 方式へ戻しては
+いけません。PyPI project 側の Trusted Publisher entry を上記の値に合わせて修正し、
+失敗した publish job を rerun します。
+
 ## Publish Order
 
 1. AIKernel.NET contract packages を先に公開する。

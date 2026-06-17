@@ -105,6 +105,21 @@ Before pushing a Python release tag, verify:
   `TWINE_PASSWORD`
 - build and publish steps remain separated
 
+The PyPI Trusted Publisher for the `aikernel-net` project must match the
+GitHub OIDC claims emitted by this repository:
+
+| Field | Value |
+| --- | --- |
+| PyPI project | `aikernel-net` |
+| Owner | `AIKernel-NET` |
+| Repository | `AIKernel.Core` |
+| Workflow | `publish-pypi.yml` |
+| Environment | `pypi` |
+
+If PyPI reports `invalid-publisher`, do not change the workflow to use token
+credentials. Fix the PyPI project Trusted Publisher entry so it matches the
+table above, then rerun the failed publish job.
+
 ## Publish Order
 
 1. Publish AIKernel.NET contract packages first.

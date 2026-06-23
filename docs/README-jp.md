@@ -16,9 +16,9 @@ Monolith は 0.1.x 系の安定化後に SDK layer を統合する reference sys
 
 ## リポジトリ横断整合
 
-共有の repository boundary、v0.1.2 development versioning、依存関係順、
+共有の repository boundary、v0.1.3 development versioning、依存関係順、
 PyPI Trusted Publishing、Python wrapper scope は
-[Package Release Alignment v0.1.2](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/package-release-alignment-v0.1.2-ja.md)
+[AIKernel GPU rev3 Migration v0.1.3](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/migration/v0.1.3-gpu-rev3-migration.md)
 で定義します。履歴としての v0.1.1.1 validation rule は
 [AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1-ja.md)
 に残します。
@@ -88,9 +88,9 @@ module を明示的に install / register します。
   sample asset を提供します。
 - GPU/native execution は明示的な Capability package でのみ追加します。
 
-v0.1.2 development では、NuGet は `0.1.2-dev{buildNumber}`、Python は
-`0.1.2.dev{buildNumber}` のような local development version を使います。公開手順が
-stable release step を明示するまで、stable `0.1.2` artifact は作成しません。
+v0.1.3 development では、NuGet は `0.1.3-dev{buildNumber}`、Python は
+`0.1.3.dev{buildNumber}` のような local development version を使います。公開手順が
+stable release step を明示するまで、stable `0.1.3` artifact は作成しません。
 
 `AIKernel.Vfs` は Core implementation namespace であり、独立 NuGet package ではありません。
 VFS contract は AIKernel.NET contract packages にあり、in-process VFS provider は
@@ -125,6 +125,6 @@ dotnet test AIKernel.Core.slnx -c Release --no-restore
 dotnet pack AIKernel.Core.slnx -c Release --no-restore
 ```
 
-v0.1.2 integration では、`python/README-ja.md` の Python package checks も実行します。
+v0.1.3 integration では、`python/README-ja.md` の Python package checks も実行します。
 stable package artifact は、AIKernel.NET contract packages が利用可能になった後、
 依存関係順に作成します。

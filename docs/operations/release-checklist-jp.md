@@ -2,13 +2,13 @@
 
 [English](release-checklist.md)
 
-この checklist は、AIKernel.Core packages を v0.1.2 正典シリーズ向けに準備するための
-ものです。maintainer が publication step を明示するまで、stable `0.1.2` package は
+この checklist は、AIKernel.Core packages を v0.1.3 正典シリーズ向けに準備するための
+ものです。maintainer が publication step を明示するまで、stable `0.1.3` package は
 作成しません。
 
 共有の release order、versioning、Python wrapper rule、PyPI Trusted Publishing
 requirements は
-[Package Release Alignment v0.1.2](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/package-release-alignment-v0.1.2-ja.md)
+[AIKernel GPU rev3 Migration v0.1.3](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/migration/v0.1.3-gpu-rev3-migration.md)
 で定義します。
 
 ## Package Scope
@@ -32,10 +32,10 @@ AIKernel.Core は CUDA、LibTorch、Native ABI、GPU runtime、Capability 固有
 
 local integration 中は development package version を使います。
 
-- NuGet: `0.1.2-dev{buildNumber}`
-- Python: `0.1.2.dev{buildNumber}`
+- NuGet: `0.1.3-dev{buildNumber}`
+- Python: `0.1.3.dev{buildNumber}`
 
-stable `0.1.2` artifact は、AIKernel.NET contract packages が確定した後、依存関係順に
+stable `0.1.3` artifact は、AIKernel.NET contract packages が確定した後、依存関係順に
 作成します。
 
 ## Preflight
@@ -61,7 +61,7 @@ py AIKernel.NET\tools\check_bilingual_xml_docs.py AIKernel.Core\src
 py -m compileall src tests
 py -m pytest
 py -m build --wheel
-py -m twine check dist\aikernel_net-0.1.2*.whl
+py -m twine check dist\aikernel_net-0.1.3*.whl
 ```
 
 ## NuGet Package Checks
@@ -69,14 +69,14 @@ py -m twine check dist\aikernel_net-0.1.2*.whl
 公開または local consumption の前に、生成済み `.nupkg` を確認します。
 
 - package id が Core package family と一致する
-- development package は `0.1.2-dev{buildNumber}` を使う
-- stable package は、明示的に要求された場合のみ `0.1.2` を使う
+- development package は `0.1.3-dev{buildNumber}` を使う
+- stable package は、明示的に要求された場合のみ `0.1.3` を使う
 - license が `Apache-2.0`
 - repository metadata が AIKernel.Core repository を指す
 - README と icon assets が必要な package に含まれる
 - CUDA、LibTorch、Native ABI、外部 Capability binary が含まれない
 - `AIKernel.Vfs` package dependency が存在しない
-- AIKernel.NET contract packages 参照が matching v0.1.2 contract package line を解決する
+- AIKernel.NET contract packages 参照が matching v0.1.3 contract package line を解決する
 
 ## Python Wheel Checks
 
@@ -130,8 +130,8 @@ clean な consumer project で確認します。
 
 ```powershell
 dotnet new console
-dotnet add package AIKernel.Core --version 0.1.2
-dotnet add package AIKernel.Kernel --version 0.1.2
+dotnet add package AIKernel.Core --version 0.1.3
+dotnet add package AIKernel.Kernel --version 0.1.3
 dotnet build
 ```
 
@@ -139,6 +139,6 @@ stable Python:
 
 ```powershell
 py -m venv .venv
-.\.venv\Scripts\python -m pip install aikernel-net==0.1.2
+.\.venv\Scripts\python -m pip install aikernel-net==0.1.3
 .\.venv\Scripts\python -c "import aikernel_net; print(aikernel_net.__version__)"
 ```

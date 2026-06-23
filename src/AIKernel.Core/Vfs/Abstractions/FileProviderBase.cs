@@ -76,7 +76,7 @@ public abstract class FileProviderBase(
         return Task.FromResult(new VfsProviderHealth
         {
             IsHealthy = false,
-            Message = "Provider health is not implemented.",
+            Message = "VFS provider is using fail-closed base health; override GetHealthAsync for backend-specific probes.",
             CheckedAtUtc = Clock.Now
         });
     }

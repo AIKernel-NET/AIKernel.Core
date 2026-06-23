@@ -16,9 +16,9 @@ line stabilizes.
 
 ## Cross-Repository Alignment
 
-Shared repository boundaries, v0.1.2 development versioning, dependency order,
+Shared repository boundaries, v0.1.3 development versioning, dependency order,
 PyPI Trusted Publishing, and Python wrapper scope are defined by
-[Package Release Alignment v0.1.2](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/package-release-alignment-v0.1.2.md).
+[AIKernel GPU rev3 Migration v0.1.3](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/migration/v0.1.3-gpu-rev3-migration.md).
 The historical v0.1.1.1 validation rules remain available in
 [AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1.md).
 When a change crosses repositories, start with the
@@ -89,9 +89,9 @@ The supported distribution paths are:
   assets for examples.
 - GPU/native execution is added only through explicit Capability packages.
 
-For v0.1.2 development, use local NuGet versions such as
-`0.1.2-dev{buildNumber}` and Python versions such as `0.1.2.dev{buildNumber}`.
-Do not create stable `0.1.2` artifacts until the publication task explicitly
+For v0.1.3 development, use local NuGet versions such as
+`0.1.3-dev{buildNumber}` and Python versions such as `0.1.3.dev{buildNumber}`.
+Do not create stable `0.1.3` artifacts until the publication task explicitly
 opens the release step.
 
 `AIKernel.Vfs` is a Core implementation namespace, not a separate NuGet package.
@@ -130,6 +130,6 @@ dotnet test AIKernel.Core.slnx -c Release --no-restore
 dotnet pack AIKernel.Core.slnx -c Release --no-restore
 ```
 
-During v0.1.2 integration, also run the Python package checks from
+During v0.1.3 integration, also run the Python package checks from
 `python/README.md`. Stable package artifacts are created later in dependency
 order after AIKernel.NET contract packages are available.

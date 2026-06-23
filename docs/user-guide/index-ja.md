@@ -15,14 +15,14 @@ Monolith は 0.1.x 系の安定化後に SDK layer を統合する標準 referen
 ## Install Packages
 
 ```bash
-dotnet add package AIKernel.Common --version 0.1.2
-dotnet add package AIKernel.Core --version 0.1.2
-dotnet add package AIKernel.Hosting --version 0.1.2
-dotnet add package AIKernel.Kernel --version 0.1.2
+dotnet add package AIKernel.Common --version 0.1.3
+dotnet add package AIKernel.Core --version 0.1.3
+dotnet add package AIKernel.Hosting --version 0.1.3
+dotnet add package AIKernel.Kernel --version 0.1.3
 ```
 
-local integration では、release task が公開を開始するまで stable `0.1.2` ではなく
-`0.1.2-dev{buildNumber}` の NuGet package を使います。
+local integration では、release task が公開を開始するまで stable `0.1.3` ではなく
+`0.1.3-dev{buildNumber}` の NuGet package を使います。
 
 Python package:
 
@@ -30,7 +30,7 @@ Python package:
 pip install aikernel-net
 ```
 
-local Python validation では、stable `0.1.2` wheel ではなく `0.1.2.dev{buildNumber}`
+local Python validation では、stable `0.1.3` wheel ではなく `0.1.3.dev{buildNumber}`
 wheel を使います。この package は generated managed API catalog と同梱 CTG-ROM sample
 asset helper を公開します。
 

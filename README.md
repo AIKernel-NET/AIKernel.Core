@@ -112,7 +112,7 @@ the host OS driver layer, and AIKernel.Wasm as the browser/WASM runtime layer.
 
 ## CTG Governance Core
 
-AIKernel.Core 0.1.2 includes the implementation-side Canonical Triadic
+AIKernel.Core 0.1.3 includes the implementation-side Canonical Triadic
 Governance (CTG) kernel surface. CTG is implemented as deterministic Core
 services that consume the AIKernel.NET contract DTOs and enums without changing
 ROM, Canon, Council, Gate, RejectPolicy, YAML, or DTO semantics.
@@ -139,7 +139,7 @@ non-replacing for existing `IDecisionGate` and `ITrajectoryGate` services.
 Read the [CTG Governance Integration Guide](docs/development/ctg-governance-integration.md)
 for implementation boundaries.
 
-Distribution note: the 0.1.2 update publishes NuGet packages and synchronized Python wrappers. for this update line.
+Distribution note: the 0.1.3 update publishes NuGet packages and synchronized Python wrappers. for this update line.
 
 ---
 
@@ -225,7 +225,7 @@ It provides `IServiceCollection` extensions and default wiring for ASP.NET Core 
 #### `Providers/`
 
 Provider integration workspace for packages that connect AIKernel to external
-models and services. The 0.1.2 Core package line does not publish provider
+models and services. The 0.1.3 Core package line does not publish provider
 packages from this repository.
 
 ##### `AIKernel.Providers.MicrosoftAI`
@@ -265,7 +265,7 @@ Previously published Python releases install as the `aikernel-net` package and
 are CPU-only by default. The package exposes Python monad helpers and managed
 assembly discovery; it does not ship CUDA, LibTorch, or the native
 `libtorch_bridge` ABI. The Python package does not reimplement OS-specific
-memory mapping, Kernel internals, or Capability internals. The 0.1.2 CTG Core
+memory mapping, Kernel internals, or Capability internals. The 0.1.3 CTG Core
 update publishes a synchronized PyPI wrapper.
 
 ---
@@ -278,22 +278,19 @@ For a focused package usage walkthrough, see the
 ### 1. Install Packages
 
 ```bash
-dotnet add package AIKernel.Core --version 0.1.2
-dotnet add package AIKernel.Hosting --version 0.1.2
-dotnet add package AIKernel.Kernel --version 0.1.2
-dotnet add package AIKernel.Providers.MicrosoftAI --version 0.1.2
+dotnet add package AIKernel.Core --version 0.1.3
+dotnet add package AIKernel.Hosting --version 0.1.3
+dotnet add package AIKernel.Kernel --version 0.1.3
+dotnet add package AIKernel.Providers.MicrosoftAI --version 0.1.3
 ```
 
-`AIKernel.Providers.MicrosoftAI` remains on the 0.1.2 Provider package line
-until the provider repository is updated. The 0.1.2 Core update is centered
-on Core, Hosting, Kernel, Common, TestKit, and the AIKernel.NET contract
-packages.
+`AIKernel.Providers.MicrosoftAI` is installed from the synchronized 0.1.3 Provider package line. The 0.1.3 Core update remains centered`r`non Core, Hosting, Kernel, Common, TestKit, and the AIKernel.NET contract`r`npackages.
 
 For direct use of functional primitives and contract testing helpers:
 
 ```bash
-dotnet add package AIKernel.Common --version 0.1.2
-dotnet add package AIKernel.TestKit --version 0.1.2
+dotnet add package AIKernel.Common --version 0.1.3
+dotnet add package AIKernel.TestKit --version 0.1.3
 ```
 
 CUDA is optional and lives outside this repository. GPU hosts should install an
@@ -306,7 +303,7 @@ local NuGet source, and install from that source:
 
 ```bash
 dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
-dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.1.2
+dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.1.3
 ```
 
 LLM / SLM developers who need direct CUDA integration should read
@@ -321,7 +318,7 @@ pip install aikernel-net
 ```
 
 The base Python package is a CPU-only universal `py3-none-any` wheel for
-Windows and Linux. The 0.1.2 CTG Core update publishes a synchronized PyPI wrapper;
+Windows and Linux. The 0.1.3 CTG Core update publishes a synchronized PyPI wrapper;
 existing Python hosts should stay on the latest published `aikernel-net`
 distribution until a Python release is scheduled. Import it as `aikernel_net`.
 The PyPI package named `aikernel` is a different project. GPU/native runtimes
@@ -342,9 +339,9 @@ The default Python install is CPU-only/CUDA-free and does not include a native
 bridge. Install GPU integrations from the matching external Capability package
 and follow that Capability repository's distribution instructions.
 
-The v0.1.2 Core package family is aligned with the AIKernel.NET contract
+The v0.1.3 Core package family is aligned with the AIKernel.NET contract
 packages `AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums`
-v0.1.2.
+v0.1.3.
 `AIKernel.Vfs` is no longer a separate package dependency; the VFS contracts are
 provided by `AIKernel.Abstractions`. The `AIKernel.Vfs` namespace remains as a
 Core implementation namespace for in-process VFS providers and stores; it is not
@@ -491,7 +488,7 @@ content.
 ## Target Boot Experience
 
 ```text
-[KERNEL] Initializing AIKernel.NET Core v0.1.2...
+[KERNEL] Initializing AIKernel.NET Core v0.1.3...
 [KERNEL] Loading VFS Provider: local... [OK]
 [KERNEL] Mounting ROM root... [OK]
 [KERNEL] Building ContextSnapshot... [OK]

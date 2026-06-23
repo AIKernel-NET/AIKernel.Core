@@ -121,4 +121,4 @@ __all__ = [
     "vfs_git_contract",
 ]
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"

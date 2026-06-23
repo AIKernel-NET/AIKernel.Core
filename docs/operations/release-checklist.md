@@ -2,13 +2,13 @@
 
 [日本語](release-checklist-jp.md)
 
-This checklist is for preparing AIKernel.Core packages for the v0.1.2 canonical
-series. Do not create stable `0.1.2` packages until the maintainer explicitly
+This checklist is for preparing AIKernel.Core packages for the v0.1.3 canonical
+series. Do not create stable `0.1.3` packages until the maintainer explicitly
 opens the publication step.
 
 Shared release order, versioning, Python wrapper rules, and PyPI Trusted
 Publishing requirements are defined by
-[Package Release Alignment v0.1.2](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/package-release-alignment-v0.1.2.md).
+[AIKernel GPU rev3 Migration v0.1.3](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/migration/v0.1.3-gpu-rev3-migration.md).
 
 ## Package Scope
 
@@ -32,10 +32,10 @@ repositories.
 
 Use development package versions during local integration:
 
-- NuGet: `0.1.2-dev{buildNumber}`
-- Python: `0.1.2.dev{buildNumber}`
+- NuGet: `0.1.3-dev{buildNumber}`
+- Python: `0.1.3.dev{buildNumber}`
 
-Stable `0.1.2` artifacts are created later in dependency order after the
+Stable `0.1.3` artifacts are created later in dependency order after the
 AIKernel.NET contract packages are finalized.
 
 ## Preflight
@@ -61,7 +61,7 @@ Run from `python/`:
 py -m compileall src tests
 py -m pytest
 py -m build --wheel
-py -m twine check dist\aikernel_net-0.1.2*.whl
+py -m twine check dist\aikernel_net-0.1.3*.whl
 ```
 
 ## NuGet Package Checks
@@ -70,14 +70,14 @@ Before publishing or consuming local packages, inspect the generated `.nupkg`
 files and verify:
 
 - package ids match the Core package family
-- development packages use `0.1.2-dev{buildNumber}`
-- stable packages, when explicitly requested, use `0.1.2`
+- development packages use `0.1.3-dev{buildNumber}`
+- stable packages, when explicitly requested, use `0.1.3`
 - license is `Apache-2.0`
 - repository metadata points at the AIKernel.Core repository
 - README and icon assets are included where expected
 - no CUDA, LibTorch, native ABI, or external Capability binaries are included
 - no `AIKernel.Vfs` package dependency exists
-- references to AIKernel.NET contract packages resolve to the matching v0.1.2
+- references to AIKernel.NET contract packages resolve to the matching v0.1.3
   contract package line
 
 ## Python Wheel Checks
@@ -134,8 +134,8 @@ In a clean consumer project:
 
 ```powershell
 dotnet new console
-dotnet add package AIKernel.Core --version 0.1.2
-dotnet add package AIKernel.Kernel --version 0.1.2
+dotnet add package AIKernel.Core --version 0.1.3
+dotnet add package AIKernel.Kernel --version 0.1.3
 dotnet build
 ```
 
@@ -143,6 +143,6 @@ For stable Python:
 
 ```powershell
 py -m venv .venv
-.\.venv\Scripts\python -m pip install aikernel-net==0.1.2
+.\.venv\Scripts\python -m pip install aikernel-net==0.1.3
 .\.venv\Scripts\python -c "import aikernel_net; print(aikernel_net.__version__)"
 ```

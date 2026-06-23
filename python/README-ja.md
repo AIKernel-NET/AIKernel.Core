@@ -23,19 +23,19 @@ distribution name として `aikernel-net` を使います。import name は
 Stable user release は PyPI に公開します。
 
 - distribution: `aikernel-net`
-- versions: `0.1.2` 以降の stable release
+- versions: `0.1.3` 以降の stable release
 - policy: stable release のみ
 
 Development release は CI/CD と developer validation のために分離します。
 
 - distribution: `aikernel-net`
-- versions: `0.1.2.dev{buildNumber}` 形式
+- versions: `0.1.3.dev{buildNumber}` 形式
 - policy: local validation and CI/CD only
 
 ユーザー向け documentation は PyPI stable package を基準にします。development
 package は CI/CD または integration testing のみに使います。
 
-v0.1.2 package では generated managed API catalog も公開します。
+v0.1.3 package では generated managed API catalog も公開します。
 `managed_api_catalog()`、`managed_api_summary()`、`managed_type_names()`、
 `find_managed_type(full_name)` で確認できます。
 

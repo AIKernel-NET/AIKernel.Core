@@ -23,19 +23,19 @@ See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the current release notes.
 Stable user releases are published to PyPI:
 
 - distribution: `aikernel-net`
-- versions: `0.1.2`, then later stable releases
+- versions: `0.1.3`, then later stable releases
 - policy: stable releases only
 
 Development releases are reserved for CI/CD and developer validation:
 
 - distribution: `aikernel-net`
-- versions: `0.1.2.dev{buildNumber}` style prereleases
+- versions: `0.1.3.dev{buildNumber}` style prereleases
 - policy: local validation and CI/CD only
 
 User documentation defaults to the PyPI stable package. Use development
 packages only for CI/CD or integration testing.
 
-The v0.1.2 package also exposes the generated managed API catalog through
+The v0.1.3 package also exposes the generated managed API catalog through
 `managed_api_catalog()`, `managed_api_summary()`, `managed_type_names()`, and
 `find_managed_type(full_name)`.
 
@@ -129,7 +129,7 @@ managed assemblies can be bundled into `aikernel_net/managed`:
 
 ```bash
 python -m build --wheel
-python -m twine check dist/aikernel_net-0.1.2-py3-none-any.whl
+python -m twine check dist/aikernel_net-0.1.3-py3-none-any.whl
 ```
 
 ## Bundled CTG-ROM Sample

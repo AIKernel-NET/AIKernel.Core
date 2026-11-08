@@ -66,8 +66,11 @@ public class SecureOptionsStartupValidator<TOptions>(
     private readonly IKernelClock _clock = clock ?? KernelClock.System();
 
     /// <summary>
-    /// 派生クラスから必要に応じて資格情報解決器を参照するための protected アクセサです。
-    /// ただし、通常の Provider 固有検証では <see cref="ValidateCoreAsync"/> の options を利用すれば十分です。
+    /// [EN] Provides derived validators with protected access to the credential resolver when provider-specific startup validation must re-read resolved credentials.
+    /// [JA] Provider 固有の起動時検証で解決済み資格情報を再参照する必要がある場合に、派生 Validator へ資格情報解決器を公開する protected アクセサです。
+    ///
+    /// [EN] Most validators should prefer the resolved options passed to <see cref="ValidateCoreAsync"/> and use this accessor only when they need resolver-level behavior.
+    /// [JA] 通常の Validator では <see cref="ValidateCoreAsync"/> に渡される解決済み options の利用を優先し、このアクセサは resolver レベルの挙動が必要な場合だけ使用してください。
     /// </summary>
     protected SecureCredentialResolver<TOptions> Resolver => _resolver;
 

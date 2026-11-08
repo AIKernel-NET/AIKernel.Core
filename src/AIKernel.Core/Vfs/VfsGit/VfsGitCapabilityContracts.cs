@@ -24,7 +24,7 @@ public static class VfsGitCapabilityContracts
             "VFS Git",
             CapabilityModuleKind.ManagedAssembly,
             CapabilityInvocationMode.AssemblyReference,
-            GetMetadataValue(descriptor.Metadata, "version", "0.1.0"),
+            GetMetadataValue(descriptor.Metadata, "version", "0.1.3"),
             "AIKernel.Core.Vfs.VfsGit",
             null,
             null,

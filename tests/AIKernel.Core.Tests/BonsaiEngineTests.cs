@@ -68,7 +68,7 @@ public sealed class BonsaiEngineTests
 
         public string Name => "Test EventBus";
 
-        public string Version => "0.1.0";
+        public string Version => "0.1.3";
 
         public IProviderCapabilities GetCapabilities() => new TestProviderCapabilities();
 

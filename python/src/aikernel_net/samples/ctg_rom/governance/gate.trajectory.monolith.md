@@ -1,5 +1,5 @@
 # Trajectory Gate Governance
-Version: 0.1.2
+Version: 0.1.3
 ID: Canon.CTG.Monolith.Gate.Trajectory
 
 The Trajectory Gate is a deterministic mathematical function over a sequence of decision results.

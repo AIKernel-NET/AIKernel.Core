@@ -1,5 +1,5 @@
 # 意思決定ゲート・ガバナンス
-Version: 0.1.2
+Version: 0.1.3
 ID: Canon.CTG.Monolith.Gate.Decision
 
 意思決定ゲートは、三つの評議会の票を評価する決定論的な数学的関数である。

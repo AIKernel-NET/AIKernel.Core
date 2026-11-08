@@ -14,7 +14,7 @@ def test_provider_manifest_from_dict_preserves_cli_metadata() -> None:
         {
             "providerId": "openai.chat",
             "name": "Chat OpenAI",
-            "version": "0.1.0",
+            "version": "0.1.3",
             "capabilities": ["chat.completion", "embedding"],
             "metadata": {"model": "gpt-4o", "endpoint": "https://api.openai.com/v1"},
             "assembly": "ChatOpenAIProvider.dll",
@@ -41,7 +41,7 @@ def test_provider_manifest_loader_fails_closed_without_capabilities(tmp_path) ->
         {
           "providerId": "empty",
           "name": "Empty",
-          "version": "0.1.0",
+          "version": "0.1.3",
           "capabilities": []
         }
         """,
@@ -61,7 +61,7 @@ def test_provider_manifest_preserves_capability_order() -> None:
         {
             "providerId": "ordered",
             "name": "Ordered",
-            "version": "0.1.0",
+            "version": "0.1.3",
             "capabilities": ["moderation", "chat.completion", "embedding"],
         }
     )
@@ -73,7 +73,7 @@ def test_core_owned_rom_storage_contract_descriptor() -> None:
     contract = rom_storage_contract(
         "aikernel.rom.storage",
         "memory",
-        {"version": "0.1.0.2"},
+        {"version": "0.1.3"},
     )
 
     assert contract.name == "ROM Storage"
@@ -87,7 +87,7 @@ def test_core_owned_vfs_git_contract_descriptor() -> None:
     contract = vfs_git_contract(
         "aikernel.vfs.git",
         "readonly",
-        {"version": "0.1.0.2"},
+        {"version": "0.1.3"},
     )
 
     assert contract.name == "VFS Git"

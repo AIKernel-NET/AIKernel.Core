@@ -18,7 +18,7 @@ Monolith は 0.1.x 系の安定化後に SDK layer を統合する reference sys
 
 共有の repository boundary、v0.1.3 development versioning、依存関係順、
 PyPI Trusted Publishing、Python wrapper scope は
-[AIKernel GPU rev3 Migration v0.1.3](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/migration/v0.1.3-gpu-rev3-migration.md)
+[AIKernel GPU canonical Migration v0.1.3](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/migration/v0.1.3-gpu-canonical-migration.md)
 で定義します。履歴としての v0.1.1.1 validation rule は
 [AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1-ja.md)
 に残します。

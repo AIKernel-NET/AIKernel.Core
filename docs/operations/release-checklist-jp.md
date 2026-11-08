@@ -6,10 +6,9 @@
 ものです。maintainer が publication step を明示するまで、stable `0.1.3` package は
 作成しません。
 
-共有の release order、versioning、Python wrapper rule、PyPI Trusted Publishing
-requirements は
-[AIKernel GPU rev3 Migration v0.1.3](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/migration/v0.1.3-gpu-rev3-migration.md)
-で定義します。
+共通のリリース順序、版管理、ローカル検証と安定版公開の違いは
+[0.1.3 パッケージリリース整合ガイド](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/package-release-alignment-v0.1.3-ja.md)
+を参照してください。Core 固有の Python と Trusted Publishing の確認は以下にまとめます。
 
 ## Package Scope
 

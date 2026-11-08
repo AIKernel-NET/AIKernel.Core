@@ -6,9 +6,10 @@ This checklist is for preparing AIKernel.Core packages for the v0.1.3 canonical
 series. Do not create stable `0.1.3` packages until the maintainer explicitly
 opens the publication step.
 
-Shared release order, versioning, Python wrapper rules, and PyPI Trusted
-Publishing requirements are defined by
-[AIKernel GPU rev3 Migration v0.1.3](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/migration/v0.1.3-gpu-rev3-migration.md).
+For shared release order, versioning, and the distinction between local
+validation and stable publication, see the
+[0.1.3 package release alignment guide](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/package-release-alignment-v0.1.3.md).
+The Core-specific Python and Trusted Publishing checks are below.
 
 ## Package Scope
 

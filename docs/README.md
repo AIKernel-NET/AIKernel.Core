@@ -18,7 +18,7 @@ line stabilizes.
 
 Shared repository boundaries, v0.1.3 development versioning, dependency order,
 PyPI Trusted Publishing, and Python wrapper scope are defined by
-[AIKernel GPU rev3 Migration v0.1.3](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/migration/v0.1.3-gpu-rev3-migration.md).
+[AIKernel GPU canonical Migration v0.1.3](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/migration/v0.1.3-gpu-canonical-migration.md).
 The historical v0.1.1.1 validation rules remain available in
 [AIKernel Repository Alignment v0.1.1.1](https://github.com/AIKernel-NET/AIKernel.NET/blob/main/docs/development/repository-alignment-v0.1.1.1.md).
 When a change crosses repositories, start with the

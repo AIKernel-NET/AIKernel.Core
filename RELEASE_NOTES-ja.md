@@ -2,6 +2,12 @@
 
 [English](RELEASE_NOTES.md)
 
+## 0.1.3（公開準備中）
+
+- Common・Core・Kernel・Hosting・TestKit を AIKernel.NET の 0.1.3 契約に揃えます。Core はマネージドランタイムであり、CUDA・LibTorch などのアクセラレーターランタイムは含めません。
+- Python の配布名は `aikernel-net`、インポート名は `aikernel_net` です。wheel の同梱 DLL と CTG-ROM サンプルは NuGet と別に検証します。
+- 安定版の生成・公開前は [Core リリースチェックリスト](docs/operations/release-checklist-jp.md) を参照してください。
+
 ## 0.1.2
 
 **2026年6月16日 - 正典 Runtime line。**

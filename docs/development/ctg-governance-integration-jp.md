@@ -85,5 +85,5 @@ Core CTG は次を実装しません。
 ## Distribution Boundary
 
 0.1.1.1 CTG Core 更新は NuGet packages のみで配布します。PyPI package は作成・公開しません。
-次の公式 v0.1.2 正典シリーズでは、NuGet と PyPI の package family を同期公開する前提です。
+次の公式 v0.1.3 正典シリーズでは、NuGet と PyPI の package family を同期公開する前提です。
 外部 Provider package は、それぞれの repository が更新されるまで独自の release line に維持します。

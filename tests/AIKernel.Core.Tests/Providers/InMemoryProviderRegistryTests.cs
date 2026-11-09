@@ -98,7 +98,7 @@ public sealed class InMemoryProviderRegistryTests
             {
               "providerId": "openai.chat",
               "name": "Chat OpenAI",
-              "version": "0.1.0",
+              "version": "0.1.3",
               "capabilities": ["chat.completion"],
               "metadata": {
                 "endpoint": "https://api.openai.com/v1",
@@ -142,7 +142,7 @@ public sealed class InMemoryProviderRegistryTests
 
         public string Name => "Test Provider";
 
-        public string Version => "0.1.0";
+        public string Version => "0.1.3";
 
         public IProviderCapabilities GetCapabilities()
         {

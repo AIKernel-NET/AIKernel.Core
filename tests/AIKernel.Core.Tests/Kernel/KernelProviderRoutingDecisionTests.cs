@@ -269,7 +269,7 @@ public sealed class KernelProviderRoutingDecisionTests
 
         public string Name => "Fake Provider";
 
-        public string Version => "0.1.0";
+        public string Version => "0.1.3";
 
         public IProviderCapabilities GetCapabilities()
         {

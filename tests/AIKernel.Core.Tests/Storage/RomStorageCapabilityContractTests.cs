@@ -10,7 +10,7 @@ public sealed class RomStorageCapabilityContractTests
     {
         var metadata = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["version"] = "0.1.0",
+            ["version"] = "0.1.3",
             ["storage_uri"] = "rom://core/storage"
         };
 

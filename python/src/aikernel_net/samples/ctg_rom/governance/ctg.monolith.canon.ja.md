@@ -1,5 +1,5 @@
 # モノリス人格のための正典的ガバナンス
-Version: 0.1.2
+Version: 0.1.3
 ID: Canon.CTG.Monolith.Canon
 
 本文書は、AIKernelにおけるモノリス人格の正典的ガバナンス原則を定義する。

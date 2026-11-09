@@ -1,5 +1,5 @@
 # Decision Gate Governance
-Version: 0.1.2
+Version: 0.1.3
 ID: Canon.CTG.Monolith.Gate.Decision
 
 The Decision Gate is a deterministic mathematical function that evaluates the votes of the three councils.

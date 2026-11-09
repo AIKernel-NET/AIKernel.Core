@@ -15,7 +15,7 @@ using AIKernel.Dtos.Time;
 /// - そのため、TimeProvider を直接 Core 全域に配るのではなく、
 ///   KernelTimeProvider で意味論を付与し、IKernelClock で統一的に参照します。
 ///
-/// v0.1.0 では標準 TimeProvider への委譲と固定時刻 replay を提供します。
+/// v0.1.3 では標準 TimeProvider への委譲と固定時刻 replay を提供します。
 /// EN: v0.2.0 以降で HLC、署名付き時刻、外部時刻証明などを追加する席をここに確保します。
 /// [EN] Documents this public package API member. [JA] KernelTimeProvider を表します。
 /// </summary>
@@ -54,7 +54,7 @@ public abstract class KernelTimeProvider : TimeProvider
     /// <summary>
     /// 時刻ソースの信頼度です。
     ///
-    /// v0.1.0 では 1.0 を返します。
+    /// v0.1.3 では 1.0 を返します。
     /// 将来的に NTP、署名付き時刻、外部監査時刻などを導入した場合、
     /// EN: その信頼性をここで表現します。
     /// [EN] Documents this public package API member. [JA] ReliabilityScore を取得します。
@@ -109,7 +109,7 @@ public abstract class KernelTimeProvider : TimeProvider
     /// <summary>
     /// Kernel の論理時刻を取得します。
     ///
-    /// v0.1.0 では GetUtcNow() を単純にラップします。
+    /// v0.1.3 では GetUtcNow() を単純にラップします。
     /// EN: 将来的に HLC や署名付き時刻を導入しても、利用側はこの API を使い続けられます。
     /// [EN] Documents this public package API member. [JA] GetLogicalTimestamp を実行します。
     /// </summary>

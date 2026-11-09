@@ -225,7 +225,7 @@ public sealed class Kernel : IKernel
             .GetName()
             .Version?
             .ToString()
-            ?? "0.0.0";
+            ?? "0.1.3";
     }
 
     /// <summary>[EN] Documents this public package API member. [JA] ExecuteAsync を実行します。</summary>

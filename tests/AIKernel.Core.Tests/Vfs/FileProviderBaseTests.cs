@@ -16,7 +16,9 @@ public sealed class FileProviderBaseTests
 
         Assert.False(available);
         Assert.False(health.IsHealthy);
-        Assert.Equal("Provider health is not implemented.", health.Message);
+        Assert.Equal(
+            "VFS provider is using fail-closed base health; override GetHealthAsync for backend-specific probes.",
+            health.Message);
     }
 
     private sealed class BareFileProvider : FileProviderBase

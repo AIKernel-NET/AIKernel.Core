@@ -1,5 +1,5 @@
 # Canonical Governance for Monolith Personality
-Version: 0.1.2
+Version: 0.1.3
 ID: Canon.CTG.Monolith.Canon
 
 This document defines the canonical governance principles for the Monolith personality in AIKernel.

@@ -72,7 +72,7 @@ core package:
 
 1. Configure the `pypi` environment in `AIKernel.Tools`.
 2. Configure the Trusted Publisher for `aikernel-tools` on PyPI.
-3. Push a tag such as `py-aikernel-tools-0.1.2`.
+3. Push a tag such as `py-aikernel-tools-0.1.3`.
 4. Confirm the workflow builds and publishes only `aikernel-tools`.
 5. On the PyPI file detail page, confirm `Uploaded using Trusted Publishing?`
    shows `Yes`.
@@ -81,7 +81,7 @@ core package:
    ```powershell
    py -m venv .venv-pypi-smoke
    .\.venv-pypi-smoke\Scripts\python -m pip install --upgrade pip
-   .\.venv-pypi-smoke\Scripts\python -m pip install aikernel-tools==0.1.2
+   .\.venv-pypi-smoke\Scripts\python -m pip install aikernel-tools==0.1.3
    .\.venv-pypi-smoke\Scripts\python -c "import aikernel_tools"
    ```
 

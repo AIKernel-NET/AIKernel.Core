@@ -7169,7 +7169,7 @@ _CATALOG: tuple[ManagedTypeDescriptor, ...] = (
         members=(
             ManagedMemberDescriptor('method', 'ToContract', 'public static CapabilityModuleDescriptor ToContract('),
             ManagedMemberDescriptor('method', 'CapabilityModuleDescriptor', 'return new CapabilityModuleDescriptor('),
-            ManagedMemberDescriptor('method', 'GetMetadataValue', 'GetMetadataValue(descriptor.Metadata, "version", "0.1.0"),'),
+            ManagedMemberDescriptor('method', 'GetMetadataValue', 'GetMetadataValue(descriptor.Metadata, "version", "0.1.3"),'),
         ),
     ),
     ManagedTypeDescriptor(
@@ -7437,7 +7437,7 @@ _CATALOG: tuple[ManagedTypeDescriptor, ...] = (
         members=(
             ManagedMemberDescriptor('method', 'ToContract', 'public static CapabilityModuleDescriptor ToContract('),
             ManagedMemberDescriptor('method', 'CapabilityModuleDescriptor', 'return new CapabilityModuleDescriptor('),
-            ManagedMemberDescriptor('method', 'GetMetadataValue', 'GetMetadataValue(descriptor.Metadata, "version", "0.1.0"),'),
+            ManagedMemberDescriptor('method', 'GetMetadataValue', 'GetMetadataValue(descriptor.Metadata, "version", "0.1.3"),'),
         ),
     ),
     ManagedTypeDescriptor(

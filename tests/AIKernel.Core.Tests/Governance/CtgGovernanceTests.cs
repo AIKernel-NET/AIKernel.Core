@@ -748,9 +748,9 @@ rejectPolicy:
     {
         return $$"""
 id: "ctg.monolith.minimal"
-version: "0.1.2"
-canonVersion: "0.1.2"
-schemaVersion: "0.1.2"
+version: "0.1.3"
+canonVersion: "0.1.3"
+schemaVersion: "0.1.3"
 locale: "{{locale}}"
 canon:
   path: "rom/governance/ctg.monolith.canon{{suffix}}.md"

@@ -24,7 +24,7 @@ public static class RomStorageCapabilityContracts
             "ROM Storage",
             CapabilityModuleKind.ManagedAssembly,
             CapabilityInvocationMode.AssemblyReference,
-            GetMetadataValue(descriptor.Metadata, "version", "0.1.0"),
+            GetMetadataValue(descriptor.Metadata, "version", "0.1.3"),
             "AIKernel.Core.Storage",
             null,
             null,

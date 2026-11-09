@@ -1,5 +1,5 @@
 # Reject Policy Governance
-Version: 0.1.2
+Version: 0.1.3
 ID: Canon.CTG.Monolith.Policy.Reject
 
 The Reject Policy defines the canonical taxonomy of rejection reasons used across the governance system.

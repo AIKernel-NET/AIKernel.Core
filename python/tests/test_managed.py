@@ -64,7 +64,7 @@ def test_managed_assemblies_resolve_from_nuget_cache(
         "AIKernel.Dtos.dll": "AIKernel.Dtos",
         "AIKernel.Enums.dll": "AIKernel.Enums",
     }.items():
-        version = "0.1.2"
+        version = "0.1.3"
         assembly_path = nuget_root / package_name.lower() / version / "lib" / "net10.0" / assembly_name
         assembly_path.parent.mkdir(parents=True, exist_ok=True)
         assembly_path.write_text("", encoding="utf-8")

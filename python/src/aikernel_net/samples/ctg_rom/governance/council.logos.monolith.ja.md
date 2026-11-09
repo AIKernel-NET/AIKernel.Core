@@ -1,5 +1,5 @@
 # ロゴス評議会ガバナンス
-Version: 0.1.2
+Version: 0.1.3
 ID: Canon.CTG.Monolith.Council.Logos
 
 ロゴス評議会は、すべてのガバナンス評価において論理的整合性、追跡可能性、および説明可能性を保証する。

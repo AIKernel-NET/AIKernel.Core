@@ -1,5 +1,5 @@
 # Pathos評議会ガバナンス
-Version: 0.1.2
+Version: 0.1.3
 ID: Canon.CTG.Monolith.Council.Pathos
 
 Pathos評議会は、人間の文脈、感情的状態、および尊厳との整合性を保証する。

@@ -1,5 +1,5 @@
 # 軌道ゲート・ガバナンス
-Version: 0.1.2
+Version: 0.1.3
 ID: Canon.CTG.Monolith.Gate.Trajectory
 
 軌道ゲートは、一連の決定結果に対する決定論的な数学的関数である。

@@ -29,7 +29,7 @@ public sealed class KernelReplayerTests
     public async Task ReplayAsync_FailsClosed_WhenDumpIsIncomplete()
     {
         var replayer = new KernelReplayer();
-        var dump = CreateReplayDumpWithoutHashChain();
+        var dump = CreateReplayDump() with { HashChain = null! };
 
         var result = await replayer.ReplayAsync(
             dump,
@@ -39,6 +39,59 @@ public sealed class KernelReplayerTests
         Assert.False(replayer.CanReplay(dump));
         Assert.False(result.IsSuccessful);
         Assert.Equal("Replay dump is incomplete or fails closed.", result.ErrorMessage);
+    }
+
+    [Theory]
+    [InlineData("structure")]
+    [InlineData("generation")]
+    [InlineData("result")]
+    [InlineData("metadata")]
+    [InlineData("generation-parent")]
+    [InlineData("polish-parent")]
+    [InlineData("digest")]
+    [InlineData("algorithm")]
+    public async Task ReplayAsync_RejectsTamperedDump(string tampering)
+    {
+        var replayer = new KernelReplayer();
+        var original = CreateReplayDump();
+        var tampered = tampering switch
+        {
+            "structure" => original with { StructureOutput = new RawLogic("tampered") },
+            "generation" => original with { GenerationOutput = "tampered" },
+            "result" => original with
+            {
+                OriginalResult = new ExecutionResult
+                {
+                    Logic = original.OriginalResult.Logic,
+                    FinalOutput = "tampered",
+                    IsSuccessful = original.OriginalResult.IsSuccessful,
+                    ErrorMessage = original.OriginalResult.ErrorMessage,
+                    ElapsedMilliseconds = original.OriginalResult.ElapsedMilliseconds
+                }
+            },
+            "metadata" => original with { CreatedAt = original.CreatedAt.AddSeconds(1) },
+            "generation-parent" => original with
+            {
+                HashChain = original.HashChain with { GenerationParentHash = original.HashChain.GenerationHash }
+            },
+            "polish-parent" => original with
+            {
+                HashChain = original.HashChain with { PolishParentHash = original.HashChain.StructureHash }
+            },
+            "digest" => original with
+            {
+                HashChain = original.HashChain with { PolishHash = original.HashChain.StructureHash }
+            },
+            "algorithm" => original with { HashChain = original.HashChain with { HashAlgorithm = "SHA1" } },
+            _ => throw new ArgumentOutOfRangeException(nameof(tampering))
+        };
+
+        var result = await replayer.ReplayAsync(tampered, CreateTraceContext(), TestContext.Current.CancellationToken);
+
+        Assert.False(replayer.CanReplay(tampered));
+        Assert.False(result.IsSuccessful);
+        Assert.Empty(result.FinalOutput);
+        Assert.Empty(result.Logic.SerializedRepresentation);
     }
 
     [Fact]
@@ -55,49 +108,27 @@ public sealed class KernelReplayerTests
 
     private static ReplayDump CreateReplayDump()
     {
-        return new ReplayDump
+        const string dumpId = "dump-1";
+        var createdAt = DateTime.UnixEpoch;
+        var structure = new RawLogic("logic");
+        const string generation = "generated";
+        var original = new ExecutionResult
         {
-            DumpId = "dump-1",
-            CreatedAt = DateTime.UnixEpoch,
-            StructureOutput = new RawLogic("logic"),
-            GenerationOutput = "final",
-            OriginalResult = new ExecutionResult
-            {
-                Logic = new RawLogic("logic"),
-                FinalOutput = "final",
-                IsSuccessful = true,
-                ErrorMessage = string.Empty,
-                ElapsedMilliseconds = 12
-            },
-            HashChain = new HashChain
-            {
-                HashAlgorithm = "sha256",
-                StructureHash = "s",
-                GenerationHash = "g",
-                GenerationParentHash = "s",
-                PolishHash = "p",
-                PolishParentHash = "g"
-            }
+            Logic = new RawLogic("original logic"),
+            FinalOutput = "final",
+            IsSuccessful = true,
+            ErrorMessage = string.Empty,
+            ElapsedMilliseconds = 12
         };
-    }
 
-    private static ReplayDump CreateReplayDumpWithoutHashChain()
-    {
         return new ReplayDump
         {
-            DumpId = "dump-1",
-            CreatedAt = DateTime.UnixEpoch,
-            StructureOutput = new RawLogic("logic"),
-            GenerationOutput = "final",
-            OriginalResult = new ExecutionResult
-            {
-                Logic = new RawLogic("logic"),
-                FinalOutput = "final",
-                IsSuccessful = true,
-                ErrorMessage = string.Empty,
-                ElapsedMilliseconds = 12
-            },
-            HashChain = null!
+            DumpId = dumpId,
+            CreatedAt = createdAt,
+            StructureOutput = structure,
+            GenerationOutput = generation,
+            OriginalResult = original,
+            HashChain = ReplayDumpIntegrity.CreateHashChain(dumpId, createdAt, structure, generation, original)
         };
     }
 

@@ -69,6 +69,29 @@ services.AddCtgGovernance();
 `AddCtgGovernance()` registers CTG evaluators and adapters without replacing an
 already registered `IDecisionGate` or `ITrajectoryGate`.
 
+## Run the Model-Backed Pipeline
+
+Choose the provider and model ID when registering the Core services. Use an
+existing provider factory and its matching `ModelPromptCapability`.
+
+```csharp
+services.AddAIKernelCore()
+    .WithModelProvider(providerFactory, capability)
+    .WithExecutionPipeline(capability.ProviderId, capability.ModelId);
+```
+
+Initialize the provider through the host's normal lifecycle before execution.
+Pass a populated `IContextCollection` and the result of trusted upstream
+signature verification to `IPipelineOrchestrator.ExecuteAsync`. Structure
+receives the orchestration and material fragments and must return a JSON
+object containing a non-empty `steps` array of strings. Generation receives
+that validated plan. Polish receives the generated text and expression
+fragments, and its output must pass the configured `IPolisherValidator`.
+
+Resolve the concrete `PipelineOrchestrator` and call `ExecuteWithReplayAsync`
+when the caller needs a `ReplayDump`. A successful run returns the stage
+outputs with a SHA-256 chain that `ReplayFromDumpAsync` verifies on read.
+
 ## Use CTG Governance
 
 Core provides the deterministic CTG kernel surface:

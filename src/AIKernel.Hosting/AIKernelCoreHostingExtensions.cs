@@ -2,6 +2,7 @@ namespace AIKernel.Hosting;
 
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
+using AIKernel.Abstractions.Providers;
 using AIKernel.Abstractions.Rom;
 using AIKernel.Abstractions.Security;
 using AIKernel.Core.Capabilities;
@@ -150,6 +151,54 @@ public static class AIKernelCoreHostingExtensions
         return services;
     }
 
+    /// <summary>
+    /// EN: Selects a registered model for the Structure and Generation phases.
+    /// JA: Structure と Generation に使う登録済みモデルを指定します。
+    /// </summary>
+    public static AIKernelCoreBuilder WithExecutionPipeline(
+        this AIKernelCoreBuilder builder,
+        string providerId,
+        string modelId)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(providerId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(modelId);
+
+        builder.Services.AddSingleton(new ExecutionPipelineModel(providerId, modelId));
+        return builder;
+    }
+
+    private static PipelineOrchestrator CreatePipelineOrchestrator(IServiceProvider services)
+    {
+        var replayer = services.GetRequiredService<IKernelReplayer>();
+        var model = services.GetService<ExecutionPipelineModel>();
+        if (model is null)
+        {
+            return new PipelineOrchestrator(replayer);
+        }
+
+        var providers = services.GetServices<IModelProvider>()
+            .Where(provider => string.Equals(provider.ProviderId, model.ProviderId, StringComparison.Ordinal))
+            .Take(2)
+            .ToArray();
+        if (providers.Length != 1)
+        {
+            throw new InvalidOperationException(
+                $"Execution pipeline requires exactly one registered model provider with ID '{model.ProviderId}'.");
+        }
+
+        return new PipelineOrchestrator(
+            replayer,
+            providers[0],
+            model.ModelId,
+            services.GetRequiredService<IKernelExecutor>(),
+            services.GetRequiredService<IOutputPolisher>(),
+            services.GetRequiredService<IPolisherValidator>(),
+            services.GetRequiredService<IKernelClock>());
+    }
+
+    private sealed record ExecutionPipelineModel(string ProviderId, string ModelId);
+
     private static IServiceCollection AddCoreRuntimeServices(
         this IServiceCollection services)
     {
@@ -203,7 +252,8 @@ public static class AIKernelCoreHostingExtensions
         services.TryAddSingleton<IModelPromptCapabilityResolver, StaticModelPromptCapabilityResolver>();
         services.TryAddSingleton<AIKernel.Abstractions.Execution.IKernelExecutor, KernelExecutor>();
         services.TryAddSingleton<IKernelReplayer, KernelReplayer>();
-        services.TryAddSingleton<IPipelineOrchestrator, PipelineOrchestrator>();
+        services.TryAddSingleton(CreatePipelineOrchestrator);
+        services.TryAddSingleton<IPipelineOrchestrator>(provider => provider.GetRequiredService<PipelineOrchestrator>());
         services.TryAddSingleton<IOutputPolisher, PassThroughOutputPolisher>();
         services.TryAddSingleton<IPolisherValidator, DefaultPolisherValidator>();
 

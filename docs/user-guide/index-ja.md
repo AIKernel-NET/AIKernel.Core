@@ -68,6 +68,28 @@ services.AddCtgGovernance();
 `AddCtgGovernance()` は CTG evaluator / adapter を登録しますが、すでに登録済みの
 `IDecisionGate` や `ITrajectoryGate` は置き換えません。
 
+## モデルを使ってパイプラインを実行する
+
+既存のProviderファクトリと対応する `ModelPromptCapability` を登録し、
+パイプラインで使うProvider IDとモデルIDを指定します。
+
+```csharp
+services.AddAIKernelCore()
+    .WithModelProvider(providerFactory, capability)
+    .WithExecutionPipeline(capability.ProviderId, capability.ModelId);
+```
+
+ホストの通常のライフサイクルでProviderを初期化します。
+`IPipelineOrchestrator.ExecuteAsync` には組み立て済みの `IContextCollection` と、
+信頼できる上流処理で得た署名検証結果を渡します。Structureは指示と資料を受け取り、
+空でない文字列配列 `steps` を持つJSONの計画を返します。Generationには検証済みの
+計画を渡します。Polishには生成文と表現の断片を渡し、`IPolisherValidator` で
+整形結果を検証します。
+
+`ReplayDump` が必要な場合は、具体型の `PipelineOrchestrator` を取得し、
+`ExecuteWithReplayAsync` を呼びます。成功時に各段階の出力とSHA-256チェーンが
+返り、`ReplayFromDumpAsync` が再生時にチェーンを検証します。
+
 ## Use CTG Governance
 
 Core は deterministic CTG kernel surface を提供します。

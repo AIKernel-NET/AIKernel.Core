@@ -40,6 +40,15 @@ internal static unsafe partial class NativeCompute
     internal static partial int AttentionTile(nint context, ulong address, float* input, float* output,
         uint rows, uint kvWidth, uint headOffset, uint headWidth, uint mode);
 
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_upload_shared")]
+    internal static partial int UploadShared(nint context, ulong address, nint source, nuint capacity, nuint offset, nuint length);
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_wipe_device")]
+    internal static partial int WipeDevice(nint context, ulong address, nuint length);
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_wipe_scratch")]
+    internal static partial int WipeScratch(nint context);
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_get_pci_bus_id")]
+    internal static partial int GetPciBusId(nint context, byte* address, int capacity);
+
     internal static void Check(int status, string operation)
     {
         if (status == 4)

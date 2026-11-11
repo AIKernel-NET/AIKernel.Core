@@ -15,6 +15,7 @@ typedef struct allocation {
 struct ak_context {
     ak_driver driver;
     void *cuda;
+    int device;
     void *stream;
     void *gemv;
     void *normalize;
@@ -43,11 +44,10 @@ int32_t ak_create(uint32_t version, int32_t ordinal, ak_context **result) {
     int status = ak_driver_open(&ctx->driver);
     if (status == AK_OK) {
         ak_driver *d = &ctx->driver;
-        int device = 0;
         void *module = NULL, *popped = NULL;
         int code = d->init(0);
-        if (!code) code = d->device_get(&device, ordinal);
-        if (!code) code = d->ctx_create(&ctx->cuda, 0, device);
+        if (!code) code = d->device_get(&ctx->device, ordinal);
+        if (!code) code = d->ctx_create(&ctx->cuda, 0, ctx->device);
         if (!code) code = d->stream_create(&ctx->stream, 1);
         if (!code) code = d->module_load(&module, ak_embedded_ptx);
         if (!code) code = d->module_func(&ctx->gemv, module, "matvec");
@@ -88,6 +88,28 @@ static int finish_stream(ak_context *ctx, int code) {
     return ak_status(code ? code : sync);
 }
 
+static void wipe_host(void *address, size_t bytes) {
+    volatile unsigned char *cursor = address;
+    while (bytes--) *cursor++ = 0;
+}
+
+static int wipe_scratch_current(ak_context *ctx) {
+    if (!ctx->scratch_bytes) return AK_OK;
+    wipe_host(ctx->scratch_host, ctx->scratch_bytes);
+    return finish_stream(ctx, ctx->driver.memset8(ctx->scratch_device, 0, ctx->scratch_bytes, ctx->stream));
+}
+
+int32_t ak_wipe_scratch(ak_context *ctx) {
+    int status = enter(ctx);
+    if (status != AK_OK) return status;
+    return leave(ctx, wipe_scratch_current(ctx));
+}
+
+int32_t ak_get_pci_bus_id(ak_context *ctx, char *target, int capacity) {
+    if (!ctx || !target || capacity < 16) return AK_INVALID;
+    return ak_status(ctx->driver.pci_bus_id(target, capacity, ctx->device));
+}
+
 static allocation **find_allocation(allocation **head, uint64_t address) {
     while (*head && (*head)->address != address) head = &(*head)->next;
     return head;
@@ -103,7 +125,13 @@ int32_t ak_destroy(ak_context *ctx) {
     ak_driver *d = &ctx->driver;
     int status = ak_status(d->ctx_push(ctx->cuda));
     int current = status == AK_OK;
-    if (current && ctx->scratch_host) status = ak_status(d->host_free(ctx->scratch_host));
+    if (current) {
+        status = wipe_scratch_current(ctx);
+        if (ctx->scratch_host) {
+            int next = ak_status(d->host_free(ctx->scratch_host));
+            if (!status) status = next;
+        }
+    }
     while (ctx->pinned_blocks) {
         allocation *item = ctx->pinned_blocks;
         ctx->pinned_blocks = item->next;
@@ -206,6 +234,8 @@ int32_t ak_pinned_free(ak_context *ctx, void *address) { return release(ctx, (ui
 static int scratch(ak_context *ctx, size_t bytes) {
     if (bytes <= ctx->scratch_bytes) return AK_OK;
     ak_driver *d = &ctx->driver;
+    int cleared = wipe_scratch_current(ctx);
+    if (cleared) return cleared;
     ctx->scratch_bytes = 0;
     if (ctx->scratch_host) {
         int code = d->host_free(ctx->scratch_host);
@@ -234,6 +264,31 @@ int32_t ak_upload(ak_context *ctx, uint64_t address, const void *source, size_t 
         if (!status) source = memcpy(ctx->scratch_host, source, bytes);
     }
     if (!status) status = finish_stream(ctx, ctx->driver.htod(address, source, bytes, ctx->stream));
+    return leave(ctx, status);
+}
+
+int32_t ak_wipe_device(ak_context *ctx, uint64_t address, size_t bytes) {
+    if (!ctx || !bytes || !within(&ctx->device_blocks, address, bytes)) return AK_INVALID;
+    int status = enter(ctx);
+    if (status != AK_OK) return status;
+    return leave(ctx, finish_stream(ctx, ctx->driver.memset8(address, 0, bytes, ctx->stream)));
+}
+
+int32_t ak_upload_shared(ak_context *ctx, uint64_t address, void *base, size_t capacity,
+                         size_t offset, size_t bytes) {
+    if (!ctx || !base || !bytes || offset > capacity || bytes > capacity - offset ||
+        !within(&ctx->device_blocks, address, bytes)) return AK_INVALID;
+    int status = enter(ctx);
+    if (status != AK_OK) return status;
+
+    int code = ctx->driver.host_register(base, capacity, 0);
+    if (code == 0) {
+        status = finish_stream(ctx, ctx->driver.htod(address, (char *)base + offset, bytes, ctx->stream));
+        int cleanup = ak_status(ctx->driver.host_unregister(base));
+        if (!status) status = cleanup;
+    } else {
+        status = ak_status(code);
+    }
     return leave(ctx, status);
 }
 

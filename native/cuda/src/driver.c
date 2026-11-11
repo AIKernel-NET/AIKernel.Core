@@ -36,6 +36,10 @@ int ak_driver_open(ak_driver *d) {
     LOAD(mem_free, "cuMemFree_v2");
     LOAD(host_alloc, "cuMemAllocHost_v2");
     LOAD(host_free, "cuMemFreeHost");
+    LOAD(host_register, "cuMemHostRegister_v2");
+    LOAD(host_unregister, "cuMemHostUnregister");
+    LOAD(memset8, "cuMemsetD8Async");
+    LOAD(pci_bus_id, "cuDeviceGetPCIBusId");
     LOAD(htod, "cuMemcpyHtoDAsync_v2");
     LOAD(dtoh, "cuMemcpyDtoHAsync_v2");
     LOAD(stream_create, "cuStreamCreate");

@@ -38,6 +38,11 @@ AK_EXPORT int32_t ak_device_free(ak_context *ctx, uint64_t address);
 AK_EXPORT int32_t ak_pinned_alloc(ak_context *ctx, size_t bytes, void **address);
 AK_EXPORT int32_t ak_pinned_free(ak_context *ctx, void *address);
 AK_EXPORT int32_t ak_upload(ak_context *ctx, uint64_t address, const void *source, size_t bytes);
+AK_EXPORT int32_t ak_upload_shared(ak_context *ctx, uint64_t address, void *base, size_t capacity,
+                                       size_t offset, size_t bytes);
+AK_EXPORT int32_t ak_wipe_device(ak_context *ctx, uint64_t address, size_t bytes);
+AK_EXPORT int32_t ak_wipe_scratch(ak_context *ctx);
+AK_EXPORT int32_t ak_get_pci_bus_id(ak_context *ctx, char *target, int capacity);
 AK_EXPORT int32_t ak_download(ak_context *ctx, uint64_t address, void *destination, size_t bytes);
 AK_EXPORT int32_t ak_gemv(ak_context *ctx, uint64_t weights, const float *x, float *y, uint32_t rows, uint32_t cols);
 AK_EXPORT int32_t ak_normalize(ak_context *ctx, const float *x, const float *scale, float *y,

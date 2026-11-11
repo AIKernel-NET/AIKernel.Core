@@ -1,3 +1,4 @@
+using System.Buffers;
 using AIKernel.Core.Memory;
 using AIKernel.Kernel.Memory;
 
@@ -148,6 +149,94 @@ public sealed class VirtualMemorySpaceTests : IDisposable
         AssertBlock(space, 1, 2);
     }
 
+    [Fact]
+    public void ForkSharesPhysicalStorageUntilTheFirstWrite()
+    {
+        var device = new TestDevice();
+        using var parent = new VirtualMemorySpace(3, BlockSize, 1, directory.FullName, 1, device);
+        parent.WriteBlock(0, Bytes(17));
+        parent.MoveBlock(0, VirtualMemoryTier.Vram);
+        parent.WriteBlock(1, Bytes(32));
+        parent.MoveBlock(1, VirtualMemoryTier.Swap);
+        var free = parent.GetAvailableBlocks();
+
+        using var child = Assert.IsType<VirtualMemorySpace>(parent.ForkSpace().Value);
+        Assert.Equal(2, parent.GetBlockReferenceCount(0));
+        Assert.Equal(2, parent.GetBlockReferenceCount(1));
+        Assert.Equal(free, child.GetAvailableBlocks());
+        Assert.Equal(1, device.LiveBlocks);
+
+        child.WriteBlockSlice(0, 0, [99]);
+        child.WriteBlock(1, Bytes(54));
+        Assert.Equal(1, parent.GetBlockReferenceCount(0));
+        AssertBlock(parent, 0, 17);
+        AssertBlock(parent, 1, 32);
+        parent.Dispose();
+
+        var changed = Bytes(0);
+        child.ReadBlock(0, changed);
+        Assert.Equal(99, changed[0]);
+        Assert.Equal(17, changed[1]);
+        AssertBlock(child, 1, 54);
+    }
+
+    [Fact]
+    public void SnapshotRestoresContinuationAndPagesWithoutInitialResidency()
+    {
+        var path = Path.Combine(directory.FullName, "kv.snapshot");
+        using var space = new VirtualMemorySpace(4, BlockSize, 1, directory.FullName);
+        space.WriteBlock(2, Bytes(12));
+        space.WriteBlock(3, Bytes(15));
+        var manifest = space.Hibernate(path, [0x10, 0x20]);
+        Assert.True(manifest.IsSuccess, manifest.Error?.ToString());
+        Assert.Equal(2, manifest.Value.StoredBlocks);
+
+        var restore = VirtualMemorySpace.Restore(path, ramBlocks: 1);
+        Assert.True(restore.IsSuccess, restore.Error?.ToString());
+        using (var restored = restore.Value!)
+        {
+            Assert.Equal((1, 0), restored.GetAvailableBlocks());
+            Span<byte> continuation = stackalloc byte[2];
+            Assert.Equal(2, restored.ReadSnapshotState(continuation).Value);
+            Assert.Equal(new byte[] { 0x10, 0x20 }, continuation.ToArray());
+            restored.UseComputeBlock(2, (data, device) =>
+            {
+                Assert.Null(device);
+                Assert.Equal(Bytes(12), data.ToArray());
+            });
+            Assert.Equal((1, 0), restored.GetAvailableBlocks());
+            AssertBlock(restored, 0, 0);
+            AssertBlock(restored, 3, 15);
+        }
+
+        var corrupt = File.ReadAllBytes(path);
+        corrupt[^33] ^= 0x80;
+        File.WriteAllBytes(path, corrupt);
+        Assert.Equal("snapshot_integrity_failed", VirtualMemorySpace.Restore(path).Error?.Code);
+        File.WriteAllBytes(path, corrupt[..31]);
+        Assert.Equal("snapshot_invalid", VirtualMemorySpace.Restore(path).Error?.Code);
+    }
+
+    [Fact]
+    public void SecureSpaceClearsHostAndDeviceBlocksBeforeRelease()
+    {
+        var device = new TestDevice { VerifyWipe = true };
+        using (var space = new VirtualMemorySpace(3, BlockSize, 1, directory.FullName, 1, device,
+                   swapPolicy: new(Encrypt: true, ZeroWipe: true)))
+        {
+            space.WriteBlock(0, Bytes(0xBE));
+            space.MoveBlock(0, VirtualMemoryTier.Vram);
+            space.WriteBlock(1, Bytes(0xEF));
+            space.MoveBlock(1, VirtualMemoryTier.Swap);
+            AssertBlock(space, 1, 0xEF);
+            Assert.Equal("snapshot_plaintext_disabled", space.Hibernate(Path.Combine(directory.FullName, "kv.snapshot")).Error?.Code);
+        }
+        Assert.True(device.WipedDeviceBlocks > 0);
+        Assert.True(device.WipedHostBlocks > 0);
+        Assert.Equal(0, device.LiveBlocks);
+        Assert.Empty(directory.EnumerateFileSystemInfos());
+    }
+
     public void Dispose() => directory.Delete(recursive: true);
 
     private sealed class TestSource : IVirtualMemorySource
@@ -169,9 +258,16 @@ public sealed class VirtualMemorySpaceTests : IDisposable
         Assert.Equal(Bytes(value), bytes);
     }
 
-    private sealed class TestDevice : IVirtualMemoryDevice
+    private sealed class TestDevice : IZeroableVirtualMemoryDevice, IVirtualMemoryHostAllocator
     {
         internal bool RejectUploads { get; init; }
+        internal bool VerifyWipe { get; init; }
+        internal int WipedDeviceBlocks { get; private set; }
+        internal int WipedHostBlocks { get; private set; }
+
+        public void ZeroScratch() { }
+
+        public IMemoryOwner<byte> AllocateHostBlock(int length) => new HostTestBlock(this, length);
         internal int LiveBlocks { get; private set; }
 
         public IVirtualMemoryDeviceBlock Upload(ReadOnlySpan<byte> source)
@@ -185,20 +281,39 @@ public sealed class VirtualMemorySpaceTests : IDisposable
             return new TestBlock(this, source.ToArray());
         }
 
-        private sealed class TestBlock(TestDevice owner, byte[] bytes) : IVirtualMemoryDeviceBlock
+        private sealed class TestBlock(TestDevice owner, byte[] bytes) : IZeroableDeviceBlock
         {
             private byte[]? content = bytes;
 
             public void Download(Span<byte> destination)
                 => (content ?? throw new ObjectDisposedException(nameof(TestBlock))).CopyTo(destination);
 
+            public void Zero() => content.AsSpan().Clear();
+
             public void Dispose()
             {
                 if (content is not null)
                 {
+                    if (owner.VerifyWipe)
+                    {
+                        Assert.All(content, b => Assert.Equal(0, b));
+                        owner.WipedDeviceBlocks++;
+                    }
                     content = null;
                     owner.LiveBlocks--;
                 }
+            }
+        }
+
+        private sealed class HostTestBlock(TestDevice owner, int length) : IMemoryOwner<byte>
+        {
+            public Memory<byte> Memory { get; } = new byte[length];
+
+            public void Dispose()
+            {
+                if (!owner.VerifyWipe) return;
+                Assert.True(Memory.Span.IndexOfAnyExcept((byte)0) < 0);
+                owner.WipedHostBlocks++;
             }
         }
     }

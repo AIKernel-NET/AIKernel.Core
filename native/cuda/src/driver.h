@@ -24,6 +24,10 @@ typedef struct ak_driver {
     int (CUDA_CALL *mem_free)(uint64_t);
     int (CUDA_CALL *host_alloc)(void **, size_t);
     int (CUDA_CALL *host_free)(void *);
+    int (CUDA_CALL *host_register)(void *, size_t, unsigned);
+    int (CUDA_CALL *host_unregister)(void *);
+    int (CUDA_CALL *memset8)(uint64_t, unsigned char, size_t, void *);
+    int (CUDA_CALL *pci_bus_id)(char *, int, int);
     int (CUDA_CALL *htod)(uint64_t, const void *, size_t, void *);
     int (CUDA_CALL *dtoh)(void *, uint64_t, size_t, void *);
     int (CUDA_CALL *stream_create)(void **, unsigned);

@@ -1,25 +1,25 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
 
 namespace AIKernel.Kernel.Memory;
 
 /// <summary>A logical address space backed by RAM, optional VRAM, and a private swap file.</summary>
-public sealed class VirtualMemorySpace : IDisposable
+public sealed partial class VirtualMemorySpace : IDisposable
 {
-    private readonly Lock gate = new();
+    private readonly Arena arena;
     private readonly Dictionary<long, Block> blocks = [];
-    private readonly LinkedList<Block> ram = new();
-    private readonly LinkedList<Block> vram = new();
-    private readonly Stack<long> freeSlots = new();
-    private readonly Stack<IMemoryOwner<byte>> freeRam = new(2);
-    private readonly IVirtualMemorySource? source;
-    private readonly string swapDirectory;
-    private readonly int ramCapacity;
-    private readonly int vramCapacity;
-    private readonly IVirtualMemoryDevice? device;
-    private FileStream? swapFile;
-    private long nextSlot;
+    private Lock gate => arena.Gate;
+    private LinkedList<Block> ram => arena.Ram;
+    private LinkedList<Block> vram => arena.Vram;
+    private Stack<long> freeSlots => arena.FreeSlots;
+    private Stack<IMemoryOwner<byte>> freeRam => arena.FreeRam;
+    private IVirtualMemorySource? source => arena.Source;
+    private int ramCapacity => arena.RamCapacity;
+    private int vramCapacity => arena.VramCapacity;
+    private IVirtualMemoryDevice? device => arena.Device;
     private long swapReads;
     private long backingReads;
     private long devicePageIns;
@@ -31,11 +31,19 @@ public sealed class VirtualMemorySpace : IDisposable
     /// <summary>The number of bytes in each block.</summary>
     public int BlockSize { get; }
 
+    /// <summary>Creates a block address space with the default swap policy.</summary>
+    public VirtualMemorySpace(long blockCount, int blockSize, int ramBlocks, string swapDirectory,
+        int vramBlocks, IVirtualMemoryDevice? device, IVirtualMemorySource? source)
+        : this(blockCount, blockSize, ramBlocks, swapDirectory, vramBlocks, device, source, default)
+    {
+    }
+
     /// <summary>
-    /// Creates a block address space. The caller keeps the optional device alive until the space is disposed.
+    /// Creates a block address space. Keep the optional device and external backing alive until all forks are closed.
     /// </summary>
     public VirtualMemorySpace(long blockCount, int blockSize, int ramBlocks, string swapDirectory,
-        int vramBlocks = 0, IVirtualMemoryDevice? device = null, IVirtualMemorySource? source = null)
+        int vramBlocks = 0, IVirtualMemoryDevice? device = null, IVirtualMemorySource? source = null,
+        SwapEncryptionPolicy swapPolicy = default)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(blockCount);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(blockSize);
@@ -46,15 +54,68 @@ public sealed class VirtualMemorySpace : IDisposable
         if (vramBlocks > 0)
         {
             ArgumentNullException.ThrowIfNull(device);
+            if (swapPolicy.ZeroWipe && device is not IZeroableVirtualMemoryDevice)
+                throw new ArgumentException("The device must support zero-wipe.", nameof(device));
         }
 
         BlockCount = blockCount;
         BlockSize = blockSize;
-        ramCapacity = ramBlocks;
-        vramCapacity = vramBlocks;
-        this.swapDirectory = Path.GetFullPath(swapDirectory);
-        this.device = vramBlocks > 0 ? device : null;
-        this.source = source;
+        arena = new Arena(ramBlocks, vramBlocks, Path.GetFullPath(swapDirectory),
+            vramBlocks > 0 ? device : null, source, swapPolicy);
+    }
+
+    private VirtualMemorySpace(VirtualMemorySpace parent)
+    {
+        BlockCount = parent.BlockCount;
+        BlockSize = parent.BlockSize;
+        arena = parent.arena;
+        blocks.EnsureCapacity(parent.blocks.Count);
+        foreach (var entry in parent.blocks)
+            blocks.Add(entry.Key, entry.Value);
+        if (arena.Spaces == int.MaxValue)
+            throw new InvalidOperationException("Too many virtual memory forks.");
+        foreach (var block in blocks.Values)
+            block.RefCount++;
+        arena.Spaces++;
+    }
+
+    /// <summary>Shares resident blocks and the tier budgets until a fork writes a page.</summary>
+    public Result<VirtualMemorySpace> ForkSpace()
+    {
+        lock (gate)
+        {
+            if (disposed)
+                return Fail<VirtualMemorySpace>("virtual_memory_closed", "The address space is closed.");
+            try
+            {
+                return Result<VirtualMemorySpace>.Success(new VirtualMemorySpace(this));
+            }
+            catch (Exception ex) when (ex is OutOfMemoryException or InvalidOperationException)
+            {
+                return Fail<VirtualMemorySpace>("virtual_memory_fork_failed", ex.Message);
+            }
+        }
+    }
+
+    /// <summary>Reports how many spaces currently reference the materialized block.</summary>
+    public int GetBlockReferenceCount(long blockIndex)
+    {
+        ValidateIndex(blockIndex);
+        lock (gate)
+        {
+            ObjectDisposedException.ThrowIf(disposed, this);
+            return blocks.TryGetValue(blockIndex, out var block) ? block.RefCount : 0;
+        }
+    }
+
+    /// <summary>Reports the physical tier capacity available across this arena's forks.</summary>
+    public (int RamBlocks, int VramBlocks) GetAvailableBlocks()
+    {
+        lock (gate)
+        {
+            ObjectDisposedException.ThrowIf(disposed, this);
+            return (ramCapacity - ram.Count, vramCapacity - vram.Count);
+        }
     }
 
     /// <summary>Reads a whole block and promotes a resident copy to RAM on a page fault.</summary>
@@ -87,6 +148,12 @@ public sealed class VirtualMemorySpace : IDisposable
             ObjectDisposedException.ThrowIf(disposed, this);
             if (blocks.TryGetValue(blockIndex, out var block))
             {
+                if (block.RefCount > 1)
+                {
+                    ReplaceSharedBlock(block, CopyToRam(source));
+                    return;
+                }
+
                 if (block.Ram is { } bytes)
                 {
                     source.CopyTo(bytes.Memory.Span);
@@ -129,6 +196,10 @@ public sealed class VirtualMemorySpace : IDisposable
                 InstallRam(block, owner);
                 blocks.Add(blockIndex, block);
             }
+            else if (block.RefCount > 1)
+            {
+                block = ReplaceSharedBlock(block, block.Ram is { } sharedRam ? CopyToRam(sharedRam.Memory.Span) : LoadBytes(block));
+            }
             else
             {
                 MoveToRam(block);
@@ -147,7 +218,7 @@ public sealed class VirtualMemorySpace : IDisposable
         {
             ObjectDisposedException.ThrowIf(disposed, this);
             return blocks.TryGetValue(blockIndex, out var block) ? block.Tier :
-                source is null ? VirtualMemoryTier.Unallocated : VirtualMemoryTier.Swap;
+                !arena.BindOnAccess ? VirtualMemoryTier.Unallocated : VirtualMemoryTier.Swap;
         }
     }
 
@@ -224,6 +295,12 @@ public sealed class VirtualMemorySpace : IDisposable
                 EnsureDeviceResidency(block);
                 operation(default, block.Device);
             }
+            else if (block is { Ram: null, SwapSlot: < 0, HasBacking: true, Dirty: false } &&
+                     source is SnapshotBacking snapshot)
+            {
+                operation(snapshot.GetPage(blockIndex), null);
+                backingReads++;
+            }
             else
             {
                 MoveToRam(block);
@@ -241,20 +318,69 @@ public sealed class VirtualMemorySpace : IDisposable
             ObjectDisposedException.ThrowIf(disposed, this);
             if (blocks.TryGetValue(blockIndex, out var block))
             {
-                ReleaseResidency(block);
+                ReleaseReference(block);
                 blocks.Remove(blockIndex);
+            }
+        }
+    }
+
+    private Block ReplaceSharedBlock(Block original, IMemoryOwner<byte> contents)
+    {
+        Block replacement;
+        try
+        {
+            replacement = new Block(original.Index) { Dirty = true };
+        }
+        catch
+        {
+            ReturnRam(contents);
+            throw;
+        }
+
+        InstallRam(replacement, contents);
+        blocks[original.Index] = replacement;
+        original.RefCount--;
+        return replacement;
+    }
+
+    private void ReleaseReference(Block block)
+    {
+        if (block.RefCount == 1) ReleaseResidency(block);
+        block.RefCount--;
+    }
+
+    /// <summary>Moves resident device blocks through RAM to make the device available to another execution.</summary>
+    public Result<int> DemoteDeviceBlocks()
+    {
+        lock (gate)
+        {
+            if (disposed) return Fail<int>("virtual_memory_closed", "The address space is closed.");
+            try
+            {
+                var moved = 0;
+                foreach (var block in blocks.Values)
+                {
+                    if (block.Device is null) continue;
+                    InstallRam(block, LoadBytes(block), allowVramEviction: false);
+                    moved++;
+                }
+                return Result<int>.Success(moved);
+            }
+            catch (Exception ex) when (IsStorageFailure(ex))
+            {
+                return Fail<int>("virtual_memory_demotion_failed", ex.Message);
             }
         }
     }
 
     private Block? FindOrBind(long index)
     {
-        if (blocks.TryGetValue(index, out var block) || source is null)
+        if (blocks.TryGetValue(index, out var block) || !arena.BindOnAccess)
         {
             return block;
         }
 
-        block = new Block(index);
+        block = new Block(index) { HasBacking = true };
         blocks.Add(index, block);
         return block;
     }
@@ -278,7 +404,14 @@ public sealed class VirtualMemorySpace : IDisposable
         lock (gate)
         {
             ObjectDisposedException.ThrowIf(disposed, this);
-            return new VirtualMemoryStatistics(ram.Count, vram.Count, blocks.Count - ram.Count - vram.Count,
+            var ramBlocks = 0;
+            var vramBlocks = 0;
+            foreach (var block in blocks.Values)
+            {
+                if (block.Ram is not null) ramBlocks++;
+                if (block.Device is not null) vramBlocks++;
+            }
+            return new VirtualMemoryStatistics(ramBlocks, vramBlocks, blocks.Count - ramBlocks - vramBlocks,
                 swapReads, devicePageIns) { BackingReads = backingReads };
         }
     }
@@ -295,25 +428,35 @@ public sealed class VirtualMemorySpace : IDisposable
 
             disposed = true;
             List<Exception>? errors = null;
-            foreach (var block in vram)
+            foreach (var block in blocks.Values)
             {
-                try
-                {
-                    block.Device!.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    (errors ??= []).Add(ex);
-                }
+                try { ReleaseReference(block); }
+                catch (Exception ex) { (errors ??= []).Add(ex); }
             }
 
-            foreach (var block in ram) ReleaseHost(block.Ram!);
-            while (freeRam.TryPop(out var owner)) ReleaseHost(owner);
             blocks.Clear();
-            ram.Clear();
-            vram.Clear();
-            freeSlots.Clear();
-            swapFile?.Dispose();
+            if (--arena.Spaces == 0)
+            {
+                // Best-effort cleanup of storage left after an earlier wipe or device error.
+                foreach (var block in vram)
+                {
+                    try { ReleaseDevice(block.Device!); }
+                    catch (Exception ex) { (errors ??= []).Add(ex); }
+                }
+                foreach (var block in ram) ReleaseHost(block.Ram!);
+                while (freeRam.TryPop(out var owner)) ReleaseHost(owner);
+                ram.Clear();
+                vram.Clear();
+                freeSlots.Clear();
+                try { arena.Swap?.Dispose(); }
+                catch (Exception ex) { (errors ??= []).Add(ex); }
+                arena.OwnedSource?.Dispose();
+            }
+            if (arena.Policy.ZeroWipe && device is IZeroableVirtualMemoryDevice wipeDevice)
+            {
+                try { wipeDevice.ZeroScratch(); }
+                catch (Exception ex) { (errors ??= []).Add(ex); }
+            }
             if (errors is not null)
             {
                 throw new AggregateException("One or more memory blocks could not be released.", errors);
@@ -321,7 +464,11 @@ public sealed class VirtualMemorySpace : IDisposable
 
             void ReleaseHost(IMemoryOwner<byte> owner)
             {
-                try { owner.Dispose(); }
+                try
+                {
+                    if (arena.Policy.ZeroWipe) CryptographicOperations.ZeroMemory(owner.Memory.Span);
+                    owner.Dispose();
+                }
                 catch (Exception ex) { (errors ??= []).Add(ex); }
             }
         }
@@ -338,14 +485,14 @@ public sealed class VirtualMemorySpace : IDisposable
         InstallRam(block, LoadBytes(block));
     }
 
-    private void InstallRam(Block block, IMemoryOwner<byte> bytes)
+    private void InstallRam(Block block, IMemoryOwner<byte> bytes, bool allowVramEviction = true)
     {
         try
         {
             if (ram.Count == ramCapacity)
             {
                 var victim = ram.First!.Value;
-                if (vramCapacity == 0 || !MoveToVram(victim, allowSwapFallback: true, incoming: block))
+                if (!allowVramEviction || vramCapacity == 0 || !MoveToVram(victim, allowSwapFallback: true, incoming: block))
                 {
                     MoveToSwap(victim);
                 }
@@ -369,6 +516,7 @@ public sealed class VirtualMemorySpace : IDisposable
 
     private void ReturnRam(IMemoryOwner<byte> owner)
     {
+        if (arena.Policy.ZeroWipe) CryptographicOperations.ZeroMemory(owner.Memory.Span);
         if (freeRam.Count < 2)
         {
             freeRam.Push(owner);
@@ -411,6 +559,11 @@ public sealed class VirtualMemorySpace : IDisposable
         try
         {
             uploaded = device!.Upload(bytes);
+            if (arena.Policy.ZeroWipe && uploaded is not IZeroableDeviceBlock)
+            {
+                uploaded.Dispose();
+                throw new InvalidOperationException("The device block does not support zero-wipe.");
+            }
         }
         catch (OutOfMemoryException) when (allowSwapFallback)
         {
@@ -427,7 +580,7 @@ public sealed class VirtualMemorySpace : IDisposable
         }
         catch
         {
-            uploaded.Dispose();
+            ReleaseDevice(uploaded);
             throw;
         }
 
@@ -439,19 +592,20 @@ public sealed class VirtualMemorySpace : IDisposable
 
     private void MoveToSwap(Block block)
     {
-        if (source is not null && !block.Dirty)
+        if (block.HasBacking && !block.Dirty)
         {
             ReleaseResidency(block);
             return;
         }
 
-        var file = swapFile ??= OpenSwapFile();
+        var swap = arena.Swap ??= OpenSwap();
         var temporary = block.Ram is null ? LoadBytes(block) : null;
-        var slot = freeSlots.TryPop(out var available) ? available : nextSlot++;
+        var slot = freeSlots.TryPop(out var available) ? available : checked(arena.NextSlot++);
         try
         {
-            RandomAccess.Write(file.SafeFileHandle, (block.Ram ?? temporary!).Memory.Span, slot * BlockSize);
+            var version = swap.Write(slot, (block.Ram ?? temporary!).Memory.Span);
             ReleaseResidency(block);
+            block.SwapVersion = version;
         }
         catch
         {
@@ -476,26 +630,14 @@ public sealed class VirtualMemorySpace : IDisposable
             {
                 deviceBlock.Download(bytes);
             }
-            else if (block.SwapSlot < 0 && source is not null)
+            else if (block.SwapSlot < 0 && block.HasBacking)
             {
-                source.ReadBlock(block.Index, bytes);
+                source!.ReadBlock(block.Index, bytes);
                 backingReads++;
             }
             else
             {
-                var offset = block.SwapSlot * BlockSize;
-                while (!bytes.IsEmpty)
-                {
-                    var read = RandomAccess.Read(swapFile!.SafeFileHandle, bytes, offset);
-                    if (read == 0)
-                    {
-                        throw new EndOfStreamException("The swap file ended inside a block.");
-                    }
-
-                    bytes = bytes[read..];
-                    offset += read;
-                }
-
+                arena.Swap!.Read(block.SwapSlot, block.SwapVersion, bytes);
                 swapReads++;
             }
 
@@ -510,10 +652,11 @@ public sealed class VirtualMemorySpace : IDisposable
 
     private void ReleaseResidency(Block block)
     {
-        block.Device?.Dispose();
+        if (block.Device is { } deviceBlock) ReleaseDevice(deviceBlock);
         if (block.Ram is { } owner) ReturnRam(owner);
         if (block.SwapSlot >= 0)
         {
+            arena.Swap!.Clear(block.SwapSlot);
             freeSlots.Push(block.SwapSlot);
         }
 
@@ -523,7 +666,7 @@ public sealed class VirtualMemorySpace : IDisposable
         block.SwapSlot = -1;
     }
 
-    private FileStream OpenSwapFile()
+    private VirtualMemorySwap OpenSwap()
     {
         var options = new FileStreamOptions
         {
@@ -537,7 +680,24 @@ public sealed class VirtualMemorySpace : IDisposable
             options.UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite;
         }
 
-        return new FileStream(Path.Combine(swapDirectory, $".aikernel-swap-{Guid.NewGuid():N}"), options);
+        var file = new FileStream(Path.Combine(arena.SwapDirectory, $".aikernel-swap-{Guid.NewGuid():N}"), options);
+        try { return new VirtualMemorySwap(file, BlockSize, arena.Policy); }
+        catch
+        {
+            file.Dispose();
+            throw;
+        }
+    }
+
+    private void ReleaseDevice(IVirtualMemoryDeviceBlock block)
+    {
+        if (arena.Policy.ZeroWipe)
+        {
+            if (block is not IZeroableDeviceBlock zeroable)
+                throw new InvalidOperationException("The device block does not support zero-wipe.");
+            zeroable.Zero();
+        }
+        block.Dispose();
     }
 
     private void TouchRam(Block block)
@@ -587,6 +747,27 @@ public sealed class VirtualMemorySpace : IDisposable
         }
     }
 
+    private sealed class Arena(int ramCapacity, int vramCapacity, string swapDirectory,
+        IVirtualMemoryDevice? device, IVirtualMemorySource? source, SwapEncryptionPolicy policy)
+    {
+        internal Lock Gate { get; } = new();
+        internal LinkedList<Block> Ram { get; } = new();
+        internal LinkedList<Block> Vram { get; } = new();
+        internal Stack<long> FreeSlots { get; } = new();
+        internal Stack<IMemoryOwner<byte>> FreeRam { get; } = new(2);
+        internal int RamCapacity { get; } = ramCapacity;
+        internal int VramCapacity { get; } = vramCapacity;
+        internal string SwapDirectory { get; } = swapDirectory;
+        internal IVirtualMemoryDevice? Device { get; } = device;
+        internal IVirtualMemorySource? Source { get; set; } = source;
+        internal bool BindOnAccess { get; set; } = source is not null;
+        internal SwapEncryptionPolicy Policy { get; } = policy;
+        internal IDisposable? OwnedSource { get; set; }
+        internal VirtualMemorySwap? Swap { get; set; }
+        internal long NextSlot { get; set; }
+        internal int Spaces { get; set; } = 1;
+    }
+
     private sealed class Block
     {
         internal Block(long index)
@@ -596,6 +777,9 @@ public sealed class VirtualMemorySpace : IDisposable
         }
 
         internal long Index { get; }
+        internal int RefCount { get; set; } = 1;
+        internal bool HasBacking { get; init; }
+        internal ulong SwapVersion { get; set; }
         internal bool Dirty { get; set; }
 
         internal LinkedListNode<Block> Node { get; }

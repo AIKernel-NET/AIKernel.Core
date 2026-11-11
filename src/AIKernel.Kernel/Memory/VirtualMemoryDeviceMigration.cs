@@ -7,7 +7,11 @@ public sealed partial class VirtualMemorySpace
 {
     /// <summary>Moves resident pages to backing storage and releases host buffers owned by the current device.</summary>
     /// <remarks>The caller holds the source device lease and keeps both devices alive until rebinding completes.</remarks>
-    public Result<int> PrepareDeviceChange()
+    public Result<int> PrepareDeviceChange() => PrepareDeviceChange(CancellationToken.None);
+
+    /// <summary>Drains resident pages, stopping at a page boundary if cancellation is requested.</summary>
+    /// <remarks>On cancellation, drained pages remain readable from backing storage and the device stays bound.</remarks>
+    public Result<int> PrepareDeviceChange(CancellationToken cancellationToken)
     {
         lock (gate)
         {
@@ -17,20 +21,32 @@ public sealed partial class VirtualMemorySpace
             try
             {
                 var devicePages = vram.Count;
-                while (vram.First is { } gpu) MoveToSwap(gpu.Value);
-                while (ram.First is { } host) MoveToSwap(host.Value);
+                while (vram.First is { } gpu)
+                {
+                    if (cancellationToken.IsCancellationRequested) return Cancelled();
+                    MoveToSwap(gpu.Value);
+                }
+                while (ram.First is { } host)
+                {
+                    if (cancellationToken.IsCancellationRequested) return Cancelled();
+                    MoveToSwap(host.Value);
+                }
                 while (freeRam.TryPeek(out var buffer))
                 {
+                    if (cancellationToken.IsCancellationRequested) return Cancelled();
                     buffer.Dispose();
                     freeRam.Pop();
                 }
-                return Result<int>.Success(devicePages);
+                return cancellationToken.IsCancellationRequested ? Cancelled() : Result<int>.Success(devicePages);
             }
             catch (Exception ex) when (IsStorageFailure(ex))
             {
                 return Fail<int>("virtual_memory_device_drain_failed", ex.Message);
             }
         }
+
+        static Result<int> Cancelled()
+            => Fail<int>("virtual_memory_device_change_canceled", "Draining the device was canceled.");
     }
 
     /// <summary>Changes the device of an arena whose resident pages have been drained.</summary>

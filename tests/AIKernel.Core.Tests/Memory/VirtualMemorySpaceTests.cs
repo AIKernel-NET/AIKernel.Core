@@ -193,7 +193,7 @@ public sealed class VirtualMemorySpaceTests : IDisposable
         using var fork = space.ForkSpace().Value!;
 
         Assert.False(space.BindPreparedDevice(target).IsSuccess);
-        Assert.Equal(1, space.PrepareDeviceChange().Value);
+        Assert.Equal(1, space.PrepareDeviceChange(TestContext.Current.CancellationToken).Value);
         Assert.Equal(0, source.LiveBlocks);
         Assert.True(space.BindPreparedDevice(target).IsSuccess);
         Assert.Equal(2, fork.GetBlockReferenceCount(0));
@@ -203,6 +203,38 @@ public sealed class VirtualMemorySpaceTests : IDisposable
         space.MoveBlock(2, VirtualMemoryTier.Vram);
         Assert.Equal(1, target.LiveBlocks);
         Assert.Equal(0, source.LiveBlocks);
+    }
+
+    [Fact]
+    public void CanceledDeviceDrainPreservesPageContentsAndReleasesRemainingResidencyOnDispose()
+    {
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        var source = new TestDevice { VerifyWipe = true, OnDownload = cancellation.Cancel };
+        var target = new TestDevice { VerifyWipe = true };
+        using (var space = new VirtualMemorySpace(2, BlockSize, 1, directory.FullName, 2, source,
+                   swapPolicy: new(Encrypt: true, ZeroWipe: true)))
+        {
+            space.WriteBlock(0, Bytes(10));
+            space.MoveBlock(0, VirtualMemoryTier.Vram);
+            space.WriteBlock(1, Bytes(20));
+            space.MoveBlock(1, VirtualMemoryTier.Vram);
+            Assert.Equal(2, source.LiveBlocks);
+
+            var result = space.PrepareDeviceChange(cancellation.Token);
+            Assert.Equal("virtual_memory_device_change_canceled", result.Error?.Code);
+            Assert.Equal(1, source.LiveBlocks);
+            Assert.False(space.BindPreparedDevice(target).IsSuccess);
+            AssertBlock(space, 0, 10);
+            var residentPage = Bytes(0);
+            space.UseDeviceBlock(1, block => block.Download(residentPage));
+            Assert.Equal(Bytes(20), residentPage);
+            Assert.Equal(1, source.LiveBlocks);
+        }
+
+        Assert.Equal(0, source.LiveBlocks);
+        Assert.Equal(2, source.WipedDeviceBlocks);
+        Assert.Equal(0, target.LiveBlocks);
+        Assert.Empty(directory.EnumerateFiles(".aikernel-swap-*"));
     }
 
     [Fact]
@@ -287,6 +319,7 @@ public sealed class VirtualMemorySpaceTests : IDisposable
     {
         internal bool RejectUploads { get; init; }
         internal bool VerifyWipe { get; init; }
+        internal Action? OnDownload { get; init; }
         internal int WipedDeviceBlocks { get; private set; }
         internal int WipedHostBlocks { get; private set; }
 
@@ -311,7 +344,10 @@ public sealed class VirtualMemorySpaceTests : IDisposable
             private byte[]? content = bytes;
 
             public void Download(Span<byte> destination)
-                => (content ?? throw new ObjectDisposedException(nameof(TestBlock))).CopyTo(destination);
+            {
+                (content ?? throw new ObjectDisposedException(nameof(TestBlock))).CopyTo(destination);
+                owner.OnDownload?.Invoke();
+            }
 
             public void Zero() => content.AsSpan().Clear();
 

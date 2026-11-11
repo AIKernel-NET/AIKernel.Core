@@ -758,7 +758,7 @@ public sealed partial class VirtualMemorySpace : IDisposable
         internal int RamCapacity { get; } = ramCapacity;
         internal int VramCapacity { get; } = vramCapacity;
         internal string SwapDirectory { get; } = swapDirectory;
-        internal IVirtualMemoryDevice? Device { get; } = device;
+        internal IVirtualMemoryDevice? Device { get; set; } = device;
         internal IVirtualMemorySource? Source { get; set; } = source;
         internal bool BindOnAccess { get; set; } = source is not null;
         internal SwapEncryptionPolicy Policy { get; } = policy;

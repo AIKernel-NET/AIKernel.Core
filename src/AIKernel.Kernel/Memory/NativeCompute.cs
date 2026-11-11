@@ -8,6 +8,9 @@ internal static unsafe partial class NativeCompute
     internal const uint Version = 1;
     private const DllImportSearchPath Search = DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.SafeDirectories;
 
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_get_device_count")]
+    internal static partial int GetDeviceCount(out int count);
+
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_create")]
     internal static partial int Create(uint version, int ordinal, out nint context);
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_destroy")]

@@ -181,6 +181,31 @@ public sealed class VirtualMemorySpaceTests : IDisposable
     }
 
     [Fact]
+    public void DeviceHandoffPreservesRamVramAndEncryptedSwapPagesAcrossForks()
+    {
+        var source = new TestDevice { VerifyWipe = true };
+        var target = new TestDevice { VerifyWipe = true };
+        using var space = new VirtualMemorySpace(3, BlockSize, 1, directory.FullName, 1, source,
+            swapPolicy: new(Encrypt: true, ZeroWipe: true));
+        space.WriteBlock(0, Bytes(10));
+        space.WriteBlock(1, Bytes(20));
+        space.WriteBlock(2, Bytes(30));
+        using var fork = space.ForkSpace().Value!;
+
+        Assert.False(space.BindPreparedDevice(target).IsSuccess);
+        Assert.Equal(1, space.PrepareDeviceChange().Value);
+        Assert.Equal(0, source.LiveBlocks);
+        Assert.True(space.BindPreparedDevice(target).IsSuccess);
+        Assert.Equal(2, fork.GetBlockReferenceCount(0));
+        AssertBlock(fork, 0, 10);
+        AssertBlock(fork, 1, 20);
+        AssertBlock(fork, 2, 30);
+        space.MoveBlock(2, VirtualMemoryTier.Vram);
+        Assert.Equal(1, target.LiveBlocks);
+        Assert.Equal(0, source.LiveBlocks);
+    }
+
+    [Fact]
     public void SnapshotRestoresContinuationAndPagesWithoutInitialResidency()
     {
         var path = Path.Combine(directory.FullName, "kv.snapshot");

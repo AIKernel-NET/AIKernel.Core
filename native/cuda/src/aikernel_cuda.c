@@ -33,6 +33,20 @@ struct ak_context {
 
 uint32_t ak_abi_version(void) { return AK_ABI; }
 
+int32_t ak_get_device_count(int32_t *count) {
+    if (!count) return AK_INVALID;
+    *count = 0;
+    ak_driver driver = { 0 };
+    int status = ak_driver_open(&driver);
+    if (status) return status;
+    int code = driver.init(0);
+    int devices = 0;
+    if (!code) code = driver.device_count(&devices);
+    if (!code) *count = devices;
+    ak_driver_close(&driver);
+    return ak_status(code);
+}
+
 int32_t ak_create(uint32_t version, int32_t ordinal, ak_context **result) {
     if (!result) return AK_INVALID;
     *result = NULL;

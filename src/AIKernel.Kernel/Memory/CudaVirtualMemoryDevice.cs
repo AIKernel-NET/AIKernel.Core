@@ -18,6 +18,18 @@ public sealed unsafe class CudaVirtualMemoryDevice : IZeroableVirtualMemoryDevic
         NativeCompute.Check(NativeCompute.Create(NativeCompute.Version, deviceOrdinal, out context), "CUDA context creation");
     }
 
+    /// <summary>Returns the number of CUDA devices visible to the driver.</summary>
+    public static Result<int> GetDeviceCount()
+    {
+        try
+        {
+            var status = NativeCompute.GetDeviceCount(out var count);
+            if (status == 0 && count >= 0) return Result<int>.Success(count);
+        }
+        catch (Exception ex) when (ex is EntryPointNotFoundException or DllNotFoundException) { }
+        return TransferFailure("cuda_device_enumeration_failed", "The CUDA device list is unavailable.");
+    }
+
     private CudaVirtualMemoryDevice(nint context) => this.context = context;
 
     /// <summary>Probes CUDA and reports its initialization status when no device tier can be used.</summary>

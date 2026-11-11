@@ -30,6 +30,7 @@ typedef struct ak_stats {
 
 /* Calls on one context must be serialized. A NULL context selects host execution for math. */
 AK_EXPORT uint32_t ak_abi_version(void);
+AK_EXPORT int32_t ak_get_device_count(int32_t *count);
 AK_EXPORT int32_t ak_create(uint32_t version, int32_t ordinal, ak_context **result);
 AK_EXPORT int32_t ak_destroy(ak_context *ctx);
 AK_EXPORT int32_t ak_get_stats(ak_context *ctx, ak_stats *result);

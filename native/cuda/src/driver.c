@@ -28,6 +28,7 @@ int ak_driver_open(ak_driver *d) {
 } while (0)
     LOAD(init, "cuInit");
     LOAD(device_get, "cuDeviceGet");
+    LOAD(device_count, "cuDeviceGetCount");
     LOAD(ctx_create, "cuCtxCreate_v2");
     LOAD(ctx_destroy, "cuCtxDestroy_v2");
     LOAD(ctx_push, "cuCtxPushCurrent_v2");

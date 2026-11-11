@@ -1,2 +1,3 @@
+include LICENSE
 include CMakeLists.txt
 recursive-include src *.c *.h *.in *.ptx

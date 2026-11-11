@@ -5,7 +5,10 @@ import sys
 
 from setuptools import Distribution, setup
 from setuptools.command.build_py import build_py
-from wheel.bdist_wheel import bdist_wheel
+try:  # setuptools >= 70.1 ships bdist_wheel; wheel.bdist_wheel is deprecated.
+    from setuptools.command.bdist_wheel import bdist_wheel
+except ImportError:  # pragma: no cover - older setuptools
+    from wheel.bdist_wheel import bdist_wheel
 
 
 class BinaryDistribution(Distribution):

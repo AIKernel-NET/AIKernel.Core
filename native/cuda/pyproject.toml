@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69", "wheel"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,6 +8,25 @@ version = "0.1.0"
 description = "AIKernel Native C ABI with a dynamically loaded CUDA Driver backend"
 requires-python = ">=3.9"
 readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Takuya Sogawa" }]
+keywords = ["aikernel", "cuda", "cuda-driver", "ctypes", "native-abi"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: C",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Homepage = "https://github.com/AIKernel-NET/AIKernel.Core"
+Repository = "https://github.com/AIKernel-NET/AIKernel.Core"
+Issues = "https://github.com/AIKernel-NET/AIKernel.Core/issues"
 
 [tool.setuptools]
 package-dir = {"" = "python"}

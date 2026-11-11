@@ -8,6 +8,21 @@ paths do not require CUDA, LibTorch, or a native bridge. GPU support is supplied
 by external Capability modules that are explicitly installed and registered by a
 trusted host.
 
+## Driver API inference
+
+Monolith uses the shared Native C ABI in ../../native/cuda. The library
+loads the operating system's NVIDIA driver on demand and JIT-loads embedded
+PTX. It also implements the same math ABI for the host. The CUDA context
+provides page-locked host buffers and device allocations. Model and KV
+state belong to the managed address spaces.
+
+When the driver or device is unavailable, the host constructs RAM and SSD
+tiers and runs the same inference pipeline. On a GPU host, physical blocks
+are borrowed for synchronous C ABI operations. The driver submits transfers
+asynchronously on a private stream and synchronizes before returning.
+Use the native-cuda-wheels workflow to build and validate the two wheel
+artifacts. See [the native package](../../native/cuda/README.md).
+
 ## Layering
 
 ```text

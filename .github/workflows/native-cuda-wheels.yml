@@ -1,0 +1,66 @@
+name: native-cuda-wheels
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ["native/cuda/**", ".github/workflows/native-cuda-wheels.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip wheel --no-deps native/cuda -w wheels
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cuda-driver-win-amd64
+          path: wheels/*-py3-none-win_amd64.whl
+          if-no-files-found: error
+
+  test-windows:
+    needs: build-windows
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: cuda-driver-win-amd64
+          path: wheels
+      - shell: pwsh
+        run: |
+          $wheel = Get-ChildItem wheels -Filter *.whl | Select-Object -First 1
+          python -m pip install --no-deps $wheel.FullName
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python native/cuda/tests/smoke.py
+
+  build-linux:
+    runs-on: ubuntu-latest
+    container: quay.io/pypa/manylinux_2_28_x86_64
+    steps:
+      - uses: actions/checkout@v4
+      - shell: bash
+        run: |
+          /opt/python/cp312-cp312/bin/python -m pip wheel --no-deps native/cuda -w raw
+          auditwheel repair --plat manylinux_2_28_x86_64 --only-plat raw/*.whl -w wheels
+          for v in 39 310 311 312 313; do
+            py=/opt/python/cp$v-cp$v/bin/python
+            "$py" -m pip install --no-deps wheels/*.whl
+            "$py" native/cuda/tests/smoke.py --no-driver
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cuda-driver-manylinux-x86-64
+          path: wheels/*-py3-none-manylinux_2_28_x86_64.whl
+          if-no-files-found: error

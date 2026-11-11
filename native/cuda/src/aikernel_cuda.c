@@ -1,0 +1,404 @@
+#include "aikernel_cuda.h"
+#include "driver.h"
+#include "embedded_ptx.h"
+
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct allocation {
+    uint64_t address;
+    size_t bytes;
+    struct allocation *next;
+} allocation;
+
+struct ak_context {
+    ak_driver driver;
+    void *cuda;
+    void *stream;
+    void *gemv;
+    void *normalize;
+    void *rope;
+    void *swiglu;
+    void *softmax;
+    void *attention;
+    allocation *device_blocks;
+    allocation *pinned_blocks;
+    void *scratch_host;
+    uint64_t scratch_device;
+    size_t scratch_bytes;
+    int fault;
+};
+
+uint32_t ak_abi_version(void) { return AK_ABI; }
+
+int32_t ak_create(uint32_t version, int32_t ordinal, ak_context **result) {
+    if (!result) return AK_INVALID;
+    *result = NULL;
+    if (version != AK_ABI) return AK_VERSION;
+    if (ordinal < 0) return AK_INVALID;
+
+    ak_context *ctx = calloc(1, sizeof(*ctx));
+    if (!ctx) return AK_OOM;
+    int status = ak_driver_open(&ctx->driver);
+    if (status == AK_OK) {
+        ak_driver *d = &ctx->driver;
+        int device = 0;
+        void *module = NULL, *popped = NULL;
+        int code = d->init(0);
+        if (!code) code = d->device_get(&device, ordinal);
+        if (!code) code = d->ctx_create(&ctx->cuda, 0, device);
+        if (!code) code = d->stream_create(&ctx->stream, 1);
+        if (!code) code = d->module_load(&module, ak_embedded_ptx);
+        if (!code) code = d->module_func(&ctx->gemv, module, "matvec");
+        if (!code) code = d->module_func(&ctx->normalize, module, "normalize");
+        if (!code) code = d->module_func(&ctx->rope, module, "rotate");
+        if (!code) code = d->module_func(&ctx->swiglu, module, "swiglu");
+        if (!code) code = d->module_func(&ctx->softmax, module, "softmax");
+        if (!code) code = d->module_func(&ctx->attention, module, "attention");
+        if (!code) code = d->ctx_pop(&popped);
+        status = ak_status(code);
+    }
+
+    if (status != AK_OK) {
+        if (ctx->cuda) ctx->driver.ctx_destroy(ctx->cuda);
+        ak_driver_close(&ctx->driver);
+        free(ctx);
+        return status;
+    }
+
+    *result = ctx;
+    return AK_OK;
+}
+
+static int enter(ak_context *ctx) {
+    if (!ctx) return AK_INVALID;
+    if (ctx->fault) return ctx->fault;
+    return ak_status(ctx->driver.ctx_push(ctx->cuda));
+}
+
+static int leave(ak_context *ctx, int status) {
+    void *popped;
+    ctx->fault = ak_status(ctx->driver.ctx_pop(&popped));
+    return status ? status : ctx->fault;
+}
+
+static int finish_stream(ak_context *ctx, int code) {
+    int sync = ctx->driver.stream_sync(ctx->stream);
+    return ak_status(code ? code : sync);
+}
+
+static allocation **find_allocation(allocation **head, uint64_t address) {
+    while (*head && (*head)->address != address) head = &(*head)->next;
+    return head;
+}
+
+static int within(allocation **head, uint64_t address, size_t bytes) {
+    allocation *item = *find_allocation(head, address);
+    return item && bytes <= item->bytes;
+}
+
+int32_t ak_destroy(ak_context *ctx) {
+    if (!ctx) return AK_INVALID;
+    ak_driver *d = &ctx->driver;
+    int status = ak_status(d->ctx_push(ctx->cuda));
+    int current = status == AK_OK;
+    if (current && ctx->scratch_host) status = ak_status(d->host_free(ctx->scratch_host));
+    while (ctx->pinned_blocks) {
+        allocation *item = ctx->pinned_blocks;
+        ctx->pinned_blocks = item->next;
+        if (current) {
+            int next = ak_status(d->host_free((void *)(uintptr_t)item->address));
+            if (!status) status = next;
+        }
+        free(item);
+    }
+    while (ctx->device_blocks) {
+        allocation *item = ctx->device_blocks;
+        ctx->device_blocks = item->next;
+        free(item);
+    }
+    /* Destroying the private context reclaims its device allocations, stream and module. */
+    int destroyed = ak_status(d->ctx_destroy(ctx->cuda));
+    if (!status) status = destroyed;
+    ak_driver_close(d);
+    free(ctx);
+    return status;
+}
+
+int32_t ak_get_stats(ak_context *ctx, ak_stats *result) {
+    if (!ctx || !result || result->size < sizeof(*result)) return AK_INVALID;
+    if (result->version != AK_ABI) return AK_VERSION;
+    ak_stats stats = { sizeof(stats), AK_ABI, 0, 0, 0, 0, ctx->scratch_bytes };
+    for (allocation *item = ctx->device_blocks; item; item = item->next) {
+        stats.device_blocks++;
+        stats.device_bytes += item->bytes;
+    }
+    for (allocation *item = ctx->pinned_blocks; item; item = item->next) {
+        stats.pinned_blocks++;
+        stats.pinned_bytes += item->bytes;
+    }
+    *result = stats;
+    return AK_OK;
+}
+
+static int allocate(ak_context *ctx, size_t bytes, uint64_t *address, int pinned) {
+    if (!address || !bytes) return AK_INVALID;
+    *address = 0;
+    allocation *item = malloc(sizeof(*item));
+    if (!item) return AK_OOM;
+
+    int status = enter(ctx);
+    if (status == AK_OK) {
+        void *host = NULL;
+        int code = pinned ? ctx->driver.host_alloc(&host, bytes) : ctx->driver.mem_alloc(address, bytes);
+        if (pinned) *address = (uint64_t)(uintptr_t)host;
+        status = ak_status(code);
+        if (status == AK_OK) {
+            allocation **list = pinned ? &ctx->pinned_blocks : &ctx->device_blocks;
+            item->address = *address;
+            item->bytes = bytes;
+            item->next = *list;
+            *list = item;
+            item = NULL;
+        }
+        status = leave(ctx, status);
+    }
+
+    free(item);
+    if (status != AK_OK) *address = 0;
+    return status;
+}
+
+int32_t ak_device_alloc(ak_context *ctx, size_t bytes, uint64_t *address) {
+    return allocate(ctx, bytes, address, 0);
+}
+
+int32_t ak_pinned_alloc(ak_context *ctx, size_t bytes, void **address) {
+    if (!address) return AK_INVALID;
+    uint64_t result = 0;
+    int status = allocate(ctx, bytes, &result, 1);
+    *address = (void *)(uintptr_t)result;
+    return status;
+}
+
+static int release(ak_context *ctx, uint64_t address, int pinned) {
+    if (!ctx || !address) return AK_INVALID;
+    allocation **slot = find_allocation(pinned ? &ctx->pinned_blocks : &ctx->device_blocks, address);
+    if (!*slot) return AK_INVALID;
+    int status = enter(ctx);
+    if (status != AK_OK) return status;
+
+    status = ak_status(pinned ? ctx->driver.host_free((void *)(uintptr_t)address) : ctx->driver.mem_free(address));
+    if (status == AK_OK) {
+        allocation *item = *slot;
+        *slot = item->next;
+        free(item);
+    }
+    /* Once freed, report success and retain any context-pop fault for the next call. */
+    leave(ctx, status);
+    return status;
+}
+
+int32_t ak_device_free(ak_context *ctx, uint64_t address) { return release(ctx, address, 0); }
+int32_t ak_pinned_free(ak_context *ctx, void *address) { return release(ctx, (uint64_t)(uintptr_t)address, 1); }
+
+static int scratch(ak_context *ctx, size_t bytes) {
+    if (bytes <= ctx->scratch_bytes) return AK_OK;
+    ak_driver *d = &ctx->driver;
+    ctx->scratch_bytes = 0;
+    if (ctx->scratch_host) {
+        int code = d->host_free(ctx->scratch_host);
+        if (code) return ak_status(code);
+        ctx->scratch_host = NULL;
+    }
+    if (ctx->scratch_device) {
+        int code = d->mem_free(ctx->scratch_device);
+        if (code) return ak_status(code);
+        ctx->scratch_device = 0;
+    }
+
+    int code = d->host_alloc(&ctx->scratch_host, bytes);
+    if (!code) code = d->mem_alloc(&ctx->scratch_device, bytes);
+    if (!code) ctx->scratch_bytes = bytes;
+    return ak_status(code);
+}
+
+int32_t ak_upload(ak_context *ctx, uint64_t address, const void *source, size_t bytes) {
+    if (!ctx || !source || !bytes || !within(&ctx->device_blocks, address, bytes)) return AK_INVALID;
+    int status = enter(ctx);
+    if (status != AK_OK) return status;
+
+    if (!within(&ctx->pinned_blocks, (uint64_t)(uintptr_t)source, bytes)) {
+        status = scratch(ctx, bytes);
+        if (!status) source = memcpy(ctx->scratch_host, source, bytes);
+    }
+    if (!status) status = finish_stream(ctx, ctx->driver.htod(address, source, bytes, ctx->stream));
+    return leave(ctx, status);
+}
+
+int32_t ak_download(ak_context *ctx, uint64_t address, void *destination, size_t bytes) {
+    if (!ctx || !destination || !bytes || !within(&ctx->device_blocks, address, bytes)) return AK_INVALID;
+    int status = enter(ctx);
+    if (status != AK_OK) return status;
+
+    void *target = destination;
+    if (!within(&ctx->pinned_blocks, (uint64_t)(uintptr_t)destination, bytes)) {
+        status = scratch(ctx, bytes);
+        target = ctx->scratch_host;
+    }
+    if (!status) status = finish_stream(ctx, ctx->driver.dtoh(target, address, bytes, ctx->stream));
+    if (!status && target != destination) memcpy(destination, target, bytes);
+    return leave(ctx, status);
+}
+
+int32_t ak_gemv(ak_context *ctx, uint64_t weights, const float *x, float *y, uint32_t rows, uint32_t cols) {
+    if (!weights || !x || !y || !rows || !cols || (size_t)rows > SIZE_MAX / sizeof(float) / cols) return AK_INVALID;
+    if (!ctx) {
+        const float *matrix = (const float *)(uintptr_t)weights;
+        for (uint32_t row = 0; row < rows; ++row) {
+            float sum = 0;
+            for (uint32_t col = 0; col < cols; ++col) sum += matrix[(size_t)row * cols + col] * x[col];
+            y[row] = sum;
+        }
+        return AK_OK;
+    }
+
+    if (!within(&ctx->device_blocks, weights, (size_t)rows * cols * sizeof(float))) return AK_INVALID;
+    int status = enter(ctx);
+    if (status != AK_OK) return status;
+
+    const size_t x_bytes = (size_t)cols * sizeof(float);
+    const size_t y_bytes = (size_t)rows * sizeof(float);
+    status = scratch(ctx, x_bytes + y_bytes);
+    if (!status) {
+        uint64_t dx = ctx->scratch_device, dy = dx + x_bytes;
+        void *args[] = { &weights, &dx, &dy, &cols };
+        char *host_y = (char *)ctx->scratch_host + x_bytes;
+        memcpy(ctx->scratch_host, x, x_bytes);
+        int code = ctx->driver.htod(dx, ctx->scratch_host, x_bytes, ctx->stream);
+        if (!code) code = ctx->driver.launch(ctx->gemv, rows, 1, 1, 128, 1, 1, 0, ctx->stream, args, NULL);
+        if (!code) code = ctx->driver.dtoh(host_y, dy, y_bytes, ctx->stream);
+        status = finish_stream(ctx, code);
+        if (!status) memcpy(y, host_y, y_bytes);
+    }
+    return leave(ctx, status);
+}
+
+static int vector_kernel(ak_context *ctx, void *kernel, const float *a, const float *b, float *out,
+                         uint32_t count, float epsilon, uint32_t mode, int serial) {
+    int status = enter(ctx);
+    if (status != AK_OK) return status;
+    size_t bytes = (size_t)count * sizeof(float);
+    size_t inputs = b ? bytes * 2 : bytes;
+    status = scratch(ctx, inputs + bytes);
+    if (!status) {
+        uint64_t da = ctx->scratch_device, db = b ? da + bytes : 0, dout = da + inputs;
+        char *host = ctx->scratch_host;
+        memcpy(host, a, bytes);
+        if (b) memcpy(host + bytes, b, bytes);
+        void *args[] = { &da, &db, &dout, &count, &epsilon, &mode };
+        int code = ctx->driver.htod(da, host, inputs, ctx->stream);
+        if (!code) code = ctx->driver.launch(kernel, serial ? 1 : (count - 1) / 128 + 1,
+            1, 1, serial ? 1 : 128, 1, 1, 0, ctx->stream, args, NULL);
+        if (!code) code = ctx->driver.dtoh(host + inputs, dout, bytes, ctx->stream);
+        status = finish_stream(ctx, code);
+        if (!status) memcpy(out, host + inputs, bytes);
+    }
+    return leave(ctx, status);
+}
+
+int32_t ak_normalize(ak_context *ctx, const float *x, const float *scale, float *y,
+                     uint32_t count, float epsilon, int32_t center) {
+    if (!x || !scale || !y || !count || !isfinite(epsilon) || epsilon <= 0 || (center != 0 && center != 1))
+        return AK_INVALID;
+    if (ctx) return vector_kernel(ctx, ctx->normalize, x, scale, y, count, epsilon, (uint32_t)center, 1);
+
+    float mean = 0, variance = 0;
+    if (center) {
+        for (uint32_t i = 0; i < count; ++i) mean += x[i];
+        mean /= (float)count;
+    }
+    for (uint32_t i = 0; i < count; ++i) {
+        float v = x[i] - mean;
+        variance += v * v;
+    }
+    float inverse = 1.0f / sqrtf(variance / (float)count + epsilon);
+    for (uint32_t i = 0; i < count; ++i) y[i] = (x[i] - mean) * inverse * scale[i];
+    return AK_OK;
+}
+
+int32_t ak_rope(ak_context *ctx, float *x, const float *sin_cos, uint32_t count) {
+    if (!x || !sin_cos || !count || count % 2) return AK_INVALID;
+    if (ctx) return vector_kernel(ctx, ctx->rope, x, sin_cos, x, count, 0, 0, 0);
+    for (uint32_t i = 0; i < count; i += 2) {
+        float a = x[i], b = x[i + 1], s = sin_cos[i], c = sin_cos[i + 1];
+        x[i] = a * c - b * s;
+        x[i + 1] = a * s + b * c;
+    }
+    return AK_OK;
+}
+
+int32_t ak_swiglu(ak_context *ctx, float *gate, const float *up, uint32_t count) {
+    if (!gate || !up || !count) return AK_INVALID;
+    if (ctx) return vector_kernel(ctx, ctx->swiglu, gate, up, gate, count, 0, 0, 0);
+    for (uint32_t i = 0; i < count; ++i) gate[i] = gate[i] / (1.0f + expf(-gate[i])) * up[i];
+    return AK_OK;
+}
+
+int32_t ak_softmax(ak_context *ctx, float *x, uint32_t count) {
+    if (!x || !count) return AK_INVALID;
+    if (ctx) return vector_kernel(ctx, ctx->softmax, x, NULL, x, count, 0, 0, 1);
+
+    float max = x[0], sum = 0;
+    for (uint32_t i = 1; i < count; ++i) max = fmaxf(max, x[i]);
+    for (uint32_t i = 0; i < count; ++i) {
+        x[i] = expf(x[i] - max);
+        sum += x[i];
+    }
+    for (uint32_t i = 0; i < count; ++i) x[i] /= sum;
+    return AK_OK;
+}
+
+int32_t ak_attention_tile(ak_context *ctx, uint64_t page, const float *x, float *y,
+                          uint32_t rows, uint32_t kv_width, uint32_t head_offset,
+                          uint32_t head_width, uint32_t mode) {
+    if (!page || !x || !y || !rows || !kv_width || !head_width || mode > 1 || kv_width > UINT32_MAX / 8 ||
+        head_offset > kv_width || head_width > kv_width - head_offset ||
+        (size_t)rows > SIZE_MAX / (2 * sizeof(float)) / kv_width) return AK_INVALID;
+
+    uint32_t outputs = mode ? head_width : rows;
+    uint32_t inputs = mode ? rows : head_width;
+    if (!ctx) {
+        const float *block = (const float *)(uintptr_t)page + head_offset + (mode ? kv_width : 0);
+        for (uint32_t out = 0; out < outputs; ++out) {
+            float sum = 0;
+            for (uint32_t in = 0; in < inputs; ++in) {
+                size_t row = mode ? in : out;
+                size_t col = mode ? out : in;
+                sum += block[row * 2 * kv_width + col] * x[in];
+            }
+            y[out] = sum;
+        }
+        return AK_OK;
+    }
+
+    if (!within(&ctx->device_blocks, page, (size_t)rows * 2 * kv_width * sizeof(float))) return AK_INVALID;
+    int status = enter(ctx);
+    if (status != AK_OK) return status;
+    size_t in_bytes = (size_t)inputs * sizeof(float), out_bytes = (size_t)outputs * sizeof(float);
+    status = scratch(ctx, in_bytes + out_bytes);
+    if (!status) {
+        uint64_t dx = ctx->scratch_device, dy = dx + in_bytes;
+        char *host_y = (char *)ctx->scratch_host + in_bytes;
+        void *args[] = { &page, &dx, &dy, &rows, &kv_width, &head_offset, &head_width, &mode };
+        memcpy(ctx->scratch_host, x, in_bytes);
+        int code = ctx->driver.htod(dx, ctx->scratch_host, in_bytes, ctx->stream);
+        if (!code) code = ctx->driver.launch(ctx->attention, (outputs - 1) / 128 + 1, 1, 1,
+            128, 1, 1, 0, ctx->stream, args, NULL);
+        if (!code) code = ctx->driver.dtoh(host_y, dy, out_bytes, ctx->stream);
+        status = finish_stream(ctx, code);
+        if (!status) memcpy(y, host_y, out_bytes);
+    }
+    return leave(ctx, status);
+}

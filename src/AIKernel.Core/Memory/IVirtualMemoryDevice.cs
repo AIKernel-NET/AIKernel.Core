@@ -1,3 +1,5 @@
+using System.Buffers;
+
 namespace AIKernel.Core.Memory;
 
 /// <summary>Uploads fixed-size blocks to a device memory tier.</summary>
@@ -14,4 +16,11 @@ public interface IVirtualMemoryDeviceBlock : IDisposable
 {
     /// <summary>Copies the entire block to an equally sized host buffer.</summary>
     void Download(Span<byte> destination);
+}
+
+/// <summary>Allocates host RAM that the device can transfer directly.</summary>
+public interface IVirtualMemoryHostAllocator
+{
+    /// <summary>Allocates a host block whose storage is owned by the returned object.</summary>
+    IMemoryOwner<byte> AllocateHostBlock(int length);
 }

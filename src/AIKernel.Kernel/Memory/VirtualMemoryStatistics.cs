@@ -7,4 +7,8 @@ namespace AIKernel.Kernel.Memory;
 /// <param name="SwapReads">Complete blocks read from the swap file.</param>
 /// <param name="DevicePageIns">Complete blocks moved to device memory.</param>
 public readonly record struct VirtualMemoryStatistics(
-    int RamBlocks, int VramBlocks, int SwapBlocks, long SwapReads, long DevicePageIns);
+    int RamBlocks, int VramBlocks, int SwapBlocks, long SwapReads, long DevicePageIns)
+{
+    /// <summary>Complete reads from the immutable block source.</summary>
+    public long BackingReads { get; init; }
+}

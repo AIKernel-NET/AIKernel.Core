@@ -126,7 +126,34 @@ public sealed class VirtualMemorySpaceTests : IDisposable
         Assert.Throws<ObjectDisposedException>(() => space.ReadBlock(0, Bytes(0)));
     }
 
+    [Fact]
+    public void BoundPagesFaultInLazilyAndDirtySlicesSpillToSwap()
+    {
+        using var space = new VirtualMemorySpace(3, BlockSize, 1, directory.FullName, source: new TestSource());
+        Assert.Equal(0, space.GetStatistics().BackingReads);
+        space.UseComputeBlock(1, (bytes, device) =>
+        {
+            Assert.Null(device);
+            Assert.Equal(Bytes(2), bytes.ToArray());
+        });
+        Assert.Equal(1, space.GetStatistics().BackingReads);
+        space.WriteBlockSlice(1, 3, [99]);
+        AssertBlock(space, 0, 1);
+        var bytes = Bytes(0);
+        space.ReadBlock(1, bytes);
+        Assert.Equal(99, bytes[3]);
+        Assert.Equal(2, bytes[4]);
+        Assert.Equal(1, space.GetStatistics().SwapReads);
+        space.DiscardBlock(1);
+        AssertBlock(space, 1, 2);
+    }
+
     public void Dispose() => directory.Delete(recursive: true);
+
+    private sealed class TestSource : IVirtualMemorySource
+    {
+        public void ReadBlock(long blockIndex, Span<byte> destination) => destination.Fill((byte)(blockIndex + 1));
+    }
 
     private static byte[] Bytes(byte value)
     {

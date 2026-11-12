@@ -33,11 +33,7 @@ internal sealed class KernelExecutionStepRunner
     public Result<ModelPromptCapability> ResolveCapability(
         IModelProvider provider,
         KernelExecutionRequest request)
-        => Try
-            .Run(() => _capabilityResolver.Resolve(provider, request))
-            .Match(
-                error => Result<ModelPromptCapability>.Fail(ToExecutionError(error, OriginStep.Capability)),
-                Result<ModelPromptCapability>.Success);
+        => Capture(() => _capabilityResolver.Resolve(provider, request), OriginStep.Capability);
     /// <summary>
     /// EN: Gets GeneratePromptAsync.
     /// [EN] Documents this public package API member. [JA] GeneratePromptAsync を取得します。
@@ -48,7 +44,7 @@ internal sealed class KernelExecutionStepRunner
         ModelPromptCapability capability,
         CancellationToken cancellationToken)
     {
-        return (await Try.RunAsync(async () => await _promptGenerator
+        return await CaptureAsync(() => _promptGenerator
             .GenerateAsync(
                 new PromptGenerationRequest(
                     request.ContextSnapshotId,
@@ -57,11 +53,7 @@ internal sealed class KernelExecutionStepRunner
                     request.UserInstruction,
                     capability,
                     request.PromptOptions),
-                cancellationToken)
-            .ConfigureAwait(false)).ConfigureAwait(false))
-            .Match(
-                error => Result<GeneratedPrompt>.Fail(ToExecutionError(error, OriginStep.Prompt)),
-                Result<GeneratedPrompt>.Success);
+                cancellationToken), OriginStep.Prompt).ConfigureAwait(false);
     }
     /// <summary>
     /// EN: Gets GenerateOutputAsync.
@@ -73,12 +65,8 @@ internal sealed class KernelExecutionStepRunner
         GeneratedPrompt prompt,
         CancellationToken cancellationToken)
     {
-        return (await Try.RunAsync(async () => await provider
-            .GenerateAsync(ToProviderMessages(prompt.Messages), cancellationToken)
-            .ConfigureAwait(false)).ConfigureAwait(false))
-            .Match(
-                error => Result<string>.Fail(ToExecutionError(error, OriginStep.Provider)),
-                Result<string>.Success);
+        return await CaptureAsync(() => provider.GenerateAsync(
+            ToProviderMessages(prompt.Messages), cancellationToken), OriginStep.Provider).ConfigureAwait(false);
     }
 
     private static IReadOnlyList<IModelMessage> ToProviderMessages(
@@ -92,23 +80,40 @@ internal sealed class KernelExecutionStepRunner
     /// </summary>
 
     public Result<int> CountOutputTokens(string output)
-        => Try
-            .Run(() => _tokenizer.CountTokens(output))
-            .Match(
-                error => Result<int>.Fail(ToExecutionError(error, OriginStep.Tokenizer)),
-                Result<int>.Success);
+        => Capture(() => _tokenizer.CountTokens(output), OriginStep.Tokenizer);
+
+    // Classify before projecting to ErrorContext: exception_type is diagnostic
+    // text and cannot retain an arbitrary derived exception's inheritance.
+    private static Result<T> Capture<T>(Func<T> operation, OriginStep originStep)
+    {
+        try
+        {
+            return Result<T>.Success(operation());
+        }
+        catch (Exception error)
+        {
+            return Result<T>.Fail(ToExecutionError(error, originStep));
+        }
+    }
+
+    private static async Task<Result<T>> CaptureAsync<T>(Func<Task<T>> operation, OriginStep originStep)
+    {
+        try
+        {
+            return Result<T>.Success(await operation().ConfigureAwait(false));
+        }
+        catch (Exception error)
+        {
+            return Result<T>.Fail(ToExecutionError(error, originStep));
+        }
+    }
 
     private static ErrorContext ToExecutionError(
-        ErrorContext error,
+        Exception error,
         OriginStep originStep)
-        => IsOperationCanceled(error)
+        => CancellationExceptionClassifier.IsCancellation(error)
             ? CanceledError(originStep)
             : ExecutionFailedError(error, originStep);
-
-    private static bool IsOperationCanceled(ErrorContext error)
-        => error.Metadata is not null &&
-           error.Metadata.TryGetValue(ResultMetadataKeys.ExceptionType, out var exceptionType) &&
-           string.Equals(exceptionType, typeof(OperationCanceledException).FullName, StringComparison.Ordinal);
 
     private static ErrorContext CanceledError(OriginStep originStep)
     {

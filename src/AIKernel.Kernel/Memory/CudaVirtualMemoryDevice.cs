@@ -55,13 +55,19 @@ public sealed unsafe class CudaVirtualMemoryDevice : IZeroableVirtualMemoryDevic
     }
 
     /// <inheritdoc />
-    public IVirtualMemoryDeviceBlock Upload(ReadOnlySpan<byte> source)
+    public IVirtualMemoryDeviceBlock Upload(ReadOnlySpan<byte> source) => Upload(source, null);
+
+    /// <summary>Creates a device tier that accounts for its own successful CUDA page allocations and releases.</summary>
+    public AllocationScope CreateAllocationScope() => new(this);
+
+    private IVirtualMemoryDeviceBlock Upload(ReadOnlySpan<byte> source, AllocationScope? scope)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(source.Length);
-        var block = new DeviceBlock(this, source.Length);
+        var block = new DeviceBlock(this, source.Length, scope);
         lock (Gate)
         {
             NativeCompute.Check(NativeCompute.DeviceAllocate(Context, (nuint)source.Length, out var address), "VRAM allocation");
+            scope?.RecordAllocation(source.Length);
             try
             {
                 fixed (byte* bytes = source)
@@ -74,7 +80,7 @@ public sealed unsafe class CudaVirtualMemoryDevice : IZeroableVirtualMemoryDevic
             }
             catch
             {
-                _ = NativeCompute.DeviceFree(Context, address);
+                if (NativeCompute.DeviceFree(Context, address) == 0) scope?.RecordRelease(source.Length);
                 throw;
             }
         }
@@ -192,7 +198,30 @@ public sealed unsafe class CudaVirtualMemoryDevice : IZeroableVirtualMemoryDevic
         }
     }
 
-    internal sealed class DeviceBlock(CudaVirtualMemoryDevice owner, int length) : IZeroableDeviceBlock
+    /// <summary>Accounts for explicit CUDA page allocations on one device, excluding its shared scratch buffers.</summary>
+    public sealed class AllocationScope : IZeroableVirtualMemoryDevice, IVirtualMemoryHostAllocator
+    {
+        private readonly CudaVirtualMemoryDevice device;
+        private long allocatedBytes;
+        private long releasedBytes;
+
+        internal AllocationScope(CudaVirtualMemoryDevice device) => this.device = device;
+
+        /// <summary>Reads the bytes requested by successful driver allocations and releases in this scope.</summary>
+        public (long AllocatedBytes, long ReleasedBytes) GetStatistics()
+        {
+            lock (device.Gate) return (allocatedBytes, releasedBytes);
+        }
+
+        internal void RecordAllocation(int length) => allocatedBytes += length;
+        internal void RecordRelease(int length) => releasedBytes += length;
+
+        IVirtualMemoryDeviceBlock IVirtualMemoryDevice.Upload(ReadOnlySpan<byte> source) => device.Upload(source, this);
+        IMemoryOwner<byte> IVirtualMemoryHostAllocator.AllocateHostBlock(int length) => device.AllocateHostBlock(length);
+        void IZeroableVirtualMemoryDevice.ZeroScratch() => device.ZeroScratch();
+    }
+
+    internal sealed class DeviceBlock(CudaVirtualMemoryDevice owner, int length, AllocationScope? scope = null) : IZeroableDeviceBlock
     {
         internal CudaVirtualMemoryDevice Owner => owner;
         internal ulong Address { get; set; }
@@ -231,6 +260,7 @@ public sealed unsafe class CudaVirtualMemoryDevice : IZeroableVirtualMemoryDevic
                 if (Address != 0 && owner.context != 0)
                 {
                     NativeCompute.Check(NativeCompute.DeviceFree(owner.Context, Address), "VRAM release");
+                    scope?.RecordRelease(Length);
                 }
 
                 Address = 0;

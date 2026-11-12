@@ -120,7 +120,7 @@ public sealed class CtgTrajectoryGateEvaluator : ITrajectoryGate
 
         foreach (var step in steps)
         {
-            if (step.DecisionGate.DecisionKind == GateDecisionKind.Deny)
+            if (!HasSuccessfulAllow(step))
             {
                 return TrajectoryGateDecisionKind.Halt;
             }
@@ -128,6 +128,16 @@ public sealed class CtgTrajectoryGateEvaluator : ITrajectoryGate
 
         return TrajectoryGateDecisionKind.Continue;
     }
+
+    // A default, missing or partially populated result is not an evaluated Allow.
+    // Keep this check shared by the decision and its first-failure diagnostics.
+    private static bool HasSuccessfulAllow(StepGovernanceTrace? step)
+        => step?.DecisionGate is
+        {
+            Succeeded: true,
+            Accepted: true,
+            DecisionKind: GateDecisionKind.Allow
+        };
 
     private IReadOnlyList<RejectReasonInfo> CreateRejectReasons(
         IReadOnlyList<StepGovernanceTrace> steps,
@@ -143,16 +153,18 @@ public sealed class CtgTrajectoryGateEvaluator : ITrajectoryGate
         {
             var step = steps[index];
 
-            if (step.DecisionGate.DecisionKind != GateDecisionKind.Deny)
+            if (HasSuccessfulAllow(step))
             {
                 continue;
             }
 
             metadata[CtgGovernanceMetadataKeys.FirstFailingStepIndex] =
                 index.ToString(System.Globalization.CultureInfo.InvariantCulture);
-            metadata[CtgGovernanceMetadataKeys.FirstFailingStepId] = step.StepId;
+            metadata[CtgGovernanceMetadataKeys.FirstFailingStepId] = step?.StepId ?? string.Empty;
 
-            return [_reasonClassifier.ClassifyDeniedStep(step, index, canonReferences)];
+            return step?.DecisionGate?.DecisionKind == GateDecisionKind.Deny
+                ? [_reasonClassifier.ClassifyDeniedStep(step, index, canonReferences)]
+                : [_reasonClassifier.ClassifyIncompleteStep(step, index, canonReferences)];
         }
 
         return [];

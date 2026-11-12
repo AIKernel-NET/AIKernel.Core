@@ -119,6 +119,23 @@ public sealed class CtgRejectReasonClassifier
             : ToUpperSnakeCase(kind.ToString());
     }
 
+    internal RejectReasonInfo ClassifyIncompleteStep(
+        StepGovernanceTrace? step,
+        int stepIndex,
+        IReadOnlyList<CanonReference>? canonReferences)
+    {
+        return Create(
+            reasonId: "ctg.trajectory.fail_closed",
+            kind: RejectReasonKind.FailClosed,
+            message: "Trajectory gate received a step without a successful Allow decision.",
+            canonReferences: canonReferences,
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                [CtgGovernanceMetadataKeys.FirstFailingStepIndex] = stepIndex.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                [CtgGovernanceMetadataKeys.FirstFailingStepId] = step?.StepId ?? string.Empty
+            });
+    }
+
     internal static int ApproveCount(GateInput input)
     {
         var count = 0;

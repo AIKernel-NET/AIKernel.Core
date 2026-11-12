@@ -91,7 +91,11 @@ internal sealed class DslRomCapabilityRegistry :
         DslPipelineValue input)
         => Try
             .Run(() => snapshot.Pipeline.Execute(
-                DslPipelineExecutionContext.Create(input)))
+                new DslPipelineExecutionContext(
+                    input,
+                    snapshot.Pipeline is CompiledDslPipeline compiled
+                        ? compiled.GetExecutionStartedAtUtc()
+                        : DateTimeOffset.UnixEpoch)))
             .Match(
                 error => Result<ResultStep<DslPipelineState, DslPipelineValue>>.Fail(AttachRomMetadata(
                     error with

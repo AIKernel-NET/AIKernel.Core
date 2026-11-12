@@ -149,7 +149,11 @@ public sealed class LocalExecutionInvoker : ICapabilityModuleInvoker
         CancellationToken cancellationToken)
         => (await Try
                 .RunAsync(() => pipeline.ExecuteAsync(
-                    new DslPipelineExecutionContext(input, DateTimeOffset.UnixEpoch),
+                    new DslPipelineExecutionContext(
+                        input,
+                        pipeline is AIKernel.Core.Dsl.CompiledDslPipeline compiled
+                            ? compiled.GetExecutionStartedAtUtc()
+                            : DateTimeOffset.UnixEpoch),
                     cancellationToken))
                 .ConfigureAwait(false))
             .MapError("LOCAL_EXECUTION_EXECUTE_FAILED");

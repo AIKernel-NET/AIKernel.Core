@@ -1,0 +1,292 @@
+.version 6.4
+.target sm_50
+.address_size 64
+
+.visible .entry matvec(
+    .param .u64 weights, .param .u64 input, .param .u64 output, .param .u32 columns
+)
+{
+    .reg .pred %p;
+    .reg .u32 %lane, %row, %n, %i, %stride, %partner;
+    .reg .u64 %w, %x, %y, %rowOffset, %offset, %wp, %xp, %yp, %sharedBase, %sharedIndex, %sharedAddress, %otherAddress;
+    .reg .f32 %sum, %a, %b;
+    .shared .align 4 .b8 partial[512];
+
+    ld.param.u64 %w, [weights];
+    ld.param.u64 %x, [input];
+    ld.param.u64 %y, [output];
+    ld.param.u32 %n, [columns];
+    mov.u32 %lane, %tid.x;
+    mov.u32 %row, %ctaid.x;
+    mul.wide.u32 %rowOffset, %row, %n;
+    shl.b64 %rowOffset, %rowOffset, 2;
+    add.u64 %w, %w, %rowOffset;
+    mov.u32 %i, %lane;
+    mov.f32 %sum, 0f00000000;
+DOT:
+    setp.ge.u32 %p, %i, %n;
+    @%p bra STORE;
+    mul.wide.u32 %offset, %i, 4;
+    add.u64 %wp, %w, %offset;
+    add.u64 %xp, %x, %offset;
+    ld.global.f32 %a, [%wp];
+    ld.global.f32 %b, [%xp];
+    fma.rn.f32 %sum, %a, %b, %sum;
+    add.u32 %i, %i, 128;
+    bra DOT;
+STORE:
+    shl.b32 %i, %lane, 2;
+    mov.u64 %sharedBase, partial;
+    cvt.u64.u32 %sharedIndex, %i;
+    add.u64 %sharedAddress, %sharedBase, %sharedIndex;
+    st.shared.f32 [%sharedAddress], %sum;
+    mov.u32 %stride, 64;
+REDUCE:
+    bar.sync 0;
+    setp.ge.u32 %p, %lane, %stride;
+    @%p bra SKIP;
+    shl.b32 %partner, %stride, 2;
+    add.u32 %partner, %partner, %i;
+    cvt.u64.u32 %sharedIndex, %partner;
+    add.u64 %otherAddress, %sharedBase, %sharedIndex;
+    ld.shared.f32 %b, [%otherAddress];
+    add.f32 %sum, %sum, %b;
+    st.shared.f32 [%sharedAddress], %sum;
+SKIP:
+    shr.u32 %stride, %stride, 1;
+    setp.ne.u32 %p, %stride, 0;
+    @%p bra REDUCE;
+    setp.ne.u32 %p, %lane, 0;
+    @%p ret;
+    mul.wide.u32 %offset, %row, 4;
+    add.u64 %yp, %y, %offset;
+    st.global.f32 [%yp], %sum;
+    ret;
+}
+
+.visible .entry normalize(.param .u64 a, .param .u64 b, .param .u64 o, .param .u32 count,
+                          .param .f32 epsilon, .param .u32 center)
+{
+    .reg .pred %p;
+    .reg .u32 %n, %mode, %i;
+    .reg .u64 %a, %b, %o, %offset, %ptr;
+    .reg .f32 %eps, %mean, %var, %nf, %v, %s, %inv;
+    ld.param.u64 %a, [a];
+    ld.param.u64 %b, [b];
+    ld.param.u64 %o, [o];
+    ld.param.u32 %n, [count];
+    ld.param.u32 %mode, [center];
+    ld.param.f32 %eps, [epsilon];
+    cvt.rn.f32.u32 %nf, %n;
+    mov.f32 %mean, 0f00000000;
+    mov.u32 %i, 0;
+    setp.eq.u32 %p, %mode, 0;
+    @%p bra N_VARIANCE_INIT;
+N_MEAN:
+    mul.wide.u32 %offset, %i, 4;
+    add.u64 %ptr, %a, %offset;
+    ld.global.f32 %v, [%ptr];
+    add.f32 %mean, %mean, %v;
+    add.u32 %i, %i, 1;
+    setp.lt.u32 %p, %i, %n;
+    @%p bra N_MEAN;
+    div.rn.f32 %mean, %mean, %nf;
+N_VARIANCE_INIT:
+    mov.f32 %var, 0f00000000;
+    mov.u32 %i, 0;
+N_VARIANCE:
+    mul.wide.u32 %offset, %i, 4;
+    add.u64 %ptr, %a, %offset;
+    ld.global.f32 %v, [%ptr];
+    sub.f32 %v, %v, %mean;
+    fma.rn.f32 %var, %v, %v, %var;
+    add.u32 %i, %i, 1;
+    setp.lt.u32 %p, %i, %n;
+    @%p bra N_VARIANCE;
+    div.rn.f32 %var, %var, %nf;
+    add.f32 %var, %var, %eps;
+    sqrt.rn.f32 %var, %var;
+    div.rn.f32 %inv, 0f3F800000, %var;
+    mov.u32 %i, 0;
+N_APPLY:
+    mul.wide.u32 %offset, %i, 4;
+    add.u64 %ptr, %a, %offset;
+    ld.global.f32 %v, [%ptr];
+    add.u64 %ptr, %b, %offset;
+    ld.global.f32 %s, [%ptr];
+    sub.f32 %v, %v, %mean;
+    mul.f32 %v, %v, %inv;
+    mul.f32 %v, %v, %s;
+    add.u64 %ptr, %o, %offset;
+    st.global.f32 [%ptr], %v;
+    add.u32 %i, %i, 1;
+    setp.lt.u32 %p, %i, %n;
+    @%p bra N_APPLY;
+    ret;
+}
+
+.visible .entry rotate(.param .u64 a, .param .u64 b, .param .u64 o, .param .u32 count,
+                       .param .f32 epsilon, .param .u32 mode)
+{
+    .reg .pred %p;
+    .reg .u32 %n, %i, %block, %lane;
+    .reg .u64 %a, %b, %o, %offset;
+    .reg .f32 %x, %y, %s, %c, %u, %v, %tmp;
+    mov.u32 %block, %ctaid.x;
+    mov.u32 %lane, %tid.x;
+    mad.lo.u32 %i, %block, 128, %lane;
+    shl.b32 %i, %i, 1;
+    ld.param.u32 %n, [count];
+    setp.ge.u32 %p, %i, %n;
+    @%p ret;
+    mul.wide.u32 %offset, %i, 4;
+    ld.param.u64 %a, [a];
+    ld.param.u64 %b, [b];
+    ld.param.u64 %o, [o];
+    add.u64 %a, %a, %offset;
+    add.u64 %b, %b, %offset;
+    add.u64 %o, %o, %offset;
+    ld.global.f32 %x, [%a];
+    ld.global.f32 %y, [%a+4];
+    ld.global.f32 %s, [%b];
+    ld.global.f32 %c, [%b+4];
+    mul.f32 %u, %x, %c;
+    mul.f32 %tmp, %y, %s;
+    sub.f32 %u, %u, %tmp;
+    mul.f32 %v, %x, %s;
+    mul.f32 %tmp, %y, %c;
+    add.f32 %v, %v, %tmp;
+    st.global.f32 [%o], %u;
+    st.global.f32 [%o+4], %v;
+    ret;
+}
+
+.visible .entry swiglu(.param .u64 a, .param .u64 b, .param .u64 o, .param .u32 count,
+                       .param .f32 epsilon, .param .u32 mode)
+{
+    .reg .pred %p;
+    .reg .u32 %n, %i, %block, %lane;
+    .reg .u64 %a, %b, %o, %offset;
+    .reg .f32 %gate, %up, %div;
+    mov.u32 %block, %ctaid.x;
+    mov.u32 %lane, %tid.x;
+    mad.lo.u32 %i, %block, 128, %lane;
+    ld.param.u32 %n, [count];
+    setp.ge.u32 %p, %i, %n;
+    @%p ret;
+    mul.wide.u32 %offset, %i, 4;
+    ld.param.u64 %a, [a];
+    ld.param.u64 %b, [b];
+    ld.param.u64 %o, [o];
+    add.u64 %a, %a, %offset;
+    add.u64 %b, %b, %offset;
+    add.u64 %o, %o, %offset;
+    ld.global.f32 %gate, [%a];
+    ld.global.f32 %up, [%b];
+    mul.f32 %div, %gate, 0fBFB8AA3B;
+    ex2.approx.f32 %div, %div;
+    add.f32 %div, %div, 0f3F800000;
+    div.rn.f32 %gate, %gate, %div;
+    mul.f32 %gate, %gate, %up;
+    st.global.f32 [%o], %gate;
+    ret;
+}
+
+.visible .entry softmax(.param .u64 a, .param .u64 b, .param .u64 o, .param .u32 count,
+                        .param .f32 epsilon, .param .u32 mode)
+{
+    .reg .pred %p;
+    .reg .u32 %n, %i;
+    .reg .u64 %a, %o, %offset, %ptr;
+    .reg .f32 %max, %sum, %v;
+    ld.param.u64 %a, [a];
+    ld.param.u64 %o, [o];
+    ld.param.u32 %n, [count];
+    ld.global.f32 %max, [%a];
+    mov.u32 %i, 0;
+S_MAX:
+    mul.wide.u32 %offset, %i, 4;
+    add.u64 %ptr, %a, %offset;
+    ld.global.f32 %v, [%ptr];
+    max.f32 %max, %max, %v;
+    add.u32 %i, %i, 1;
+    setp.lt.u32 %p, %i, %n;
+    @%p bra S_MAX;
+    mov.u32 %i, 0;
+    mov.f32 %sum, 0f00000000;
+S_SUM:
+    mul.wide.u32 %offset, %i, 4;
+    add.u64 %ptr, %a, %offset;
+    ld.global.f32 %v, [%ptr];
+    sub.f32 %v, %v, %max;
+    mul.f32 %v, %v, 0f3FB8AA3B;
+    ex2.approx.f32 %v, %v;
+    add.f32 %sum, %sum, %v;
+    add.u64 %ptr, %o, %offset;
+    st.global.f32 [%ptr], %v;
+    add.u32 %i, %i, 1;
+    setp.lt.u32 %p, %i, %n;
+    @%p bra S_SUM;
+    mov.u32 %i, 0;
+S_APPLY:
+    mul.wide.u32 %offset, %i, 4;
+    add.u64 %ptr, %o, %offset;
+    ld.global.f32 %v, [%ptr];
+    div.rn.f32 %v, %v, %sum;
+    st.global.f32 [%ptr], %v;
+    add.u32 %i, %i, 1;
+    setp.lt.u32 %p, %i, %n;
+    @%p bra S_APPLY;
+    ret;
+}
+
+.visible .entry attention(.param .u64 p, .param .u64 x, .param .u64 y, .param .u32 rows,
+    .param .u32 width, .param .u32 head_offset, .param .u32 head_width, .param .u32 mode)
+{
+    .reg .pred %p, %value;
+    .reg .u32 %rows, %width, %head, %offset, %mode, %in, %out, %block, %lane, %i, %row, %col, %stride;
+    .reg .u64 %base, %x, %y, %ix, %ptr, %rowOffset, %colOffset;
+    .reg .f32 %sum, %a, %b;
+    ld.param.u32 %rows, [rows];
+    ld.param.u32 %width, [width];
+    ld.param.u32 %offset, [head_offset];
+    ld.param.u32 %head, [head_width];
+    ld.param.u32 %mode, [mode];
+    setp.ne.u32 %value, %mode, 0;
+    selp.u32 %out, %head, %rows, %value;
+    selp.u32 %in, %rows, %head, %value;
+    mov.u32 %block, %ctaid.x;
+    mov.u32 %lane, %tid.x;
+    mad.lo.u32 %out, %block, 128, %lane;
+    selp.u32 %i, %head, %rows, %value;
+    setp.ge.u32 %p, %out, %i;
+    @%p ret;
+    ld.param.u64 %base, [p];
+    ld.param.u64 %x, [x];
+    ld.param.u64 %y, [y];
+    @%value add.u32 %offset, %offset, %width;
+    mul.wide.u32 %colOffset, %offset, 4;
+    add.u64 %base, %base, %colOffset;
+    shl.b32 %stride, %width, 3;
+    mov.u32 %i, 0;
+    mov.f32 %sum, 0f00000000;
+A_DOT:
+    selp.u32 %row, %i, %out, %value;
+    selp.u32 %col, %out, %i, %value;
+    mul.wide.u32 %rowOffset, %row, %stride;
+    mul.wide.u32 %colOffset, %col, 4;
+    add.u64 %ptr, %base, %rowOffset;
+    add.u64 %ptr, %ptr, %colOffset;
+    ld.global.f32 %a, [%ptr];
+    mul.wide.u32 %ix, %i, 4;
+    add.u64 %ptr, %x, %ix;
+    ld.global.f32 %b, [%ptr];
+    fma.rn.f32 %sum, %a, %b, %sum;
+    add.u32 %i, %i, 1;
+    setp.lt.u32 %p, %i, %in;
+    @%p bra A_DOT;
+    mul.wide.u32 %ix, %out, 4;
+    add.u64 %ptr, %y, %ix;
+    st.global.f32 [%ptr], %sum;
+    ret;
+}

@@ -37,6 +37,9 @@ internal static class PosixNative
         int flags,
         int mode);
 
+    [DllImport("libc", EntryPoint = "shm_open", SetLastError = true)]
+    internal static extern int OpenShared([MarshalAs(UnmanagedType.LPUTF8Str)] string name, int flags, uint mode);
+
     [DllImport("libc", EntryPoint = "mmap", SetLastError = true)]
     internal static extern IntPtr Mmap(
         IntPtr address,

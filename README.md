@@ -1,5 +1,7 @@
 # AIKernel.NET Core
 
+CUDA Driver NuGet (0.1.4 preparation): [build, package, and verify](docs/development/cuda-driver-nuget.md).
+
 ![AIKernel.NET Logo](assets/aikernel-logo.png)
 
 **AIKernel.NET Core** is a runtime designed to solve three core problems in LLM applications: **context drift, lack of reproducibility, and lack of governance**.

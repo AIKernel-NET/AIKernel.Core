@@ -1,5 +1,7 @@
 # AIKernel.NET Core
 
+CUDA Driver NuGet（0.1.4準備）：[ビルド・配布・検証](docs/development/cuda-driver-nuget.md)。
+
 ![AIKernel.NET Logo](assets/aikernel-logo.png)
 
 **AIKernel.NET Core** は、LLM アプリケーションにおける **文脈の暴走・再現性の欠如・ガバナンス不能** を解決するためのランタイムです。

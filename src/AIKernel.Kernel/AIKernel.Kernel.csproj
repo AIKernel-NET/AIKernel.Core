@@ -31,7 +31,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <!-- Packaging requires both native runtime assets; managed builds remain SDK-only. -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>EN: Kernel facade and orchestration layer for AIKernel.NET. Coordinates Core, Providers, Context, Governance, and execution flow through a unified IKernel interface.
 
 JA: AIKernel.NET の Kernel Facade およびオーケストレーション層です。Core、Provider、Context、Governance、実行フローを統合された IKernel インターフェースで制御します。</Description>
@@ -40,4 +41,5 @@ JA: AIKernel.NET の Kernel Facade およびオーケストレーション層で
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
+  <Import Project="../../build/CudaNativePackaging.targets" />
 </Project>

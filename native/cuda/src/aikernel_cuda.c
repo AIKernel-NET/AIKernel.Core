@@ -47,6 +47,23 @@ int32_t ak_get_device_count(int32_t *count) {
     return ak_status(code);
 }
 
+int32_t ak_get_device_pci_bus_id(int32_t ordinal, char *target, int32_t capacity) {
+    if (!target || capacity < 16) return AK_INVALID;
+    target[0] = '\0';
+    if (ordinal < 0) return AK_INVALID;
+
+    ak_driver driver = { 0 };
+    int status = ak_driver_open(&driver);
+    if (status) return status;
+    int device = 0;
+    int code = driver.init(0);
+    if (!code) code = driver.device_get(&device, ordinal);
+    if (!code) code = driver.pci_bus_id(target, capacity, device);
+    if (code) target[0] = '\0';
+    ak_driver_close(&driver);
+    return ak_status(code);
+}
+
 int32_t ak_create(uint32_t version, int32_t ordinal, ak_context **result) {
     if (!result) return AK_INVALID;
     *result = NULL;

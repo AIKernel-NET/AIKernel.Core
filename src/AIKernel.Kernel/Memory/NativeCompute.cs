@@ -11,6 +11,9 @@ internal static unsafe partial class NativeCompute
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_get_device_count")]
     internal static partial int GetDeviceCount(out int count);
 
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_get_device_pci_bus_id")]
+    internal static partial int GetDevicePciBusId(int ordinal, byte* address, int capacity);
+
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_create")]
     internal static partial int Create(uint version, int ordinal, out nint context);
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_destroy")]

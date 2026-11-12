@@ -64,6 +64,17 @@ if __name__ == "__main__":
     parser.add_argument("--gpu", action="store_true")
     parser.add_argument("--no-driver", action="store_true")
     args = parser.parse_args()
+    probe_pci = _bind("get_device_pci_bus_id", C.c_int32, C.POINTER(C.c_char), C.c_int32)
+    pci = C.create_string_buffer(b"unresolved", 32)
+    assert probe_pci(-1, pci, len(pci)) == 1 and not pci.value
+    assert probe_pci(0, pci, 15) == 1
+    assert probe_pci(2147483647, pci, len(pci)) != 0 and not pci.value
+    if args.no_driver:
+        assert probe_pci(0, pci, len(pci)) == 2 and not pci.value
+    if args.gpu:
+        assert probe_pci(0, pci, len(pci)) == 0 and b":" in pci.value
+    probed_pci = pci.value
+
     create = _bind("create", C.c_uint32, C.c_int32, C.POINTER(C.c_void_p))
     handle = C.c_void_p()
     assert create(_ABI + 1, 0, C.byref(handle)) == 6 and not handle
@@ -73,6 +84,11 @@ if __name__ == "__main__":
         if args.no_driver:
             assert unavailable.cuda_status == 2
     with Context(0, fallback=not args.gpu) as context:
+        if args.gpu:
+            get_pci = _bind("get_pci_bus_id", C.c_void_p, C.POINTER(C.c_char), C.c_int32)
+            with context._access() as handle:
+                _check(get_pci(handle, pci, len(pci)))
+            assert pci.value == probed_pci
         assert not args.no_driver or not context.uses_cuda
         exercise(context)
         stats = allocation_cycles(context) if args.gpu else context.stats()

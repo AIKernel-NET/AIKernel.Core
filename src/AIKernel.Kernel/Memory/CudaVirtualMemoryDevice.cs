@@ -30,6 +30,30 @@ public sealed unsafe class CudaVirtualMemoryDevice : IZeroableVirtualMemoryDevic
         return TransferFailure("cuda_device_enumeration_failed", "The CUDA device list is unavailable.");
     }
 
+    /// <summary>Gets the PCI bus ID for a CUDA ordinal without creating a device context.</summary>
+    public static Result<string> GetDevicePciBusId(int ordinal)
+    {
+        Span<byte> id = stackalloc byte[32];
+        id.Clear();
+        try
+        {
+            int status;
+            fixed (byte* address = id)
+                status = NativeCompute.GetDevicePciBusId(ordinal, address, id.Length);
+
+            var length = id.IndexOf((byte)0);
+            if (status == 0 && length > 0)
+                return Result<string>.Success(Encoding.ASCII.GetString(id[..length]));
+            if (status is 2 or 3)
+                return Result<string>.Fail(new ErrorContext("The CUDA driver or device is unavailable.",
+                    "cuda_device_not_found", false) { FailureKind = FailureKind.FailClosed });
+        }
+        catch (Exception ex) when (ex is EntryPointNotFoundException or DllNotFoundException or BadImageFormatException) { }
+
+        return Result<string>.Fail(new ErrorContext("The CUDA PCI bus ID could not be resolved.",
+            "cuda_device_enumeration_failed", false) { FailureKind = FailureKind.FailClosed });
+    }
+
     private CudaVirtualMemoryDevice(nint context) => this.context = context;
 
     /// <summary>Probes CUDA and reports its initialization status when no device tier can be used.</summary>

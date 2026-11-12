@@ -34,7 +34,23 @@ internal static class ResultStepIdentity
         IReadOnlyList<ResultStepReplayLogEntry> replayLog)
     {
         var payload = BuildReplayLogCanonicalPayload(replayLog);
-        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(payload));
+        using var hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        var encoder = Encoding.UTF8.GetEncoder();
+        Span<byte> buffer = stackalloc byte[4096];
+        foreach (var chunk in payload.GetChunks())
+        {
+            var remaining = chunk.Span;
+            while (!remaining.IsEmpty)
+            {
+                encoder.Convert(remaining, buffer, flush: false, out var charsUsed, out var bytesUsed, out _);
+                hasher.AppendData(buffer[..bytesUsed]);
+                remaining = remaining[charsUsed..];
+            }
+        }
+        // Keep encoder state across StringBuilder chunks, including split surrogate pairs.
+        encoder.Convert(ReadOnlySpan<char>.Empty, buffer, flush: true, out _, out var finalBytes, out _);
+        hasher.AppendData(buffer[..finalBytes]);
+        var bytes = hasher.GetHashAndReset();
 
         return "replay:sha256:" + Convert.ToHexStringLower(bytes);
     }
@@ -73,7 +89,7 @@ internal static class ResultStepIdentity
         return builder.ToString();
     }
 
-    private static string BuildReplayLogCanonicalPayload(
+    private static StringBuilder BuildReplayLogCanonicalPayload(
         IReadOnlyList<ResultStepReplayLogEntry> replayLog)
     {
         var builder = new StringBuilder();
@@ -107,6 +123,6 @@ internal static class ResultStepIdentity
                 entry.SemanticDelta.Metadata?.Count.ToString(CultureInfo.InvariantCulture) ?? "0");
         }
 
-        return builder.ToString();
+        return builder;
     }
 }

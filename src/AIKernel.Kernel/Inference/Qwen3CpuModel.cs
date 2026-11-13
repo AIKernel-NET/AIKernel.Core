@@ -79,6 +79,26 @@ public sealed class Qwen3CpuModel : IDisposable
     /// <summary>Encoded mapped-file length, without FP32 expansion.</summary>
     public long WeightBytes=>file.Length;
 
+    /// <summary>Precomputes only a trusted system-prefix KV before accepting user requests.</summary>
+    public async Task WarmupAsync(string system,CancellationToken cancellationToken=default)
+    {
+        ArgumentNullException.ThrowIfNull(system);
+        if(system.Length>8192)throw new ArgumentException("System instructions exceed the input limit.");
+        await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await Task.Run(()=>{
+                if(prefixCache?.System==system)return;
+                var prefix=tokenizer.Prefix(system);
+                if(prefix.Count>=context)throw new ArgumentException("System prefix exceeds the context limit.");
+                using var state=new State(this,cancellationToken);
+                for(int i=0;i<prefix.Count;i++){cancellationToken.ThrowIfCancellationRequested();Forward(prefix[i],i,state);}
+                prefixCache=new(system,prefix.Count,state.Keys.Select(k=>k.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray(),
+                    state.Values.Select(v=>v.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray());
+            },cancellationToken).ConfigureAwait(false);
+        }
+        finally{gate.Release();}
+    }
     /// <summary>Generates a bounded reply. Concurrent use is serialized; request KV state is never shared.</summary>
     public async Task<CpuGeneration> GenerateAsync(string system,string user,int maxNewTokens=128,CancellationToken cancellationToken=default)
     {

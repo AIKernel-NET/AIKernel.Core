@@ -8,6 +8,7 @@ if(args.Length>1 && args[1]=="--classify")
 {
     var fixture=JsonSerializer.Deserialize<ClassificationFixture>(File.ReadAllText(args[2]))!;
     using var classifier=new Qwen3CpuModel(modelPath,4,1024);
+    if(args.Contains("--warmup"))await classifier.WarmupAsync(fixture.System);
     foreach(var item in fixture.Cases)
     {
         using var timeout=new CancellationTokenSource(TimeSpan.FromMinutes(4));

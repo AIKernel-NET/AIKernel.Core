@@ -25,6 +25,7 @@ Console.WriteLine(result.FinishReason); // stop or length
 - Trusted Qwen chat boundaries and the no-thinking prefix use dedicated token IDs. Only the final answer is returned; incomplete control sequences fail.
 - Weights remain read-only memory mapped. Per-request KV and activation buffers are cleared after use.
 - Only a trusted system-prefix KV is reused, never user text or generated replies.
+- `WarmupAsync(system, cancellationToken)` prepares that prefix before admission. Publish readiness only after all required prefixes are prepared. It does not persist KV across process restarts.
 - Calls on a model instance are serialized. Dispose the model only after active calls have stopped.
 - Cancellation is checked during token, layer and row work. A proxy can delay propagation of a disconnected browser.
 - The caller must independently verify model provenance, SHA-256 and license before loading. Model paths are trusted operator configuration.

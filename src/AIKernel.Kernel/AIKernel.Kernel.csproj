@@ -42,6 +42,9 @@ JA: AIKernel.NET の Kernel Facade およびオーケストレーション層で
 
   <!-- Release staging supplies binaries built from the same pinned Core source.
        CPU-only source builds remain possible without an NVIDIA driver or compiler. -->
+  <PropertyGroup>
+    <AIKernelRequireCudaAssets Condition="'$(PackageVersion)' == '0.1.4'">true</AIKernelRequireCudaAssets>
+  </PropertyGroup>
   <ItemGroup Condition="'$(AIKernelCudaNativeRoot)' != ''">
     <None Include="$(AIKernelCudaNativeRoot)/win-x64/aikernel_cuda_driver.dll"
           Pack="true" PackagePath="runtimes/win-x64/native/" />

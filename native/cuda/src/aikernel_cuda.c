@@ -1,4 +1,5 @@
 #include "aikernel_cuda.h"
+#include "cpu_gemv.h"
 #include "driver.h"
 #include "embedded_ptx.h"
 
@@ -342,12 +343,7 @@ int32_t ak_gemv(ak_context *ctx, uint64_t weights, const float *x, float *y, uin
     if (!weights || !x || !y || !rows || !cols || (size_t)rows > SIZE_MAX / sizeof(float) / cols) return AK_INVALID;
     if (!ctx) {
         const float *matrix = (const float *)(uintptr_t)weights;
-        for (uint32_t row = 0; row < rows; ++row) {
-            float sum = 0;
-            for (uint32_t col = 0; col < cols; ++col) sum += matrix[(size_t)row * cols + col] * x[col];
-            y[row] = sum;
-        }
-        return AK_OK;
+        return ak_cpu_gemv(matrix, x, y, rows, cols);
     }
 
     if (!within(&ctx->device_blocks, weights, (size_t)rows * cols * sizeof(float))) return AK_INVALID;

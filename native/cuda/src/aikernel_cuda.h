@@ -48,6 +48,10 @@ AK_EXPORT int32_t ak_wipe_scratch(ak_context *ctx);
 AK_EXPORT int32_t ak_get_pci_bus_id(ak_context *ctx, char *target, int capacity);
 AK_EXPORT int32_t ak_download(ak_context *ctx, uint64_t address, void *destination, size_t bytes);
 AK_EXPORT int32_t ak_gemv(ak_context *ctx, uint64_t weights, const float *x, float *y, uint32_t rows, uint32_t cols);
+/* Selected host FP32 GEMV path. An unsupported/invalid forced path returns -1.
+ * Configure AIKERNEL_CPU_GEMV before calls: auto (default), scalar, avx, avx2, avx512. */
+enum { AK_CPU_UNAVAILABLE = -1, AK_CPU_SCALAR = 0, AK_CPU_AVX2 = 1, AK_CPU_AVX512 = 2, AK_CPU_AVX = 3 };
+AK_EXPORT int32_t ak_cpu_gemv_backend(void);
 AK_EXPORT int32_t ak_normalize(ak_context *ctx, const float *x, const float *scale, float *y,
                                uint32_t count, float epsilon, int32_t center);
 AK_EXPORT int32_t ak_rope(ak_context *ctx, float *x, const float *sin_cos, uint32_t count);

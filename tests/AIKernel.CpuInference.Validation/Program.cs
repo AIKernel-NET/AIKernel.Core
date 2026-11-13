@@ -2,6 +2,39 @@ using AIKernel.Kernel.Inference;
 using System.Text.Json;
 using System.Buffers.Binary;
 using System.Diagnostics;
+using System.Runtime.Intrinsics.X86;
+using System.Runtime.InteropServices;
+using System.Text;
+
+var brand = new StringBuilder();
+if (X86Base.IsSupported)
+{
+    for (int leaf = unchecked((int)0x80000002); leaf <= unchecked((int)0x80000004); leaf++)
+    {
+        var (eax, ebx, ecx, edx) = X86Base.CpuId(leaf, 0);
+        foreach (int register in new[] { eax, ebx, ecx, edx })
+            brand.Append(Encoding.ASCII.GetString(BitConverter.GetBytes(register)));
+    }
+}
+Console.WriteLine(JsonSerializer.Serialize(new { kind = "hardware", cpu = brand.ToString().Trim('\0', ' '),
+    os = RuntimeInformation.OSDescription, architecture = RuntimeInformation.ProcessArchitecture.ToString(),
+    runtime = RuntimeInformation.FrameworkDescription, processors = Environment.ProcessorCount,
+    avx = Avx.IsSupported, avx2 = Avx2.IsSupported, fma = Fma.IsSupported, avx512 = Avx512F.IsSupported,
+    intrinsicOverrides = Environment.GetEnvironmentVariables().Keys.Cast<string>().Where(k =>
+        k.StartsWith("DOTNET_Enable", StringComparison.OrdinalIgnoreCase) || k.StartsWith("COMPlus_Enable", StringComparison.OrdinalIgnoreCase)).ToArray() }));
+if (args.Contains("--require-avx-only"))
+{
+    if (!Avx.IsSupported || Avx2.IsSupported || Fma.IsSupported || Avx512F.IsSupported
+        || Environment.GetEnvironmentVariables().Keys.Cast<string>().Any(k =>
+            k.StartsWith("DOTNET_Enable", StringComparison.OrdinalIgnoreCase) || k.StartsWith("COMPlus_Enable", StringComparison.OrdinalIgnoreCase)))
+    {
+        Console.Error.WriteLine("An actual AVX-only machine without intrinsic overrides is required.");
+        Environment.ExitCode = 2;
+        return;
+    }
+    args = args.Where(a => a != "--require-avx-only").ToArray();
+}
+if (args.Length == 0) return;
 
 string modelPath=args[0];
 if(args.Length>1 && args[1]=="--benchmark")

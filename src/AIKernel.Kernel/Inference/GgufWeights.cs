@@ -69,6 +69,12 @@ internal sealed unsafe class GgufWeights : IDisposable
         if(!Tensors.TryGetValue(name,out var t)||t.Rows!=rows||t.Columns!=cols)throw new InvalidDataException("Tensor shape mismatch: "+name);
         return t;
     }
+    internal byte* BytesAt(long offset, int length)
+    {
+        if (offset < 0 || length < 0 || offset > Length || length > Length - offset)
+            throw new ArgumentOutOfRangeException(nameof(offset));
+        return address + view.PointerOffset + offset;
+    }
     internal byte* Pointer(Tensor t)=>address+view.PointerOffset+t.Offset;
     internal float[] Vector(Tensor t)
     {

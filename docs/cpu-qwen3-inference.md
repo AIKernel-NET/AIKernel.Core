@@ -34,7 +34,19 @@ Console.WriteLine(result.FinishReason); // stop or length
 
 The default selects AVX-512F, then AVX2+FMA, AVX, scalar. .NET intrinsic support includes operating-system support. `AIKERNEL_CPU_GEMV=scalar|avx|avx2|avx512|auto` can select a path for testing; unsupported forced paths throw. AVX does not use FMA or AVX2 instructions.
 
-Direct quantized-vector computation is the default. `AIKERNEL_Q1_KERNEL=lookup` is an experimental alternative and was slower on the development machine. AVX-512F support does not imply use of VNNI or BF16.
+Direct quantized-vector computation is the default. `AIKERNEL_Q1_KERNEL=lookup` is an experimental alternative. Previous development-machine timings were affected by concurrent work and must be repeated after reboot before drawing performance conclusions. AVX-512F support does not imply use of VNNI or BF16.
+
+## Optional GPU matrix offload
+
+`Qwen3GpuModel` uses the same transformer with quantized matrices resident on CUDA.
+Attention, normalization, RoPE and KV remain on the CPU. It requires the matching
+AIKernel CUDA Driver library and an NVIDIA driver; CUDA Toolkit and LibTorch are
+not runtime dependencies. The CPU API above still loads no CUDA library.
+See [GPU setup, allocation limits and validation](../native/cuda/README.md#quantized-qwen3-matrix-offload).
+
+GPU functional checks and performance comparisons are separate. Development-machine
+CPU/GPU performance measurements are on hold until a reboot and a quiet background
+load; diagnostic timings from functional tests must not be presented as benchmark results.
 
 ## Validation
 
@@ -45,7 +57,7 @@ dotnet run --project tests/AIKernel.Hosting.Validation
 
 The tokenizer fixture was generated with Hugging Face tokenizers 0.22.2 from the official Bonsai 1.7B tokenizer JSON, SHA-256 `aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4`. It tests full trusted chat templates as well as Japanese, English, combining accents, emoji and leading newlines. Tokenizer reference tooling is not a runtime dependency.
 
-The quantized arithmetic check independently decodes 257 rows of actual model bytes and compares scalar, AVX, AVX2 and AVX-512 paths at 1/2/4 workers, for direct-vector and lookup kernels. All passed on the EPYC 9555 XServer on 2026-11-14. Unsupported AVX-512 is rejected on the Xeon E-2174G development machine. This does not constitute execution on an AVX-only machine or exhaustive numerical proof. The fixed Japanese inquiry produced identical 48-token replies across the tested AVX2/AVX-512 runs (96-token ceiling).
+The quantized arithmetic check independently decodes 257 rows of actual model bytes and compares scalar, AVX, AVX2 and AVX-512 paths at 1/2/4 workers, for direct-vector and lookup kernels. All passed on the EPYC 9555 XServer on 2026-11-14. Unsupported AVX-512 is rejected on the Xeon E-2174G development machine. The separate physical i7-3770K / Ubuntu validation also passed with AVX=true and AVX2/FMA/AVX-512=false, including automatic calibration and cache reuse. These finite checks are not exhaustive numerical proof. The fixed Japanese inquiry produced identical 48-token replies across the tested AVX2/AVX-512 runs (96-token ceiling).
 
 Model format references: [Bonsai 1.7B](https://huggingface.co/prism-ml/Bonsai-1.7B-gguf), [Bonsai 4B](https://huggingface.co/prism-ml/Bonsai-4B-gguf), [PrismML quantization implementation](https://github.com/PrismML-Eng/llama.cpp/blob/master/ggml/src/ggml-quants.c).
 

@@ -32,6 +32,8 @@ internal static unsafe partial class NativeCompute
     internal static partial int Download(nint context, ulong address, byte* destination, nuint length);
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_gemv")]
     internal static partial int Gemv(nint context, ulong address, float* input, float* output, uint rows, uint columns);
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_gemv_q1_0")]
+    internal static partial int GemvQ1(nint context, ulong address, float* input, float* output, uint rows, uint columns);
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_normalize")]
     internal static partial int Normalize(nint context, float* input, float* scale, float* output,
         uint length, float epsilon, int center);

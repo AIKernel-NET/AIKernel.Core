@@ -19,6 +19,7 @@ struct ak_context {
     int device;
     void *stream;
     void *gemv;
+    void *gemv_q1;
     void *normalize;
     void *rope;
     void *swiglu;
@@ -83,6 +84,7 @@ int32_t ak_create(uint32_t version, int32_t ordinal, ak_context **result) {
         if (!code) code = d->stream_create(&ctx->stream, 1);
         if (!code) code = d->module_load(&module, ak_embedded_ptx);
         if (!code) code = d->module_func(&ctx->gemv, module, "matvec");
+        if (!code) code = d->module_func(&ctx->gemv_q1, module, "matvec_q1_0");
         if (!code) code = d->module_func(&ctx->normalize, module, "normalize");
         if (!code) code = d->module_func(&ctx->rope, module, "rotate");
         if (!code) code = d->module_func(&ctx->swiglu, module, "swiglu");
@@ -148,8 +150,13 @@ static allocation **find_allocation(allocation **head, uint64_t address) {
 }
 
 static int within(allocation **head, uint64_t address, size_t bytes) {
-    allocation *item = *find_allocation(head, address);
-    return item && bytes <= item->bytes;
+    /* Interior ranges are needed for bounded, chunked uploads and mapped tensors.
+       Subtraction avoids overflow at the end of an allocation. Free still requires its base. */
+    for (allocation *item = *head; item; item = item->next) {
+        if (address >= item->address && address - item->address < item->bytes &&
+            bytes <= item->bytes - (size_t)(address - item->address)) return 1;
+    }
+    return 0;
 }
 
 int32_t ak_destroy(ak_context *ctx) {
@@ -339,14 +346,8 @@ int32_t ak_download(ak_context *ctx, uint64_t address, void *destination, size_t
     return leave(ctx, status);
 }
 
-int32_t ak_gemv(ak_context *ctx, uint64_t weights, const float *x, float *y, uint32_t rows, uint32_t cols) {
-    if (!weights || !x || !y || !rows || !cols || (size_t)rows > SIZE_MAX / sizeof(float) / cols) return AK_INVALID;
-    if (!ctx) {
-        const float *matrix = (const float *)(uintptr_t)weights;
-        return ak_cpu_gemv(matrix, x, y, rows, cols);
-    }
-
-    if (!within(&ctx->device_blocks, weights, (size_t)rows * cols * sizeof(float))) return AK_INVALID;
+static int device_gemv(ak_context *ctx, void *kernel, uint64_t weights, const float *x, float *y,
+                       uint32_t rows, uint32_t cols) {
     int status = enter(ctx);
     if (status != AK_OK) return status;
 
@@ -359,12 +360,28 @@ int32_t ak_gemv(ak_context *ctx, uint64_t weights, const float *x, float *y, uin
         char *host_y = (char *)ctx->scratch_host + x_bytes;
         memcpy(ctx->scratch_host, x, x_bytes);
         int code = ctx->driver.htod(dx, ctx->scratch_host, x_bytes, ctx->stream);
-        if (!code) code = ctx->driver.launch(ctx->gemv, rows, 1, 1, 128, 1, 1, 0, ctx->stream, args, NULL);
+        if (!code) code = ctx->driver.launch(kernel, rows, 1, 1, 128, 1, 1, 0, ctx->stream, args, NULL);
         if (!code) code = ctx->driver.dtoh(host_y, dy, y_bytes, ctx->stream);
         status = finish_stream(ctx, code);
         if (!status) memcpy(y, host_y, y_bytes);
     }
     return leave(ctx, status);
+}
+
+int32_t ak_gemv(ak_context *ctx, uint64_t weights, const float *x, float *y, uint32_t rows, uint32_t cols) {
+    if (!weights || !x || !y || !rows || !cols ||
+        (size_t)rows > SIZE_MAX / sizeof(float) / cols) return AK_INVALID;
+    if (!ctx) return ak_cpu_gemv((const float *)(uintptr_t)weights, x, y, rows, cols);
+    if (weights % sizeof(float) || !within(&ctx->device_blocks, weights, (size_t)rows * cols * sizeof(float))) return AK_INVALID;
+    return device_gemv(ctx, ctx->gemv, weights, x, y, rows, cols);
+}
+
+int32_t ak_gemv_q1_0(ak_context *ctx, uint64_t weights, const float *x, float *y, uint32_t rows, uint32_t cols) {
+    /* GGUF type 41: 128 signs + one FP16 scale = 18 bytes per block. No CPU fallback. */
+    if (!ctx || !weights || weights % 2 || !x || !y || !rows || !cols || cols % 128 ||
+        (size_t)rows > SIZE_MAX / 18 / (cols / 128)) return AK_INVALID;
+    if (!within(&ctx->device_blocks, weights, (size_t)rows * (cols / 128) * 18)) return AK_INVALID;
+    return device_gemv(ctx, ctx->gemv_q1, weights, x, y, rows, cols);
 }
 
 static int vector_kernel(ak_context *ctx, void *kernel, const float *a, const float *b, float *out,

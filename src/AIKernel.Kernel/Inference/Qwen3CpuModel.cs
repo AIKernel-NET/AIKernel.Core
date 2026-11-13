@@ -8,6 +8,7 @@ namespace AIKernel.Kernel.Inference;
 public sealed class Qwen3CpuModel : IDisposable
 {
     private readonly GgufWeights file;
+    private readonly CudaQuantizedMatrix? gpu;
     private readonly QwenTokenizer tokenizer;
     private readonly GgufWeights.Tensor embedding, output;
     private readonly Layer[] layers;
@@ -30,6 +31,9 @@ public sealed class Qwen3CpuModel : IDisposable
 
     /// <summary>Loads only supported bounded dense models. No CUDA library is loaded.</summary>
     public Qwen3CpuModel(string modelPath,int cpuThreads=4,int contextTokens=1024)
+        : this(modelPath,cpuThreads,contextTokens,null,0) { }
+
+    internal Qwen3CpuModel(string modelPath,int cpuThreads,int contextTokens,int? deviceOrdinal,long maximumWeightBytes)
     {
         if(cpuThreads<1||cpuThreads>6||contextTokens<64||contextTokens>2048)throw new ArgumentOutOfRangeException(nameof(cpuThreads));
         threads=cpuThreads;context=contextTokens;backend=QuantizedCpuMatrix.Backend;prefillBackend=decodeBackend=backend;prefillThreads=decodeThreads=cpuThreads;
@@ -76,6 +80,7 @@ public sealed class Qwen3CpuModel : IDisposable
                 frequencies[i]=freq*(extrapolation+(1-extrapolation)/factor);
             }
             tokenizer=new(file);
+            if(deviceOrdinal.HasValue)gpu=new(file,deviceOrdinal.Value,maximumWeightBytes);
         }
         catch{file.Dispose();throw;}
     }
@@ -220,14 +225,14 @@ public sealed class Qwen3CpuModel : IDisposable
                 foreach(int id in choices)
                 {
                     var row=output with {Offset=output.Offset+(long)id*output.RowBytes,Rows=1};
-                    QuantizedCpuMatrix.Multiply(file,row,state.Normal,score,state.Options,decodeBackend);
+                    Multiply(row,state.Normal,score,state.Options,decodeBackend);
                     if(score[0]>best){best=score[0];next=id;}
                 }
                 if(!float.IsFinite(best))throw new ArithmeticException("Non-finite model score.");
             }
             else
             {
-                QuantizedCpuMatrix.Multiply(file,output,state.Normal,state.Logits,state.Options,decodeBackend);
+                Multiply(output,state.Normal,state.Logits,state.Options,decodeBackend);
                 next=0;float best=float.NegativeInfinity;
                 for(int i=0;i<state.Logits.Length;i++)if(state.Logits[i]>best){best=state.Logits[i];next=i;}
                 if(!float.IsFinite(best))throw new ArithmeticException("Non-finite model logits.");
@@ -244,6 +249,14 @@ public sealed class Qwen3CpuModel : IDisposable
         return new(tokenizer.DecodeReply(generated),prompt.Count,generated.Count,finish,elapsed,CpuBackend)
         {PrefillMilliseconds=prefillMs,DecodeMilliseconds=decodeMs,PrefillForwardTokens=prompt.Count-begin,DecodeForwardTokens=decodeForwards,PrefillThreads=prefillThreads,DecodeThreads=decodeThreads};
     }
+    internal long DeviceWeightBytes=>gpu?.WeightBytes??0;
+    internal string? DevicePciBusId=>gpu?.PciBusId;
+    internal void ZeroGpuScratch()=>gpu?.ZeroScratch();
+    private void Multiply(GgufWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,string selectedBackend)
+    {
+        if(gpu is null)QuantizedCpuMatrix.Multiply(file,tensor,input,output,options,selectedBackend);
+        else gpu.Multiply(tensor,input,output,options.CancellationToken);
+    }
     private void Forward(int id,int position,State s,string selectedBackend)
     {
         QuantizedCpuMatrix.Row(file,embedding,id,s.X);
@@ -251,9 +264,9 @@ public sealed class Qwen3CpuModel : IDisposable
         {
             s.Options.CancellationToken.ThrowIfCancellationRequested();var l=layers[index];
             Norm(s.X,l.Norm,s.Normal,epsilon);
-            QuantizedCpuMatrix.Multiply(file,l.Q,s.Normal,s.Q,s.Options,selectedBackend);
-            QuantizedCpuMatrix.Multiply(file,l.K,s.Normal,s.K,s.Options,selectedBackend);
-            QuantizedCpuMatrix.Multiply(file,l.V,s.Normal,s.V,s.Options,selectedBackend);
+            Multiply(l.Q,s.Normal,s.Q,s.Options,selectedBackend);
+            Multiply(l.K,s.Normal,s.K,s.Options,selectedBackend);
+            Multiply(l.V,s.Normal,s.V,s.Options,selectedBackend);
             for(int h=0;h<heads;h++)Norm(s.Q.AsSpan(h*headSize,headSize),l.QNorm,s.Q.AsSpan(h*headSize,headSize),epsilon);
             for(int h=0;h<kvHeads;h++)Norm(s.K.AsSpan(h*headSize,headSize),l.KNorm,s.K.AsSpan(h*headSize,headSize),epsilon);
             Rope(s.Q,heads,position);Rope(s.K,kvHeads,position);
@@ -267,13 +280,13 @@ public sealed class Qwen3CpuModel : IDisposable
                 var target=s.Attention.AsSpan(h*headSize,headSize);target.Clear();
                 for(int t=0;t<=position;t++){float p=scores[t]/sum;var v=values.AsSpan(t*kvSize+kv,headSize);for(int d=0;d<headSize;d++)target[d]+=p*v[d];}
             });
-            QuantizedCpuMatrix.Multiply(file,l.O,s.Attention,s.Projected,s.Options,selectedBackend);
+            Multiply(l.O,s.Attention,s.Projected,s.Options,selectedBackend);
             for(int i=0;i<width;i++)s.X[i]+=s.Projected[i];
             Norm(s.X,l.FfnNorm,s.Normal,epsilon);
-            QuantizedCpuMatrix.Multiply(file,l.Gate,s.Normal,s.Gate,s.Options,selectedBackend);
-            QuantizedCpuMatrix.Multiply(file,l.Up,s.Normal,s.Up,s.Options,selectedBackend);
+            Multiply(l.Gate,s.Normal,s.Gate,s.Options,selectedBackend);
+            Multiply(l.Up,s.Normal,s.Up,s.Options,selectedBackend);
             for(int i=0;i<hidden;i++)s.Gate[i]=s.Gate[i]/(1+MathF.Exp(-s.Gate[i]))*s.Up[i];
-            QuantizedCpuMatrix.Multiply(file,l.Down,s.Gate,s.Projected,s.Options,selectedBackend);
+            Multiply(l.Down,s.Gate,s.Projected,s.Options,selectedBackend);
             for(int i=0;i<width;i++)s.X[i]+=s.Projected[i];
         }
         Norm(s.X,finalNorm,s.Normal,epsilon);
@@ -306,7 +319,7 @@ public sealed class Qwen3CpuModel : IDisposable
         public void Dispose(){foreach(var array in new[]{X,Normal,Q,K,V,Attention,Projected,Gate,Up,Logits}.Concat(Keys).Concat(Values))Array.Clear(array);}
     }
     /// <summary>Dispose only after active requests have stopped.</summary>
-    public void Dispose(){if(prefixCache is {} c)foreach(var a in c.Keys.Concat(c.Values))Array.Clear(a);prefixCache=null;file.Dispose();gate.Dispose();}
+    public void Dispose(){if(prefixCache is {} c)foreach(var a in c.Keys.Concat(c.Values))Array.Clear(a);prefixCache=null;try{gpu?.Dispose();}finally{file.Dispose();gate.Dispose();}}
 }
 /// <summary>Measured result of a completed CPU generation.</summary>
 public sealed record CpuGeneration(string Text,int InputTokens,int OutputTokens,string FinishReason,long ElapsedMilliseconds,string CpuBackend)

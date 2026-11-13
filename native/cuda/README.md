@@ -57,6 +57,9 @@ Console.WriteLine(reply.Text);
 ~~~
 
 Deploy the native library from this source revision alongside the managed assembly.
+The official `AIKernel.Kernel` NuGet release includes matching `win-x64` and
+`linux-x64` runtime assets, so normal RID-aware restore/publish selects the library.
+Release packaging requires both assets; a source-only CPU build may omit them.
 NVIDIA's installed driver is required; a CUDA Toolkit or LibTorch installation is
 not required. CPU-only callers still use `Qwen3CpuModel` without loading this library.
 An invalid device, missing native export, unsupported model or exhausted allocation
@@ -95,3 +98,9 @@ Its timings are functional diagnostics, not controlled performance measurements.
 Equal output on these inputs is regression evidence, not proof of universal
 numerical equivalence. Benchmark CPU/GPU only after controlling background load,
 with the same model hash, inputs, thread ceiling and warmup policy.
+
+Python users install `aikernel-net[gpu]==0.1.4` and the .NET 10 runtime. Import
+`aikernel_cuda_driver` before calling the managed GPU API via pythonnet, so the
+matching native library from its platform wheel is loaded. The managed wrapper
+wheel remains platform-independent; the optional driver wheel is available for
+Windows x64 and manylinux 2.28+ x64. CPU-only imports do not require this extra.

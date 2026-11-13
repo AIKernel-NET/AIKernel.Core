@@ -40,4 +40,20 @@ JA: AIKernel.NET の Kernel Facade およびオーケストレーション層で
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
+  <!-- Release staging supplies binaries built from the same pinned Core source.
+       CPU-only source builds remain possible without an NVIDIA driver or compiler. -->
+  <ItemGroup Condition="'$(AIKernelCudaNativeRoot)' != ''">
+    <None Include="$(AIKernelCudaNativeRoot)/win-x64/aikernel_cuda_driver.dll"
+          Pack="true" PackagePath="runtimes/win-x64/native/" />
+    <None Include="$(AIKernelCudaNativeRoot)/linux-x64/libaikernel_cuda_driver.so"
+          Pack="true" PackagePath="runtimes/linux-x64/native/" />
+  </ItemGroup>
+  <Target Name="ValidateCudaReleaseAssets" BeforeTargets="GenerateNuspec"
+          Condition="'$(AIKernelRequireCudaAssets)' == 'true'">
+    <Error Condition="!Exists('$(AIKernelCudaNativeRoot)/win-x64/aikernel_cuda_driver.dll')"
+           Text="The release requires the matching Windows CUDA Driver binary." />
+    <Error Condition="!Exists('$(AIKernelCudaNativeRoot)/linux-x64/libaikernel_cuda_driver.so')"
+           Text="The release requires the matching manylinux CUDA Driver binary." />
+  </Target>
+
 </Project>

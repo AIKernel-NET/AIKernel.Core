@@ -8,6 +8,9 @@ namespace AIKernel.Kernel.Inference;
 
 internal static unsafe class QuantizedCpuMatrix
 {
+    // Initialize lookup tables before any hot kernel is JIT-compiled, including tuning before Row().
+    // An explicit constructor removes beforefieldinit semantics and repeated lazy-init checks.
+    static QuantizedCpuMatrix() {}
     private static readonly float[] HalfValues=Enumerable.Range(0,65536).Select(i=>(float)BitConverter.UInt16BitsToHalf((ushort)i)).ToArray();
     private static readonly Vector256<float>[] Signs=Enumerable.Range(0,256).Select(b=>Vector256.Create(
         Mask(b,0),Mask(b,1),Mask(b,2),Mask(b,3),Mask(b,4),Mask(b,5),Mask(b,6),Mask(b,7)).AsSingle()).ToArray();
@@ -41,16 +44,41 @@ internal static unsafe class QuantizedCpuMatrix
         int workers=Math.Min(options.MaxDegreeOfParallelism,Math.Max(1,t.Rows/64));
         var lut = t.Type == 41 && backend != "scalar" && Environment.GetEnvironmentVariable("AIKERNEL_Q1_KERNEL") == "lookup" ? ArrayPool<float>.Shared.Rent(t.Columns * 32) : null;
         if(lut is not null) BuildLookup(x,t.Columns,lut,backend);
-        try { Parallel.For(0,workers,options,w=>{
-            int first=t.Rows*w/workers,last=t.Rows*(w+1)/workers;
+        try
+        {
+            fixed(float* destination=y)
             fixed(float* input=x)
-            for(int row=first;row<last;row++)
             {
-                if((row&63)==0)options.CancellationToken.ThrowIfCancellationRequested();
-                var p=(byte*)ptr+(long)row*t.RowBytes;
-                y[row]=t.Type==41?(lut is null?Q1(p,input,t.Columns,backend):LookupDot(p,lut,t.Columns)):F32((float*)p,input,t.Columns);
+                nuint address=(nuint)destination;
+                nint inputAddress=(nint)input;
+                void Work(int worker)
+                {
+                    int first=worker==0?0:RowBoundary(t.Rows*worker/workers,t.Rows,address);
+                    int last=worker+1==workers?t.Rows:RowBoundary(t.Rows*(worker+1)/workers,t.Rows,address);
+                    MultiplyRows((byte*)ptr,t.Columns,t.RowBytes,t.Type,(float*)inputAddress,(float*)address,first,last,backend,lut,options.CancellationToken);
+                }
+                if(workers==1)Work(0);else Parallel.For(0,workers,options,Work);
             }
-        }); } finally {if(lut is not null)ArrayPool<float>.Shared.Return(lut,clearArray:true);}
+        }
+        finally {if(lut is not null)ArrayPool<float>.Shared.Return(lut,clearArray:true);}
+    }
+    // Keep captured state and managed-array range checks outside the hot row loop.
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void MultiplyRows(byte* weights,int columns,int rowBytes,int type,float* input,float* output,
+        int first,int last,string backend,float[]? lookup,CancellationToken cancellationToken)
+    {
+        for(int row=first;row<last;row++)
+        {
+            if((row&63)==0)cancellationToken.ThrowIfCancellationRequested();
+            var p=weights+(long)row*rowBytes;
+            output[row]=type==41?(lookup is null?Q1(p,input,columns,backend):LookupDot(p,lookup,columns)):F32((float*)p,input,columns);
+        }
+    }
+    // Align actual output addresses, rather than assuming a managed array starts on a cache line.
+    internal static int RowBoundary(int row,int rows,nuint address)
+    {
+        nuint aligned=(address+(nuint)row*sizeof(float)+63)&~(nuint)63;
+        return Math.Min(rows,checked((int)((aligned-address)/sizeof(float))));
     }
     private static void BuildLookup(float[] x,int n,float[] table,string backend)
     {

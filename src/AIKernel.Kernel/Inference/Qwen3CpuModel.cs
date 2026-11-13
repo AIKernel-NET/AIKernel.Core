@@ -18,6 +18,11 @@ public sealed class Qwen3CpuModel : IDisposable
     private readonly float ropeAmplitude;
     private readonly SemaphoreSlim gate=new(1,1);
     private readonly string backend;
+    private string prefillBackend,decodeBackend;
+    private int prefillThreads,decodeThreads;
+    private CpuKernelTuner? tuner;
+    private CpuAutoTuningOptions? tuningOptions;
+    private CpuTuningStatus? tuningStatus;
     private PrefixState? prefixCache;
     private sealed record PrefixState(string System,int Count,float[][] Keys,float[][] Values);
     private sealed record Layer(GgufWeights.Tensor Q,GgufWeights.Tensor K,GgufWeights.Tensor V,GgufWeights.Tensor O,
@@ -27,7 +32,7 @@ public sealed class Qwen3CpuModel : IDisposable
     public Qwen3CpuModel(string modelPath,int cpuThreads=4,int contextTokens=1024)
     {
         if(cpuThreads<1||cpuThreads>6||contextTokens<64||contextTokens>2048)throw new ArgumentOutOfRangeException(nameof(cpuThreads));
-        threads=cpuThreads;context=contextTokens;backend=QuantizedCpuMatrix.Backend;
+        threads=cpuThreads;context=contextTokens;backend=QuantizedCpuMatrix.Backend;prefillBackend=decodeBackend=backend;prefillThreads=decodeThreads=cpuThreads;
         file=new(modelPath);
         try
         {
@@ -75,9 +80,74 @@ public sealed class Qwen3CpuModel : IDisposable
         catch{file.Dispose();throw;}
     }
     /// <summary>Selected and OS-supported instruction family.</summary>
-    public string CpuBackend=>backend;
+    public string CpuBackend=>prefillBackend==decodeBackend?prefillBackend:$"prefill={prefillBackend};decode={decodeBackend}";
+    /// <summary>Most recent tuning decision, or null when tuning was not requested.</summary>
+    public CpuTuningStatus? TuningStatus=>tuningStatus;
     /// <summary>Encoded mapped-file length, without FP32 expansion.</summary>
     public long WeightBytes=>file.Length;
+
+    /// <summary>Measures supported kernels on mapped weight samples. Call at startup or while admission is closed.</summary>
+    public async Task<CpuTuningStatus> TuneCpuAsync(CpuAutoTuningOptions options,bool refresh=false,CancellationToken cancellationToken=default)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            string? forced=Environment.GetEnvironmentVariable("AIKERNEL_CPU_GEMV");
+            if(!string.IsNullOrEmpty(forced)&&forced!="auto")
+                return tuningStatus=new(backend,backend,"operator-forced","",0,0,threads,threads);
+            if(Environment.GetEnvironmentVariable("AIKERNEL_Q1_KERNEL") is { } kernel&&kernel!="vector")
+                return tuningStatus=new(backend,backend,"non-vector-kernel","",0,0,threads,threads);
+            if(tuner is null||tuningOptions!=options)
+            {
+                var candidates=new List<string>();
+                if(System.Runtime.Intrinsics.X86.Avx2.IsSupported&&System.Runtime.Intrinsics.X86.Fma.IsSupported)candidates.Add("avx2");
+                if(System.Runtime.Intrinsics.X86.Avx512F.IsSupported)candidates.Add("avx512");
+                if(candidates.Count==0)candidates.Add(backend);
+                var counts=new[]{1,2,4,6}.Where(n=>n<=Math.Min(threads,Environment.ProcessorCount)).Append(Math.Min(threads,Environment.ProcessorCount)).Distinct().OrderDescending();
+                var choices=candidates.SelectMany(b=>counts.Select(n=>new CpuKernelChoice(b,n)));
+                tuner=new(options,CpuKernelTuner.Identity(options,threads,context,$"{file.Length}/{width}/{hidden}/{layers.Length}"),choices);
+                tuningOptions=options;
+            }
+            var selected=await Task.Run(()=>tuner.Tune(ProbeKernel,ValidateKernel,refresh,cancellationToken),cancellationToken).ConfigureAwait(false);
+            // The trusted prefix represents the same model/input across validated arithmetic kernels.
+            prefillBackend=selected.PrefillBackend;decodeBackend=selected.DecodeBackend;prefillThreads=selected.PrefillThreads;decodeThreads=selected.DecodeThreads;tuningStatus=selected;
+            return selected;
+        }
+        finally{gate.Release();}
+
+        IEnumerable<GgufWeights.Tensor> Samples(string phase)
+        {
+            foreach(int i in new[]{0,layers.Length/2,layers.Length-1}.Distinct())
+            {yield return layers[i].Q;yield return layers[i].Gate;yield return layers[i].Down;}
+            if(phase=="decode")yield return output with {Rows=Math.Min(8192,output.Rows)};
+        }
+        double ProbeKernel(string phase,CpuKernelChoice selected)
+        {
+            // Current prefill is repeated GEMV, not a batched GEMM or a VNNI kernel.
+            var matrices=Samples(phase).ToArray();
+            var inputs=matrices.Select(t=>Enumerable.Range(0,t.Columns).Select(i=>MathF.Sin(i*.017f)).ToArray()).ToArray();
+            var outputs=matrices.Select(t=>new float[t.Rows]).ToArray();
+            var parallel=new ParallelOptions{MaxDegreeOfParallelism=selected.Threads,CancellationToken=cancellationToken};
+            var watch=Stopwatch.StartNew();
+            for(int pass=0;pass<(phase=="prefill"?2:1);pass++)for(int i=0;i<matrices.Length;i++)
+            {cancellationToken.ThrowIfCancellationRequested();QuantizedCpuMatrix.Multiply(file,matrices[i],inputs[i],outputs[i],parallel,selected.Backend);}
+            return Math.Max(watch.Elapsed.TotalMilliseconds,.000001);
+        }
+        bool ValidateKernel(CpuKernelChoice selected)
+        {
+            var parallel=new ParallelOptions{MaxDegreeOfParallelism=selected.Threads,CancellationToken=cancellationToken};
+            foreach(var tensor in Samples("decode"))
+            {
+                cancellationToken.ThrowIfCancellationRequested();var sample=tensor with {Rows=Math.Min(8,tensor.Rows)};
+                float[] x=Enumerable.Range(0,sample.Columns).Select(i=>MathF.Sin(i*.17f)).ToArray(),expected=new float[sample.Rows],actual=new float[sample.Rows];
+                QuantizedCpuMatrix.Multiply(file,sample,x,expected,parallel,"scalar");
+                QuantizedCpuMatrix.Multiply(file,sample,x,actual,parallel,selected.Backend);
+                for(int i=0;i<actual.Length;i++)if(!float.IsFinite(actual[i])||Math.Abs(actual[i]-expected[i])>.001f*Math.Max(1,Math.Abs(expected[i])))return false;
+            }
+            return true;
+        }
+    }
 
     /// <summary>Precomputes only a trusted system-prefix KV before accepting user requests.</summary>
     public async Task WarmupAsync(string system,CancellationToken cancellationToken=default)
@@ -91,8 +161,8 @@ public sealed class Qwen3CpuModel : IDisposable
                 if(prefixCache?.System==system)return;
                 var prefix=tokenizer.Prefix(system);
                 if(prefix.Count>=context)throw new ArgumentException("System prefix exceeds the context limit.");
-                using var state=new State(this,cancellationToken);
-                for(int i=0;i<prefix.Count;i++){cancellationToken.ThrowIfCancellationRequested();Forward(prefix[i],i,state);}
+                using var state=new State(this,cancellationToken);state.Options.MaxDegreeOfParallelism=prefillThreads;
+                for(int i=0;i<prefix.Count;i++){cancellationToken.ThrowIfCancellationRequested();Forward(prefix[i],i,state,prefillBackend);}
                 prefixCache=new(system,prefix.Count,state.Keys.Select(k=>k.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray(),
                     state.Values.Select(v=>v.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray());
             },cancellationToken).ConfigureAwait(false);
@@ -121,7 +191,7 @@ public sealed class Qwen3CpuModel : IDisposable
         if(system.Length>8192||user.Length>4096)throw new ArgumentException("Text exceeds model input limit.");
         var prompt=tokenizer.Chat(system,user);
         if(prompt.Count+maximum>context)throw new ArgumentException("Model context budget exceeded.");
-        using var state=new State(this,token);var watch=Stopwatch.StartNew();var generated=new List<int>();
+        using var state=new State(this,token);state.Options.MaxDegreeOfParallelism=prefillThreads;var watch=Stopwatch.StartNew();var generated=new List<int>();
         int prefixCount=tokenizer.Prefix(system).Count,begin=0;
         if(prefixCache is { } cached && cached.System==system)
         {
@@ -130,7 +200,7 @@ public sealed class Qwen3CpuModel : IDisposable
         }
         for(int i=begin;i<prompt.Count;i++)
         {
-            token.ThrowIfCancellationRequested();Forward(prompt[i],i,state);
+            token.ThrowIfCancellationRequested();Forward(prompt[i],i,state,prefillBackend);
             if(i+1==prefixCount)
             {
                 // Cache only trusted system instructions, never inquiry text or generated content.
@@ -138,6 +208,7 @@ public sealed class Qwen3CpuModel : IDisposable
                     state.Values.Select(v=>v.AsSpan(0,prefixCount*kvSize).ToArray()).ToArray());
             }
         }
+        long prefillTicks=watch.ElapsedTicks;int decodeForwards=0;state.Options.MaxDegreeOfParallelism=decodeThreads;
         var finish="length";
         for(int step=0;step<maximum;step++)
         {
@@ -149,14 +220,14 @@ public sealed class Qwen3CpuModel : IDisposable
                 foreach(int id in choices)
                 {
                     var row=output with {Offset=output.Offset+(long)id*output.RowBytes,Rows=1};
-                    QuantizedCpuMatrix.Multiply(file,row,state.Normal,score,state.Options,backend);
+                    QuantizedCpuMatrix.Multiply(file,row,state.Normal,score,state.Options,decodeBackend);
                     if(score[0]>best){best=score[0];next=id;}
                 }
                 if(!float.IsFinite(best))throw new ArithmeticException("Non-finite model score.");
             }
             else
             {
-                QuantizedCpuMatrix.Multiply(file,output,state.Normal,state.Logits,state.Options,backend);
+                QuantizedCpuMatrix.Multiply(file,output,state.Normal,state.Logits,state.Options,decodeBackend);
                 next=0;float best=float.NegativeInfinity;
                 for(int i=0;i<state.Logits.Length;i++)if(state.Logits[i]>best){best=state.Logits[i];next=i;}
                 if(!float.IsFinite(best))throw new ArithmeticException("Non-finite model logits.");
@@ -164,20 +235,25 @@ public sealed class Qwen3CpuModel : IDisposable
             if(next==tokenizer.End){finish="stop";break;}
             generated.Add(next);
             if(choices is not null){finish="classified";break;}
-            if(step+1<maximum)Forward(next,prompt.Count+step,state);
+            if(step+1<maximum){Forward(next,prompt.Count+step,state,decodeBackend);decodeForwards++;}
         }
-        return new(tokenizer.DecodeReply(generated),prompt.Count,generated.Count,finish,watch.ElapsedMilliseconds,backend);
+        long elapsed=watch.ElapsedMilliseconds;
+        double prefillMs=(double)prefillTicks*1000/Stopwatch.Frequency,decodeMs=watch.Elapsed.TotalMilliseconds-prefillMs;
+        tuner?.Observe("prefill",prefillBackend+"@"+prefillThreads,prompt.Count,prompt.Count-begin,prefillMs);
+        if(choices is null)tuner?.Observe("decode",decodeBackend+"@"+decodeThreads,prompt.Count+generated.Count,generated.Count,decodeMs);
+        return new(tokenizer.DecodeReply(generated),prompt.Count,generated.Count,finish,elapsed,CpuBackend)
+        {PrefillMilliseconds=prefillMs,DecodeMilliseconds=decodeMs,PrefillForwardTokens=prompt.Count-begin,DecodeForwardTokens=decodeForwards,PrefillThreads=prefillThreads,DecodeThreads=decodeThreads};
     }
-    private void Forward(int id,int position,State s)
+    private void Forward(int id,int position,State s,string selectedBackend)
     {
         QuantizedCpuMatrix.Row(file,embedding,id,s.X);
         for(int index=0;index<layers.Length;index++)
         {
             s.Options.CancellationToken.ThrowIfCancellationRequested();var l=layers[index];
             Norm(s.X,l.Norm,s.Normal,epsilon);
-            QuantizedCpuMatrix.Multiply(file,l.Q,s.Normal,s.Q,s.Options,backend);
-            QuantizedCpuMatrix.Multiply(file,l.K,s.Normal,s.K,s.Options,backend);
-            QuantizedCpuMatrix.Multiply(file,l.V,s.Normal,s.V,s.Options,backend);
+            QuantizedCpuMatrix.Multiply(file,l.Q,s.Normal,s.Q,s.Options,selectedBackend);
+            QuantizedCpuMatrix.Multiply(file,l.K,s.Normal,s.K,s.Options,selectedBackend);
+            QuantizedCpuMatrix.Multiply(file,l.V,s.Normal,s.V,s.Options,selectedBackend);
             for(int h=0;h<heads;h++)Norm(s.Q.AsSpan(h*headSize,headSize),l.QNorm,s.Q.AsSpan(h*headSize,headSize),epsilon);
             for(int h=0;h<kvHeads;h++)Norm(s.K.AsSpan(h*headSize,headSize),l.KNorm,s.K.AsSpan(h*headSize,headSize),epsilon);
             Rope(s.Q,heads,position);Rope(s.K,kvHeads,position);
@@ -191,13 +267,13 @@ public sealed class Qwen3CpuModel : IDisposable
                 var target=s.Attention.AsSpan(h*headSize,headSize);target.Clear();
                 for(int t=0;t<=position;t++){float p=scores[t]/sum;var v=values.AsSpan(t*kvSize+kv,headSize);for(int d=0;d<headSize;d++)target[d]+=p*v[d];}
             });
-            QuantizedCpuMatrix.Multiply(file,l.O,s.Attention,s.Projected,s.Options,backend);
+            QuantizedCpuMatrix.Multiply(file,l.O,s.Attention,s.Projected,s.Options,selectedBackend);
             for(int i=0;i<width;i++)s.X[i]+=s.Projected[i];
             Norm(s.X,l.FfnNorm,s.Normal,epsilon);
-            QuantizedCpuMatrix.Multiply(file,l.Gate,s.Normal,s.Gate,s.Options,backend);
-            QuantizedCpuMatrix.Multiply(file,l.Up,s.Normal,s.Up,s.Options,backend);
+            QuantizedCpuMatrix.Multiply(file,l.Gate,s.Normal,s.Gate,s.Options,selectedBackend);
+            QuantizedCpuMatrix.Multiply(file,l.Up,s.Normal,s.Up,s.Options,selectedBackend);
             for(int i=0;i<hidden;i++)s.Gate[i]=s.Gate[i]/(1+MathF.Exp(-s.Gate[i]))*s.Up[i];
-            QuantizedCpuMatrix.Multiply(file,l.Down,s.Gate,s.Projected,s.Options,backend);
+            QuantizedCpuMatrix.Multiply(file,l.Down,s.Gate,s.Projected,s.Options,selectedBackend);
             for(int i=0;i<width;i++)s.X[i]+=s.Projected[i];
         }
         Norm(s.X,finalNorm,s.Normal,epsilon);
@@ -233,7 +309,21 @@ public sealed class Qwen3CpuModel : IDisposable
     public void Dispose(){if(prefixCache is {} c)foreach(var a in c.Keys.Concat(c.Values))Array.Clear(a);prefixCache=null;file.Dispose();gate.Dispose();}
 }
 /// <summary>Measured result of a completed CPU generation.</summary>
-public sealed record CpuGeneration(string Text,int InputTokens,int OutputTokens,string FinishReason,long ElapsedMilliseconds,string CpuBackend);
+public sealed record CpuGeneration(string Text,int InputTokens,int OutputTokens,string FinishReason,long ElapsedMilliseconds,string CpuBackend)
+{
+    /// <summary>Prompt forward passes excluding already cached system-prefix work.</summary>
+    public double PrefillMilliseconds {get;init;}
+    /// <summary>Output projections and generated-token forward passes.</summary>
+    public double DecodeMilliseconds {get;init;}
+    /// <summary>Number of prompt tokens forwarded during this call.</summary>
+    public int PrefillForwardTokens {get;init;}
+    /// <summary>Generated tokens forwarded for subsequent predictions, excluding the final unforwarded token.</summary>
+    public int DecodeForwardTokens {get;init;}
+    /// <summary>Worker ceiling used during prompt processing.</summary>
+    public int PrefillThreads {get;init;}
+    /// <summary>Worker ceiling used during token generation.</summary>
+    public int DecodeThreads {get;init;}
+}
 
 internal static class GgufExtensions
 {

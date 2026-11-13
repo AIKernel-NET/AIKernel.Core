@@ -64,20 +64,29 @@ public sealed class LocalExecutionInvoker : ICapabilityModuleInvoker
                     "pipeline.json argument or metadata value is required.")),
                 async pipelineJson =>
                 {
-                    var execution = await (
-                        from document in ParseDocument(pipelineJson).AsTask()
-                        from pipeline in CompilePipelineAsync(document, cancellationToken)
-                        from executed in ExecutePipelineAsync(pipeline, ReadInput(request), cancellationToken)
-                        select executed)
-                        .ConfigureAwait(false);
+                    CapabilityInvocationResult OnFailure(ErrorContext error) => Fail(
+                        request, metadata, error.Code ?? "LOCAL_EXECUTION_FAILED",
+                        error.Message ?? "Local DSL execution failed.");
 
-                    return execution.Match(
-                        error => Fail(
-                            request,
-                            metadata,
-                            error.Code ?? "LOCAL_EXECUTION_FAILED",
-                            error.Message ?? "Local DSL execution failed."),
-                        result => CreateInvocationResult(request, metadata, result));
+                    // Result's general LINQ helpers capture exceptions, including cancellation.
+                    // Await explicitly here so the DSL cancellation contract reaches the caller.
+                    Result<DslPipelineExecutionResult> execution;
+                    try
+                    {
+                        var document = ParseDocument(pipelineJson);
+                        cancellationToken.ThrowIfCancellationRequested();
+                        if (document.IsFailure) return OnFailure(document.Error!);
+                        var pipeline = await CompilePipelineAsync(document.Value!, cancellationToken).ConfigureAwait(false);
+                        if (pipeline.IsFailure) return OnFailure(pipeline.Error!);
+                        execution = await ExecutePipelineAsync(pipeline.Value!, ReadInput(request), cancellationToken)
+                            .ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException) { throw; }
+                    catch (Exception exception)
+                    {
+                        execution = Result<DslPipelineExecutionResult>.Fail(ErrorContext.FromException(exception));
+                    }
+                    return execution.Match(OnFailure, result => CreateInvocationResult(request, metadata, result));
                 })
             .ConfigureAwait(false);
     }
@@ -138,21 +147,41 @@ public sealed class LocalExecutionInvoker : ICapabilityModuleInvoker
     private async Task<Result<IKernelPipeline>> CompilePipelineAsync(
         DslDocument document,
         CancellationToken cancellationToken)
-        => (await Try
-                .RunAsync(() => _compiler.CompileAsync(document, cancellationToken))
-                .ConfigureAwait(false))
-            .MapError("LOCAL_EXECUTION_COMPILE_FAILED");
+    {
+        try
+        {
+            var pipeline = await _compiler.CompileAsync(document, cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            return Result<IKernelPipeline>.Success(pipeline);
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception exception)
+        {
+            return Result<IKernelPipeline>.Fail(ErrorContext.FromException(exception))
+                .MapError("LOCAL_EXECUTION_COMPILE_FAILED");
+        }
+    }
 
     private static async Task<Result<DslPipelineExecutionResult>> ExecutePipelineAsync(
         IKernelPipeline pipeline,
         DslPipelineValue input,
         CancellationToken cancellationToken)
-        => (await Try
-                .RunAsync(() => pipeline.ExecuteAsync(
-                    new DslPipelineExecutionContext(input, DateTimeOffset.UnixEpoch),
-                    cancellationToken))
-                .ConfigureAwait(false))
-            .MapError("LOCAL_EXECUTION_EXECUTE_FAILED");
+    {
+        try
+        {
+            var result = await pipeline.ExecuteAsync(
+                new DslPipelineExecutionContext(input, DateTimeOffset.UnixEpoch), cancellationToken)
+                .ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            return Result<DslPipelineExecutionResult>.Success(result);
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception exception)
+        {
+            return Result<DslPipelineExecutionResult>.Fail(ErrorContext.FromException(exception))
+                .MapError("LOCAL_EXECUTION_EXECUTE_FAILED");
+        }
+    }
 
     private static Result<DslDocument> ParseDocument(
         string json)

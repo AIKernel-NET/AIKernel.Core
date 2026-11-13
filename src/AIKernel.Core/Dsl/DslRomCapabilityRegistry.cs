@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using AIKernel.Common.Results;
 
-internal sealed class DslRomCapabilityRegistry :
+internal sealed partial class DslRomCapabilityRegistry :
     IDslCapabilityRegistry,
     AIKernel.Abstractions.Dsl.IDslCapabilityRegistry
 {
@@ -363,11 +363,11 @@ internal sealed class DslRomCapabilityRegistry :
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        return await Task.FromResult(Invoke(name, DslContractMapper.ToCore(input), args)
-            .Match(
-                error => throw new InvalidOperationException(error.Message),
-                DslContractMapper.ToContract))
+        var result = await InvokeAsync(name, DslContractMapper.ToCore(input), args, cancellationToken)
             .ConfigureAwait(false);
+        return result.Match(
+            error => throw new InvalidOperationException(error.Message),
+            DslContractMapper.ToContract);
     }
 }
 

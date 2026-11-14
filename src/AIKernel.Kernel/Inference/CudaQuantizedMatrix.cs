@@ -3,12 +3,12 @@ using AIKernel.Kernel.Memory;
 namespace AIKernel.Kernel.Inference;
 
 // Owns one private CUDA context. The caller serializes all requests and disposal.
-internal sealed unsafe class CudaQuantizedMatrix : IDisposable
+internal sealed unsafe class CudaQuantizedMatrix : IMatrixOffload
 {
     private readonly CudaVirtualMemoryDevice device;
     private readonly CudaVirtualMemoryDevice.DeviceBlock weights;
-    internal long WeightBytes => weights.Length;
-    internal string? PciBusId => device.GetPciBusId();
+    public long WeightBytes => weights.Length;
+    public string? PciBusId => device.GetPciBusId();
 
     internal CudaQuantizedMatrix(GgufWeights file, int ordinal, long maximumWeightBytes)
     {
@@ -35,7 +35,7 @@ internal sealed unsafe class CudaQuantizedMatrix : IDisposable
         catch { device.Dispose(); throw; }
     }
 
-    internal void Multiply(GgufWeights.Tensor tensor, float[] input, float[] output, CancellationToken token)
+    public void Multiply(GgufWeights.Tensor tensor, float[] input, float[] output, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
         long bytes = checked((long)tensor.Rows * tensor.RowBytes);
@@ -61,7 +61,7 @@ internal sealed unsafe class CudaQuantizedMatrix : IDisposable
         token.ThrowIfCancellationRequested();
     }
 
-    internal void ZeroScratch() => device.ZeroScratch();
+    public void ZeroScratch() => device.ZeroScratch();
     public void Dispose()
     {
         try { weights.Dispose(); }

@@ -8,7 +8,8 @@ namespace AIKernel.Kernel.Inference;
 public sealed class Qwen3CpuModel : IDisposable
 {
     private readonly GgufWeights file;
-    private readonly CudaQuantizedMatrix? gpu;
+    private readonly IMatrixOffload? gpu;
+    private readonly bool quantizeGpuActivations;
     private readonly QwenTokenizer tokenizer;
     private readonly GgufWeights.Tensor embedding, output;
     private readonly Layer[] layers;
@@ -33,10 +34,12 @@ public sealed class Qwen3CpuModel : IDisposable
     public Qwen3CpuModel(string modelPath,int cpuThreads=4,int contextTokens=1024)
         : this(modelPath,cpuThreads,contextTokens,null,0) { }
 
-    internal Qwen3CpuModel(string modelPath,int cpuThreads,int contextTokens,int? deviceOrdinal,long maximumWeightBytes)
+    internal Qwen3CpuModel(string modelPath,int cpuThreads,int contextTokens,int? deviceOrdinal,long maximumWeightBytes,
+        bool vulkan=false,bool gpuQ8=false)
     {
         if(cpuThreads<1||cpuThreads>6||contextTokens<64||contextTokens>2048)throw new ArgumentOutOfRangeException(nameof(cpuThreads));
         threads=cpuThreads;context=contextTokens;backend=QuantizedCpuMatrix.Backend;prefillBackend=decodeBackend=backend;prefillThreads=decodeThreads=cpuThreads;
+        quantizeGpuActivations=gpuQ8;
         file=new(modelPath);
         try
         {
@@ -80,7 +83,9 @@ public sealed class Qwen3CpuModel : IDisposable
                 frequencies[i]=freq*(extrapolation+(1-extrapolation)/factor);
             }
             tokenizer=new(file);
-            if(deviceOrdinal.HasValue)gpu=new(file,deviceOrdinal.Value,maximumWeightBytes);
+            if(deviceOrdinal.HasValue)gpu=vulkan
+                ? new VulkanQuantizedMatrix(file,deviceOrdinal.Value,maximumWeightBytes)
+                : new CudaQuantizedMatrix(file,deviceOrdinal.Value,maximumWeightBytes);
         }
         catch{file.Dispose();throw;}
     }
@@ -99,19 +104,19 @@ public sealed class Qwen3CpuModel : IDisposable
         try
         {
             string? forced=Environment.GetEnvironmentVariable("AIKERNEL_CPU_GEMV");
-            if(!string.IsNullOrEmpty(forced)&&forced!="auto")
+            if(!string.IsNullOrEmpty(forced)&&forced!="auto"&&forced!="q8-auto")
                 return tuningStatus=new(backend,backend,"operator-forced","",0,0,threads,threads);
             if(Environment.GetEnvironmentVariable("AIKERNEL_Q1_KERNEL") is { } kernel&&kernel!="vector")
                 return tuningStatus=new(backend,backend,"non-vector-kernel","",0,0,threads,threads);
             if(tuner is null||tuningOptions!=options)
             {
-                var candidates=new List<string>();
-                if(System.Runtime.Intrinsics.X86.Avx2.IsSupported&&System.Runtime.Intrinsics.X86.Fma.IsSupported)candidates.Add("avx2");
-                if(System.Runtime.Intrinsics.X86.Avx512F.IsSupported)candidates.Add("avx512");
+                var candidates=forced=="q8-auto"?Int8CpuMatrix.Candidates(includeAmx:false):new List<string>();
+                if(forced!="q8-auto"&&System.Runtime.Intrinsics.X86.Avx2.IsSupported&&System.Runtime.Intrinsics.X86.Fma.IsSupported)candidates.Add("avx2");
+                if(forced!="q8-auto"&&System.Runtime.Intrinsics.X86.Avx512F.IsSupported)candidates.Add("avx512");
                 if(candidates.Count==0)candidates.Add(backend);
                 var counts=new[]{1,2,4,6}.Where(n=>n<=Math.Min(threads,Environment.ProcessorCount)).Append(Math.Min(threads,Environment.ProcessorCount)).Distinct().OrderDescending();
                 var choices=candidates.SelectMany(b=>counts.Select(n=>new CpuKernelChoice(b,n)));
-                tuner=new(options,CpuKernelTuner.Identity(options,threads,context,$"{file.Length}/{width}/{hidden}/{layers.Length}"),choices);
+                tuner=new(options,CpuKernelTuner.Identity(options,threads,context,$"{file.Length}/{width}/{hidden}/{layers.Length}/{(forced=="q8-auto"?"q8-v1":"fp32")}"),choices);
                 tuningOptions=options;
             }
             var selected=await Task.Run(()=>tuner.Tune(ProbeKernel,ValidateKernel,refresh,cancellationToken),cancellationToken).ConfigureAwait(false);
@@ -146,7 +151,8 @@ public sealed class Qwen3CpuModel : IDisposable
             {
                 cancellationToken.ThrowIfCancellationRequested();var sample=tensor with {Rows=Math.Min(8,tensor.Rows)};
                 float[] x=Enumerable.Range(0,sample.Columns).Select(i=>MathF.Sin(i*.17f)).ToArray(),expected=new float[sample.Rows],actual=new float[sample.Rows];
-                QuantizedCpuMatrix.Multiply(file,sample,x,expected,parallel,"scalar");
+                QuantizedCpuMatrix.Multiply(file,sample,x,expected,parallel,
+                    selected.Backend.EndsWith("-q8",StringComparison.Ordinal)?"scalar-q8":"scalar");
                 QuantizedCpuMatrix.Multiply(file,sample,x,actual,parallel,selected.Backend);
                 for(int i=0;i<actual.Length;i++)if(!float.IsFinite(actual[i])||Math.Abs(actual[i]-expected[i])>.001f*Math.Max(1,Math.Abs(expected[i])))return false;
             }
@@ -251,10 +257,18 @@ public sealed class Qwen3CpuModel : IDisposable
     }
     internal long DeviceWeightBytes=>gpu?.WeightBytes??0;
     internal string? DevicePciBusId=>gpu?.PciBusId;
+    internal object? VulkanDiagnostics=>(gpu as VulkanQuantizedMatrix)?.Diagnostics;
+    internal VulkanComputeDeviceInfo? VulkanDevice=>(gpu as VulkanQuantizedMatrix)?.DeviceInfo;
     internal void ZeroGpuScratch()=>gpu?.ZeroScratch();
     private void Multiply(GgufWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,string selectedBackend)
     {
         if(gpu is null)QuantizedCpuMatrix.Multiply(file,tensor,input,output,options,selectedBackend);
+        else if(quantizeGpuActivations&&tensor.Type==41)
+        {
+            options.CancellationToken.ThrowIfCancellationRequested();
+            using var rounded=new Q8ActivationBuffer(input,tensor.Columns);
+            gpu.Multiply(tensor,rounded.Values,output,options.CancellationToken);
+        }
         else gpu.Multiply(tensor,input,output,options.CancellationToken);
     }
     private void Forward(int id,int position,State s,string selectedBackend)

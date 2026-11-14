@@ -24,6 +24,7 @@
     <PackageReference Include="AIKernel.Dtos" Version="$(AIKernelContractPackageVersion)" />
     <PackageReference Include="AIKernel.Enums" Version="$(AIKernelContractPackageVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+    <PackageReference Include="Silk.NET.Vulkan" Version="2.23.0" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -40,10 +41,16 @@ JA: AIKernel.NET の Kernel Facade およびオーケストレーション層で
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Inference/Shaders/quantized_gemv.spv" />
+    <EmbeddedResource Include="Inference/Shaders/quantized_gemv_subgroup.spv" />
+  </ItemGroup>
+
   <!-- Release staging supplies binaries built from the same pinned Core source.
        CPU-only source builds remain possible without an NVIDIA driver or compiler. -->
   <PropertyGroup>
     <AIKernelRequireCudaAssets Condition="'$(PackageVersion)' == '0.1.4'">true</AIKernelRequireCudaAssets>
+    <AIKernelRequireCpuAssets Condition="'$(PackageVersion)' == '0.1.4'">true</AIKernelRequireCpuAssets>
   </PropertyGroup>
   <ItemGroup Condition="'$(AIKernelCudaNativeRoot)' != ''">
     <None Include="$(AIKernelCudaNativeRoot)/win-x64/aikernel_cuda_driver.dll"
@@ -51,6 +58,14 @@ JA: AIKernel.NET の Kernel Facade およびオーケストレーション層で
     <None Include="$(AIKernelCudaNativeRoot)/linux-x64/libaikernel_cuda_driver.so"
           Pack="true" PackagePath="runtimes/linux-x64/native/" />
   </ItemGroup>
+  <ItemGroup Condition="'$(AIKernelCpuNativeRoot)' != ''">
+    <None Include="$(AIKernelCpuNativeRoot)/win-x64/aikernel_cpu_accel.dll" Pack="true" PackagePath="runtimes/win-x64/native/" />
+    <None Include="$(AIKernelCpuNativeRoot)/linux-x64/libaikernel_cpu_accel.so" Pack="true" PackagePath="runtimes/linux-x64/native/" />
+  </ItemGroup>
+  <Target Name="ValidateCpuReleaseAssets" BeforeTargets="GenerateNuspec" Condition="'$(AIKernelRequireCpuAssets)' == 'true'">
+    <Error Condition="!Exists('$(AIKernelCpuNativeRoot)/win-x64/aikernel_cpu_accel.dll')" Text="The release requires the matching Windows VNNI/AMX binary." />
+    <Error Condition="!Exists('$(AIKernelCpuNativeRoot)/linux-x64/libaikernel_cpu_accel.so')" Text="The release requires the matching Linux VNNI/AMX binary." />
+  </Target>
   <Target Name="ValidateCudaReleaseAssets" BeforeTargets="GenerateNuspec"
           Condition="'$(AIKernelRequireCudaAssets)' == 'true'">
     <Error Condition="!Exists('$(AIKernelCudaNativeRoot)/win-x64/aikernel_cuda_driver.dll')"

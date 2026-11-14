@@ -14,14 +14,22 @@ public sealed class Qwen3GpuModel : IDisposable
     /// <param name="maximumWeightBytes">Encoded model allocation limit. Driver context and matrix working buffers are additional; upload staging is bounded to one MiB.</param>
     public Qwen3GpuModel(string modelPath,int deviceOrdinal=0,int cpuThreads=4,int contextTokens=1024,
         long maximumWeightBytes=1024L*1024*1024)
+        :this(modelPath,deviceOrdinal,cpuThreads,contextTokens,maximumWeightBytes,false) { }
+    /// <summary>Optionally rounds Q1_0-matrix activations to Q8 block128 before the existing FP32 CUDA arithmetic.
+    /// This does not use GPU INT8 instructions or Tensor Cores. Original constructor behavior is unchanged.</summary>
+    public Qwen3GpuModel(string modelPath,int deviceOrdinal,int cpuThreads,int contextTokens,
+        long maximumWeightBytes,bool quantizeActivations)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(deviceOrdinal);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumWeightBytes);
-        engine=new(modelPath,cpuThreads,contextTokens,deviceOrdinal,maximumWeightBytes);
+        engine=new(modelPath,cpuThreads,contextTokens,deviceOrdinal,maximumWeightBytes,gpuQ8:quantizeActivations);
         DeviceOrdinal=deviceOrdinal;
+        ActivationPrecision=quantizeActivations?"q8-block128-fp32-accumulate":"fp32";
     }
     /// <summary>The CUDA ordinal used for every matrix multiplication.</summary>
     public int DeviceOrdinal {get;}
+    /// <summary>Activation rounding and arithmetic used for Q1_0 matrices.</summary>
+    public string ActivationPrecision {get;}
     /// <summary>PCI identity of the device used, for matching telemetry.</summary>
     public string? DevicePciBusId=>engine.DevicePciBusId;
     /// <summary>Resident encoded model bytes, excluding driver context and scratch buffers.</summary>
@@ -47,7 +55,7 @@ public sealed class Qwen3GpuModel : IDisposable
     private GpuGeneration Convert(CpuGeneration result)=>new(result.Text,result.InputTokens,result.OutputTokens,
         result.FinishReason,result.ElapsedMilliseconds,result.PrefillMilliseconds,result.DecodeMilliseconds,
         result.PrefillForwardTokens,result.DecodeForwardTokens,result.PrefillThreads,result.DecodeThreads,
-        DeviceOrdinal,DeviceWeightBytes);
+        DeviceOrdinal,DeviceWeightBytes){ActivationPrecision=ActivationPrecision};
     /// <summary>Releases model mappings, KV prefix and device context after active requests have stopped.</summary>
     public void Dispose()=>engine.Dispose();
 }
@@ -59,4 +67,6 @@ public sealed record GpuGeneration(string Text,int InputTokens,int OutputTokens,
 {
     /// <summary>Actual execution path; attention, normalization, RoPE and KV remain on the CPU.</summary>
     public string Backend=>"cuda-matrix-offload";
+    /// <summary>Input activation representation; CUDA accumulation remains FP32.</summary>
+    public string ActivationPrecision {get;init;}="fp32";
 }

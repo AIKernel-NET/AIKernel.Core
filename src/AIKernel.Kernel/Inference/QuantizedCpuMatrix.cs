@@ -22,6 +22,7 @@ internal static unsafe class QuantizedCpuMatrix
             var requested=Environment.GetEnvironmentVariable("AIKERNEL_CPU_GEMV");
             var auto=Avx512F.IsSupported?"avx512":Avx2.IsSupported&&Fma.IsSupported?"avx2":Avx.IsSupported?"avx":"scalar";
             if(string.IsNullOrEmpty(requested)||requested=="auto")return auto;
+            if(requested=="q8-auto"||Int8CpuMatrix.IsBackend(requested)||Int8CpuMatrix.IsRoundedFloatBackend(requested))return Int8CpuMatrix.Resolve(requested);
             if(requested=="scalar" || requested=="avx"&&Avx.IsSupported || requested=="avx2"&&Avx2.IsSupported&&Fma.IsSupported ||
                requested=="avx512"&&Avx512F.IsSupported)return requested;
             throw new PlatformNotSupportedException("Requested CPU instruction set is unavailable.");
@@ -40,6 +41,13 @@ internal static unsafe class QuantizedCpuMatrix
     internal static void Multiply(GgufWeights file,GgufWeights.Tensor t,float[] x,float[] y,ParallelOptions options,string backend)
     {
         if(x.Length<t.Columns||y.Length<t.Rows)throw new ArgumentException("Matrix dimensions mismatch.");
+        if(t.Type==41&&Int8CpuMatrix.IsRoundedFloatBackend(backend))
+        {
+            options.CancellationToken.ThrowIfCancellationRequested();
+            using var rounded=new Q8ActivationBuffer(x,t.Columns);
+            Multiply(file,t,rounded.Values,y,options,backend[..^3]);return;
+        }
+        if(t.Type==41&&Int8CpuMatrix.IsBackend(backend)){Int8CpuMatrix.Multiply(file,t,x,y,options,backend);return;}
         nint ptr=(nint)file.Pointer(t);
         int workers=Math.Min(options.MaxDegreeOfParallelism,Math.Max(1,t.Rows/64));
         var lut = t.Type == 41 && backend != "scalar" && Environment.GetEnvironmentVariable("AIKERNEL_Q1_KERNEL") == "lookup" ? ArrayPool<float>.Shared.Rent(t.Columns * 32) : null;

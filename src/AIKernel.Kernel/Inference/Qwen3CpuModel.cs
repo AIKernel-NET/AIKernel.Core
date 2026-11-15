@@ -10,6 +10,7 @@ public sealed class Qwen3CpuModel : IDisposable
     private readonly GgufWeights file;
     private readonly IMatrixOffload? gpu;
     private readonly bool quantizeGpuActivations;
+    private readonly bool preserveQ8Arithmetic;
     private readonly bool profileEnabled=Environment.GetEnvironmentVariable("AIKERNEL_INFERENCE_PROFILE")=="1";
     private readonly QwenTokenizer tokenizer;
     private readonly GgufWeights.Tensor embedding, output;
@@ -52,6 +53,7 @@ public sealed class Qwen3CpuModel : IDisposable
         if(requestedInstructionSet.Length==0)requestedInstructionSet="auto";
         threads=cpuThreads;context=contextTokens;backend=QuantizedCpuMatrix.Resolve(requestedInstructionSet);prefillBackend=decodeBackend=backend;prefillThreads=decodeThreads=cpuThreads;
         quantizeGpuActivations=gpuQ8;
+        preserveQ8Arithmetic=deviceOrdinal.HasValue?gpuQ8||gpuInt8.HasValue:backend.EndsWith("-q8",StringComparison.Ordinal);
         file=new(modelPath);
         try
         {
@@ -394,7 +396,7 @@ public sealed class Qwen3CpuModel : IDisposable
             profile?.Add(InferenceStage.Attention,stage);
             Multiply(l.O,s.Attention,s.Projected,s.Options,selectedBackend,profile);
             stage=profile?.Start()??0;
-            for(int i=0;i<width;i++)s.X[i]+=s.Projected[i];
+            InferenceVectorMath.Add(s.X,s.Projected);
             profile?.Add(InferenceStage.Residual,stage);
             stage=profile?.Start()??0;
             Norm(s.X,l.FfnNorm,s.Normal,epsilon);
@@ -405,11 +407,12 @@ public sealed class Qwen3CpuModel : IDisposable
                 Multiply(l.Up,s.Normal,s.Up,s.Options,selectedBackend,profile,prepared);
             }
             stage=profile?.Start()??0;
-            for(int i=0;i<hidden;i++)s.Gate[i]=s.Gate[i]/(1+MathF.Exp(-s.Gate[i]))*s.Up[i];
+            if(preserveQ8Arithmetic)for(int i=0;i<hidden;i++)s.Gate[i]=s.Gate[i]/(1+MathF.Exp(-s.Gate[i]))*s.Up[i];
+            else InferenceVectorMath.SwiGlu(s.Gate,s.Up);
             profile?.Add(InferenceStage.SwiGLU,stage);
             Multiply(l.Down,s.Gate,s.Projected,s.Options,selectedBackend,profile);
             stage=profile?.Start()??0;
-            for(int i=0;i<width;i++)s.X[i]+=s.Projected[i];
+            InferenceVectorMath.Add(s.X,s.Projected);
             profile?.Add(InferenceStage.Residual,stage);
         }
         stage=profile?.Start()??0;
@@ -418,9 +421,13 @@ public sealed class Qwen3CpuModel : IDisposable
     }
     private Qwen3Workspace AcquireWorkspace(CancellationToken token)
         =>(workspace??=new(width,hidden,querySize,kvSize,heads,headSize,file.Tokens.Length,layers.Length,context)).Acquire(token,threads);
-    private static float Dot(ReadOnlySpan<float> a,ReadOnlySpan<float> b){float sum=0;for(int i=0;i<a.Length;i++)sum+=a[i]*b[i];return sum;}
-    private static void Norm(ReadOnlySpan<float> x,ReadOnlySpan<float> weights,Span<float> y,float eps)
-    {float sum=Dot(x,x);float scale=1/MathF.Sqrt(sum/x.Length+eps);for(int i=0;i<x.Length;i++)y[i]=x[i]*scale*weights[i];}
+    private float Dot(ReadOnlySpan<float> a,ReadOnlySpan<float> b)
+    {if(!preserveQ8Arithmetic)return InferenceVectorMath.Dot(a,b);float sum=0;for(int i=0;i<a.Length;i++)sum+=a[i]*b[i];return sum;}
+    private void Norm(ReadOnlySpan<float> x,ReadOnlySpan<float> weights,Span<float> y,float eps)
+    {
+        if(!preserveQ8Arithmetic){InferenceVectorMath.Norm(x,weights,y,eps);return;}
+        float sum=Dot(x,x);float scale=1/MathF.Sqrt(sum/x.Length+eps);for(int i=0;i<x.Length;i++)y[i]=x[i]*scale*weights[i];
+    }
     /// <summary>Dispose only after active requests have stopped.</summary>
     public void Dispose(){workspace?.Dispose();workspace=null;if(prefixCache is {} c)foreach(var a in c.Keys.Concat(c.Values))Array.Clear(a);prefixCache=null;try{gpu?.Dispose();}finally{file.Dispose();gate.Dispose();}}
 }

@@ -10,11 +10,12 @@ internal static class LogitValidation
     internal static void Run(string[] args)
     {
         string modelPath=args[1],backend=args[2],destination=args[3];
+        int workers=int.TryParse(Environment.GetEnvironmentVariable("AIKERNEL_BENCH_CPU_WORKERS"),out int configured)?configured:4;
         int[]? teacher=args.Length>4?JsonSerializer.Deserialize<int[]>(File.ReadAllText(args[4])):null;
         const BindingFlags flags=BindingFlags.Instance|BindingFlags.NonPublic;
         using var model=backend=="cuda-dp4a"
-            ?new Qwen3CpuModel(modelPath,4,1024,0,1024L*1024*1024,gpuInt8:CudaQ8Kernel.Dp4a)
-            :new Qwen3CpuModel(modelPath,4,1024,backend);
+            ?new Qwen3CpuModel(modelPath,workers,1024,0,1024L*1024*1024,gpuInt8:CudaQ8Kernel.Dp4a)
+            :new Qwen3CpuModel(modelPath,workers,1024,backend);
         var type=typeof(Qwen3CpuModel);
         var tokenizer=(QwenTokenizer)type.GetField("tokenizer",flags)!.GetValue(model)!;
         var output=(GgufWeights.Tensor)type.GetField("output",flags)!.GetValue(model)!;
@@ -38,6 +39,6 @@ internal static class LogitValidation
             if(step<31)Forward(teacher?[step]??best,prompt.Count+step);
         }
         File.WriteAllText(destination+".tokens.json",JsonSerializer.Serialize(tokens));
-        Console.WriteLine(JsonSerializer.Serialize(new{kind="teacher-forced-logits",backend,steps=32,checkpoints,vocabulary=state.Logits.Length,teacherForced=teacher is not null,performanceBenchmark=false}));
+        Console.WriteLine(JsonSerializer.Serialize(new{kind="teacher-forced-logits",backend,workers,steps=32,checkpoints,vocabulary=state.Logits.Length,teacherForced=teacher is not null,performanceBenchmark=false,instructionSets=CpuInstructionSets.Available}));
     }
 }

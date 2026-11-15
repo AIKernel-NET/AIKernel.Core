@@ -270,3 +270,37 @@ The separate optimization validator can capture teacher-forced full-vocabulary
 logits from frozen DLLs, and compares real mapped Q1 matrices to independently
 decoded double-precision dot products. It is a diagnostic harness, not a public
 API or a throughput benchmark.
+
+### FP32 accumulation and SIMD stage
+
+Q1 FP32 vector and lookup kernels use four independent accumulators. Common
+FP32 dot products, RMS normalization, SwiGLU and residual addition use guarded
+AVX/AVX-512 vectors, with scalar tails/fallback. AVX-only CPUs do not execute
+unconditional AVX2 integer or FMA instructions. The existing explicit matrix ISA
+selector and FP32 default are unchanged; it does not constrain the runtime's
+common non-matrix operations.
+
+Applying the common-stage changes to Q8 initially exceeded the predeclared logit
+error limits, despite all checked greedy choices matching. Small floating-point
+changes crossed activation rounding boundaries. The accepted implementation
+therefore retains the original Q8 dot/normalization/SwiGLU and rounded-Q8 matrix
+accumulation order. It benefits from shared preparation, without inheriting the
+FP32 arithmetic changes. The rejected experiment and its error measurements are
+retained, rather than increasing the tolerance to accept it.
+
+834 unit tests cover tail lengths, in-place normalization, extreme SwiGLU inputs
+and independent double-precision dot calculations. Mapped real-model Q1 samples
+are also checked against independent double-precision decoded weights, using
+`2e-6 * sum(abs(weight * input)) + 1e-6` as the error bound. The model-level gate
+feeds the same 32-token history to both binaries and compares all vocabulary
+logits at steps 0, 1, 3, 7, 15 and 31. FP32 limits are max absolute 0.01 and RMS
+0.001, with at least 30/32 matching greedy decisions. These are regression gates,
+not general task-quality guarantees.
+
+On real AVX-only i7-3770K, AVX2 development and AVX-512 Server hardware, both
+models passed: largest observed FP32 logit difference was 0.00006223, RMS below
+0.00000683, and all checked greedy decisions matched. The accepted native-Q8
+CPU and CUDA paths produced zero logit difference on the development machine.
+Server validation used two workers, CPU affinity 4/5 and an account RSS abort
+guard at 7 GiB. These checks do not establish a latency gain; benchmark the
+frozen prototype and candidate separately with profiling disabled.

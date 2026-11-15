@@ -8,6 +8,7 @@ internal static class MatrixValidation
     {
         using var file=new GgufWeights(model);using var stream=File.OpenRead(model);
         var random=new Random(140015);int cases=0,values=0;double worst=0,worstBoundRatio=0;
+        int workersLimit=int.TryParse(Environment.GetEnvironmentVariable("AIKERNEL_BENCH_CPU_WORKERS"),out int configured)?configured:4;
         var backends=new[]{"scalar","avx","avx2","avx512"}.Where(CpuInstructionSets.Available.Contains).ToArray();
         foreach(var tensor in file.Tensors.Values.Where(t=>t.Type==41).GroupBy(t=>t.Columns).Select(g=>g.First()))
         foreach(int pattern in new[]{0,1,2,3})
@@ -29,7 +30,7 @@ internal static class MatrixValidation
                 }
                 bound[row]=2e-6*bound[row]+1e-6;
             }
-            foreach(string backend in backends)foreach(int workers in new[]{1,4})
+            foreach(string backend in backends)foreach(int workers in new[]{1,workersLimit})
             {
                 var actual=new float[sample.Rows];QuantizedCpuMatrix.Multiply(file,sample,x,actual,new(){MaxDegreeOfParallelism=workers},backend);
                 for(int row=0;row<actual.Length;row++)

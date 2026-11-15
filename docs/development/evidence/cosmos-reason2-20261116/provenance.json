@@ -1,0 +1,45 @@
+{
+  "referenceLibrary": "Transformers 4.57.1",
+  "referenceTorch": "2.15.0+cpu",
+  "publicBaseModel": "Qwen/Qwen3-VL-2B-Instruct",
+  "publicBaseRevision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "requestedModel": "nvidia/Cosmos-Reason2-2B",
+  "requestedRevision": "9ce19a195e423419c349abfc86fd07178b230561",
+  "requestedWeightsDownloaded": false,
+  "authenticatedConfigReadStatus": 401,
+  "assets": {
+    "config.json": {
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct/resolve/89644892e4d85e24eaac8bacfd4f463576704203/config.json",
+      "sha256": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b"
+    },
+    "tokenizer.json": {
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct/resolve/89644892e4d85e24eaac8bacfd4f463576704203/tokenizer.json",
+      "sha256": "a5d85b6dcc535e6b93115a9ef287e6132fdbf30270da6218194ba742261173c7"
+    },
+    "tokenizer_config.json": {
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct/resolve/89644892e4d85e24eaac8bacfd4f463576704203/tokenizer_config.json",
+      "sha256": "c2da771801886ad9ae98181793ffd3dfb7f1af30f6f7c6a4e15d7dbba52e2399"
+    },
+    "preprocessor_config.json": {
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct/resolve/89644892e4d85e24eaac8bacfd4f463576704203/preprocessor_config.json",
+      "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516"
+    },
+    "video_preprocessor_config.json": {
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct/resolve/89644892e4d85e24eaac8bacfd4f463576704203/video_preprocessor_config.json",
+      "sha256": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13"
+    },
+    "chat_template.json": {
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct/resolve/89644892e4d85e24eaac8bacfd4f463576704203/chat_template.json",
+      "sha256": "6f8a6a55027e3da5160105556cda5dd69f6423f1c32645f6730d32de7773d0c4"
+    }
+  },
+  "referenceSources": {
+    "configuration_qwen3_vl.py": "177fd0a4dc1b08307c08ca72cf26b8d7dc028ab6ab5975bf650fc14ab8132a83",
+    "modeling_qwen3_vl.py": "dd63ed3b124232735b3dca1bfa28f9d6b0d3f7182afcb75dde8f3e724b2b22da",
+    "modular_qwen3_vl.py": "12793eca3bf9549fd704f8f2c1b5f8c8fc997b1c6e2358be711a831179f47ff4",
+    "processing_qwen3_vl.py": "efd8d64aaf608aad1ffb3e6d503d6a99e5227d007df95c1d9fa905d998cda4a9",
+    "video_processing_qwen3_vl.py": "a49a83fc45cd9baa3e391a68af79743c70d47b86d7d6c81a262fda4104f89db7",
+    "__init__.py": "69b55a787c302a02fede0548ddce4f4997eba19954e13c44297c1e0ddef90574"
+  },
+  "productionUsesPython": false
+}

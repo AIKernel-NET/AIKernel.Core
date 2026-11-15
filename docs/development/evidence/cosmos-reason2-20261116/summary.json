@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-16",
+  "status": "preview; gated checkpoint validation pending",
+  "paths": [
+    {
+      "dtype": "f32",
+      "checks": 16,
+      "maxAbsolute": 3.3527613e-07,
+      "generatedTokenIdsPerMode": 8,
+      "modes": [
+        "text",
+        "image",
+        "video"
+      ],
+      "syntheticWeights": true
+    },
+    {
+      "dtype": "bf16",
+      "checks": 16,
+      "maxAbsolute": 3.632158e-07,
+      "generatedTokenIdsPerMode": 8,
+      "modes": [
+        "text",
+        "image",
+        "video"
+      ],
+      "syntheticWeights": true
+    },
+    {
+      "dtype": "f16",
+      "checks": 16,
+      "maxAbsolute": 5.112961e-07,
+      "generatedTokenIdsPerMode": 8,
+      "modes": [
+        "text",
+        "image",
+        "video"
+      ],
+      "syntheticWeights": true
+    }
+  ],
+  "unitTests": 900,
+  "realCosmosGenerationValidated": false,
+  "cosmosServer7GBValidated": false
+}

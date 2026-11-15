@@ -1,0 +1,130 @@
+[
+  {
+    "mode": "text",
+    "name": "logits",
+    "elements": 1280,
+    "maxAbsolute": 1.1920929E-07,
+    "rms": 2.622681926398083E-08,
+    "pass": true
+  },
+  {
+    "mode": "text",
+    "name": "generation",
+    "elements": 2560,
+    "maxAbsolute": 1.1920929E-07,
+    "rms": 2.155269395803326E-08,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "patches",
+    "elements": 36864,
+    "maxAbsolute": 0,
+    "rms": 0,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "vision",
+    "elements": 192,
+    "maxAbsolute": 6.3329935E-08,
+    "rms": 2.1257624158896542E-08,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "deep-0",
+    "elements": 192,
+    "maxAbsolute": 7.4505806E-08,
+    "rms": 2.1745938312111678E-08,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "deep-1",
+    "elements": 192,
+    "maxAbsolute": 9.313226E-08,
+    "rms": 2.1659651285633368E-08,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "deep-2",
+    "elements": 192,
+    "maxAbsolute": 6.100163E-08,
+    "rms": 2.2272704173090275E-08,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "logits",
+    "elements": 3200,
+    "maxAbsolute": 2.9802322E-07,
+    "rms": 6.908619339215353E-08,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "generation",
+    "elements": 2560,
+    "maxAbsolute": 1.4901161E-07,
+    "rms": 4.345520923539113E-08,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "patches",
+    "elements": 73728,
+    "maxAbsolute": 0,
+    "rms": 0,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "vision",
+    "elements": 384,
+    "maxAbsolute": 6.7055225E-08,
+    "rms": 2.013899491615419E-08,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "deep-0",
+    "elements": 384,
+    "maxAbsolute": 6.7055225E-08,
+    "rms": 2.115142122431734E-08,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "deep-1",
+    "elements": 384,
+    "maxAbsolute": 6.3329935E-08,
+    "rms": 2.232760435169654E-08,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "deep-2",
+    "elements": 384,
+    "maxAbsolute": 6.239861E-08,
+    "rms": 1.8647485131680027E-08,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "logits",
+    "elements": 7040,
+    "maxAbsolute": 3.632158E-07,
+    "rms": 6.435546716323684E-08,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "generation",
+    "elements": 2560,
+    "maxAbsolute": 1.3411045E-07,
+    "rms": 3.578786693535774E-08,
+    "pass": true
+  }
+]

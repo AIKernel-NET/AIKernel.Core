@@ -62,6 +62,30 @@ signed Q8 activations, followed by `2*dot - sum(activation)` per 128-element blo
 The pair sum is bounded by ±254, so VPMADDUBSW does not saturate. This requires
 the updated optional CPU library; `avx2-q8` remains the rounded-FP32 control.
 
+| Setting | Q1_0 matrix arithmetic |
+| --- | --- |
+| scalar-q8 | Independent signed integer dot reference, then block scaling |
+| avx-q8, avx2-q8, avx512-q8 | Common Q8 rounding, restored to FP32 for the selected vector kernel |
+| avx2-int8-q8 | AVX2 unsigned-byte x signed-byte integer dot without saturation |
+| avx-vnni-q8 | 256-bit VEX VNNI unsigned-byte x signed-byte integer dot |
+| avx512-vnni-q8 | 512-bit VNNI integer dot |
+| amx-int8-q8 | AMX signed INT8 tile dot (explicit opt-in; real hardware validation pending) |
+| q8-auto | Best available initial Q8 path, with phase/thread tuning when TuneCpuAsync is called |
+
+CpuInt8Acceleration.AvailableBackends reports actual usable candidates. VNNI and AMX
+need the optional aikernel_cpu_accel native library. Original FP32 CPU inference needs
+neither this library nor CUDA. q8-auto excludes AMX until an AMX host has independently
+validated it. Tuning uses a separate precision identity/cache and a Q8 reference, so
+FP32 and Q8 timings/caches are never silently mixed. Current prefill is repeated GEMV,
+not batched GEMM; no general AMX or VNNI speedup is assumed.
+
+For CUDA, the existing boolean overload of Qwen3GpuModel takes quantizeActivations.
+Qwen3VulkanModel has the same optional boolean. When true, both use the identical Q8
+rounding, restore those values to FP32, and run the existing FP32 matrix arithmetic.
+ActivationPrecision reports q8-block128-fp32-accumulate. This does NOT use GPU INT8
+instructions or Tensor Cores. It is a comparable activation-precision experiment,
+not an INT8 GPU throughput benchmark. FP32-weight tensors keep their original path.
+
 ### Native CUDA INT8 follow-up (2026-11-15 development source)
 
 The new overload below uses packed integer activations directly. The original
@@ -105,29 +129,6 @@ The default is 128 greedy steps including EOS; text is deliberately empty and
 This fixed-work protocol measures compute time, not the latency or quality of
 a natural customer reply. Always publish prefill and decode separately and
 validate reply quality separately from fixed-token throughput.
-
-| Setting | Q1_0 matrix arithmetic |
-| --- | --- |
-| scalar-q8 | Independent signed integer dot reference, then block scaling |
-| avx-q8, avx2-q8, avx512-q8 | Common Q8 rounding, restored to FP32 for the selected vector kernel |
-| avx-vnni-q8 | 256-bit VEX VNNI unsigned-byte x signed-byte integer dot |
-| avx512-vnni-q8 | 512-bit VNNI integer dot |
-| amx-int8-q8 | AMX signed INT8 tile dot (explicit opt-in; real hardware validation pending) |
-| q8-auto | Best available initial Q8 path, with phase/thread tuning when TuneCpuAsync is called |
-
-CpuInt8Acceleration.AvailableBackends reports actual usable candidates. VNNI and AMX
-need the optional aikernel_cpu_accel native library. Original FP32 CPU inference needs
-neither this library nor CUDA. q8-auto excludes AMX until an AMX host has independently
-validated it. Tuning uses a separate precision identity/cache and a Q8 reference, so
-FP32 and Q8 timings/caches are never silently mixed. Current prefill is repeated GEMV,
-not batched GEMM; no general AMX or VNNI speedup is assumed.
-
-For CUDA, the new six-argument Qwen3GpuModel constructor takes quantizeActivations.
-Qwen3VulkanModel has the same optional boolean. When true, both use the identical Q8
-rounding, restore those values to FP32, and run the existing FP32 matrix arithmetic.
-ActivationPrecision reports q8-block128-fp32-accumulate. This does NOT use GPU INT8
-instructions or Tensor Cores. It is a comparable activation-precision experiment,
-not an INT8 GPU throughput benchmark. FP32-weight tensors keep their original path.
 
 ## ISA and operating-system guards
 

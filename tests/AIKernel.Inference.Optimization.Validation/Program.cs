@@ -17,6 +17,7 @@ if(args[1]=="cpu")
 }
 else if(args[1]=="cuda")
 {
+    if(args[2] is not ("q8" or "fp32" or "dp4a" or "tensorcore"))throw new ArgumentException("Unknown CUDA precision.");
     using var m=args[2] is "q8" or "fp32"?new Qwen3GpuModel(args[0],0,4,1024,1024L*1024*1024,args[2]=="q8")
         :new Qwen3GpuModel(args[0],0,4,1024,1024L*1024*1024,args[2]=="dp4a"?CudaQ8Kernel.Dp4a:CudaQ8Kernel.TensorCore);
     await m.WarmupAsync(system,timeout.Token);var r=await m.GenerateBenchmarkAsync(system,inquiry,128,timeout.Token);

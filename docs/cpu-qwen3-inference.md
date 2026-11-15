@@ -231,8 +231,8 @@ CUDA INT8 warmup covers the full output projection and single-label row shape in
 addition to layer matrices. The benchmark's setup record includes the selected
 integer shape map so later first-request calibration can be detected. CPU results
 retain activation precision without enabling profiling, alongside actual backend
-and per-phase worker counts. Duplicate Q8 preparation and arithmetic-order/SIMD
-changes remain separate follow-up work; they are not part of this implementation.
+and per-phase worker counts. The subsequent shared-Q8 and FP32 SIMD stages below
+were validated separately from this first implementation.
 
 The first repeated stage comparison preserved all five token hashes for each of
 AVX2 FP32, AVX2 INT8-Q8, CUDA FP32 and CUDA DP4A on Bonsai 1.7B, and AVX2 FP32 on
@@ -304,3 +304,43 @@ CPU and CUDA paths produced zero logit difference on the development machine.
 Server validation used two workers, CPU affinity 4/5 and an account RSS abort
 guard at 7 GiB. These checks do not establish a latency gain; benchmark the
 frozen prototype and candidate separately with profiling disabled.
+
+### Controlled prototype comparison (2026-11-15)
+
+Frozen prototype binaries and the optimized candidate were measured again on the
+development Xeon E-2174G, with four workers, affinity `0x55`, .NET 10.0.15 and
+NVIDIA driver 596.59. Each condition used ABBA order and five measured requests
+per block, giving ten samples per version. Before each process, two consecutive
+15-second CPU averages had to be at most 10%. Each request greedily generated
+128 tokens while ignoring EOS; model load, calibration and one initial request
+were excluded. Stage profiling and CUDA events were disabled.
+
+| Path | 1.7B: prototype -> optimized | 4B: prototype -> optimized |
+| --- | --- | --- |
+| CPU AVX2, FP32 activation | 13.73 -> 8.62 s (-37.2%) | 32.12 -> 20.20 s (-37.1%) |
+| CPU AVX2 INT8, Q8 activation | 9.35 -> 9.15 s (-2.1%) | 21.41 -> 20.98 s (-2.0%) |
+| RTX 4000 SFF Ada, FP32 activation | 9.18 -> 7.04 s (-23.3%) | 12.84 -> 11.37 s (-11.4%) |
+
+All weights were Q1_0. These are median total generation-call latencies including
+managed request cleanup, not just matrix time. Gains are cumulative with the
+earlier workspace/RoPE changes, not an isolated measurement of each change. The
+Q8 differences are small; do not present them as established performance gains.
+`auto` still retains FP32 activation precision.
+
+A major background CPU spike affected one CUDA 1.7B block. The complete ABBA
+condition (20 requests) was retained separately and repeated. A retrospective
+quality rule (median estimated background CPU over 15% or p95 over 40%) was
+applied to every original block, independently of its latency. The final dataset
+contains 120 accepted requests and 20 excluded diagnostic requests. Start-time
+and whole-process background estimates are retained with every block.
+
+The exact measured candidate also passed teacher-forced CUDA FP32 logit checks:
+max absolute error below 0.000060, RMS below 0.0000068 and all 32 greedy choices
+matching on both models. Native Q8 paths retain zero logit difference. AVX-only
+and Server AVX-512 checks in this update establish numerical regressions only;
+their new latency was not measured. AMX remains outside physical validation.
+
+The WebSite repository's November 15 article keeps the original prototype
+snapshot and publishes the new comparison separately, including raw logs,
+excluded data, binary hashes and chart regeneration scripts. The internal
+optimization validation executable is explicitly non-packable.

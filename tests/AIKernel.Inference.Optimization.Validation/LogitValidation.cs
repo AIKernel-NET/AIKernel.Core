@@ -13,15 +13,15 @@ internal static class LogitValidation
         int workers=int.TryParse(Environment.GetEnvironmentVariable("AIKERNEL_BENCH_CPU_WORKERS"),out int configured)?configured:4;
         int[]? teacher=args.Length>4?JsonSerializer.Deserialize<int[]>(File.ReadAllText(args[4])):null;
         const BindingFlags flags=BindingFlags.Instance|BindingFlags.NonPublic;
-        using var model=backend=="cuda-dp4a"
-            ?new Qwen3CpuModel(modelPath,workers,1024,0,1024L*1024*1024,gpuInt8:CudaQ8Kernel.Dp4a)
+        using var model=backend is "cuda-dp4a" or "cuda-fp32"
+            ?new Qwen3CpuModel(modelPath,workers,1024,0,1024L*1024*1024,gpuInt8:backend=="cuda-dp4a"?CudaQ8Kernel.Dp4a:null)
             :new Qwen3CpuModel(modelPath,workers,1024,backend);
         var type=typeof(Qwen3CpuModel);
         var tokenizer=(QwenTokenizer)type.GetField("tokenizer",flags)!.GetValue(model)!;
         var output=(GgufWeights.Tensor)type.GetField("output",flags)!.GetValue(model)!;
         var forward=type.GetMethod("Forward",flags)!;var multiply=type.GetMethod("Multiply",flags)!;
         using var state=(Qwen3Workspace)type.GetMethod("AcquireWorkspace",flags)!.Invoke(model,[CancellationToken.None])!;
-        string selected=backend=="cuda-dp4a"?model.CpuBackend:backend;
+        string selected=backend.StartsWith("cuda-",StringComparison.Ordinal)?model.CpuBackend:backend;
         var prompt=tokenizer.Chat("Answer the customer in Japanese. Ask for the error message and model path. Do not invent facts.","サンプルを起動するとモデルが見つからないと表示されます。確認する設定を教えてください。");
         void Forward(int token,int position)=>forward.Invoke(model,[token,position,state,selected,null]);
         for(int i=0;i<prompt.Count;i++)Forward(prompt[i],i);

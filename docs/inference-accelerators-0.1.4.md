@@ -55,6 +55,13 @@ experiment, recording output length/text and never promising identical answers.
 
 AIKERNEL_CPU_GEMV accepts the original scalar/avx/avx2/avx512/auto settings plus:
 
+These choices are also accepted by the per-model `instructionSet` constructor argument.
+Omitting the argument retains automatic selection when no environment override is set.
+`avx2-int8-q8` uses native VPMADDUBSW/VPMADDWD with unsigned 0/1 weights and
+signed Q8 activations, followed by `2*dot - sum(activation)` per 128-element block.
+The pair sum is bounded by ±254, so VPMADDUBSW does not saturate. This requires
+the updated optional CPU library; `avx2-q8` remains the rounded-FP32 control.
+
 | Setting | Q1_0 matrix arithmetic |
 | --- | --- |
 | scalar-q8 | Independent signed integer dot reference, then block scaling |

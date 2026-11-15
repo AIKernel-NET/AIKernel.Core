@@ -15,18 +15,16 @@ internal static unsafe class QuantizedCpuMatrix
     private static readonly Vector256<float>[] Signs=Enumerable.Range(0,256).Select(b=>Vector256.Create(
         Mask(b,0),Mask(b,1),Mask(b,2),Mask(b,3),Mask(b,4),Mask(b,5),Mask(b,6),Mask(b,7)).AsSingle()).ToArray();
     private static int Mask(int b,int bit)=>(b&(1<<bit))==0?int.MinValue:0;
-    internal static string Backend
+    internal static string Backend=>Resolve(Environment.GetEnvironmentVariable("AIKERNEL_CPU_GEMV"));
+    internal static string Resolve(string? requested)
     {
-        get
-        {
-            var requested=Environment.GetEnvironmentVariable("AIKERNEL_CPU_GEMV");
             var auto=Avx512F.IsSupported?"avx512":Avx2.IsSupported&&Fma.IsSupported?"avx2":Avx.IsSupported?"avx":"scalar";
             if(string.IsNullOrEmpty(requested)||requested=="auto")return auto;
             if(requested=="q8-auto"||Int8CpuMatrix.IsBackend(requested)||Int8CpuMatrix.IsRoundedFloatBackend(requested))return Int8CpuMatrix.Resolve(requested);
             if(requested=="scalar" || requested=="avx"&&Avx.IsSupported || requested=="avx2"&&Avx2.IsSupported&&Fma.IsSupported ||
                requested=="avx512"&&Avx512F.IsSupported)return requested;
-            throw new PlatformNotSupportedException("Requested CPU instruction set is unavailable.");
-        }
+            if(!CpuInstructionSets.Known.Contains(requested))throw new ArgumentException($"Unknown CPU instruction set '{requested}'.",nameof(requested));
+            throw new PlatformNotSupportedException($"Requested CPU instruction set '{requested}' is unavailable on this CPU/OS.");
     }
     internal static void Row(GgufWeights file,GgufWeights.Tensor t,int row,Span<float> output)
     {

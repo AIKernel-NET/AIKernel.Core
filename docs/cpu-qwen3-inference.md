@@ -34,6 +34,41 @@ Console.WriteLine(result.FinishReason); // stop or length
 
 The default selects AVX-512F, then AVX2+FMA, AVX, scalar. .NET intrinsic support includes operating-system support. `AIKERNEL_CPU_GEMV=scalar|avx|avx2|avx512|auto` can select a path for testing; unsupported forced paths throw. AVX does not use FMA or AVX2 instructions.
 
+The original constructor retains this automatic behavior. To force a matrix instruction
+set for one model without changing process-wide environment variables:
+
+```csharp
+using var model = new Qwen3CpuModel(path, 4, 1024, instructionSet: "avx2");
+Console.WriteLine(model.RequestedInstructionSet); // requested policy
+Console.WriteLine(model.CpuBackend);               // actual selection
+```
+
+`CpuInstructionSets.Available` lists CPU/OS/native-library-supported choices. An explicit
+`"auto"` overrides the environment and preserves FP32 activations. Null inherits the
+environment; without an environment override it is automatic. Unknown names and
+unsupported forced choices fail before opening the model. Forced choices remain fixed
+even if `TuneCpuAsync` is called or another caller changes the environment later.
+The selection concerns Q1_0 matrix kernels, not a global ban on other instructions
+used by the .NET runtime, tokenizer, attention or OS.
+
+For same-CPU ISA comparisons, use `CpuAutoTuningOptions.TuneThreadCount = false`
+to hold workers constant during automatic ISA calibration; its production default
+remains true. `GenerateBenchmarkAsync` explicitly ignores EOS and generates exactly
+the requested number of greedy steps (1–256); ordinary `GenerateAsync` still stops
+at EOS. Benchmark output is not intended as a customer reply. Decode time includes
+output projection and sampling; for N generated tokens there are N−1 additional
+transformer forwards. Report prefill separately from Decode milliseconds/N.
+
+```text
+AIKernel.FixedToken.Benchmark cpu model.gguf --workers 4 --tokens 128
+AIKernel.FixedToken.Benchmark cpu model.gguf --instruction-set avx --workers 4 --tokens 128
+AIKernel.FixedToken.Benchmark cpu model.gguf --instruction-set avx2 --workers 4 --tokens 128
+AIKernel.FixedToken.Benchmark --list-instruction-sets
+```
+
+The benchmark's omitted `--instruction-set` is `auto`, calibrated before warmup.
+Q8 remains an opt-in precision change (`q8-auto` or an explicit `*-q8` choice).
+
 Direct quantized-vector computation is the default. `AIKERNEL_Q1_KERNEL=lookup` is an experimental alternative. Previous development-machine timings were affected by concurrent work and must be repeated after reboot before drawing performance conclusions. AVX-512F support does not imply use of VNNI or BF16.
 
 ## Optional GPU matrix offload

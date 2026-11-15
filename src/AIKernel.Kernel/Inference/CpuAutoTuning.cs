@@ -13,6 +13,8 @@ public sealed record CpuAutoTuningOptions(string ProfileDirectory,string ModelSh
 {
     /// <summary>Soft calibration deadline; at most one already-started matrix probe can overrun it.</summary>
     public TimeSpan CalibrationBudget {get;init;}=TimeSpan.FromSeconds(2);
+    /// <summary>Also measure worker counts up to the configured ceiling. False holds the supplied worker count fixed.</summary>
+    public bool TuneThreadCount {get;init;}=true;
     /// <summary>Age after which a saved profile must be measured again.</summary>
     public TimeSpan ProfileMaxAge {get;init;}=TimeSpan.FromHours(24);
 }

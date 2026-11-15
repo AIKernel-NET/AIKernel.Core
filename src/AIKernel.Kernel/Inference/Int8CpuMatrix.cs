@@ -23,7 +23,7 @@ internal static unsafe class Int8CpuMatrix
     [DllImport(Library,EntryPoint="ak_cpu_supports",CallingConvention=CallingConvention.Cdecl)] private static extern uint Supports();
     [DllImport(Library,EntryPoint="ak_cpu_q1_q8",CallingConvention=CallingConvention.Cdecl)]
     private static extern int NativeMultiply(byte* weights,nuint weightBytes,sbyte* x,float* scales,int* sums,uint rows,uint columns,uint backend,float* y);
-    internal static bool IsBackend(string backend)=>backend is "scalar-q8" or "avx-vnni-q8" or "avx512-vnni-q8" or "amx-int8-q8";
+    internal static bool IsBackend(string backend)=>backend is "scalar-q8" or "avx2-int8-q8" or "avx-vnni-q8" or "avx512-vnni-q8" or "amx-int8-q8";
     internal static bool IsRoundedFloatBackend(string backend)=>backend is "avx-q8" or "avx2-q8" or "avx512-q8";
     internal static List<string> Candidates(bool includeAmx=true)
     {
@@ -31,6 +31,7 @@ internal static unsafe class Int8CpuMatrix
         if(System.Runtime.Intrinsics.X86.Avx.IsSupported)list.Add("avx-q8");
         if(System.Runtime.Intrinsics.X86.Avx2.IsSupported&&System.Runtime.Intrinsics.X86.Fma.IsSupported)list.Add("avx2-q8");
         if(System.Runtime.Intrinsics.X86.Avx512F.IsSupported)list.Add("avx512-q8");
+        if((flags&8)!=0)list.Add("avx2-int8-q8");
         if((flags&1)!=0)list.Add("avx-vnni-q8");
         if((flags&2)!=0)list.Add("avx512-vnni-q8");
         if(includeAmx&&(flags&4)!=0)list.Add("amx-int8-q8");
@@ -73,7 +74,7 @@ internal static unsafe class Int8CpuMatrix
                         if(backend=="scalar-q8")Scalar(w,(sbyte*)input,(float*)scale,count,tensor.Columns,output);
                         else
                         {
-                            uint kind=backend=="avx-vnni-q8"?1u:backend=="avx512-vnni-q8"?2u:3u;
+                            uint kind=backend=="avx-vnni-q8"?1u:backend=="avx512-vnni-q8"?2u:backend=="avx2-int8-q8"?4u:3u;
                             int status=NativeMultiply(w,(nuint)((long)count*tensor.RowBytes),(sbyte*)input,(float*)scale,(int*)sum,
                                 (uint)count,(uint)tensor.Columns,kind,output);
                             if(status!=0)throw new PlatformNotSupportedException($"CPU Q8 kernel {backend} failed ({status}); no partial result is returned.");

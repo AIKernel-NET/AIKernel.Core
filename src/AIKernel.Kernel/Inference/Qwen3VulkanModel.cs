@@ -36,6 +36,12 @@ public sealed class Qwen3VulkanModel : IDisposable
         try{return Convert(await engine.GenerateAsync(system,user,maxNewTokens,cancellationToken).ConfigureAwait(false));}
         finally{engine.ZeroGpuScratch();}
     }
+    /// <summary>Benchmark only: greedy generation for exactly tokenCount steps, ignoring EOS.</summary>
+    public async Task<VulkanGeneration> GenerateBenchmarkAsync(string system,string user,int tokenCount=128,CancellationToken cancellationToken=default)
+    {
+        try{return Convert(await engine.GenerateBenchmarkAsync(system,user,tokenCount,cancellationToken).ConfigureAwait(false));}
+        finally{engine.ZeroGpuScratch();}
+    }
     /// <summary>Scores explicit single-token labels.</summary>
     public async Task<VulkanGeneration> ClassifyAsync(string system,string user,IReadOnlyList<string> labels,CancellationToken cancellationToken=default)
     {

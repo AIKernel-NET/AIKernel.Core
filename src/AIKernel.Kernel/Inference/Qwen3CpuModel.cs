@@ -20,6 +20,7 @@ public sealed class Qwen3CpuModel : IDisposable
     private readonly float ropeAmplitude;
     private readonly SemaphoreSlim gate=new(1,1);
     private readonly string backend;
+    private readonly string requestedInstructionSet;
     private string prefillBackend,decodeBackend;
     private int prefillThreads,decodeThreads;
     private CpuKernelTuner? tuner;
@@ -34,11 +35,18 @@ public sealed class Qwen3CpuModel : IDisposable
     public Qwen3CpuModel(string modelPath,int cpuThreads=4,int contextTokens=1024)
         : this(modelPath,cpuThreads,contextTokens,null,0) { }
 
+    /// <summary>Selects a CPU instruction set per model. Null inherits AIKERNEL_CPU_GEMV; absent configuration uses auto.
+    /// Explicit auto overrides the environment. Unsupported forced sets fail before the model is opened.</summary>
+    public Qwen3CpuModel(string modelPath,int cpuThreads,int contextTokens,string? instructionSet)
+        :this(modelPath,cpuThreads,contextTokens,null,0,instructionSet:instructionSet) { }
+
     internal Qwen3CpuModel(string modelPath,int cpuThreads,int contextTokens,int? deviceOrdinal,long maximumWeightBytes,
-        bool vulkan=false,bool gpuQ8=false)
+        bool vulkan=false,bool gpuQ8=false,string? instructionSet=null)
     {
         if(cpuThreads<1||cpuThreads>6||contextTokens<64||contextTokens>2048)throw new ArgumentOutOfRangeException(nameof(cpuThreads));
-        threads=cpuThreads;context=contextTokens;backend=QuantizedCpuMatrix.Backend;prefillBackend=decodeBackend=backend;prefillThreads=decodeThreads=cpuThreads;
+        requestedInstructionSet=instructionSet??Environment.GetEnvironmentVariable("AIKERNEL_CPU_GEMV")??"auto";
+        if(requestedInstructionSet.Length==0)requestedInstructionSet="auto";
+        threads=cpuThreads;context=contextTokens;backend=QuantizedCpuMatrix.Resolve(requestedInstructionSet);prefillBackend=decodeBackend=backend;prefillThreads=decodeThreads=cpuThreads;
         quantizeGpuActivations=gpuQ8;
         file=new(modelPath);
         try
@@ -90,6 +98,8 @@ public sealed class Qwen3CpuModel : IDisposable
         catch{file.Dispose();throw;}
     }
     /// <summary>Selected and OS-supported instruction family.</summary>
+    public string RequestedInstructionSet=>requestedInstructionSet;
+    /// <summary>Actual matrix instruction set(s), including tuning decisions.</summary>
     public string CpuBackend=>prefillBackend==decodeBackend?prefillBackend:$"prefill={prefillBackend};decode={decodeBackend}";
     /// <summary>Most recent tuning decision, or null when tuning was not requested.</summary>
     public CpuTuningStatus? TuningStatus=>tuningStatus;
@@ -103,7 +113,7 @@ public sealed class Qwen3CpuModel : IDisposable
         await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            string? forced=Environment.GetEnvironmentVariable("AIKERNEL_CPU_GEMV");
+            string forced=requestedInstructionSet;
             if(!string.IsNullOrEmpty(forced)&&forced!="auto"&&forced!="q8-auto")
                 return tuningStatus=new(backend,backend,"operator-forced","",0,0,threads,threads);
             if(Environment.GetEnvironmentVariable("AIKERNEL_Q1_KERNEL") is { } kernel&&kernel!="vector")
@@ -114,9 +124,11 @@ public sealed class Qwen3CpuModel : IDisposable
                 if(forced!="q8-auto"&&System.Runtime.Intrinsics.X86.Avx2.IsSupported&&System.Runtime.Intrinsics.X86.Fma.IsSupported)candidates.Add("avx2");
                 if(forced!="q8-auto"&&System.Runtime.Intrinsics.X86.Avx512F.IsSupported)candidates.Add("avx512");
                 if(candidates.Count==0)candidates.Add(backend);
-                var counts=new[]{1,2,4,6}.Where(n=>n<=Math.Min(threads,Environment.ProcessorCount)).Append(Math.Min(threads,Environment.ProcessorCount)).Distinct().OrderDescending();
+                IEnumerable<int> counts=options.TuneThreadCount
+                    ?new[]{1,2,4,6}.Where(n=>n<=Math.Min(threads,Environment.ProcessorCount)).Append(Math.Min(threads,Environment.ProcessorCount)).Distinct().OrderDescending()
+                    :new[]{threads};
                 var choices=candidates.SelectMany(b=>counts.Select(n=>new CpuKernelChoice(b,n)));
-                tuner=new(options,CpuKernelTuner.Identity(options,threads,context,$"{file.Length}/{width}/{hidden}/{layers.Length}/{(forced=="q8-auto"?"q8-v1":"fp32")}"),choices);
+                tuner=new(options,CpuKernelTuner.Identity(options,threads,context,$"{file.Length}/{width}/{hidden}/{layers.Length}/{(forced=="q8-auto"?"q8-v1":"fp32")}/tuneThreads={options.TuneThreadCount}"),choices);
                 tuningOptions=options;
             }
             var selected=await Task.Run(()=>tuner.Tune(ProbeKernel,ValidateKernel,refresh,cancellationToken),cancellationToken).ConfigureAwait(false);
@@ -188,6 +200,15 @@ public sealed class Qwen3CpuModel : IDisposable
         try{return await Task.Run(()=>Run(system,user,maxNewTokens,null,cancellationToken),cancellationToken).ConfigureAwait(false);}
         finally{gate.Release();}
     }
+    /// <summary>Benchmark only: greedy generation for exactly tokenCount steps, including EOS tokens.
+    /// This is not a user-facing reply API. Context limits and cancellation still apply.</summary>
+    public async Task<CpuGeneration> GenerateBenchmarkAsync(string system,string user,int tokenCount=128,CancellationToken cancellationToken=default)
+    {
+        if(tokenCount<1||tokenCount>256)throw new ArgumentOutOfRangeException(nameof(tokenCount));
+        await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try{return await Task.Run(()=>Run(system,user,tokenCount,null,cancellationToken,ignoreEos:true),cancellationToken).ConfigureAwait(false);}
+        finally{gate.Release();}
+    }
     /// <summary>Scores the next token over explicitly supplied single-token labels, without fabricated confidence.</summary>
     public async Task<CpuGeneration> ClassifyAsync(string system,string user,IReadOnlyList<string> labels,CancellationToken cancellationToken=default)
     {
@@ -197,7 +218,7 @@ public sealed class Qwen3CpuModel : IDisposable
         try{return await Task.Run(()=>Run(system,user,1,ids,cancellationToken),cancellationToken).ConfigureAwait(false);}
         finally{gate.Release();}
     }
-    private CpuGeneration Run(string system,string user,int maximum,int[]? choices,CancellationToken token)
+    private CpuGeneration Run(string system,string user,int maximum,int[]? choices,CancellationToken token,bool ignoreEos=false)
     {
         if(system.Length>8192||user.Length>4096)throw new ArgumentException("Text exceeds model input limit.");
         var prompt=tokenizer.Chat(system,user);
@@ -220,7 +241,7 @@ public sealed class Qwen3CpuModel : IDisposable
             }
         }
         long prefillTicks=watch.ElapsedTicks;int decodeForwards=0;state.Options.MaxDegreeOfParallelism=decodeThreads;
-        var finish="length";
+        var finish=ignoreEos?"benchmark-fixed-tokens":"length";
         for(int step=0;step<maximum;step++)
         {
             token.ThrowIfCancellationRequested();
@@ -243,7 +264,7 @@ public sealed class Qwen3CpuModel : IDisposable
                 for(int i=0;i<state.Logits.Length;i++)if(state.Logits[i]>best){best=state.Logits[i];next=i;}
                 if(!float.IsFinite(best))throw new ArithmeticException("Non-finite model logits.");
             }
-            if(next==tokenizer.End){finish="stop";break;}
+            if(next==tokenizer.End&&!ignoreEos){finish="stop";break;}
             generated.Add(next);
             if(choices is not null){finish="classified";break;}
             if(step+1<maximum){Forward(next,prompt.Count+step,state,decodeBackend);decodeForwards++;}

@@ -48,6 +48,7 @@ uint32_t ak_cpu_supports(void)
     uint32_t r[4],flags=0;cpuid(0,0,r);if(r[0]<7)return cached=0;
     cpuid(1,0,r);if((r[2]&(UINT32_C(1)<<27))==0||(xstate()&6)!=6)return cached=0;
     cpuid(7,0,r);uint32_t sub=r[0],b=r[1],c=r[2],d=r[3];
+    if(b&(UINT32_C(1)<<5))flags|=8;
     if(sub>=1){cpuid(7,1,r);if((r[0]&(UINT32_C(1)<<4))&&(b&(UINT32_C(1)<<5)))flags|=1;}
     const uint32_t avx512_mask=(UINT32_C(1)<<16)|(UINT32_C(1)<<17)|(UINT32_C(1)<<30)|(UINT32_C(1)<<31);
     if((b&avx512_mask)==avx512_mask&&(c&(UINT32_C(1)<<11))&&(xstate()&0xe6)==0xe6)flags|=2;
@@ -64,7 +65,7 @@ int ak_cpu_q1_q8(const uint8_t* w,size_t bytes,const int8_t* x,const float* scal
     uint32_t rows,uint32_t columns,uint32_t backend,float* y)
 {
     if(!w||!x||!scales||!sums||!y||!rows||!columns||columns%128||columns>200000||rows>200000||
-       (uint64_t)rows*(columns/128)*18>bytes||backend<1||backend>3)return -1;
+       (uint64_t)rows*(columns/128)*18>bytes||backend<1||backend>4)return -1;
     uint32_t flag=1u<<(backend-1);
     if((ak_cpu_supports()&flag)==0)return -2;
     if(backend==3)
@@ -72,6 +73,7 @@ int ak_cpu_q1_q8(const uint8_t* w,size_t bytes,const int8_t* x,const float* scal
         if(!ak_amx_enable())return -3;
         ak_amx_rows(w,x,scales,rows,columns,y);
     }
+    else if(backend==4)ak_avx2int8_rows(w,x,scales,sums,rows,columns,y);
     else ak_vnni_rows(w,x,scales,sums,rows,columns,backend,y);
     return 0;
 }

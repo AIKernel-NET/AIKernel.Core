@@ -2,7 +2,8 @@
 
 2026-11-15。レビュー対象は `codex/context-free-cuda-pci` の `9362118`。
 実装は `c6f8fdf` を起点とする `codex/model-expansion-gemma4-gptoss` で進めます。
-生成グラフはQwen3 denseに加え、Gemma 4 E2BのCPUテキスト参照経路を実装しました。
+生成グラフはQwen3 denseに加え、Gemma 4 E2Bのテキスト生成、CPU SIMD、CUDA行列演算、
+Server向けのRAM予算付きSSDバックエンドを実装しました。
 GPT-OSSは引き続き読み取り・形式の参照デコードまでです。
 0.1.4 は既存の Bonsai の数値・再現性・配布検証を維持します。
 
@@ -21,6 +22,10 @@ tokenizer 112例、対話形式8例の照合と、512トークン窓の境界・
 [APIと対応範囲](../gemma4-e2b-inference.md) ·
 [参照revision、誤差、再現手順](evidence/gemma4-e2b-20261115/README.md)
 
+生成実装後の[CPU／GPU最適化とServerの7GB検証](gemma4-optimization-20261115-jp.md)では、
+FP32活性化を維持してQ4_0／Q6_K／F16の行列演算を高速化しました。
+CPUの重みページングはAIKernelの `VirtualMemorySpace` を使用します。
+
 ## 第1段階で実装した読み取り・形式の分離
 
 - GGUFディレクトリ読み取りをQwen3の実行条件から分離しました。
@@ -31,12 +36,12 @@ tokenizer 112例、対話形式8例の照合と、512トークン窓の境界・
   格納バイト数は実行時のRSSやKV込みのメモリ見積もりではありません。
 - F16、BF16、Q4_0、Q8_0、Q4_K、Q6_K、MXFP4のデコードとCPU参照GEMVを追加しました。
   作業領域は最大256要素のブロックで、全重みをFP32へ展開しません。
-  これらは正しさを検証する経路であり、SIMD/GPUの最適化は未実施です。
+  これらは正しさを検証する共通経路です。Gemma用F16／Q4_0／Q6_Kには、その後SIMD／CUDA経路を追加しました。
 - Qwen3のモデル条件を `Qwen3ModelDefinition` へ、対話形式を `QwenChatTemplate` へ分離しました。
   tokenizerとtemplateの契約を分け、複数の終了トークンを表現できるようにしています。
   Qwenの符号化、演算順序、`auto` のFP32選択、運用上限は維持します。
 - 未対応architectureをQwenのForwardに通さず、新形式を既存のCUDA/Vulkan/Q8カーネルへ
-  誤って渡すことも実行前に拒否します。GPUの分割uploadや新モデルの入場判定は未実装です。
+  誤って渡すことも実行前に拒否します。Gemmaには専用CUDA経路とテンソル単位の分割upload、重み予算を追加しました。
 
 第1段階では実配布物の先頭16MiBをrevision固定で取得し、完全なファイル長に対してヘッダーを検査しました。
 その時点では全重みのダウンロードや新モデルの生成を行っていません。現在のGemma生成検証は上記の別記録です。
@@ -55,7 +60,8 @@ QAT版にもQ6_Kが含まれるため、ファイル名のQ4_0だけで対応形
 
 ## 次に実装する範囲
 
-Gemma 4 E2BではCPU参照生成まで完了し、GPU・SIMDの最適化と実運用枠の検証が残っています。
+Gemma 4 E2BではCPU SIMD・CUDA行列演算とServerの7GB RSS枠を検証しました。
+次の対象はGPU forward全体の常駐化、バッチPrefill、別のCPU命令セット向け最適化です。
 GPT-OSSではtokenizer/Harmony、MoEルーターとexpert集約、sink、bias付き演算が残っています。
 MXFP4参照デコードはその前提です。GPT-OSS全体の生成対応やServerの7GB枠での動作は未検証です。
 

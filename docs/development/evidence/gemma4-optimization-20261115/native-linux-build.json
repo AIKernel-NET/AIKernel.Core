@@ -1,0 +1,18 @@
+{
+  "compiler": "gcc (GCC) 8.5.0 20210514 (Red Hat 8.5.0-29)",
+  "flags": [
+    "gcc",
+    "-O3",
+    "-std=c11",
+    "-D_GNU_SOURCE",
+    "-shared",
+    "-fPIC",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fvisibility=hidden"
+  ],
+  "abi": 1,
+  "gemmaExport": true,
+  "sha256": "05bead78074996fd5d2f498e1f77d0e5618c0ad6fc2bb74b0fc897a62b73f32c"
+}

@@ -14,8 +14,47 @@ internal static class Gemma4Validation
             Console.WriteLine(JsonSerializer.Serialize(samples.Select(text=>new{text,ids=tokenizer.Encode(text),decoded=tokenizer.Decode(tokenizer.Encode(text)),
                 chatIds=chat.Chat("You are helpful.",text)})));return;
         }
-        using var model=new Gemma4E2BCpuModel(args[1],4,1024);
+        int threads=int.Parse(Environment.GetEnvironmentVariable("GEMMA_THREADS")??"4");
+        int context=int.Parse(Environment.GetEnvironmentVariable("GEMMA_CONTEXT")??"1024");
+        var execution=new Gemma4ExecutionOptions{Backend=Enum.Parse<Gemma4Backend>(Environment.GetEnvironmentVariable("GEMMA_BACKEND")??"Auto",true),
+            CudaDeviceOrdinal=int.Parse(Environment.GetEnvironmentVariable("GEMMA_GPU")??"0"),ProfileMatrices=Environment.GetEnvironmentVariable("GEMMA_PROFILE")=="1",
+            Memory=Environment.GetEnvironmentVariable("GEMMA_SWAP_DIRECTORY") is {Length:>0} swap?new Gemma4MemoryOptions{SwapDirectory=swap,
+                WeightCacheBytes=long.Parse(Environment.GetEnvironmentVariable("GEMMA_CACHE_BYTES")??"5000000000")}:null};
+        var load=Stopwatch.StartNew();
+        using var model=new Gemma4E2BCpuModel(args[1],threads,context,4L*1024*1024*1024,execution);
+        double loadMs=load.Elapsed.TotalMilliseconds;
         using var timeout=new CancellationTokenSource(TimeSpan.FromMinutes(30));
+        if(Environment.GetEnvironmentVariable("GEMMA_PREFAULT")=="1")PrefaultMappedWeights(model);
+        if(args[0]=="--gemma-benchmark")
+        {
+            using var spec=JsonDocument.Parse(File.ReadAllText(args[2]));
+            int[] benchPrompt=spec.RootElement.GetProperty("prompt").EnumerateArray().Select(v=>v.GetInt32()).ToArray();
+            int benchSteps=spec.RootElement.GetProperty("steps").GetInt32();
+            int repeat=args.Length>4?int.Parse(args[4]):3;
+            if(benchPrompt.Length+benchSteps>context||benchSteps<1||benchSteps>256||repeat<1||repeat>10)throw new ArgumentException("Invalid benchmark bounds.");
+            using(var warm=model.CreateState(timeout.Token))model.Forward(benchPrompt[0],0,warm,true);
+            var results=new List<object>();
+            for(int iteration=0;iteration<repeat;iteration++)
+            {
+                using var benchState=model.CreateState(timeout.Token);var benchTimer=Stopwatch.StartNew();var ids=new List<int>();
+                for(int i=0;i<benchPrompt.Length;i++)model.Forward(benchPrompt[i],i,benchState,i==benchPrompt.Length-1);
+                double prefillMs=benchTimer.Elapsed.TotalMilliseconds;
+                for(int i=0;i<benchSteps;i++)
+                {
+                    ids.Add(Gemma4E2BCpuModel.Argmax(benchState.Logits));
+                    if(i+1<benchSteps)model.Forward(ids[^1],benchPrompt.Length+i,benchState,true);
+                }
+                double totalMs=benchTimer.Elapsed.TotalMilliseconds;
+                string hash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(MemoryMarshal.AsBytes(ids.ToArray().AsSpan()))).ToLowerInvariant();
+                results.Add(new{iteration,prefillMs,decodeMs=totalMs-prefillMs,totalMs,decodeForwardTokens=benchSteps-1,outputTokens=benchSteps,
+                    decodeMsPerToken=(totalMs-prefillMs)/Math.Max(1,benchSteps-1),hash,tokens=ids,
+                    matrixMs=benchState.MatrixTicks*1000.0/Stopwatch.Frequency,benchState.MatrixCalls});
+                Console.Error.WriteLine($"iteration {iteration+1}: {totalMs:F1}ms");
+            }
+            var process=Process.GetCurrentProcess();
+            File.WriteAllText(args[3],JsonSerializer.Serialize(new{backend=model.Backend,threads,context,loadMs,model.WeightBytes,model.GpuWeightBytes,
+                peakWorkingSetBytes=process.PeakWorkingSet64,workingSetBytes=process.WorkingSet64,promptTokens=benchPrompt.Length,steps=benchSteps,ignoreEos=true,temperature=0,model.MemoryStatistics,results}));return;
+        }
         if(args[0]=="--gemma-lifecycle")
         {
             const string system="Answer briefly.",user="日本の首都はどこですか？";
@@ -54,7 +93,16 @@ internal static class Gemma4Validation
             if(i+1<steps)Forward(i<teacher.Length?teacher[i]:tokens[^1],prompt.Length+i,true);
             Console.Error.WriteLine($"decode {i+1}/{steps}");
         }
-        var result=new{tokens,text=model.Tokenizer.Decode(tokens),elapsedMilliseconds=timer.ElapsedMilliseconds,promptLength=prompt.Length,steps};
+        var result=new{tokens,text=model.Tokenizer.Decode(tokens),elapsedMilliseconds=timer.ElapsedMilliseconds,promptLength=prompt.Length,steps,model.MemoryStatistics};
         File.WriteAllText(Path.Combine(destination,"result.json"),JsonSerializer.Serialize(result));Console.WriteLine(JsonSerializer.Serialize(result));
+    }
+    // Validation only: touch every page of this model's existing map, rather than measuring
+    // only the small PLE rows referenced by a short prompt. Does not create another mapping.
+    private static unsafe void PrefaultMappedWeights(Gemma4E2BCpuModel model)
+    {
+        var field=typeof(Gemma4E2BCpuModel).GetField("file",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!;
+        var file=(GgufWeights)field.GetValue(model)!;long checksum=0;
+        for(long offset=0;offset<file.Length;offset+=4096)checksum+=*file.BytesAt(offset,1);
+        Console.Error.WriteLine($"Prefaulted {file.Length} mapped bytes; checksum={checksum}");
     }
 }

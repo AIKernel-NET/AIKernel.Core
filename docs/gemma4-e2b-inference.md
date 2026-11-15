@@ -1,8 +1,10 @@
-# Gemma 4 E2BのCPUテキスト生成
+# Gemma 4 E2BのCPU／GPUテキスト生成
 
 `Gemma4E2BCpuModel` はGemma 4 E2Bの専用tokenizer、対話テンプレート、生成グラフを
-AIKernel内で実行します。CUDA・LibTorch・Pythonのインストールは実行時に不要です。
-現段階はFP32のCPU参照経路です。応答速度の最適化やGPUオフロードは未実装です。
+AIKernel内で実行します。CPUではAVX2 SIMDを使用し、非対応CPUでは参照経路へ戻ります。
+CPU実行にはCUDA・LibTorch・Pythonは不要です。GPUは明示的に選択でき、NVIDIAドライバーと
+AIKernelのネイティブDLLを使います。CUDA Toolkit・LibTorchは実行時に必要ありません。
+どちらもFP32の活性化を維持し、追加のINT8量子化は行いません。
 
 ## 使用例
 
@@ -18,6 +20,61 @@ var result = await model.GenerateAsync(
     maxNewTokens: 64, cancellationToken: timeout.Token);
 Console.WriteLine(result.Text);
 ```
+
+GPUの行列演算を使う場合は次のように指定します。従来のクラス名を維持しており、
+選択結果は `Backend`、GPUに置いた重みのバイト数は `GpuWeightBytes` で確認できます。
+
+```csharp
+using var model = new Gemma4E2BCpuModel(
+    "gemma-4-E2B_q4_0-it.gguf", 4, 1024, 4L << 30,
+    new Gemma4ExecutionOptions {
+        Backend = Gemma4Backend.Cuda,
+        CudaDeviceOrdinal = 0,
+        MaximumGpuWeightBytes = 2L << 30
+    });
+```
+
+`Auto` はCPU上でAVX2の可否を判定します。CPUとGPUの速度を自動計測して選ぶ機能ではありません。
+比較用の `Reference` は改修前のスカラー計算を保ちます。CUDA指定時の未対応形式、VRAM不足、
+ドライバーエラーは呼び出し元へ返し、CPUへ黙って切り替えません。
+
+GPU経路はF16／Q4_0／Q6_Kの行列を符号化されたまま保持します。巨大なPLEトークン検索表は
+CPU上のマップに残し、FP32重みの全展開コピーを作りません。4行／128スレッドで各行を1warpが
+協調して計算します。Attention、RoPE、GELU、共有KVはCPU側です。行列ごとの同期は残っており、
+forward全体のGPU常駐化やバッチPrefillは今後の最適化項目です。
+このPTX経路はCompute Capability 7.5以上を対象にしています。
+
+## Serverの7GB枠とSSDバックエンド
+
+Serverでは次のようにCPU用のメモリ予算を指定します。単位は十進バイトです。
+
+```csharp
+using var model = new Gemma4E2BCpuModel(path, 6, 2048, 4L << 30,
+    new Gemma4ExecutionOptions {
+        Memory = new Gemma4MemoryOptions {
+            MaximumResidentBytes = 7_000_000_000,
+            WeightCacheBytes = 5_000_000_000,
+            RuntimeReserveBytes = 1_000_000_000,
+            SwapDirectory = privateSwapDirectory
+        }
+    });
+```
+
+このモードは無制限のGGUFマップを解放し、すべての重みアクセスをAIKernelの
+`VirtualMemorySpace` に接続します。行をまたがない4MiBページを上限付きのRAMキャッシュへ
+読み込み、入り切らないページはSSD上のGGUFをbackingとして再取得します。重みは不変なので、
+同じデータを別のswapファイルへ重複して書きません。これはOSのmmap任せのページングとは別の経路です。
+OSのファイルキャッシュは利用されるため、backing読み込み回数は物理SSDのI/O回数と同一ではありません。
+
+KV・活性化・tokenizer・ランタイム用の余裕を残し、ページ境界とforward開始時にRSSを確認します。
+圧力が高ければRAMキャッシュを退避し、予備バッファも解放します。退避できないメモリだけで
+余裕を確保できない場合は例外で停止します。`RuntimeReserveBytes` は予算上の余裕であり、
+OSへのメモリ予約ではありません。この制御はcgroupのようなOS強制上限ではないため、
+Server試験では外側にもRSS監視を置きます。CPU用ページングとGPU常駐重みの同時指定は未対応です。
+
+`MemoryStatistics` からRAMページ数と `BackingReads` を確認できます。
+32MiBのキャッシュで同じモデルを生成し、退避・再読み込み後も公式参照との数値契約を維持する
+試験を用意しています。生成時のKVなどの利用者データはRAMで消去し、今回の重みページングには含めません。
 
 検証に使用した配布物は
 [GoogleのGemma 4 E2B QAT Q4_0 GGUF](https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/tree/675cff42a74c774d6cb76f76d8eacb49b48c9b93) です。
@@ -55,9 +112,11 @@ KV、ロジット、Attentionスコア、PLEと中間活性化はリクエスト
 現段階では利用者のprefixをキャッシュしません。
 公開APIはモデルごとに生成を直列化します。`Dispose` は実行中の生成の完了を待ちます。
 
-マップされたファイルのサイズはRSSの保証ではありません。Server上の7GB制限、
-長時間負荷、Linux・AVX-only実機でのGemma生成はまだ検証していません。
-この参照経路をBonsaiの性能グラフへ混在させないでください。
+マップされたファイルのサイズはRSSの保証ではありません。CPU／GPUの応答時間と
+Serverの7GB枠の検証は[最適化の検証記録](development/gemma4-optimization-20261115-jp.md)で
+条件を区別して記録します。Bonsaiとはモデル・入力・量子化形式が異なるため、速度を直接比較しません。
+GPU経路ではリクエストの終了時に転送用のホスト／デバイスscratchも消去します。
+消去に失敗した場合は例外を返します。CUDAコンテキストの破棄だけを「消去の成功」とは扱いません。
 
 ## 数値検証
 

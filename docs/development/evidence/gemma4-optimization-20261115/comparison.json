@@ -1,0 +1,205 @@
+{
+  "model": "Gemma 4 E2B QAT Q4_0",
+  "modelSha256": "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",
+  "method": "23 prompt tokens + 128 fixed greedy output tokens (127 decode forwards), one unmeasured forward, three independent processes, median; profile off; model loading, workspace allocation/cleanup and HTTP excluded.",
+  "note": "CUDA is newly implemented; its comparison baseline is CPU reference, not a previous CUDA implementation. Development and Server differ in hardware and worker count.",
+  "rows": [
+    {
+      "name": "Development CPU · reference",
+      "seconds": 399.42987569999997,
+      "minSeconds": 362.5909588,
+      "maxSeconds": 400.8552299,
+      "prefillSeconds": 42.9477934,
+      "decodeMsPerToken": 2755.765656692913,
+      "hashes": [
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e"
+      ],
+      "threads": 4,
+      "color": "#94a3b8",
+      "percentOfDevelopmentReference": 100.0
+    },
+    {
+      "name": "Development CPU · SIMD",
+      "seconds": 124.7907257,
+      "minSeconds": 117.09842119999999,
+      "maxSeconds": 147.1358714,
+      "prefillSeconds": 5.1275768,
+      "decodeMsPerToken": 940.3447716535433,
+      "hashes": [
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e"
+      ],
+      "threads": 4,
+      "color": "#10b981",
+      "percentOfDevelopmentReference": 31.242211284597712
+    },
+    {
+      "name": "RTX 4000 SFF Ada · CUDA",
+      "seconds": 10.499689700000001,
+      "minSeconds": 10.3295233,
+      "maxSeconds": 10.9221379,
+      "prefillSeconds": 1.1469132,
+      "decodeMsPerToken": 73.48108740157481,
+      "hashes": [
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e"
+      ],
+      "threads": 4,
+      "color": "#f59e0b",
+      "percentOfDevelopmentReference": 2.6286690953197525
+    },
+    {
+      "name": "T1000 · CUDA",
+      "seconds": 13.1030995,
+      "minSeconds": 12.6436872,
+      "maxSeconds": 13.4088853,
+      "prefillSeconds": 1.492478,
+      "decodeMsPerToken": 91.42221653543308,
+      "hashes": [
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e"
+      ],
+      "threads": 4,
+      "color": "#fbbf24",
+      "percentOfDevelopmentReference": 3.280450536414395
+    },
+    {
+      "name": "Server CPU · reference",
+      "seconds": 240.84829749999997,
+      "minSeconds": 230.0766337,
+      "maxSeconds": 253.44073989999998,
+      "prefillSeconds": 28.222884999999998,
+      "decodeMsPerToken": 1674.2158464566928,
+      "hashes": [
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e"
+      ],
+      "threads": 6,
+      "color": "#94a3b8",
+      "percentOfDevelopmentReference": 60.298017787956866
+    },
+    {
+      "name": "Server CPU · SIMD + SSD backing",
+      "seconds": 53.6360706,
+      "minSeconds": 52.7915534,
+      "maxSeconds": 55.5418893,
+      "prefillSeconds": 3.3331655000000002,
+      "decodeMsPerToken": 395.3201826771653,
+      "hashes": [
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+        "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e"
+      ],
+      "threads": 6,
+      "color": "#3b82f6",
+      "percentOfDevelopmentReference": 13.42815694644846
+    }
+  ],
+  "memory": [
+    {
+      "test": "paged-context-2048",
+      "peakBytes": 2530553856,
+      "promptTokens": 1920,
+      "outputTokens": 128,
+      "statistics": {
+        "RamBlocks": 538,
+        "VramBlocks": 0,
+        "SwapBlocks": 0,
+        "SwapReads": 0,
+        "DevicePageIns": 0,
+        "BackingReads": 538
+      }
+    },
+    {
+      "test": "paged-all-ple-pages",
+      "peakBytes": 4409446400,
+      "promptTokens": 483,
+      "outputTokens": 128,
+      "statistics": {
+        "RamBlocks": 986,
+        "VramBlocks": 0,
+        "SwapBlocks": 0,
+        "SwapReads": 0,
+        "DevicePageIns": 0,
+        "BackingReads": 986
+      }
+    }
+  ],
+  "cpuReductionPercent": 68.75778871540228,
+  "serverReductionPercent": 77.73035094840145,
+  "allBenchmarkTokensEqual": true,
+  "numerical": [
+    {
+      "path": "cpu-numeric",
+      "comparisons": 228,
+      "maximumAbsoluteError": 0.0008544921875,
+      "maximumLogitError": 9.965896606445312e-05,
+      "maximumRmsError": 6.711182436613651e-05,
+      "tokensEqual": true
+    },
+    {
+      "path": "gpu-numeric",
+      "comparisons": 228,
+      "maximumAbsoluteError": 0.0008544921875,
+      "maximumLogitError": 7.319450378417969e-05,
+      "maximumRmsError": 3.8607370207230944e-05,
+      "tokensEqual": true
+    },
+    {
+      "path": "t1000-numeric",
+      "comparisons": 228,
+      "maximumAbsoluteError": 0.0008544921875,
+      "maximumLogitError": 7.319450378417969e-05,
+      "maximumRmsError": 3.8607370207230944e-05,
+      "tokensEqual": true
+    },
+    {
+      "path": "paged-numeric",
+      "comparisons": 228,
+      "maximumAbsoluteError": 0.0008544921875,
+      "maximumLogitError": 9.965896606445312e-05,
+      "maximumRmsError": 6.711182436613651e-05,
+      "tokensEqual": true
+    },
+    {
+      "path": "server-numeric",
+      "comparisons": 228,
+      "maximumAbsoluteError": 0.0008544921875,
+      "maximumLogitError": 7.772445678710938e-05,
+      "maximumRmsError": 4.783913817688776e-05,
+      "tokensEqual": true
+    },
+    {
+      "path": "server-paged-numeric",
+      "comparisons": 228,
+      "maximumAbsoluteError": 0.0008544921875,
+      "maximumLogitError": 7.772445678710938e-05,
+      "maximumRmsError": 4.783913817688776e-05,
+      "tokensEqual": true
+    }
+  ],
+  "unitTests": {
+    "total": 877,
+    "executed": 877,
+    "passed": 877,
+    "failed": 0,
+    "error": 0,
+    "timeout": 0,
+    "aborted": 0,
+    "inconclusive": 0,
+    "passedButRunAborted": 0,
+    "notRunnable": 0,
+    "notExecuted": 0,
+    "disconnected": 0,
+    "warning": 0,
+    "completed": 0,
+    "inProgress": 0,
+    "pending": 0
+  }
+}

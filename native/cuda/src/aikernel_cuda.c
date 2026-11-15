@@ -4,6 +4,7 @@
 #include "embedded_ptx.h"
 #include "q1_dp4a.h"
 #include "q1_mma.h"
+#include "gemma_gemv.h"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -28,6 +29,7 @@ struct ak_context {
     void *stream;
     void *gemv;
     void *gemv_q1;
+    void *gemma_gemv;
     void *gemv_q8[2];
     uint32_t int8_capabilities;
     void *normalize;
@@ -462,6 +464,43 @@ int32_t ak_gemv_q1_0(ak_context *ctx, uint64_t weights, const float *x, float *y
         (size_t)rows > SIZE_MAX / 18 / (cols / 128)) return AK_INVALID;
     if (!within(&ctx->device_blocks, weights, (size_t)rows * (cols / 128) * 18)) return AK_INVALID;
     return device_gemv(ctx, ctx->gemv_q1, weights, x, y, rows, cols);
+}
+
+int32_t ak_gemv_gemma(ak_context *ctx, uint64_t weights, const float *x, float *y,
+                       uint32_t rows, uint32_t cols, uint32_t type) {
+    if (!ctx || !weights || weights % 2 || !x || !y || !rows || !cols) return AK_INVALID;
+    size_t stride;
+    if (type == 2 && cols % 32 == 0) stride = (size_t)cols / 32 * 18;
+    else if (type == 14 && cols % 256 == 0) stride = (size_t)cols / 256 * 210;
+    else if (type == 1 && cols % 32 == 0) stride = (size_t)cols * 2;
+    else return AK_INVALID;
+    if (rows > SIZE_MAX / stride || !within(&ctx->device_blocks, weights, (size_t)rows * stride)) return AK_INVALID;
+    int status = enter(ctx);
+    if (status) return status;
+    if (!ctx->gemma_gemv) {
+        void *module = NULL;
+        int code = ctx->driver.module_load(&module, ak_gemma_gemv_ptx);
+        if (!code) code = ctx->driver.module_func(&ctx->gemma_gemv, module, "gemma_gemv");
+        status = ak_status(code);
+    }
+    size_t x_bytes = (size_t)cols * sizeof(float), y_bytes = (size_t)rows * sizeof(float);
+    if (!status) status = scratch(ctx, x_bytes + y_bytes);
+    if (!status) {
+        uint64_t dx = ctx->scratch_device, dy = dx + x_bytes;
+        void *args[] = { &weights, &dx, &dy, &cols, &rows, &type };
+        char *host_y = (char *)ctx->scratch_host + x_bytes;
+        memcpy(ctx->scratch_host, x, x_bytes);
+        int code = profile_mark(ctx, 0, 0);
+        if (!code) code = ctx->driver.htod(dx, ctx->scratch_host, x_bytes, ctx->stream);
+        code = profile_mark(ctx, 1, code);
+        if (!code) code = ctx->driver.launch(ctx->gemma_gemv, rows / 4 + (rows % 4 != 0), 1, 1, 128, 1, 1, 0, ctx->stream, args, NULL);
+        code = profile_mark(ctx, 2, code);
+        if (!code) code = ctx->driver.dtoh(host_y, dy, y_bytes, ctx->stream);
+        code = profile_mark(ctx, 3, code);
+        status = profile_finish(ctx, code, x_bytes, y_bytes);
+        if (!status) memcpy(y, host_y, y_bytes);
+    }
+    return leave(ctx, status);
 }
 
 int32_t ak_get_int8_capabilities(ak_context *ctx, uint32_t *flags) {

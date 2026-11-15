@@ -416,6 +416,19 @@ public sealed partial class VirtualMemorySpace : IDisposable
         }
     }
 
+    /// <summary>Evicts least-recently-used RAM pages across this arena's forks and releases spare buffers.
+    /// Clean immutable pages return to their source; dirty pages use the configured swap policy.</summary>
+    public void TrimRam(int maximumBlocks)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(maximumBlocks);
+        lock(gate)
+        {
+            ObjectDisposedException.ThrowIf(disposed,this);
+            while(ram.Count>maximumBlocks)MoveToSwap(ram.First!.Value);
+            while(freeRam.TryPop(out var owner))owner.Dispose();
+        }
+    }
+
     /// <summary>Releases all resident blocks and deletes the swap file.</summary>
     public void Dispose()
     {

@@ -60,6 +60,9 @@ AK_EXPORT int32_t ak_download(ak_context *ctx, uint64_t address, void *destinati
 AK_EXPORT int32_t ak_gemv(ak_context *ctx, uint64_t weights, const float *x, float *y, uint32_t rows, uint32_t cols);
 /* Device-only GGUF Q1_0 g128 GEMV. Weights stay encoded; cols must be a multiple of 128. */
 AK_EXPORT int32_t ak_gemv_q1_0(ak_context *ctx, uint64_t weights, const float *x, float *y, uint32_t rows, uint32_t cols);
+/* Encoded Gemma F16/Q4_0/Q6_K, FP32 activations, no activation quantization. */
+AK_EXPORT int32_t ak_gemv_gemma(ak_context *ctx, uint64_t weights, const float *x, float *y,
+    uint32_t rows, uint32_t cols, uint32_t type);
 /* Capability bits 1=DP4A, 2=SM80 integer MMA. Calls on one context are serialized. */
 AK_EXPORT int32_t ak_get_int8_capabilities(ak_context *ctx, uint32_t *flags);
 AK_EXPORT int32_t ak_gemv_q1_q8(ak_context *ctx, uint64_t weights, const int8_t *x,

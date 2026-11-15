@@ -1,0 +1,19 @@
+{
+  "pass": true,
+  "results": [
+    {
+      "model": "1.7",
+      "elements": 910014,
+      "bitwiseEqual": true,
+      "tokensEqual": true,
+      "sha256": "e6c71a25ef26849ca34cc2ba28950dd2154e4d53f771723f4059c4af039a407e"
+    },
+    {
+      "model": "4",
+      "elements": 910014,
+      "bitwiseEqual": true,
+      "tokensEqual": true,
+      "sha256": "4f4f10ba66479df383190cb06b6c983ebb95c2bf27dfb9d88c1761871dc4eb5d"
+    }
+  ]
+}

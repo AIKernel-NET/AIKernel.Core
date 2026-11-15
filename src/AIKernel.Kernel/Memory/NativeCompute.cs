@@ -34,6 +34,8 @@ internal static unsafe partial class NativeCompute
     internal static partial int Gemv(nint context, ulong address, float* input, float* output, uint rows, uint columns);
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_gemv_q1_0")]
     internal static partial int GemvQ1(nint context, ulong address, float* input, float* output, uint rows, uint columns);
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_gemv_gemma")]
+    internal static partial int GemvGemma(nint context,ulong address,float* input,float* output,uint rows,uint columns,uint type);
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_get_int8_capabilities")]
     internal static partial int GetInt8Capabilities(nint context,out uint flags);
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_gemv_q1_q8")]

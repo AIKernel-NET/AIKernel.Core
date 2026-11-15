@@ -4,8 +4,9 @@ using System.Runtime.InteropServices;
 
 namespace AIKernel.Kernel.Inference;
 
-/// <summary>Text-only Gemma 4 E2B, mapped GGUF weights, FP32 CPU reference computation and private shared-KV state.
-/// No Torch/CUDA dependency. Other Gemma sizes and multimodal inputs are not supported.</summary>
+/// <summary>Text-only Gemma 4 E2B, mapped GGUF weights, FP32 activations and private shared-KV state.
+/// CPU SIMD with portable reference fallback; optional CUDA Driver linear-layer offload.
+/// Other Gemma sizes and multimodal inputs are not supported.</summary>
 public sealed class Gemma4E2BCpuModel : IDisposable
 {
     private const int Width=1536,LayerCount=35,Heads=8,PleWidth=256,Vocabulary=262144,Owners=15,Window=512;
@@ -17,6 +18,15 @@ public sealed class Gemma4E2BCpuModel : IDisposable
     private readonly float[] finalNorm,pleNorm,fullFrequencies,localFrequencies;
     private readonly Layer[] layers=new Layer[LayerCount];
     private readonly int context,threads;
+    private readonly Gemma4ExecutionOptions execution;
+    private readonly Gemma4CudaMatrix? cuda;
+    private readonly Gemma4PagedWeights? paged;
+    /// <summary>Selected execution path; CUDA currently offloads linear layers, with attention on CPU.</summary>
+    public string Backend=>cuda is not null?"gemma4-cuda-fp32":execution.Backend!=Gemma4Backend.Reference&&Gemma4CpuMatrix.Supported?"gemma4-avx2-fp32":"gemma4-reference-fp32";
+    /// <summary>Encoded weights retained on GPU, excluding the CPU PLE lookup table.</summary>
+    public long GpuWeightBytes=>cuda?.WeightBytes??0;
+    /// <summary>Current RAM residency and disk-source page-ins when explicit paging is enabled.</summary>
+    public AIKernel.Kernel.Memory.VirtualMemoryStatistics? MemoryStatistics=>paged?.Statistics;
     private readonly SemaphoreSlim gate=new(1,1);
     private bool disposed;
     private sealed record Layer(int HeadSize,int Hidden,int Owner,GgufWeights.Tensor Q,GgufWeights.Tensor? K,GgufWeights.Tensor? V,
@@ -26,7 +36,15 @@ public sealed class Gemma4E2BCpuModel : IDisposable
 
     /// <summary>Loads the E2B text graph. Defaults bound concurrency and context; mapped bytes are not an RSS guarantee.</summary>
     public Gemma4E2BCpuModel(string modelPath,int cpuThreads=4,int contextTokens=1024,long maximumWeightBytes=4L*1024*1024*1024)
+        :this(modelPath,cpuThreads,contextTokens,maximumWeightBytes,new Gemma4ExecutionOptions()){}
+
+    /// <summary>Chooses reference, SIMD CPU or CUDA linear layers without changing activation precision.</summary>
+    public Gemma4E2BCpuModel(string modelPath,int cpuThreads,int contextTokens,long maximumWeightBytes,Gemma4ExecutionOptions execution)
     {
+        ArgumentNullException.ThrowIfNull(execution);
+        if(!Enum.IsDefined(execution.Backend)||execution.CudaDeviceOrdinal<0)throw new ArgumentOutOfRangeException(nameof(execution));
+        if(execution.Memory is not null&&execution.Backend==Gemma4Backend.Cuda)throw new NotSupportedException("CPU paging and CUDA resident weights use separate budgets; select one execution mode.");
+        this.execution=execution;
         if(cpuThreads is <1 or >6)throw new ArgumentOutOfRangeException(nameof(cpuThreads));
         if(contextTokens is <64 or >2048)throw new ArgumentOutOfRangeException(nameof(contextTokens));
         if(maximumWeightBytes<1)throw new ArgumentOutOfRangeException(nameof(maximumWeightBytes));
@@ -57,6 +75,15 @@ public sealed class Gemma4E2BCpuModel : IDisposable
                     Vector(p+"attn_norm.weight",Width),Vector(p+"attn_q_norm.weight",head),own?Vector(p+"attn_k_norm.weight",head):null,
                     Vector(p+"post_attention_norm.weight",Width),Vector(p+"ffn_norm.weight",Width),Vector(p+"post_ffw_norm.weight",Width),
                     Vector(p+"post_norm.weight",Width),Vector(p+"layer_output_scale.weight",1)[0]);
+            }
+            if(execution.Backend==Gemma4Backend.Cuda)
+                cuda=new(file,layers.SelectMany(l=>new[]{l.Q,l.K,l.V,l.O,l.Gate,l.Up,l.Down,l.PleGate,l.PleOutput}).OfType<GgufWeights.Tensor>().Append(embedding).Append(pleProjection),execution.CudaDeviceOrdinal,execution.MaximumGpuWeightBytes);
+            if(execution.Memory is not null)
+            {
+                paged=new(modelPath,layers.SelectMany(l=>new[]{l.Q,l.K,l.V,l.O,l.Gate,l.Up,l.Down,l.PleGate,l.PleOutput}).OfType<GgufWeights.Tensor>().Append(embedding).Append(pleProjection).Append(pleEmbedding),execution.Memory);
+                // Metadata and small norm vectors are already decoded. Release the unrestricted mapping;
+                // every subsequent weight access uses the bounded AIKernel virtual-memory arena.
+                file.Dispose();
             }
         }
         catch{file.Dispose();throw;}
@@ -130,7 +157,7 @@ public sealed class Gemma4E2BCpuModel : IDisposable
             }
             string text=chat.DecodeReply(tokens);
             if(string.IsNullOrWhiteSpace(text))throw new InvalidDataException("Gemma did not produce a visible text reply.");
-            return new CpuGeneration(text,prompt.Count,tokens.Count,finish,watch.ElapsedMilliseconds,"gemma4-reference-fp32")
+            return new CpuGeneration(text,prompt.Count,tokens.Count,finish,watch.ElapsedMilliseconds,Backend)
             {PrefillForwardTokens=prompt.Count,DecodeForwardTokens=Math.Max(0,tokens.Count-(finish=="stop"?0:1)),PrefillThreads=threads,DecodeThreads=threads,
                 PrefillMilliseconds=prefillMilliseconds,DecodeMilliseconds=watch.Elapsed.TotalMilliseconds-prefillMilliseconds};
         }
@@ -140,15 +167,26 @@ public sealed class Gemma4E2BCpuModel : IDisposable
     {
         int best=0;for(int i=0;i<logits.Length;i++){if(!float.IsFinite(logits[i]))throw new ArithmeticException("Non-finite Gemma logits.");if(logits[i]>logits[best])best=i;}return best;
     }
-    internal State CreateState(CancellationToken ct)=>new(context,threads,ct);
+    internal State CreateState(CancellationToken ct)=>new(context,threads,ct){Cleanup=cuda is null?null:cuda.ZeroScratch,Profile=execution.ProfileMatrices};
     internal void Forward(int token,int position,State s,bool computeLogits,Action<int,string,float[]>? trace=null)
     {
         ObjectDisposedException.ThrowIf(disposed,this);s.Options.CancellationToken.ThrowIfCancellationRequested();
         if((uint)token>=Vocabulary||position!=s.Position||position>=context)throw new ArgumentOutOfRangeException(nameof(position));
-        void Mm(GgufWeights.Tensor tensor,float[] x,float[] y)=>ReferenceCpuMatrix.Multiply(file,tensor,x,y,s.Options);
+        paged?.CheckBudget();
+        void Mm(GgufWeights.Tensor tensor,float[] x,float[] y)
+        {
+            long start=s.Profile?Stopwatch.GetTimestamp():0;
+            if(cuda is not null)cuda.Multiply(tensor,x,y,s.Options.CancellationToken);
+            else if(paged is not null)paged.Multiply(tensor,x,y,s.Options,execution.Backend==Gemma4Backend.Reference);
+            else if(execution.Backend==Gemma4Backend.Reference)ReferenceCpuMatrix.Multiply(file,tensor,x,y,s.Options);
+            else Gemma4CpuMatrix.Multiply(file,tensor,x,y,s.Options);
+            if(s.Profile){s.MatrixTicks+=Stopwatch.GetTimestamp()-start;s.MatrixCalls++;}
+        }
         void Trace(int layer,string stage,float[] data)=>trace?.Invoke(layer,stage,data);
-        QuantizedCpuMatrix.Row(file,embedding,token,s.X);Scale(s.X,MathF.Sqrt(Width));Trace(-1,"embedding",s.X);
-        QuantizedCpuMatrix.Row(file,pleEmbedding,token,s.Ple);Scale(s.Ple,MathF.Sqrt(PleWidth));
+        if(paged is not null)paged.ReadRow(embedding,token,s.X);else QuantizedCpuMatrix.Row(file,embedding,token,s.X);
+        Scale(s.X,MathF.Sqrt(Width));Trace(-1,"embedding",s.X);
+        if(paged is not null)paged.ReadRow(pleEmbedding,token,s.Ple);else QuantizedCpuMatrix.Row(file,pleEmbedding,token,s.Ple);
+        Scale(s.Ple,MathF.Sqrt(PleWidth));
         Mm(pleProjection,s.X,s.ProjectedPle);Scale(s.ProjectedPle,1f/MathF.Sqrt(Width));
         for(int layer=0;layer<LayerCount;layer++)Norm(s.ProjectedPle.AsSpan(layer*PleWidth,PleWidth),s.ProjectedPle.AsSpan(layer*PleWidth,PleWidth),pleNorm);
         for(int i=0;i<s.Ple.Length;i++)s.Ple[i]=(s.ProjectedPle[i]+s.Ple[i])*(float)Math.Pow(2,-.5);
@@ -216,6 +254,9 @@ public sealed class Gemma4E2BCpuModel : IDisposable
         internal readonly Gemma4KvCache[] Caches;
         internal readonly ParallelOptions Options;
         internal int Position;
+        internal Action? Cleanup;
+        internal bool Profile;
+        internal long MatrixTicks,MatrixCalls;
         internal State(int context,int threads,CancellationToken ct)
         {
             Scores=new float[context];Options=new(){MaxDegreeOfParallelism=threads,CancellationToken=ct};
@@ -226,8 +267,9 @@ public sealed class Gemma4E2BCpuModel : IDisposable
             foreach(var cache in Caches)cache.Dispose();
             foreach(var array in new[]{X,Normal,Temp,Query,Key,Value,Attention,Gate,Up,Ple,ProjectedPle,PleGate,Logits,Scores,LocalCos,LocalSin,FullCos,FullSin})Array.Clear(array);
             Position=0;
+            var cleanup=Cleanup;Cleanup=null;cleanup?.Invoke();
         }
     }
     /// <summary>Waits for active generation to finish, then releases the mapped model.</summary>
-    public void Dispose(){gate.Wait();try{if(disposed)return;disposed=true;file.Dispose();}finally{gate.Release();}}
+    public void Dispose(){gate.Wait();try{if(disposed)return;disposed=true;try{cuda?.Dispose();paged?.Dispose();}finally{file.Dispose();}}finally{gate.Release();}}
 }

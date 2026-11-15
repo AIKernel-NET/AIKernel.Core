@@ -30,6 +30,7 @@ public sealed class Qwen3CpuModel : IDisposable
     private PrefixState? prefixCache;
     private Qwen3Workspace? workspace;
     private bool cleanupFailed;
+    private bool integerWarmupComplete;
     private sealed record PrefixState(string System,int Count,float[][] Keys,float[][] Values);
     private sealed record Layer(GgufWeights.Tensor Q,GgufWeights.Tensor K,GgufWeights.Tensor V,GgufWeights.Tensor O,
         GgufWeights.Tensor Gate,GgufWeights.Tensor Up,GgufWeights.Tensor Down,float[] Norm,float[] FfnNorm,float[] QNorm,float[] KNorm);
@@ -185,7 +186,7 @@ public sealed class Qwen3CpuModel : IDisposable
         try
         {
             await Task.Run(()=>WithCleanup(()=>{
-                if(prefixCache?.System==system)return 0;
+                if(prefixCache?.System==system&&(gpu is not CudaQuantizedMatrix {UsesInt8:true}||integerWarmupComplete))return 0;
                 var prefix=tokenizer.Prefix(system);
                 if(prefix.Count>=context)throw new ArgumentException("System prefix exceeds the context limit.");
                 using var state=AcquireWorkspace(cancellationToken);state.Options.MaxDegreeOfParallelism=prefillThreads;
@@ -195,6 +196,7 @@ public sealed class Qwen3CpuModel : IDisposable
                 {
                     Multiply(output,state.Normal,state.Logits,state.Options,prefillBackend);
                     Multiply(output with {Rows=1},state.Normal,state.Logits,state.Options,prefillBackend);
+                    integerWarmupComplete=true;
                 }
                 ReplacePrefix(new(system,prefix.Count,state.Keys.Select(k=>k.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray(),
                     state.Values.Select(v=>v.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray()));
@@ -274,7 +276,7 @@ public sealed class Qwen3CpuModel : IDisposable
             int next;
             if(choices is not null)
             {
-                float best=float.NegativeInfinity;next=choices[0];var score=new float[1];
+                float best=float.NegativeInfinity;next=choices[0];var score=state.Logits;
                 foreach(int id in choices)
                 {
                     var row=output with {Offset=output.Offset+(long)id*output.RowBytes,Rows=1};

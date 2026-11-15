@@ -344,3 +344,10 @@ The WebSite repository's November 15 article keeps the original prototype
 snapshot and publishes the new comparison separately, including raw logs,
 excluded data, binary hashes and chart regeneration scripts. The internal
 optimization validation executable is explicitly non-packable.
+
+## Planned model expansion
+
+[Gemma 4 and GPT-OSS implementation plan (Japanese)](development/model-expansion-gemma4-gptoss-jp.md)
+records the current loader/runtime limits, verified model-specific requirements,
+implementation order and acceptance gates. These models are not yet supported;
+0.1.4's verified Qwen3/Q1_0 path remains the compatibility baseline.

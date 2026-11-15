@@ -50,7 +50,7 @@ public sealed class Qwen3VulkanModel : IDisposable
     }
     private VulkanGeneration Convert(CpuGeneration r)=>new(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.ElapsedMilliseconds,
         r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,Device,DeviceWeightBytes)
-        {ActivationPrecision=ActivationPrecision};
+        {ActivationPrecision=ActivationPrecision,GeneratedTokenSha256=r.GeneratedTokenSha256};
     /// <summary>Releases resources after active requests have stopped.</summary>
     public void Dispose()=>engine.Dispose();
 }
@@ -64,4 +64,8 @@ public sealed record VulkanGeneration(string Text,int InputTokens,int OutputToke
     public string Backend=>"vulkan-matrix-offload";
     /// <summary>Input activation representation; Vulkan accumulation remains FP32.</summary>
     public string ActivationPrecision {get;init;}="fp32";
+    /// <summary>Benchmark-only generated token hash; benchmark Text is empty.</summary>
+    public string? GeneratedTokenSha256 {get;init;}
+    /// <summary>Benchmark-only generated token hash; benchmark Text is empty.</summary>
+    public string? GeneratedTokenSha256 {get;init;}
 }

@@ -61,7 +61,7 @@ public sealed class Qwen3GpuModel : IDisposable
     private GpuGeneration Convert(CpuGeneration result)=>new(result.Text,result.InputTokens,result.OutputTokens,
         result.FinishReason,result.ElapsedMilliseconds,result.PrefillMilliseconds,result.DecodeMilliseconds,
         result.PrefillForwardTokens,result.DecodeForwardTokens,result.PrefillThreads,result.DecodeThreads,
-        DeviceOrdinal,DeviceWeightBytes){ActivationPrecision=ActivationPrecision};
+        DeviceOrdinal,DeviceWeightBytes){ActivationPrecision=ActivationPrecision,GeneratedTokenSha256=result.GeneratedTokenSha256};
     /// <summary>Releases model mappings, KV prefix and device context after active requests have stopped.</summary>
     public void Dispose()=>engine.Dispose();
 }
@@ -75,4 +75,8 @@ public sealed record GpuGeneration(string Text,int InputTokens,int OutputTokens,
     public string Backend=>"cuda-matrix-offload";
     /// <summary>Input activation representation; CUDA accumulation remains FP32.</summary>
     public string ActivationPrecision {get;init;}="fp32";
+    /// <summary>Benchmark-only generated token hash; benchmark Text is empty.</summary>
+    public string? GeneratedTokenSha256 {get;init;}
+    /// <summary>Benchmark-only generated token hash; benchmark Text is empty.</summary>
+    public string? GeneratedTokenSha256 {get;init;}
 }

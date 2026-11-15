@@ -27,4 +27,3 @@ for rows in [1,4,5,17,64,65]:
   assert f(c.byref(w,1),len(blob),xp,sp,ip,rows,cols+1,1,yp)==-1
   assert f(c.byref(w,1),len(blob),xp,sp,ip,rows,cols,5,yp)==-1
 print(json.dumps({'passed':True,'nativeSha256':hashlib.sha256(libpath.read_bytes()).hexdigest(),'flags':flags,'exactNativeCases':cases,'unsupportedIsaAndBoundsChecked':True}))
-

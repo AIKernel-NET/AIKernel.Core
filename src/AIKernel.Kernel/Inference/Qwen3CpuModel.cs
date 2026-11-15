@@ -273,8 +273,8 @@ public sealed class Qwen3CpuModel : IDisposable
         double prefillMs=(double)prefillTicks*1000/Stopwatch.Frequency,decodeMs=watch.Elapsed.TotalMilliseconds-prefillMs;
         tuner?.Observe("prefill",prefillBackend+"@"+prefillThreads,prompt.Count,prompt.Count-begin,prefillMs);
         if(choices is null)tuner?.Observe("decode",decodeBackend+"@"+decodeThreads,prompt.Count+generated.Count,generated.Count,decodeMs);
-        return new(tokenizer.DecodeReply(generated),prompt.Count,generated.Count,finish,elapsed,CpuBackend)
-        {PrefillMilliseconds=prefillMs,DecodeMilliseconds=decodeMs,PrefillForwardTokens=prompt.Count-begin,DecodeForwardTokens=decodeForwards,PrefillThreads=prefillThreads,DecodeThreads=decodeThreads};
+        return new(ignoreEos?string.Empty:tokenizer.DecodeReply(generated),prompt.Count,generated.Count,finish,elapsed,CpuBackend)
+        {GeneratedTokenSha256=ignoreEos?Convert.ToHexStringLower(SHA256.HashData(System.Runtime.InteropServices.MemoryMarshal.AsBytes(generated.ToArray().AsSpan()))):null,PrefillMilliseconds=prefillMs,DecodeMilliseconds=decodeMs,PrefillForwardTokens=prompt.Count-begin,DecodeForwardTokens=decodeForwards,PrefillThreads=prefillThreads,DecodeThreads=decodeThreads};
     }
     internal long DeviceWeightBytes=>gpu?.WeightBytes??0;
     internal string? DevicePciBusId=>gpu?.PciBusId;
@@ -359,6 +359,10 @@ public sealed class Qwen3CpuModel : IDisposable
 /// <summary>Measured result of a completed CPU generation.</summary>
 public sealed record CpuGeneration(string Text,int InputTokens,int OutputTokens,string FinishReason,long ElapsedMilliseconds,string CpuBackend)
 {
+    /// <summary>Benchmark-only SHA-256 of little-endian Int32 generated token IDs, including EOS. Text is empty in benchmark mode.</summary>
+    public string? GeneratedTokenSha256 {get;init;}
+    /// <summary>Benchmark-only SHA-256 of little-endian Int32 generated token IDs, including EOS. Text is empty in benchmark mode.</summary>
+    public string? GeneratedTokenSha256 {get;init;}
     /// <summary>Prompt forward passes excluding already cached system-prefix work.</summary>
     public double PrefillMilliseconds {get;init;}
     /// <summary>Output projections and generated-token forward passes.</summary>

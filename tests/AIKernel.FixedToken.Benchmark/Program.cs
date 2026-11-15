@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.Json;
 
 void Log(object value){Console.WriteLine(JsonSerializer.Serialize(value));Console.Out.Flush();}
-string Hash(string text)=>Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text)));
 string FileHash(string path)=>Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(path)));
 if(args is ["--list-instruction-sets"]){Log(new{instructionSets=CpuInstructionSets.Available});return;}
 if(args.Length<2)throw new ArgumentException("Usage: <cpu|cuda|vulkan> model.gguf [--instruction-set auto|avx|avx2|avx512|q8-auto|...] [--workers 4] [--tokens 128] [--device 0] [--precision fp32|q8]");
@@ -48,38 +47,39 @@ else if(mode=="cuda")
     using var model=new Qwen3GpuModel(args[1],device,workers,1024,1024L*1024*1024,precision=="q8");
     await model.WarmupAsync(system,timeout.Token);
     Log(new{kind="setup",setupMs=setup.Elapsed.TotalMilliseconds,model.DevicePciBusId,model.DeviceWeightBytes,model.ActivationPrecision});
-    await Measure(async()=>{var r=await model.GenerateBenchmarkAsync(system,inquiry,tokens,timeout.Token);return new Row(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads);});
+    await Measure(async()=>{var r=await model.GenerateBenchmarkAsync(system,inquiry,tokens,timeout.Token);return new Row(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,r.GeneratedTokenSha256);});
 }
 else
 {
     using var model=new Qwen3VulkanModel(args[1],device,workers,1024,1024L*1024*1024,precision=="q8");
     await model.WarmupAsync(system,timeout.Token);
     Log(new{kind="setup",setupMs=setup.Elapsed.TotalMilliseconds,model.Device,model.DeviceWeightBytes,model.ActivationPrecision});
-    await Measure(async()=>{var r=await model.GenerateBenchmarkAsync(system,inquiry,tokens,timeout.Token);return new Row(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads);});
+    await Measure(async()=>{var r=await model.GenerateBenchmarkAsync(system,inquiry,tokens,timeout.Token);return new Row(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,r.GeneratedTokenSha256);});
 }
 Log(new{kind="complete",passed=true});
 
 async Task Measure(Func<Task<Row>> generate)
 {
     var first=await generate();
-    Check(first);Log(new{kind="unmeasured",textSha256=Hash(first.Text),first.OutputTokens,first.FinishReason});
+    Check(first);Log(new{kind="unmeasured",tokenSha256=first.GeneratedTokenSha256,first.OutputTokens,first.FinishReason});
     for(int i=1;i<=5;i++)
     {
         var wall=Stopwatch.StartNew();var result=await generate();wall.Stop();Check(result);
-        if(result.Text!=first.Text||result.OutputTokens!=first.OutputTokens)throw new Exception("Nondeterministic repeated generation.");
+        if(result.GeneratedTokenSha256!=first.GeneratedTokenSha256||result.OutputTokens!=first.OutputTokens)throw new Exception("Nondeterministic repeated generation.");
         using var process=Process.GetCurrentProcess();
-        Log(new{kind="request",iteration=i,wallMs=wall.Elapsed.TotalMilliseconds,result,textSha256=Hash(result.Text),
+        Log(new{kind="request",iteration=i,wallMs=wall.Elapsed.TotalMilliseconds,result,tokenSha256=result.GeneratedTokenSha256,
             decodeMsPerToken=result.DecodeMilliseconds/result.OutputTokens,peakWorkingSetBytes=process.PeakWorkingSet64});
     }
 }
 void Check(Row r)
 {
+    if(r.GeneratedTokenSha256?.Length!=64||r.Text.Length!=0)throw new Exception("Benchmark must return a token hash, not a decoded reply.");
     if(r.OutputTokens!=tokens||r.DecodeForwardTokens!=tokens-1||r.FinishReason!="benchmark-fixed-tokens")throw new Exception("Fixed-token protocol violated.");
     if(r.PrefillThreads!=workers||r.DecodeThreads!=workers)throw new Exception("Worker count changed during ISA comparison.");
 }
 record Row(string Text,int InputTokens,int OutputTokens,string FinishReason,double PrefillMilliseconds,double DecodeMilliseconds,
-    int PrefillForwardTokens,int DecodeForwardTokens,int PrefillThreads,int DecodeThreads)
+    int PrefillForwardTokens,int DecodeForwardTokens,int PrefillThreads,int DecodeThreads,string? GeneratedTokenSha256)
 {
     public static Row From(CpuGeneration r)=>new(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,
-        r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads);
+        r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,r.GeneratedTokenSha256);
 }

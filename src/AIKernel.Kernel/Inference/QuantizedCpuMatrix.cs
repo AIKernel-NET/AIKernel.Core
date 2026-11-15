@@ -28,8 +28,10 @@ internal static unsafe class QuantizedCpuMatrix
     }
     internal static void Row(GgufWeights file,GgufWeights.Tensor t,int row,Span<float> output)
     {
+        if(t.Rank>2||(uint)row>=(uint)t.Rows||output.Length<t.Columns)throw new ArgumentException("Row dimensions mismatch.");
         var p=file.Pointer(t)+(long)row*t.RowBytes;
         if(t.Type==0){new ReadOnlySpan<float>(p,t.Columns).CopyTo(output);return;}
+        if(t.Type!=41){t.Encoding.Decode(new ReadOnlySpan<byte>(p,t.RowBytes),output[..t.Columns]);return;}
         for(int i=0;i<t.Columns;i+=128,p+=18)
         {
             float scale=HalfValues[Unsafe.ReadUnaligned<ushort>(p)];
@@ -38,7 +40,12 @@ internal static unsafe class QuantizedCpuMatrix
     }
     internal static void Multiply(GgufWeights file,GgufWeights.Tensor t,float[] x,float[] y,ParallelOptions options,string backend,InferenceProfiler? profile=null,PreparedQ8Activation? prepared=null,bool preserveArithmetic=false)
     {
-        if(x.Length<t.Columns||y.Length<t.Rows)throw new ArgumentException("Matrix dimensions mismatch.");
+        if(t.Rank>2||x.Length<t.Columns||y.Length<t.Rows)throw new ArgumentException("Matrix dimensions mismatch.");
+        if(t.Type is not (0 or 41))
+        {
+            if(backend.EndsWith("-q8",StringComparison.Ordinal))throw new NotSupportedException("Q8 activation kernels require Q1_0 weights.");
+            ReferenceCpuMatrix.Multiply(file,t,x,y,options);return;
+        }
         if(t.Type==41&&Int8CpuMatrix.IsRoundedFloatBackend(backend))
         {
             options.CancellationToken.ThrowIfCancellationRequested();

@@ -40,6 +40,8 @@ internal sealed unsafe class CudaQuantizedMatrix : IMatrixOffload
 
     internal CudaQuantizedMatrix(GgufWeights file, int ordinal, long maximumWeightBytes,CudaQ8Kernel? int8Kernel=null)
     {
+        if(file.Tensors.Values.Any(t=>t.Rank>2||t.Type is not (0 or 41)))
+            throw new NotSupportedException("CUDA supports only F32/Q1_0 matrices; no implicit format reinterpretation.");
         ArgumentOutOfRangeException.ThrowIfNegative(ordinal);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumWeightBytes);
         if (file.Length > maximumWeightBytes || file.Length > int.MaxValue)

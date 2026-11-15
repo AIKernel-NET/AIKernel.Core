@@ -1,9 +1,49 @@
 # Gemma 4 と GPT-OSS 対応の実装計画
 
 2026-11-15。レビュー対象は `codex/context-free-cuda-pci` の `9362118`。
-現時点で独自エンジンが実行できるのは Qwen3 dense / F32・Q1_0 です。
-この文書は次版の実装計画であり、Gemma 4 / GPT-OSS の対応完了を示しません。
+実装は `c6f8fdf` を起点とする `codex/model-expansion-gemma4-gptoss` で進めます。
+生成グラフは引き続き Qwen3 dense です。新しい重み形式のCPU参照処理を追加しましたが、
+Gemma 4 / GPT-OSS の生成対応完了を示すものではありません。
 0.1.4 は既存の Bonsai の数値・再現性・配布検証を維持します。
+
+## 今回実装した範囲
+
+- GGUFディレクトリ読み取りをQwen3の実行条件から分離しました。
+  rank 1〜4、expert行列のコピーを伴わないビュー、64bitのオフセット・格納サイズに対応します。
+  メタデータ量、積のoverflow、領域の重複・切断・整列を検査します。
+- 公開API `GgufModelInspector.Inspect` を追加しました。重みをマップせず、ヘッダーから
+  architecture、tokenizerの識別子、テンソル形状・形式・格納バイト数を調べられます。
+  格納バイト数は実行時のRSSやKV込みのメモリ見積もりではありません。
+- F16、BF16、Q4_0、Q8_0、Q4_K、Q6_K、MXFP4のデコードとCPU参照GEMVを追加しました。
+  作業領域は最大256要素のブロックで、全重みをFP32へ展開しません。
+  これらは正しさを検証する経路であり、SIMD/GPUの最適化は未実施です。
+- Qwen3のモデル条件を `Qwen3ModelDefinition` へ、対話形式を `QwenChatTemplate` へ分離しました。
+  tokenizerとtemplateの契約を分け、複数の終了トークンを表現できるようにしています。
+  Qwenの符号化、演算順序、`auto` のFP32選択、運用上限は維持します。
+- 未対応architectureをQwenのForwardに通さず、新形式を既存のCUDA/Vulkan/Q8カーネルへ
+  誤って渡すことも実行前に拒否します。GPUの分割uploadや新モデルの入場判定は未実装です。
+
+実配布物の先頭16MiBをrevision固定で取得し、完全なファイル長に対してヘッダーを検査しました。
+全重みのダウンロードや新モデルの生成は行っていません。
+
+| 配布物 | テンソル数 | 確認できた形式 | 最大rank |
+| --- | ---: | --- | ---: |
+| Google Gemma 4 E2B QAT Q4_0 | 541 | F32、F16、Q4_0、**Q6_K** | 2 |
+| ggml-org GPT-OSS-20B MXFP4 | 459 | F32、Q8_0、MXFP4 | 3 |
+
+QAT版にもQ6_Kが含まれるため、ファイル名のQ4_0だけで対応形式を決めないことを実データで確認しました。
+同じヘッダーのtokenizer識別子は、Gemmaが `gemma4`、GPT-OSSが `gpt2` / `gpt-4o` でした。
+識別子の読み取りと、そのtokenizerの実装・検証は別の段階です。
+
+検証結果、モデルrevision、取得部分のSHA-256、再現手順は
+[検証記録](evidence/model-expansion-20261115/README.md) に保存しています。
+
+## 次に実装する範囲
+
+Gemma 4 E2Bではtokenizer/template、PLE、層別Attention/RoPE、共有KV、活性化とsoft capが残っています。
+GPT-OSSではtokenizer/Harmony、MoEルーターとexpert集約、sink、bias付き演算が残っています。
+今回のMXFP4参照デコードはその前提です。公式参照との中間値・ロジット照合ができるまでは、
+モデル全体の生成対応やServerの7GB枠での動作を表明しません。
 
 ## 添付レビューから採用する方針
 
@@ -87,9 +127,9 @@ GoogleにはQATのGGUF配布経路がありますが、実行可否は選んだ�
 全テンソル型で判断します。Q4_0というファイル名だけでロード可能とはしません。
 [Google QAT配布案内](https://ai.google.dev/gemma/docs/core#quantization-aware_training_qat)
 
-## 現在の制約と変更する境界
+## 改修前の制約と変更する境界
 
-| 実装箇所 | 現在の制約 | 次版の変更 |
+| 実装箇所 | `9362118` 時点の制約 | 次版の変更（実施状況は上記） |
 | --- | --- | --- |
 | [GgufWeights](../../src/AIKernel.Kernel/Inference/GgufWeights.cs) | qwen3固定、rank 1/2、各次元200,000、F32/Q1_0、総数4.1B上限 | GGUFの構文・境界検査をモデルの対応判定から分離。rank 3のexpert軸を含む形状配列を導入し、オフセット・バイト数はchecked 64bitで検証 |
 | [Qwen3CpuModel](../../src/AIKernel.Kernel/Inference/Qwen3CpuModel.cs) | qwen3の名前・Layer構成、同一KV形状、head次元256以下 | モデルごとの定義、層ごとのAttention/RoPE/FFN/KV参照を構成。Qwen用の既存APIは互換adapterにする |

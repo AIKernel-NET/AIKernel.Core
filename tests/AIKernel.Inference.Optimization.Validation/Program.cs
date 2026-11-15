@@ -1,6 +1,20 @@
 using AIKernel.Kernel.Inference;
 using System.Text.Json;
 
+if(args.Length>=2&&args[0]=="--inspect")
+{
+    var info=GgufModelInspector.Inspect(args[1]);
+    Console.WriteLine(JsonSerializer.Serialize(info));return;
+}
+if(args.Length==3&&args[0]=="--inspect-header")
+{
+    using var stream=new HeaderOnlyStream(File.ReadAllBytes(args[1]),long.Parse(args[2]));
+    var info=GgufModelInspector.Inspect(stream);
+    Console.WriteLine(JsonSerializer.Serialize(new{info.Architecture,info.TokenizerModel,info.TokenizerPre,info.FileBytes,
+        info.StoredTensorBytes,info.StoredParameters,TensorCount=info.Tensors.Length,
+        Formats=info.Tensors.GroupBy(t=>t.Encoding).ToDictionary(g=>g.Key,g=>g.Count()),
+        MaximumRank=info.Tensors.Max(t=>t.Dimensions.Length),HeaderBytesConsumed=stream.Position,GenerationValidated=false}));return;
+}
 if(args.Length==2&&args[0]=="--matrices"){MatrixValidation.Run(args[1]);return;}
 if(args.Length>=4&&args[0]=="--logits"){LogitValidation.Run(args);return;}
 if(args.Length!=3)throw new ArgumentException("model path, cpu|cuda, backend|precision required");
@@ -24,3 +38,8 @@ else if(args[1]=="cuda")
     Console.WriteLine(JsonSerializer.Serialize(new{kind="functional-hash",r.GeneratedTokenSha256,r.OutputTokens,r.Profile,backend=args[2],performanceBenchmark=false}));
 }
 else throw new ArgumentException("Unknown execution mode");
+
+internal sealed class HeaderOnlyStream(byte[] header,long length):MemoryStream(header)
+{
+    public override long Length=>length;
+}

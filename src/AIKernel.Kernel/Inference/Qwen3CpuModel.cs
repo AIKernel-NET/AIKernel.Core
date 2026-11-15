@@ -57,14 +57,9 @@ public sealed class Qwen3CpuModel : IDisposable
         file=new(modelPath);
         try
         {
-            width=file.Int("qwen3.embedding_length");hidden=file.Int("qwen3.feed_forward_length");
-            heads=file.Int("qwen3.attention.head_count");kvHeads=file.Int("qwen3.attention.head_count_kv");
-            headSize=file.Int("qwen3.attention.key_length",width/Math.Max(1,heads));
-            var count=file.Int("qwen3.block_count");epsilon=file.Float("qwen3.attention.layer_norm_rms_epsilon",1e-6f);
-            if(width is <128 or >8192||hidden is <128 or >32768||heads is <1 or >64||kvHeads<1||heads%kvHeads!=0||
-               headSize is <32 or >256||headSize%2!=0||count is <1 or >64||!float.IsFinite(epsilon)||epsilon<=0||
-               context>file.Int("qwen3.context_length")||file.Int("qwen3.attention.value_length",headSize)!=headSize)
-                throw new InvalidDataException("Unsupported Qwen3 dimensions.");
+            var definition=Qwen3ModelDefinition.Read(file,context,deviceOrdinal.HasValue,preserveQ8Arithmetic);
+            width=definition.Width;hidden=definition.Hidden;heads=definition.Heads;kvHeads=definition.KvHeads;
+            headSize=definition.HeadSize;var count=definition.LayerCount;epsilon=definition.Epsilon;
             querySize=heads*headSize;kvSize=kvHeads*headSize;
             embedding=file.Require("token_embd.weight",file.Tokens.Length,width);
             output=file.ContainsOutput()?file.Require("output.weight",file.Tokens.Length,width):embedding;
@@ -296,7 +291,7 @@ public sealed class Qwen3CpuModel : IDisposable
                 profile?.Add(InferenceStage.Argmax,stage);
                 if(!float.IsFinite(best))throw new ArithmeticException("Non-finite model logits.");
             }
-            if(next==tokenizer.End&&!ignoreEos){finish="stop";break;}
+            if(tokenizer.IsStopToken(next)&&!ignoreEos){finish="stop";break;}
             generated.Add(next);
             if(choices is not null){finish="classified";break;}
             if(step+1<maximum){Forward(next,prompt.Count+step,state,decodeBackend,profile);decodeForwards++;}

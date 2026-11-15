@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace AIKernel.Kernel.Inference;
 
 /// <summary>Qwen byte-level BPE with merge ranks from the model, and no user-injected special tokens.</summary>
-internal sealed class QwenTokenizer
+internal sealed class QwenTokenizer : ITextTokenizer
 {
     private readonly Dictionary<string,int> vocab=new(StringComparer.Ordinal);
     private readonly Dictionary<(int,int),(int Id,int Rank)> merges=[];
@@ -13,7 +13,7 @@ internal sealed class QwenTokenizer
     private readonly int[] single=new int[256];
     private static readonly Regex Pieces=new(@"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+",RegexOptions.CultureInvariant,TimeSpan.FromSeconds(1));
     internal int End {get;}
-    private readonly int start,thinkStart,thinkEnd;
+    private readonly IChatTemplate chat;
     internal QwenTokenizer(GgufWeights file)
     {
         if(file.Metadata.GetValueOrDefault("tokenizer.ggml.model") is not "gpt2" ||
@@ -36,9 +36,7 @@ internal sealed class QwenTokenizer
             if(vocab.TryGetValue(a,out int x)&&vocab.TryGetValue(b,out int y)&&vocab.TryGetValue(a+b,out int z))
                 merges.TryAdd((x,y),(z,rank));
         }
-        thinkStart=vocab["<think>"];thinkEnd=vocab["</think>"];
-        start=vocab["<|im_start|>"];End=file.Int("tokenizer.ggml.eos_token_id");
-        if(End!=vocab["<|im_end|>"])throw new NotSupportedException("Unsupported chat boundary.");
+        End=file.Int("tokenizer.ggml.eos_token_id");chat=new QwenChatTemplate(this,End);
     }
     internal List<int> Encode(string text)
     {
@@ -57,26 +55,14 @@ internal sealed class QwenTokenizer
         return result;
     }
     internal List<int> Prefix(string system)
-    {
-        var ids=new List<int>{start};ids.AddRange(Encode("system\n"+system));ids.Add(End);ids.AddRange(Encode("\n"));
-        ids.Add(start);return ids;
-    }
+        =>chat.Prefix(system);
     internal List<int> Chat(string system,string user)
-    {
-        var ids=Prefix(system);ids.AddRange(Encode("user\n"+user));ids.Add(End);ids.AddRange(Encode("\n"));
-        ids.Add(start);ids.AddRange(Encode("assistant\n"));
-        ids.Add(thinkStart);ids.AddRange(Encode("\n\n"));ids.Add(thinkEnd);ids.AddRange(Encode("\n\n"));return ids;
-    }
+        =>chat.Chat(system,user);
     internal string DecodeReply(List<int> tokens)
-    {
-        // The public result contains only the final answer, even if a model reopens a thinking block.
-        int end=tokens.LastIndexOf(thinkEnd);
-        var answer=end>=0?tokens.Skip(end+1).ToList():tokens;
-        if(answer.Contains(thinkStart)||answer.Contains(start)||answer.Contains(End))
-            throw new InvalidDataException("Incomplete or unexpected model control sequence.");
-        string text=Decode(answer).Trim();
-        if(text.Length==0)throw new InvalidDataException("The model did not produce a final answer.");
-        return text;
-    }
+        =>chat.DecodeReply(tokens);
+    internal bool IsStopToken(int token)=>chat.StopTokens.Contains(token);
+    List<int> ITextTokenizer.Encode(string text)=>Encode(text);
+    string ITextTokenizer.Decode(IEnumerable<int> tokens)=>Decode(tokens);
+    int ITextTokenizer.SpecialToken(string text)=>vocab.TryGetValue(text,out int id)?id:throw new InvalidDataException("Missing control token: "+text);
     internal string Decode(IEnumerable<int> tokens)=>Encoding.UTF8.GetString(tokens.SelectMany(i=>bytes[i]).ToArray());
 }

@@ -1,0 +1,24 @@
+[
+  {
+    "name": "gemma4",
+    "repository": "google/gemma-4-E2B-it-qat-q4_0-gguf",
+    "revision": "675cff42a74c774d6cb76f76d8eacb49b48c9b93",
+    "file": "gemma-4-E2B_q4_0-it.gguf",
+    "fileBytes": 3349516256,
+    "fileSha256": "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",
+    "headerBytes": 16777216,
+    "headerSha256": "56d1296924257597c6ff79f3200b39f2f187e01078807a14776446c53869f246",
+    "sourceUrl": "https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/675cff42a74c774d6cb76f76d8eacb49b48c9b93/gemma-4-E2B_q4_0-it.gguf"
+  },
+  {
+    "name": "gpt-oss",
+    "repository": "ggml-org/gpt-oss-20b-GGUF",
+    "revision": "41e8a94d15d62070b36cf4553a0250717ecf46b8",
+    "file": "gpt-oss-20b-MXFP4.gguf",
+    "fileBytes": 12109566624,
+    "fileSha256": "27cd6c432c7672cb812a92f611cf3ba7bbc35928262bb1e1253ff4ee6ae35901",
+    "headerBytes": 16777216,
+    "headerSha256": "56a7e3750aaaace1bcabda03484cd11487f2018c5320908934cff8e5bf019c7c",
+    "sourceUrl": "https://huggingface.co/ggml-org/gpt-oss-20b-GGUF/resolve/41e8a94d15d62070b36cf4553a0250717ecf46b8/gpt-oss-20b-MXFP4.gguf"
+  }
+]

@@ -76,6 +76,8 @@ internal sealed unsafe class VulkanQuantizedMatrix : IMatrixOffload
 
     internal VulkanQuantizedMatrix(GgufWeights file, int ordinal, long maximumWeightBytes)
     {
+        if(file.Tensors.Values.Any(t=>t.Rank>2||t.Type is not (0 or 41)))
+            throw new NotSupportedException("Vulkan supports only F32/Q1_0 matrices; no implicit format reinterpretation.");
         if (file.Length <= 0 || file.Length > maximumWeightBytes || file.Length > int.MaxValue)
             throw new ArgumentException("Encoded model exceeds the Vulkan weight budget.");
         vk = Vk.GetApi();

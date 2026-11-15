@@ -1,0 +1,39 @@
+[
+  {
+    "model": "gemma4",
+    "Architecture": "gemma4",
+    "TokenizerModel": "gemma4",
+    "TokenizerPre": null,
+    "FileBytes": 3349516256,
+    "StoredTensorBytes": 3333699724,
+    "StoredParameters": 4628569635,
+    "TensorCount": 541,
+    "Formats": {
+      "Q4_0": 275,
+      "F32": 263,
+      "F16": 1,
+      "Q6_K": 2
+    },
+    "MaximumRank": 2,
+    "HeaderBytesConsumed": 15815534,
+    "GenerationValidated": false
+  },
+  {
+    "model": "gpt-oss",
+    "Architecture": "gpt-oss",
+    "TokenizerModel": "gpt2",
+    "TokenizerPre": "gpt-4o",
+    "FileBytes": 12109566624,
+    "StoredTensorBytes": 12096558336,
+    "StoredParameters": 20914757184,
+    "TensorCount": 459,
+    "Formats": {
+      "F32": 289,
+      "Q8_0": 98,
+      "MXFP4": 72
+    },
+    "MaximumRank": 3,
+    "HeaderBytesConsumed": 13008263,
+    "GenerationValidated": false
+  }
+]

@@ -17,7 +17,8 @@ for(int i=2;i<args.Length;i+=2)
 }
 string mode=args[0],requested=options.GetValueOrDefault("--instruction-set","auto"),precision=options.GetValueOrDefault("--precision","fp32");
 int workers=int.Parse(options.GetValueOrDefault("--workers","4")),tokens=int.Parse(options.GetValueOrDefault("--tokens","128")),device=int.Parse(options.GetValueOrDefault("--device","0"));
-if(mode is not ("cpu" or "cuda" or "vulkan")||workers is <1 or >6||tokens is <1 or >256||device<0||precision is not ("fp32" or "q8"))throw new ArgumentException("Invalid benchmark configuration.");
+if(mode is not ("cpu" or "cuda" or "vulkan")||workers is <1 or >6||tokens is <1 or >256||device<0||precision is not ("fp32" or "q8" or "int8-auto" or "dp4a" or "tensor-core"))throw new ArgumentException("Invalid benchmark configuration.");
+if(mode!="cuda"&&precision is ("int8-auto" or "dp4a" or "tensor-core"))throw new ArgumentException("Native CUDA integer choices require cuda mode.");
 if(mode!="cpu"&&options.ContainsKey("--instruction-set")||mode=="cpu"&&options.ContainsKey("--device"))throw new ArgumentException("Instruction sets are CPU-only; device ordinals are GPU-only.");
 if(mode=="cpu"&&precision!="fp32")throw new ArgumentException("CPU activation precision is part of --instruction-set (for example q8-auto).");
 // Validate forced choices before reading/hashing the model or loading native GPU code.
@@ -44,10 +45,14 @@ if(mode=="cpu")
 }
 else if(mode=="cuda")
 {
-    using var model=new Qwen3GpuModel(args[1],device,workers,1024,1024L*1024*1024,precision=="q8");
+    using var model=precision is "fp32" or "q8"
+        ?new Qwen3GpuModel(args[1],device,workers,1024,1024L*1024*1024,precision=="q8")
+        :new Qwen3GpuModel(args[1],device,workers,1024,1024L*1024*1024,
+            precision=="dp4a"?CudaQ8Kernel.Dp4a:precision=="tensor-core"?CudaQ8Kernel.TensorCore:CudaQ8Kernel.Auto);
     await model.WarmupAsync(system,timeout.Token);
     Log(new{kind="setup",setupMs=setup.Elapsed.TotalMilliseconds,model.DevicePciBusId,model.DeviceWeightBytes,model.ActivationPrecision});
     await Measure(async()=>{var r=await model.GenerateBenchmarkAsync(system,inquiry,tokens,timeout.Token);return new Row(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,r.GeneratedTokenSha256);});
+    Log(new{kind="integer-kernels",model.Int8Statistics});
 }
 else
 {

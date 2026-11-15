@@ -17,6 +17,7 @@ typedef struct ak_driver {
     int (CUDA_CALL *init)(unsigned);
     int (CUDA_CALL *device_get)(int *, int);
     int (CUDA_CALL *device_count)(int *);
+    int (CUDA_CALL *device_attribute)(int *, int, int);
     int (CUDA_CALL *ctx_create)(void **, unsigned, int);
     int (CUDA_CALL *ctx_destroy)(void *);
     int (CUDA_CALL *ctx_push)(void *);

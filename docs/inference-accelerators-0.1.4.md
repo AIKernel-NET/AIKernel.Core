@@ -62,6 +62,50 @@ signed Q8 activations, followed by `2*dot - sum(activation)` per 128-element blo
 The pair sum is bounded by ±254, so VPMADDUBSW does not saturate. This requires
 the updated optional CPU library; `avx2-q8` remains the rounded-FP32 control.
 
+### Native CUDA INT8 follow-up (2026-11-15 development source)
+
+The new overload below uses packed integer activations directly. The original
+constructor and `bool quantizeActivations` overload keep their previous behavior.
+The earlier v5 distribution and November 14 measurements do not include this change.
+
+```csharp
+using var model = new Qwen3GpuModel(path, 0, 4, 1024, 1024L * 1024 * 1024,
+    CudaQ8Kernel.Auto); // or Dp4a / TensorCore for controlled comparisons
+await model.WarmupAsync(system);
+var reply = await model.GenerateAsync(system, inquiry);
+Console.WriteLine(model.Int8Statistics);
+```
+
+Q1_0 blocks contain 128 signs and one FP16 weight scale. Activations use the existing
+block128 ties-to-even quantizer. Native code evaluates unsigned 0/1 weight bytes
+against signed activation bytes, then applies `2*dot - sum(activation)` and the
+two scales. DP4A targets SM61+; the integer MMA implementation targets SM80+.
+Unsupported forced modes throw before model upload. T1000 uses DP4A in this
+implementation. Merely exposing a Vulkan integer-dot API is not evidence of
+hardware acceleration, so the P630 FP32 shader remains the control.
+
+`Auto` warms both supported integer kernels and compares three synchronous calls
+per kernel for each matrix shape, outside reported benchmark measurements.
+It selects Tensor Core MMA only when its median is at least 5% lower than DP4A.
+Results are checked against each other before timing. Decisions are local to the
+model/context; this is shape calibration, not a guarantee of global optimality
+or an online load-adaptive policy. The MMA GEMV kernel repeats the input over
+eight columns, so it is not automatically faster than DP4A. `Int8Statistics`
+reports actual kernel calls, including calibration, and the selected shape map.
+
+Transfers use bounded reusable pinned/device scratch and one stream synchronization
+per matrix call. Attention, normalization, RoPE, KV state and sampling still run
+on the CPU. No CUDA Toolkit, cuBLAS or LibTorch runtime is required. PTX fragment
+layout follows the [NVIDIA PTX ISA](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#warp-level-matrix-fragment-mma-16832).
+
+For matched-work measurements, use `AIKernel.FixedToken.Benchmark cuda model.gguf
+--device 0 --precision dp4a` (or `tensor-core`, `int8-auto`, legacy `q8`, `fp32`).
+The default is 128 greedy steps including EOS; text is deliberately empty and
+`GeneratedTokenSha256` identifies the complete generated token sequence.
+This fixed-work protocol measures compute time, not the latency or quality of
+a natural customer reply. Always publish prefill and decode separately and
+validate reply quality separately from fixed-token throughput.
+
 | Setting | Q1_0 matrix arithmetic |
 | --- | --- |
 | scalar-q8 | Independent signed integer dot reference, then block scaling |

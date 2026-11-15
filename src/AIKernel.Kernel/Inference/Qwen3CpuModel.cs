@@ -41,7 +41,7 @@ public sealed class Qwen3CpuModel : IDisposable
         :this(modelPath,cpuThreads,contextTokens,null,0,instructionSet:instructionSet) { }
 
     internal Qwen3CpuModel(string modelPath,int cpuThreads,int contextTokens,int? deviceOrdinal,long maximumWeightBytes,
-        bool vulkan=false,bool gpuQ8=false,string? instructionSet=null)
+        bool vulkan=false,bool gpuQ8=false,string? instructionSet=null,CudaQ8Kernel? gpuInt8=null)
     {
         if(cpuThreads<1||cpuThreads>6||contextTokens<64||contextTokens>2048)throw new ArgumentOutOfRangeException(nameof(cpuThreads));
         requestedInstructionSet=instructionSet??Environment.GetEnvironmentVariable("AIKERNEL_CPU_GEMV")??"auto";
@@ -93,7 +93,7 @@ public sealed class Qwen3CpuModel : IDisposable
             tokenizer=new(file);
             if(deviceOrdinal.HasValue)gpu=vulkan
                 ? new VulkanQuantizedMatrix(file,deviceOrdinal.Value,maximumWeightBytes)
-                : new CudaQuantizedMatrix(file,deviceOrdinal.Value,maximumWeightBytes);
+                : new CudaQuantizedMatrix(file,deviceOrdinal.Value,maximumWeightBytes,gpuInt8);
         }
         catch{file.Dispose();throw;}
     }
@@ -278,6 +278,7 @@ public sealed class Qwen3CpuModel : IDisposable
     }
     internal long DeviceWeightBytes=>gpu?.WeightBytes??0;
     internal string? DevicePciBusId=>gpu?.PciBusId;
+    internal CudaQ8Statistics? CudaQ8Statistics=>(gpu as CudaQuantizedMatrix)?.Statistics;
     internal object? VulkanDiagnostics=>(gpu as VulkanQuantizedMatrix)?.Diagnostics;
     internal VulkanComputeDeviceInfo? VulkanDevice=>(gpu as VulkanQuantizedMatrix)?.DeviceInfo;
     internal void ZeroGpuScratch()=>gpu?.ZeroScratch();

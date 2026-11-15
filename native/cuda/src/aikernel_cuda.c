@@ -2,6 +2,8 @@
 #include "cpu_gemv.h"
 #include "driver.h"
 #include "embedded_ptx.h"
+#include "q1_dp4a.h"
+#include "q1_mma.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -20,6 +22,8 @@ struct ak_context {
     void *stream;
     void *gemv;
     void *gemv_q1;
+    void *gemv_q8[2];
+    uint32_t int8_capabilities;
     void *normalize;
     void *rope;
     void *swiglu;
@@ -80,6 +84,12 @@ int32_t ak_create(uint32_t version, int32_t ordinal, ak_context **result) {
         void *module = NULL, *popped = NULL;
         int code = d->init(0);
         if (!code) code = d->device_get(&ctx->device, ordinal);
+        int major = 0, minor = 0;
+        if (!code) code = d->device_attribute(&major, 75, ctx->device);
+        if (!code) code = d->device_attribute(&minor, 76, ctx->device);
+        if (!code && (major > 6 || (major == 6 && minor >= 1))) ctx->int8_capabilities |= 1;
+        /* This MMA kernel targets sm_80, not all sm_75 devices have Tensor Cores. */
+        if (!code && major >= 8) ctx->int8_capabilities |= 2;
         if (!code) code = d->ctx_create(&ctx->cuda, 0, ctx->device);
         if (!code) code = d->stream_create(&ctx->stream, 1);
         if (!code) code = d->module_load(&module, ak_embedded_ptx);
@@ -382,6 +392,47 @@ int32_t ak_gemv_q1_0(ak_context *ctx, uint64_t weights, const float *x, float *y
         (size_t)rows > SIZE_MAX / 18 / (cols / 128)) return AK_INVALID;
     if (!within(&ctx->device_blocks, weights, (size_t)rows * (cols / 128) * 18)) return AK_INVALID;
     return device_gemv(ctx, ctx->gemv_q1, weights, x, y, rows, cols);
+}
+
+int32_t ak_get_int8_capabilities(ak_context *ctx, uint32_t *flags) {
+    if (!ctx || !flags) return AK_INVALID;
+    *flags = ctx->int8_capabilities;
+    return AK_OK;
+}
+
+int32_t ak_gemv_q1_q8(ak_context *ctx, uint64_t weights, const int8_t *x,
+                     const float *scales, const int32_t *sums, float *y,
+                     uint32_t rows, uint32_t cols, uint32_t backend) {
+    /* backend 1: DP4A (sm_61+); 2: integer MMA (sm_80+). Never silently fallback. */
+    if (!ctx || !weights || weights % 2 || !x || !scales || !sums || !y ||
+        !rows || rows > 200000 || !cols || cols > 200000 || cols % 128 || backend < 1 || backend > 2 ||
+        !within(&ctx->device_blocks, weights, (size_t)rows * (cols / 128) * 18)) return AK_INVALID;
+    if (!(ctx->int8_capabilities & (1u << (backend - 1)))) return AK_VERSION;
+    int status = enter(ctx);
+    if (status) return status;
+    void **kernel = &ctx->gemv_q8[backend - 1];
+    if (!*kernel) {
+        void *module = NULL;
+        int code = ctx->driver.module_load(&module, backend == 1 ? ak_q1_dp4a_ptx : ak_q1_mma_ptx);
+        if (!code) code = ctx->driver.module_func(kernel, module, backend == 1 ? "matvec_q1_q8_dp4a" : "matvec_q1_q8_mma");
+        if (code) return leave(ctx, ak_status(code));
+    }
+    const size_t block_bytes = (size_t)(cols / 128) * sizeof(float);
+    const size_t input_bytes = cols + block_bytes * 2, output_bytes = (size_t)rows * sizeof(float);
+    status = scratch(ctx, input_bytes + output_bytes);
+    if (!status) {
+        char *host = ctx->scratch_host;
+        memcpy(host, x, cols); memcpy(host + cols, scales, block_bytes); memcpy(host + cols + block_bytes, sums, block_bytes);
+        uint64_t dx = ctx->scratch_device, ds = dx + cols, di = ds + block_bytes, dy = dx + input_bytes;
+        void *args[] = { &weights, &dx, &ds, &di, &dy, &rows, &cols };
+        int code = ctx->driver.htod(dx, host, input_bytes, ctx->stream);
+        uint32_t grid = backend == 1 ? (rows + 3) / 4 : (rows + 15) / 16;
+        if (!code) code = ctx->driver.launch(*kernel, grid, 1, 1, backend == 1 ? 128 : 32, 1, 1, 0, ctx->stream, args, NULL);
+        if (!code) code = ctx->driver.dtoh(host + input_bytes, dy, output_bytes, ctx->stream);
+        status = finish_stream(ctx, code);
+        if (!status) memcpy(y, host + input_bytes, output_bytes);
+    }
+    return leave(ctx, status);
 }
 
 static int vector_kernel(ak_context *ctx, void *kernel, const float *a, const float *b, float *out,

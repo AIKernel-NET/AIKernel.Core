@@ -31,8 +31,9 @@ var modelPath=args[1];
 if(args[0]=="matrix")
 {
     using var file=new GgufWeights(modelPath);
-    using IMatrixOffload? gpu=args.Length>=3 ? (args.Length==4&&args[3]=="cuda"
-        ? new CudaQuantizedMatrix(file,int.Parse(args[2]),1024L*1024*1024)
+    bool nativeInt8=args.Length==5;
+    using IMatrixOffload? gpu=args.Length>=3 ? (args.Length>=4&&args[3]=="cuda"
+        ? new CudaQuantizedMatrix(file,int.Parse(args[2]),1024L*1024*1024,nativeInt8?Enum.Parse<CudaQ8Kernel>(args[4]):null)
         : new VulkanQuantizedMatrix(file,int.Parse(args[2]),1024L*1024*1024)) : null;
     if(gpu is VulkanQuantizedMatrix vk)Log(new{kind="device",vk.DeviceInfo});
     var matrices=file.Tensors.Values.Where(t=>t.Type==41&&t.Rows>=129).Take(5).ToList();
@@ -66,10 +67,11 @@ if(args[0]=="matrix")
             gpu.Multiply(sample,x,actual,timeout.Token);
             for(int i=0;i<actual.Length;i++)
             {
-                double error=Math.Abs(actual[i]-expected[i]);maxVulkanError=Math.Max(maxVulkanError,error);
-                if(!float.IsFinite(actual[i])||error>0.001*Math.Max(1,Math.Abs(expected[i])))throw new Exception($"Vulkan reference mismatch, row {i}, error {error}");
+                float reference=nativeInt8?q8Expected[i]:expected[i];
+                double error=Math.Abs(actual[i]-reference);maxVulkanError=Math.Max(maxVulkanError,error);
+                if(!float.IsFinite(actual[i])||error>0.001*Math.Max(1,Math.Abs(reference)))throw new Exception($"GPU reference mismatch, row {i}, error {error}");
             }
-            if(sample.Type==41)
+            if(sample.Type==41&&!nativeInt8)
             {
                 using var rounded=new Q8ActivationBuffer(x,sample.Columns);
                 var roundedReference=new float[sample.Rows];

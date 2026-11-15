@@ -26,6 +26,19 @@ public sealed class Qwen3GpuModel : IDisposable
         DeviceOrdinal=deviceOrdinal;
         ActivationPrecision=quantizeActivations?"q8-block128-fp32-accumulate":"fp32";
     }
+    /// <summary>Uses native INT8 accumulation, optionally measured per shape to select DP4A or Tensor Cores.
+    /// Activations are Q8 block128, with FP32 scaling of integer block sums. Unsupported forced kernels fail.</summary>
+    public Qwen3GpuModel(string modelPath,int deviceOrdinal,int cpuThreads,int contextTokens,
+        long maximumWeightBytes,CudaQ8Kernel kernel)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(deviceOrdinal);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumWeightBytes);
+        if(!Enum.IsDefined(kernel))throw new ArgumentOutOfRangeException(nameof(kernel));
+        engine=new(modelPath,cpuThreads,contextTokens,deviceOrdinal,maximumWeightBytes,gpuInt8:kernel);
+        DeviceOrdinal=deviceOrdinal;ActivationPrecision="q8-block128-int32-accumulate";
+    }
+    /// <summary>Actual integer kernel call counts and calibrated choices, or zero counts for legacy precision.</summary>
+    public CudaQ8Statistics? Int8Statistics=>engine.CudaQ8Statistics;
     /// <summary>The CUDA ordinal used for every matrix multiplication.</summary>
     public int DeviceOrdinal {get;}
     /// <summary>Activation rounding and arithmetic used for Q1_0 matrices.</summary>
@@ -73,7 +86,7 @@ public sealed record GpuGeneration(string Text,int InputTokens,int OutputTokens,
 {
     /// <summary>Actual execution path; attention, normalization, RoPE and KV remain on the CPU.</summary>
     public string Backend=>"cuda-matrix-offload";
-    /// <summary>Input activation representation; CUDA accumulation remains FP32.</summary>
+    /// <summary>Activation and accumulation precision of Q1_0 matrices; FP32 matrices are unchanged.</summary>
     public string ActivationPrecision {get;init;}="fp32";
     /// <summary>Benchmark-only generated token hash; benchmark Text is empty.</summary>
     public string? GeneratedTokenSha256 {get;init;}

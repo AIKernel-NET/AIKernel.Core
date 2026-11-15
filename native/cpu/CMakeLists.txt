@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.22)
 project(aikernel_cpu_accel C)
+# A single-config build without a type must not silently benchmark unoptimized code.
+# Explicit Debug and multi-config generators remain available for diagnostics.
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
 set(CMAKE_C_STANDARD 11)
 if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8 OR NOT CMAKE_SYSTEM_PROCESSOR MATCHES "AMD64|amd64|x86_64")
   message(FATAL_ERROR "CPU accelerator currently targets x64 only")

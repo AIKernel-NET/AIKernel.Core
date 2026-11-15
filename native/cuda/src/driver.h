@@ -36,6 +36,9 @@ typedef struct ak_driver {
     int (CUDA_CALL *stream_sync)(void *);
     int (CUDA_CALL *module_load)(void **, const void *);
     int (CUDA_CALL *module_func)(void **, void *, const char *);
+    int (CUDA_CALL *event_create)(void **, unsigned);
+    int (CUDA_CALL *event_record)(void *, void *);
+    int (CUDA_CALL *event_elapsed)(float *, void *, void *);
     ak_launch_fn launch;
 } ak_driver;
 

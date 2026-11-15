@@ -13,6 +13,23 @@ internal sealed unsafe class CudaQuantizedMatrix : IMatrixOffload
     private readonly uint int8Capabilities;
     private readonly Dictionary<(int Rows,int Columns),uint> selections=[];
     private long dp4aCalls,tensorCoreCalls;
+    private readonly bool eventProfile=Environment.GetEnvironmentVariable("AIKERNEL_CUDA_EVENT_PROFILE")=="1";
+    internal void BeginProfile()
+    {
+        if(eventProfile)lock(device.Gate)NativeCompute.Check(NativeCompute.ProfileConfigure(device.Context,1),"CUDA profile reset");
+    }
+    internal CudaMatrixProfile? ReadProfile()
+    {
+        if(!eventProfile)return null;
+        var result=new NativeCompute.MatrixProfile {Size=(uint)sizeof(NativeCompute.MatrixProfile),Version=1};
+        lock(device.Gate)
+        {
+            NativeCompute.Check(NativeCompute.ProfileRead(device.Context,ref result),"CUDA profile snapshot");
+            NativeCompute.Check(NativeCompute.ProfileConfigure(device.Context,0),"CUDA profile disable");
+        }
+        return new(result.Calls,result.UploadBytes,result.DownloadBytes,result.UploadMs,result.KernelMs,result.DownloadMs,result.HostSyncMs);
+    }
+    internal bool UsesInt8=>int8Kernel.HasValue;
     internal CudaQ8Statistics Statistics
     {
         get {lock(device.Gate)return new(dp4aCalls,tensorCoreCalls,selections.ToDictionary(p=>$"{p.Key.Rows}x{p.Key.Columns}",p=>p.Value==1?"dp4a":"tensor-core-int8"));}
@@ -53,7 +70,7 @@ internal sealed unsafe class CudaQuantizedMatrix : IMatrixOffload
         catch { device.Dispose(); throw; }
     }
 
-    public void Multiply(GgufWeights.Tensor tensor, float[] input, float[] output, CancellationToken token)
+    public void Multiply(GgufWeights.Tensor tensor, float[] input, float[] output, CancellationToken token,InferenceProfiler? profile=null)
     {
         token.ThrowIfCancellationRequested();
         long bytes = checked((long)tensor.Rows * tensor.RowBytes);
@@ -65,7 +82,7 @@ internal sealed unsafe class CudaQuantizedMatrix : IMatrixOffload
             ObjectDisposedException.ThrowIf(weights.Address == 0, this);
             if(int8Kernel.HasValue&&tensor.Type==41)
             {
-                MultiplyInt8(tensor,input,output,token);
+                MultiplyInt8(tensor,input,output,token,profile);
                 token.ThrowIfCancellationRequested();return;
             }
             fixed (float* x = input)
@@ -85,14 +102,16 @@ internal sealed unsafe class CudaQuantizedMatrix : IMatrixOffload
     }
 
     public void ZeroScratch() => device.ZeroScratch();
-    private void MultiplyInt8(GgufWeights.Tensor tensor,float[] input,float[] output,CancellationToken token)
+    private void MultiplyInt8(GgufWeights.Tensor tensor,float[] input,float[] output,CancellationToken token,InferenceProfiler? profile)
     {
         int columns=tensor.Columns,rows=tensor.Rows;
         if(columns%128!=0)throw new ArgumentException("Q8 matrices require 128-element blocks.");
         var q=ArrayPool<sbyte>.Shared.Rent(columns);var scales=ArrayPool<float>.Shared.Rent(columns/128);var sums=ArrayPool<int>.Shared.Rent(columns/128);
         try
         {
+            long started=profile?.Start()??0;
             Int8CpuMatrix.Quantize(input.AsSpan(0,columns),q,scales,sums);
+            profile?.Add(InferenceStage.Quantization,started);
             fixed(sbyte* qp=q)fixed(float* sp=scales)fixed(int* ip=sums)fixed(float* yp=output)
             {
                 ulong address=weights.Address+(ulong)tensor.Offset;

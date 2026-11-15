@@ -5,6 +5,12 @@
 #include "q1_dp4a.h"
 #include "q1_mma.h"
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#else
+#include <time.h>
+#endif
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,6 +41,9 @@ struct ak_context {
     uint64_t scratch_device;
     size_t scratch_bytes;
     int fault;
+    int profile_enabled;
+    void *profile_events[4]; /* Context-owned, reclaimed with the private context. */
+    ak_matrix_profile profile;
 };
 
 uint32_t ak_abi_version(void) { return AK_ABI; }
@@ -130,6 +139,63 @@ static int leave(ak_context *ctx, int status) {
 static int finish_stream(ak_context *ctx, int code) {
     int sync = ctx->driver.stream_sync(ctx->stream);
     return ak_status(code ? code : sync);
+}
+
+static double profile_clock_ms(void) {
+#ifdef _WIN32
+    LARGE_INTEGER counter, frequency;
+    QueryPerformanceCounter(&counter); QueryPerformanceFrequency(&frequency);
+    return (double)counter.QuadPart * 1000.0 / (double)frequency.QuadPart;
+#else
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    return (double)now.tv_sec * 1000.0 + (double)now.tv_nsec / 1000000.0;
+#endif
+}
+
+int32_t ak_profile_configure(ak_context *ctx, uint32_t enabled) {
+    if (enabled > 1) return AK_INVALID;
+    int status = enter(ctx);
+    if (status) return status;
+    ctx->profile_enabled = 0;
+    memset(&ctx->profile, 0, sizeof(ctx->profile));
+    ctx->profile.size = sizeof(ctx->profile); ctx->profile.version = AK_ABI;
+    for (int i = 0; enabled && i < 4 && !status; i++) {
+        if (!ctx->profile_events[i]) status = ak_status(ctx->driver.event_create(&ctx->profile_events[i], 0));
+    }
+    if (!status) ctx->profile_enabled = (int)enabled;
+    return leave(ctx, status);
+}
+
+int32_t ak_profile_read(ak_context *ctx, ak_matrix_profile *result) {
+    if (!ctx || !result || result->size < sizeof(*result)) return AK_INVALID;
+    if (result->version != AK_ABI) return AK_VERSION;
+    if (!ctx->profile_enabled) return AK_INVALID;
+    if (ctx->fault) return ctx->fault;
+    *result = ctx->profile;
+    return AK_OK;
+}
+
+/* Record on the existing private stream; no additional synchronization. */
+static int profile_mark(ak_context *ctx, int index, int code) {
+    return !code && ctx->profile_enabled
+        ? ctx->driver.event_record(ctx->profile_events[index], ctx->stream) : code;
+}
+
+static int profile_finish(ak_context *ctx, int code, size_t upload, size_t download) {
+    double start = ctx->profile_enabled ? profile_clock_ms() : 0;
+    int status = finish_stream(ctx, code);
+    if (ctx->profile_enabled && !status) {
+        ctx->profile.host_sync_ms += profile_clock_ms() - start;
+        float elapsed[3] = {0};
+        for (int i = 0; i < 3 && !status; i++)
+            status = ak_status(ctx->driver.event_elapsed(&elapsed[i], ctx->profile_events[i], ctx->profile_events[i+1]));
+        if (!status) {
+            ctx->profile.calls++; ctx->profile.upload_bytes += upload; ctx->profile.download_bytes += download;
+            ctx->profile.upload_ms += elapsed[0]; ctx->profile.kernel_ms += elapsed[1]; ctx->profile.download_ms += elapsed[2];
+        }
+    }
+    return status;
 }
 
 static void wipe_host(void *address, size_t bytes) {
@@ -369,10 +435,14 @@ static int device_gemv(ak_context *ctx, void *kernel, uint64_t weights, const fl
         void *args[] = { &weights, &dx, &dy, &cols };
         char *host_y = (char *)ctx->scratch_host + x_bytes;
         memcpy(ctx->scratch_host, x, x_bytes);
-        int code = ctx->driver.htod(dx, ctx->scratch_host, x_bytes, ctx->stream);
+        int code = profile_mark(ctx, 0, 0);
+        if (!code) code = ctx->driver.htod(dx, ctx->scratch_host, x_bytes, ctx->stream);
+        code = profile_mark(ctx, 1, code);
         if (!code) code = ctx->driver.launch(kernel, rows, 1, 1, 128, 1, 1, 0, ctx->stream, args, NULL);
+        code = profile_mark(ctx, 2, code);
         if (!code) code = ctx->driver.dtoh(host_y, dy, y_bytes, ctx->stream);
-        status = finish_stream(ctx, code);
+        code = profile_mark(ctx, 3, code);
+        status = profile_finish(ctx, code, x_bytes, y_bytes);
         if (!status) memcpy(y, host_y, y_bytes);
     }
     return leave(ctx, status);
@@ -425,11 +495,15 @@ int32_t ak_gemv_q1_q8(ak_context *ctx, uint64_t weights, const int8_t *x,
         memcpy(host, x, cols); memcpy(host + cols, scales, block_bytes); memcpy(host + cols + block_bytes, sums, block_bytes);
         uint64_t dx = ctx->scratch_device, ds = dx + cols, di = ds + block_bytes, dy = dx + input_bytes;
         void *args[] = { &weights, &dx, &ds, &di, &dy, &rows, &cols };
-        int code = ctx->driver.htod(dx, host, input_bytes, ctx->stream);
+        int code = profile_mark(ctx, 0, 0);
+        if (!code) code = ctx->driver.htod(dx, host, input_bytes, ctx->stream);
         uint32_t grid = backend == 1 ? (rows + 3) / 4 : (rows + 15) / 16;
+        code = profile_mark(ctx, 1, code);
         if (!code) code = ctx->driver.launch(*kernel, grid, 1, 1, backend == 1 ? 128 : 32, 1, 1, 0, ctx->stream, args, NULL);
+        code = profile_mark(ctx, 2, code);
         if (!code) code = ctx->driver.dtoh(host + input_bytes, dy, output_bytes, ctx->stream);
-        status = finish_stream(ctx, code);
+        code = profile_mark(ctx, 3, code);
+        status = profile_finish(ctx, code, input_bytes, output_bytes);
         if (!status) memcpy(y, host + input_bytes, output_bytes);
     }
     return leave(ctx, status);

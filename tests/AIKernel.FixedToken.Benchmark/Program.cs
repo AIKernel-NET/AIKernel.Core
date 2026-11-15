@@ -12,9 +12,14 @@ if(args.Length<2)throw new ArgumentException("Usage: <cpu|cuda|vulkan> model.ggu
 var options=new Dictionary<string,string>();
 for(int i=2;i<args.Length;i+=2)
 {
-    if(i+1==args.Length||args[i] is not ("--instruction-set" or "--workers" or "--tokens" or "--device" or "--precision"))throw new ArgumentException("Unknown or incomplete option.");
+    if(i+1==args.Length||args[i] is not ("--instruction-set" or "--workers" or "--tokens" or "--device" or "--precision" or "--profile" or "--cuda-events"))throw new ArgumentException("Unknown or incomplete option.");
     options.Add(args[i],args[i+1]);
 }
+bool profile=bool.Parse(options.GetValueOrDefault("--profile","false"));
+bool cudaEvents=bool.Parse(options.GetValueOrDefault("--cuda-events","false"));
+if(cudaEvents&&(!profile||args[0]!="cuda"))throw new ArgumentException("CUDA events require cuda mode and --profile true.");
+Environment.SetEnvironmentVariable("AIKERNEL_INFERENCE_PROFILE",profile?"1":null);
+Environment.SetEnvironmentVariable("AIKERNEL_CUDA_EVENT_PROFILE",cudaEvents?"1":null);
 string mode=args[0],requested=options.GetValueOrDefault("--instruction-set","auto"),precision=options.GetValueOrDefault("--precision","fp32");
 int workers=int.Parse(options.GetValueOrDefault("--workers","4")),tokens=int.Parse(options.GetValueOrDefault("--tokens","128")),device=int.Parse(options.GetValueOrDefault("--device","0"));
 if(mode is not ("cpu" or "cuda" or "vulkan")||workers is <1 or >6||tokens is <1 or >256||device<0||precision is not ("fp32" or "q8" or "int8-auto" or "dp4a" or "tensor-core"))throw new ArgumentException("Invalid benchmark configuration.");
@@ -28,7 +33,7 @@ const string inquiry="分類: 設定・エラー\n問い合わせ:\nサンプル
 using var timeout=new CancellationTokenSource(TimeSpan.FromHours(2));
 var kernel=typeof(Qwen3CpuModel).Assembly;
 string modelHash=FileHash(args[1]);
-Log(new{kind="environment",protocol="fixed-greedy-128-v1",mode,requestedInstructionSet=requested,workers,tokens,device,precision,
+Log(new{kind="environment",protocol="fixed-greedy-128-v1",profile,cudaEvents,mode,requestedInstructionSet=requested,workers,tokens,device,precision,
     model=Path.GetFileName(args[1]),modelSha256=modelHash,kernelSha256=FileHash(kernel.Location),
     runtime=RuntimeInformation.FrameworkDescription,os=RuntimeInformation.OSDescription,processors=Environment.ProcessorCount,
     instructionSets=CpuInstructionSets.Available,measuredRequests=5,unmeasuredRequests=1,ignoreEos=true,temperature=0,system,inquiry});
@@ -51,7 +56,7 @@ else if(mode=="cuda")
             precision=="dp4a"?CudaQ8Kernel.Dp4a:precision=="tensor-core"?CudaQ8Kernel.TensorCore:CudaQ8Kernel.Auto);
     await model.WarmupAsync(system,timeout.Token);
     Log(new{kind="setup",setupMs=setup.Elapsed.TotalMilliseconds,model.DevicePciBusId,model.DeviceWeightBytes,model.ActivationPrecision});
-    await Measure(async()=>{var r=await model.GenerateBenchmarkAsync(system,inquiry,tokens,timeout.Token);return new Row(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,r.GeneratedTokenSha256);});
+    await Measure(async()=>{var r=await model.GenerateBenchmarkAsync(system,inquiry,tokens,timeout.Token);return new Row(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,r.GeneratedTokenSha256,r.Profile);});
     Log(new{kind="integer-kernels",model.Int8Statistics});
 }
 else
@@ -59,7 +64,7 @@ else
     using var model=new Qwen3VulkanModel(args[1],device,workers,1024,1024L*1024*1024,precision=="q8");
     await model.WarmupAsync(system,timeout.Token);
     Log(new{kind="setup",setupMs=setup.Elapsed.TotalMilliseconds,model.Device,model.DeviceWeightBytes,model.ActivationPrecision});
-    await Measure(async()=>{var r=await model.GenerateBenchmarkAsync(system,inquiry,tokens,timeout.Token);return new Row(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,r.GeneratedTokenSha256);});
+    await Measure(async()=>{var r=await model.GenerateBenchmarkAsync(system,inquiry,tokens,timeout.Token);return new Row(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,r.GeneratedTokenSha256,r.Profile);});
 }
 Log(new{kind="complete",passed=true});
 
@@ -83,8 +88,8 @@ void Check(Row r)
     if(r.PrefillThreads!=workers||r.DecodeThreads!=workers)throw new Exception("Worker count changed during ISA comparison.");
 }
 record Row(string Text,int InputTokens,int OutputTokens,string FinishReason,double PrefillMilliseconds,double DecodeMilliseconds,
-    int PrefillForwardTokens,int DecodeForwardTokens,int PrefillThreads,int DecodeThreads,string? GeneratedTokenSha256)
+    int PrefillForwardTokens,int DecodeForwardTokens,int PrefillThreads,int DecodeThreads,string? GeneratedTokenSha256,InferenceProfile? Profile)
 {
     public static Row From(CpuGeneration r)=>new(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,
-        r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,r.GeneratedTokenSha256);
+        r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,r.GeneratedTokenSha256,r.Profile);
 }

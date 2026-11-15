@@ -10,6 +10,7 @@ public sealed class Qwen3CpuModel : IDisposable
     private readonly GgufWeights file;
     private readonly IMatrixOffload? gpu;
     private readonly bool quantizeGpuActivations;
+    private readonly bool profileEnabled=Environment.GetEnvironmentVariable("AIKERNEL_INFERENCE_PROFILE")=="1";
     private readonly QwenTokenizer tokenizer;
     private readonly GgufWeights.Tensor embedding, output;
     private readonly Layer[] layers;
@@ -221,18 +222,31 @@ public sealed class Qwen3CpuModel : IDisposable
     private CpuGeneration Run(string system,string user,int maximum,int[]? choices,CancellationToken token,bool ignoreEos=false)
     {
         if(system.Length>8192||user.Length>4096)throw new ArgumentException("Text exceeds model input limit.");
+        var profile=profileEnabled?new InferenceProfiler():null;
+        if(profile is not null)(gpu as CudaQuantizedMatrix)?.BeginProfile();
+        long stage=profile?.Start()??0;
         var prompt=tokenizer.Chat(system,user);
+        profile?.Add(InferenceStage.Tokenization,stage);
         if(prompt.Count+maximum>context)throw new ArgumentException("Model context budget exceeded.");
-        using var state=new State(this,token);state.Options.MaxDegreeOfParallelism=prefillThreads;var watch=Stopwatch.StartNew();var generated=new List<int>();
+        stage=profile?.Start()??0;
+        var state=new State(this,token);
+        profile?.Add(InferenceStage.StateAllocation,stage);
+        CpuGeneration result;
+        try
+        {
+        state.Options.MaxDegreeOfParallelism=prefillThreads;var watch=Stopwatch.StartNew();var generated=new List<int>();
+        stage=profile?.Start()??0;
         int prefixCount=tokenizer.Prefix(system).Count,begin=0;
         if(prefixCache is { } cached && cached.System==system)
         {
             for(int i=0;i<layers.Length;i++){cached.Keys[i].CopyTo(state.Keys[i],0);cached.Values[i].CopyTo(state.Values[i],0);}
             begin=cached.Count;
         }
+        profile?.Add(InferenceStage.PrefixCopy,stage);
+        if(profile is not null)profile.Phase=InferencePhase.Prefill;
         for(int i=begin;i<prompt.Count;i++)
         {
-            token.ThrowIfCancellationRequested();Forward(prompt[i],i,state,prefillBackend);
+            token.ThrowIfCancellationRequested();Forward(prompt[i],i,state,prefillBackend,profile);
             if(i+1==prefixCount)
             {
                 // Cache only trusted system instructions, never inquiry text or generated content.
@@ -241,6 +255,7 @@ public sealed class Qwen3CpuModel : IDisposable
             }
         }
         long prefillTicks=watch.ElapsedTicks;int decodeForwards=0;state.Options.MaxDegreeOfParallelism=decodeThreads;
+        if(profile is not null)profile.Phase=InferencePhase.Decode;
         var finish=ignoreEos?"benchmark-fixed-tokens":"length";
         for(int step=0;step<maximum;step++)
         {
@@ -252,29 +267,41 @@ public sealed class Qwen3CpuModel : IDisposable
                 foreach(int id in choices)
                 {
                     var row=output with {Offset=output.Offset+(long)id*output.RowBytes,Rows=1};
-                    Multiply(row,state.Normal,score,state.Options,decodeBackend);
+                    Multiply(row,state.Normal,score,state.Options,decodeBackend,profile);
                     if(score[0]>best){best=score[0];next=id;}
                 }
                 if(!float.IsFinite(best))throw new ArithmeticException("Non-finite model score.");
             }
             else
             {
-                Multiply(output,state.Normal,state.Logits,state.Options,decodeBackend);
+                Multiply(output,state.Normal,state.Logits,state.Options,decodeBackend,profile);
+                stage=profile?.Start()??0;
                 next=0;float best=float.NegativeInfinity;
                 for(int i=0;i<state.Logits.Length;i++)if(state.Logits[i]>best){best=state.Logits[i];next=i;}
+                profile?.Add(InferenceStage.Argmax,stage);
                 if(!float.IsFinite(best))throw new ArithmeticException("Non-finite model logits.");
             }
             if(next==tokenizer.End&&!ignoreEos){finish="stop";break;}
             generated.Add(next);
             if(choices is not null){finish="classified";break;}
-            if(step+1<maximum){Forward(next,prompt.Count+step,state,decodeBackend);decodeForwards++;}
+            if(step+1<maximum){Forward(next,prompt.Count+step,state,decodeBackend,profile);decodeForwards++;}
         }
         long elapsed=watch.ElapsedMilliseconds;
         double prefillMs=(double)prefillTicks*1000/Stopwatch.Frequency,decodeMs=watch.Elapsed.TotalMilliseconds-prefillMs;
         tuner?.Observe("prefill",prefillBackend+"@"+prefillThreads,prompt.Count,prompt.Count-begin,prefillMs);
         if(choices is null)tuner?.Observe("decode",decodeBackend+"@"+decodeThreads,prompt.Count+generated.Count,generated.Count,decodeMs);
-        return new(ignoreEos?string.Empty:tokenizer.DecodeReply(generated),prompt.Count,generated.Count,finish,elapsed,CpuBackend)
+        result=new(ignoreEos?string.Empty:tokenizer.DecodeReply(generated),prompt.Count,generated.Count,finish,elapsed,CpuBackend)
         {GeneratedTokenSha256=ignoreEos?Convert.ToHexStringLower(SHA256.HashData(System.Runtime.InteropServices.MemoryMarshal.AsBytes(generated.ToArray().AsSpan()))):null,PrefillMilliseconds=prefillMs,DecodeMilliseconds=decodeMs,PrefillForwardTokens=prompt.Count-begin,DecodeForwardTokens=decodeForwards,PrefillThreads=prefillThreads,DecodeThreads=decodeThreads};
+        }
+        finally
+        {
+            if(profile is not null)profile.Phase=InferencePhase.Request;
+            stage=profile?.Start()??0;state.Dispose();profile?.Add(InferenceStage.StateClear,stage);
+        }
+        if(profile is null)return result;
+        var snapshot=profile.Snapshot(width,hidden,layers.Length,heads,kvHeads,headSize,context,CpuBackend,
+            (gpu as CudaQuantizedMatrix)?.UsesInt8==true?"q8-int32":quantizeGpuActivations||backend.EndsWith("-q8",StringComparison.Ordinal)?"q8":"fp32");
+        return result with {Profile=snapshot with {CudaMatrix=(gpu as CudaQuantizedMatrix)?.ReadProfile()}};
     }
     internal long DeviceWeightBytes=>gpu?.WeightBytes??0;
     internal string? DevicePciBusId=>gpu?.PciBusId;
@@ -282,30 +309,41 @@ public sealed class Qwen3CpuModel : IDisposable
     internal object? VulkanDiagnostics=>(gpu as VulkanQuantizedMatrix)?.Diagnostics;
     internal VulkanComputeDeviceInfo? VulkanDevice=>(gpu as VulkanQuantizedMatrix)?.DeviceInfo;
     internal void ZeroGpuScratch()=>gpu?.ZeroScratch();
-    private void Multiply(GgufWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,string selectedBackend)
+    private void Multiply(GgufWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,string selectedBackend,InferenceProfiler? profile=null)
     {
-        if(gpu is null)QuantizedCpuMatrix.Multiply(file,tensor,input,output,options,selectedBackend);
+        long started=profile?.Start()??0;
+        if(gpu is null)QuantizedCpuMatrix.Multiply(file,tensor,input,output,options,selectedBackend,profile);
         else if(quantizeGpuActivations&&tensor.Type==41)
         {
             options.CancellationToken.ThrowIfCancellationRequested();
-            using var rounded=new Q8ActivationBuffer(input,tensor.Columns);
-            gpu.Multiply(tensor,rounded.Values,output,options.CancellationToken);
+            using var rounded=new Q8ActivationBuffer(input,tensor.Columns,profile);
+            gpu.Multiply(tensor,rounded.Values,output,options.CancellationToken,profile);
         }
-        else gpu.Multiply(tensor,input,output,options.CancellationToken);
+        else gpu.Multiply(tensor,input,output,options.CancellationToken,profile);
+        profile?.Add(InferenceStage.Matrix,started);
     }
-    private void Forward(int id,int position,State s,string selectedBackend)
+    private void Forward(int id,int position,State s,string selectedBackend,InferenceProfiler? profile=null)
     {
+        long stage=profile?.Start()??0;
         QuantizedCpuMatrix.Row(file,embedding,id,s.X);
+        profile?.Add(InferenceStage.Embedding,stage);
         for(int index=0;index<layers.Length;index++)
         {
             s.Options.CancellationToken.ThrowIfCancellationRequested();var l=layers[index];
+            stage=profile?.Start()??0;
             Norm(s.X,l.Norm,s.Normal,epsilon);
-            Multiply(l.Q,s.Normal,s.Q,s.Options,selectedBackend);
-            Multiply(l.K,s.Normal,s.K,s.Options,selectedBackend);
-            Multiply(l.V,s.Normal,s.V,s.Options,selectedBackend);
+            profile?.Add(InferenceStage.Normalization,stage);
+            Multiply(l.Q,s.Normal,s.Q,s.Options,selectedBackend,profile);
+            Multiply(l.K,s.Normal,s.K,s.Options,selectedBackend,profile);
+            Multiply(l.V,s.Normal,s.V,s.Options,selectedBackend,profile);
+            stage=profile?.Start()??0;
             for(int h=0;h<heads;h++)Norm(s.Q.AsSpan(h*headSize,headSize),l.QNorm,s.Q.AsSpan(h*headSize,headSize),epsilon);
             for(int h=0;h<kvHeads;h++)Norm(s.K.AsSpan(h*headSize,headSize),l.KNorm,s.K.AsSpan(h*headSize,headSize),epsilon);
+            profile?.Add(InferenceStage.Normalization,stage);
+            stage=profile?.Start()??0;
             Rope(s.Q,heads,position);Rope(s.K,kvHeads,position);
+            profile?.Add(InferenceStage.Rope,stage);
+            stage=profile?.Start()??0;
             var keys=s.Keys[index];var values=s.Values[index];
             s.K.CopyTo(keys,position*kvSize);s.V.CopyTo(values,position*kvSize);
             Parallel.For(0,heads,s.Options,h=>{
@@ -316,16 +354,27 @@ public sealed class Qwen3CpuModel : IDisposable
                 var target=s.Attention.AsSpan(h*headSize,headSize);target.Clear();
                 for(int t=0;t<=position;t++){float p=scores[t]/sum;var v=values.AsSpan(t*kvSize+kv,headSize);for(int d=0;d<headSize;d++)target[d]+=p*v[d];}
             });
-            Multiply(l.O,s.Attention,s.Projected,s.Options,selectedBackend);
+            profile?.Add(InferenceStage.Attention,stage);
+            Multiply(l.O,s.Attention,s.Projected,s.Options,selectedBackend,profile);
+            stage=profile?.Start()??0;
             for(int i=0;i<width;i++)s.X[i]+=s.Projected[i];
+            profile?.Add(InferenceStage.Residual,stage);
+            stage=profile?.Start()??0;
             Norm(s.X,l.FfnNorm,s.Normal,epsilon);
-            Multiply(l.Gate,s.Normal,s.Gate,s.Options,selectedBackend);
-            Multiply(l.Up,s.Normal,s.Up,s.Options,selectedBackend);
+            profile?.Add(InferenceStage.Normalization,stage);
+            Multiply(l.Gate,s.Normal,s.Gate,s.Options,selectedBackend,profile);
+            Multiply(l.Up,s.Normal,s.Up,s.Options,selectedBackend,profile);
+            stage=profile?.Start()??0;
             for(int i=0;i<hidden;i++)s.Gate[i]=s.Gate[i]/(1+MathF.Exp(-s.Gate[i]))*s.Up[i];
-            Multiply(l.Down,s.Gate,s.Projected,s.Options,selectedBackend);
+            profile?.Add(InferenceStage.SwiGLU,stage);
+            Multiply(l.Down,s.Gate,s.Projected,s.Options,selectedBackend,profile);
+            stage=profile?.Start()??0;
             for(int i=0;i<width;i++)s.X[i]+=s.Projected[i];
+            profile?.Add(InferenceStage.Residual,stage);
         }
+        stage=profile?.Start()??0;
         Norm(s.X,finalNorm,s.Normal,epsilon);
+        profile?.Add(InferenceStage.Normalization,stage);
     }
     private void Rope(float[] vector,int count,int position)
     {
@@ -360,6 +409,8 @@ public sealed class Qwen3CpuModel : IDisposable
 /// <summary>Measured result of a completed CPU generation.</summary>
 public sealed record CpuGeneration(string Text,int InputTokens,int OutputTokens,string FinishReason,long ElapsedMilliseconds,string CpuBackend)
 {
+    /// <summary>Optional stage diagnostics enabled at model construction by AIKERNEL_INFERENCE_PROFILE=1.</summary>
+    public InferenceProfile? Profile {get;init;}
     /// <summary>Benchmark-only SHA-256 of little-endian Int32 generated token IDs, including EOS. Text is empty in benchmark mode.</summary>
     public string? GeneratedTokenSha256 {get;init;}
     /// <summary>Prompt forward passes excluding already cached system-prefix work.</summary>

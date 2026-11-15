@@ -241,7 +241,7 @@ internal sealed unsafe class VulkanQuantizedMatrix : IMatrixOffload
         var fenceInfo=new FenceCreateInfo{SType=StructureType.FenceCreateInfo};Check(vk.CreateFence(device,&fenceInfo,null,out fence),"create fence");
     }
 
-    public void Multiply(GgufWeights.Tensor tensor,float[] x,float[] y,CancellationToken token)
+    public void Multiply(GgufWeights.Tensor tensor,float[] x,float[] y,CancellationToken token,InferenceProfiler? inferenceProfile=null)
     {
         token.ThrowIfCancellationRequested();
         lock(sync)

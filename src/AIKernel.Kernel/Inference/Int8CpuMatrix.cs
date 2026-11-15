@@ -44,7 +44,7 @@ internal static unsafe class Int8CpuMatrix
         if((IsBackend(requested)||IsRoundedFloatBackend(requested))&&Candidates().Contains(requested))return requested;
         throw new PlatformNotSupportedException("Requested Q8 kernel needs a compatible native library, CPU and OS.");
     }
-    internal static void Multiply(GgufWeights file,GgufWeights.Tensor tensor,float[] x,float[] y,ParallelOptions options,string backend)
+    internal static void Multiply(GgufWeights file,GgufWeights.Tensor tensor,float[] x,float[] y,ParallelOptions options,string backend,InferenceProfiler? profile=null)
     {
         if(Resolve(backend)!=backend)throw new ArgumentException("Resolve the Q8 backend before multiplication.");
         if(tensor.Type!=41||tensor.Columns%128!=0||x.Length<tensor.Columns||y.Length<tensor.Rows)
@@ -55,7 +55,9 @@ internal static unsafe class Int8CpuMatrix
         var sums=ArrayPool<int>.Shared.Rent(blocks);
         try
         {
+            long started=profile?.Start()??0;
             Quantize(x.AsSpan(0,tensor.Columns),q,scales,sums);
+            profile?.Add(InferenceStage.Quantization,started);
             int workers=Math.Min(options.MaxDegreeOfParallelism,Math.Max(1,tensor.Rows/64));
             nint weights=(nint)file.Pointer(tensor);
             fixed(sbyte* xp=q)fixed(float* sp=scales)fixed(int* ip=sums)fixed(float* yp=y)

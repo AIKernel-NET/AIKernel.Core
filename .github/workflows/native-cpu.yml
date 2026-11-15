@@ -1,0 +1,24 @@
+name: native-cpu-release
+
+on:
+  pull_request:
+    paths: ['native/cpu/**', '.github/workflows/native-cpu.yml']
+  push:
+    branches: [main, dev]
+    paths: ['native/cpu/**', '.github/workflows/native-cpu.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure optimized native CPU build
+        run: cmake -S native/cpu -B build/cpu -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: Verify actual compilation flags
+        run: python native/cpu/check_release_flags.py build/cpu/compile_commands.json
+      - name: Build
+        run: cmake --build build/cpu --config Release --parallel 2

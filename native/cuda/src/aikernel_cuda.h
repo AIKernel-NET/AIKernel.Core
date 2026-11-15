@@ -28,6 +28,16 @@ typedef struct ak_stats {
     uint64_t scratch_bytes_per_tier;
 } ak_stats;
 
+/* Opt-in GEMV stream timeline. Events perturb timing; host sync overlaps GPU time.
+ * Counters exclude model uploads, scratch wipes and non-GEMV kernels. */
+typedef struct ak_matrix_profile {
+    uint32_t size, version;
+    uint64_t calls, upload_bytes, download_bytes;
+    double upload_ms, kernel_ms, download_ms, host_sync_ms;
+} ak_matrix_profile;
+AK_EXPORT int32_t ak_profile_configure(ak_context *ctx, uint32_t enabled);
+AK_EXPORT int32_t ak_profile_read(ak_context *ctx, ak_matrix_profile *result);
+
 /* Calls on one context must be serialized. A NULL context selects host execution for math. */
 AK_EXPORT uint32_t ak_abi_version(void);
 AK_EXPORT int32_t ak_get_device_count(int32_t *count);

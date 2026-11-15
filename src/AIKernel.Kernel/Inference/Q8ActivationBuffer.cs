@@ -7,7 +7,7 @@ namespace AIKernel.Kernel.Inference;
 internal sealed class Q8ActivationBuffer : IDisposable
 {
     internal float[] Values { get; }
-    internal Q8ActivationBuffer(float[] input,int columns)
+    internal Q8ActivationBuffer(float[] input,int columns,InferenceProfiler? profile=null)
     {
         var q=ArrayPool<sbyte>.Shared.Rent(columns);
         var scales=ArrayPool<float>.Shared.Rent(columns/128);
@@ -15,8 +15,10 @@ internal sealed class Q8ActivationBuffer : IDisposable
         Values=ArrayPool<float>.Shared.Rent(columns);
         try
         {
+            long started=profile?.Start()??0;
             Int8CpuMatrix.Quantize(input.AsSpan(0,columns),q,scales,sums);
             for(int i=0;i<columns;i++)Values[i]=q[i]*scales[i/128];
+            profile?.Add(InferenceStage.Quantization,started);
         }
         catch{ArrayPool<float>.Shared.Return(Values,clearArray:true);throw;}
         finally{ArrayPool<sbyte>.Shared.Return(q,clearArray:true);ArrayPool<float>.Shared.Return(scales,clearArray:true);ArrayPool<int>.Shared.Return(sums,clearArray:true);}

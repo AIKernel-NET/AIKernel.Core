@@ -61,6 +61,18 @@ internal static unsafe partial class NativeCompute
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_get_pci_bus_id")]
     internal static partial int GetPciBusId(nint context, byte* address, int capacity);
 
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct MatrixProfile
+    {
+        internal uint Size,Version;
+        internal ulong Calls,UploadBytes,DownloadBytes;
+        internal double UploadMs,KernelMs,DownloadMs,HostSyncMs;
+    }
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_profile_configure")]
+    internal static partial int ProfileConfigure(nint context,uint enabled);
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_profile_read")]
+    internal static partial int ProfileRead(nint context,ref MatrixProfile result);
+
     internal static void Check(int status, string operation)
     {
         if (status == 4)

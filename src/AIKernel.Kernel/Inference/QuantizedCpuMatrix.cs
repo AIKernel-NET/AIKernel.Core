@@ -36,16 +36,16 @@ internal static unsafe class QuantizedCpuMatrix
             for(int j=0;j<128;j++)output[i+j]=((p[2+j/8]>>(j%8))&1)==0?-scale:scale;
         }
     }
-    internal static void Multiply(GgufWeights file,GgufWeights.Tensor t,float[] x,float[] y,ParallelOptions options,string backend)
+    internal static void Multiply(GgufWeights file,GgufWeights.Tensor t,float[] x,float[] y,ParallelOptions options,string backend,InferenceProfiler? profile=null)
     {
         if(x.Length<t.Columns||y.Length<t.Rows)throw new ArgumentException("Matrix dimensions mismatch.");
         if(t.Type==41&&Int8CpuMatrix.IsRoundedFloatBackend(backend))
         {
             options.CancellationToken.ThrowIfCancellationRequested();
-            using var rounded=new Q8ActivationBuffer(x,t.Columns);
+            using var rounded=new Q8ActivationBuffer(x,t.Columns,profile);
             Multiply(file,t,rounded.Values,y,options,backend[..^3]);return;
         }
-        if(t.Type==41&&Int8CpuMatrix.IsBackend(backend)){Int8CpuMatrix.Multiply(file,t,x,y,options,backend);return;}
+        if(t.Type==41&&Int8CpuMatrix.IsBackend(backend)){Int8CpuMatrix.Multiply(file,t,x,y,options,backend,profile);return;}
         nint ptr=(nint)file.Pointer(t);
         int workers=Math.Min(options.MaxDegreeOfParallelism,Math.Max(1,t.Rows/64));
         var lut = t.Type == 41 && backend != "scalar" && Environment.GetEnvironmentVariable("AIKERNEL_Q1_KERNEL") == "lookup" ? ArrayPool<float>.Shared.Rent(t.Columns * 32) : null;

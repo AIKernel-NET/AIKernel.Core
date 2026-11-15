@@ -49,6 +49,9 @@ int ak_driver_open(ak_driver *d) {
     LOAD(module_load, "cuModuleLoadData");
     LOAD(module_func, "cuModuleGetFunction");
     LOAD(launch, "cuLaunchKernel");
+    LOAD(event_create, "cuEventCreate");
+    LOAD(event_record, "cuEventRecord");
+    LOAD(event_elapsed, "cuEventElapsedTime");
 #undef LOAD
     return AK_OK;
 }

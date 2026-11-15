@@ -122,3 +122,88 @@ GEMV divides output rows between workers, aligning boundaries to actual 64-byte 
 The GGUF mapping is read-only and uses OS page caching. `VirtualMemorySpace` separately supports budgeted RAM and SSD swap, but this Qwen3 engine's mutable KV arrays are not connected to that paging API. A 7 GB resident / 12 GB logical LLM workload has not been validated. Increasing the virtual-address limit does not establish a resident-memory bound. Such an integration requires admission accounting for model pages, KV, activations, temporary workspaces and runtime overhead, plus bounded encrypted swap I/O and failure tests.
 
 The quantized matrix tables have an explicit static initializer. Tuning can invoke multiplication before the first embedding row read; leaving initialization as beforefieldinit caused lazy static-base helpers to remain in the hot Q1 loop under the tested .NET 10.0.15 JIT. A before/after disassembly check found three GC-static-base helper call sites before the fix and none afterward. Keep first-use calibration and cached-startup benchmarks in performance validation.
+
+## Optimization baseline and stage diagnostics (2026-11-15)
+
+The November 15 fixed-token prototype is frozen before algorithm changes: 225
+included requests and 15 excluded diagnostic requests, preserved as complete
+blocks with their exclusion reasons. It is not an optimized release claim.
+Future measurements must use separate output directories, fixed workers/affinity,
+the same power scheme and two consecutive 15-second CPU averages at or below 10%.
+The public shared-host label is Server; its account budget remains six CPU workers
+in total and 7 GiB resident memory, including the concurrently running demo.
+
+Set `AIKERNEL_INFERENCE_PROFILE=1` **before constructing** a model to attach an
+`InferenceProfile` to completed CPU, CUDA or Vulkan results. The fixed-token
+harness exposes this as `--profile true`. Prefill and Decode separately aggregate
+embedding, matrix, normalization, RoPE, attention, SwiGLU, residual and argmax wall
+time. Q8 quantization is a nested part of Matrix, so do not add it twice. Attention
+includes KV writes and the head-worker dispatch. No per-worker timing is collected.
+When disabled, no profiling object, timestamps, GC counters or stage dictionary
+are created; existing generation timings still operate as before.
+
+Request-stage diagnostics include tokenization, state allocation, prefix copying
+and state clearing. The allocation delta is process-wide GC allocation, including
+runtime worker activity; it is not retained memory, RSS or solely this request.
+Managed request time excludes wrapper-level GPU scratch cleanup. External wall time
+remains the end-to-end measurement. The actual model dimensions, CPU backend and
+activation precision accompany each profile.
+
+Instrumentation-only validation on the development machine, Bonsai 1.7B, fixed
+128 tokens, four physical cores, five requests per block:
+
+| Path | Profile off median | Profile on median | Repeated off median |
+| --- | ---: | ---: | ---: |
+| AVX2 FP32 | 13.724 s | 13.808 s | 14.175 s |
+| RTX 4000 SFF Ada FP32 offload | 9.722 s | 9.726 s | — |
+
+All CPU token hashes matched the frozen November 15 AVX2 sequence. CUDA profile
+on/off hashes also matched each other. Differences of +0.61% and +0.05% are within
+the observed sample variability; this is not proof of zero overhead. On this CPU
+condition Matrix accounted for approximately 88% of elapsed work, SwiGLU 2% and
+RoPE 0.7%. CUDA Matrix includes staging, transfers, kernels and synchronization;
+it cannot be interpreted as pure GPU arithmetic. The GGUF reports width 2048,
+hidden size 6144, 28 layers, 16 query heads and eight KV heads.
+
+For a separate CUDA timeline diagnostic, also set `AIKERNEL_CUDA_EVENT_PROFILE=1`,
+or use `--profile true --cuda-events true` in CUDA benchmark mode. This requires
+the matching native library with `ak_profile_configure` and `ak_profile_read`.
+Four events on the existing private stream bracket GEMV upload, kernel and download;
+the existing synchronization is timed separately on the host. Event intervals
+include stream scheduling gaps, and host wait overlaps device time. Never sum
+these overlapping measures or use event-instrumented latency as the performance
+baseline. No CUDA events or event timers are used when this option is disabled.
+See the [CUDA Driver event API](https://docs.nvidia.com/cuda/cuda-driver-api/cuda_driver_api/group__CUDA__EVENT.html).
+
+### Order and correctness gates for 0.1.4
+
+1. Preserve this instrumentation-only baseline before changing algorithms.
+2. Reuse RoPE trigonometric values, request workspaces and shared-input Q8
+   preparation. Require unchanged token hashes for the same actual kernel and
+   precision; cancellation and cross-request isolation must also pass.
+3. Group accumulator-order changes and any measured worthwhile SwiGLU/Norm/Dot
+   vectorization in a separate numerical change. Compare against independent
+   scalar calculations and explicit logit tolerances before taking new hashes.
+   Keeping `auto` at FP32 does not make changed summation order bit-identical.
+
+`auto` remains FP32. Q8 precision remains explicit. Full GPU-resident forward/KV,
+true batched prefill, NUMA placement and expanded AMX work are later stages, not
+requirements silently folded into this first arithmetic-preserving change.
+
+Workspace reuse must clear its used high-water range before reuse, including KV,
+logits, attention scores, quantized buffers and pinned host staging. A trusted
+system-prefix cache is private model state, excluded from per-request clearing;
+it must never contain inquiry tokens and must be cleared on replacement/disposal.
+GPU wipe failure must reach the caller; context destruction alone is not evidence
+of VRAM zeroing. Preserve both the original inference failure and any cleanup
+failure, and stop admission to an instance whose cleanup failed.
+
+GPU auto selection must cover the output projection during startup warmup, not
+only layer shapes. Record per-process shape choices and repeat across launches;
+retune after GPU-resident forward changes. Replay diagnostics should retain actual
+kernel names, activation precision and per-phase worker counts alongside model
+and binary identity, rather than recording only the requested `auto` option.
+
+For future scale-only caches, FP16 scales add 2/18 (about 11%) of Q1 payload size;
+decoded FP32 scales add 4/18 (about 22%). Account for this difference in RAM limits.
+Neither estimate is a measured resident-memory guarantee.

@@ -1,0 +1,21 @@
+{
+  "counters": {
+    "total": "889",
+    "executed": "889",
+    "passed": "889",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "trxSha256": "533971df81cb57633dee2f5a1344818152fd14dc7196fbe6a06c5788dd79a846"
+}

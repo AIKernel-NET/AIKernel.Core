@@ -1,6 +1,7 @@
 using AIKernel.Kernel.Inference;
 using System.Text.Json;
 
+if(args.Length>0&&args[0].StartsWith("--gemma-",StringComparison.Ordinal)){await Gemma4Validation.Run(args);return;}
 if(args.Length>=2&&args[0]=="--inspect")
 {
     var info=GgufModelInspector.Inspect(args[1]);

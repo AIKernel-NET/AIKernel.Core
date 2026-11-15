@@ -1,0 +1,85 @@
+{
+  "pairs": [
+    {
+      "model": "1.7",
+      "mode": "cpu",
+      "precision": "avx2-int8-q8",
+      "tokens": 128,
+      "sha256": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e",
+      "pass": true
+    },
+    {
+      "model": "1.7",
+      "mode": "cpu",
+      "precision": "avx2-q8",
+      "tokens": 128,
+      "sha256": "33cf1e25ec1b1f19f486f3fedf2b26c47d47fc89ea3767b8b4a64a451848e9ef",
+      "pass": true
+    },
+    {
+      "model": "1.7",
+      "mode": "cuda",
+      "precision": "dp4a",
+      "tokens": 128,
+      "sha256": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e",
+      "pass": true
+    },
+    {
+      "model": "1.7",
+      "mode": "cuda",
+      "precision": "q8",
+      "tokens": 128,
+      "sha256": "33cf1e25ec1b1f19f486f3fedf2b26c47d47fc89ea3767b8b4a64a451848e9ef",
+      "pass": true
+    },
+    {
+      "model": "1.7",
+      "mode": "cuda",
+      "precision": "tensorcore",
+      "tokens": 128,
+      "sha256": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e",
+      "pass": true
+    },
+    {
+      "model": "4",
+      "mode": "cpu",
+      "precision": "avx2-int8-q8",
+      "tokens": 128,
+      "sha256": "04885936686fc8ef72b3b7bcf4cea727ebd1b687440342298f887e8a55a14c45",
+      "pass": true
+    },
+    {
+      "model": "4",
+      "mode": "cpu",
+      "precision": "avx2-q8",
+      "tokens": 128,
+      "sha256": "04885936686fc8ef72b3b7bcf4cea727ebd1b687440342298f887e8a55a14c45",
+      "pass": true
+    },
+    {
+      "model": "4",
+      "mode": "cuda",
+      "precision": "dp4a",
+      "tokens": 128,
+      "sha256": "04885936686fc8ef72b3b7bcf4cea727ebd1b687440342298f887e8a55a14c45",
+      "pass": true
+    },
+    {
+      "model": "4",
+      "mode": "cuda",
+      "precision": "q8",
+      "tokens": 128,
+      "sha256": "8c6ab7dde90ae25353bcd89da14f6145df9c315d8dc3ea48f660b0d3595fca8e",
+      "pass": true
+    },
+    {
+      "model": "4",
+      "mode": "cuda",
+      "precision": "tensorcore",
+      "tokens": 128,
+      "sha256": "04885936686fc8ef72b3b7bcf4cea727ebd1b687440342298f887e8a55a14c45",
+      "pass": true
+    }
+  ],
+  "performanceBenchmark": false
+}

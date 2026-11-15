@@ -2,11 +2,26 @@
 
 2026-11-15。レビュー対象は `codex/context-free-cuda-pci` の `9362118`。
 実装は `c6f8fdf` を起点とする `codex/model-expansion-gemma4-gptoss` で進めます。
-生成グラフは引き続き Qwen3 dense です。新しい重み形式のCPU参照処理を追加しましたが、
-Gemma 4 / GPT-OSS の生成対応完了を示すものではありません。
+生成グラフはQwen3 denseに加え、Gemma 4 E2BのCPUテキスト参照経路を実装しました。
+GPT-OSSは引き続き読み取り・形式の参照デコードまでです。
 0.1.4 は既存の Bonsai の数値・再現性・配布検証を維持します。
 
-## 今回実装した範囲
+## Gemma 4 E2Bの生成実装
+
+`Gemma4E2BCpuModel` を追加し、日本語の実生成まで確認しました。
+専用Unicode BPE、単一ターンの対話形式、PLE、局所/全文脈Attention、共有KV、
+層別RoPE、GELU、後段の正規化、layer scalar、出力soft capを実装しています。
+Qwen3の処理には分岐を加えず、別のモデルクラスとして追加しました。
+
+Google配布のQAT GGUFと同じ重みをTransformersの参照グラフへ読み込ませ、
+228組の中間値・ロジット比較が許容誤差内で、12ステップのtoken ID列も一致しました。
+元BF16チェックポイントとの量子化誤差評価ではありません。
+tokenizer 112例、対話形式8例の照合と、512トークン窓の境界・共有KV・消去のテストも追加しました。
+
+[APIと対応範囲](../gemma4-e2b-inference.md) ·
+[参照revision、誤差、再現手順](evidence/gemma4-e2b-20261115/README.md)
+
+## 第1段階で実装した読み取り・形式の分離
 
 - GGUFディレクトリ読み取りをQwen3の実行条件から分離しました。
   rank 1〜4、expert行列のコピーを伴わないビュー、64bitのオフセット・格納サイズに対応します。
@@ -23,8 +38,8 @@ Gemma 4 / GPT-OSS の生成対応完了を示すものではありません。
 - 未対応architectureをQwenのForwardに通さず、新形式を既存のCUDA/Vulkan/Q8カーネルへ
   誤って渡すことも実行前に拒否します。GPUの分割uploadや新モデルの入場判定は未実装です。
 
-実配布物の先頭16MiBをrevision固定で取得し、完全なファイル長に対してヘッダーを検査しました。
-全重みのダウンロードや新モデルの生成は行っていません。
+第1段階では実配布物の先頭16MiBをrevision固定で取得し、完全なファイル長に対してヘッダーを検査しました。
+その時点では全重みのダウンロードや新モデルの生成を行っていません。現在のGemma生成検証は上記の別記録です。
 
 | 配布物 | テンソル数 | 確認できた形式 | 最大rank |
 | --- | ---: | --- | ---: |
@@ -40,10 +55,9 @@ QAT版にもQ6_Kが含まれるため、ファイル名のQ4_0だけで対応形
 
 ## 次に実装する範囲
 
-Gemma 4 E2Bではtokenizer/template、PLE、層別Attention/RoPE、共有KV、活性化とsoft capが残っています。
+Gemma 4 E2BではCPU参照生成まで完了し、GPU・SIMDの最適化と実運用枠の検証が残っています。
 GPT-OSSではtokenizer/Harmony、MoEルーターとexpert集約、sink、bias付き演算が残っています。
-今回のMXFP4参照デコードはその前提です。公式参照との中間値・ロジット照合ができるまでは、
-モデル全体の生成対応やServerの7GB枠での動作を表明しません。
+MXFP4参照デコードはその前提です。GPT-OSS全体の生成対応やServerの7GB枠での動作は未検証です。
 
 ## 添付レビューから採用する方針
 

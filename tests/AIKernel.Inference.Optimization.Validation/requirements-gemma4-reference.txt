@@ -1,0 +1,7 @@
+# Validation only; AIKernel has no Python/Torch runtime dependency.
+# Install torch==2.15.0+cpu separately from https://download.pytorch.org/whl/cpu.
+transformers @ https://github.com/huggingface/transformers/archive/3a134bc37f7c22c801b618e289b0255425f22647.zip
+gguf==0.19.0
+tokenizers==0.23.3
+numpy==2.5.4
+jinja2==3.1.6

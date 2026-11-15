@@ -348,6 +348,10 @@ optimization validation executable is explicitly non-packable.
 ## Planned model expansion
 
 [Gemma 4 and GPT-OSS implementation plan (Japanese)](development/model-expansion-gemma4-gptoss-jp.md)
+
+Gemma 4 E2B now has a separate CPU text reference graph, tokenizer, and shared-KV implementation.
+See [Gemma 4 E2B usage and validation (Japanese)](gemma4-e2b-inference.md).
+Its performance and resource limits have not been qualified for production hosting.
 records the current loader/runtime limits, verified model-specific requirements,
 implementation order and acceptance gates. These models are not yet supported;
 0.1.4's verified Qwen3/Q1_0 path remains the compatibility baseline.

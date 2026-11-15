@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-15",
+  "baselineCommit": "eaa6200",
+  "branch": "codex/model-expansion-gemma4-gptoss",
+  "testsPassed": 868,
+  "buildWarnings": 0,
+  "buildErrors": 0,
+  "tokenizerCases": 112,
+  "chatCases": 8,
+  "numericalComparisons": 228,
+  "bonsaiHashCases": 10,
+  "performanceBenchmark": false,
+  "runtime": "Windows x64 .NET 10 CPU reference",
+  "runnerNotes": "runner: numeric/lifecycle/Q8 regression; final-runner: budget and timing diagnostics finalized, FP32 regression, tokenizer and support reply. Forward arithmetic unchanged.",
+  "artifacts": {
+    "runner\\aikernel_cuda_driver.dll": "feff2bf33f6d75d1b02a8778cf5a4c42db20674572e945779099bc424d8e9009",
+    "runner\\aikernel_cpu_accel.dll": "0fe20a05cca323909b1ccbc23d94d87524a9a869251d096d581bd529f854704f",
+    "final-runner\\AIKernel.Kernel.dll": "9880cfcc51f3cf97051a1fc455542cda4a1504843a23d6b42510a87d7c64a1a0",
+    "runner\\AIKernel.Kernel.dll": "5b0372a9345e4b4bfe22d7f60d2593e74ea139b36e7841cce9400f398c61ae44"
+  }
+}

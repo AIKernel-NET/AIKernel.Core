@@ -15,6 +15,11 @@
    Q8 inputs are signed [-127,127], with one scale and sum per 128 elements. */
 AK_API uint32_t ak_cpu_abi(void);
 AK_API uint32_t ak_cpu_supports(void);
+/* Gemma Q4_0 with three residual Q8 planes per 32 activations. Explicit precision mode. */
+AK_API uint32_t ak_cpu_gemma_supports(void);
+AK_API int ak_cpu_gemma_q4_residual(const uint8_t*,size_t,const int8_t*,const float*,const int32_t*,uint32_t,uint32_t,uint32_t,float*);
+void ak_gemma_vnni256(const uint8_t*,const int8_t*,const float*,const int32_t*,uint32_t,uint32_t,float*);
+void ak_gemma_vnni512(const uint8_t*,const int8_t*,const float*,const int32_t*,uint32_t,uint32_t,float*);
 AK_API int ak_cpu_q1_q8(const uint8_t* w, size_t bytes, const int8_t* x,
     const float* scales, const int32_t* sums, uint32_t rows, uint32_t columns, uint32_t backend, float* y);
 void ak_vnni256_rows(const uint8_t*,const int8_t*,const float*,const int32_t*,uint32_t,uint32_t,float*);

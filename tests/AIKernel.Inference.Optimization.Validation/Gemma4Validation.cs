@@ -17,6 +17,7 @@ internal static class Gemma4Validation
         int threads=int.Parse(Environment.GetEnvironmentVariable("GEMMA_THREADS")??"4");
         int context=int.Parse(Environment.GetEnvironmentVariable("GEMMA_CONTEXT")??"1024");
         var execution=new Gemma4ExecutionOptions{Backend=Enum.Parse<Gemma4Backend>(Environment.GetEnvironmentVariable("GEMMA_BACKEND")??"Auto",true),
+            InstructionSet=Enum.Parse<Gemma4InstructionSet>(Environment.GetEnvironmentVariable("GEMMA_ISA")??"Auto",true),
             CudaDeviceOrdinal=int.Parse(Environment.GetEnvironmentVariable("GEMMA_GPU")??"0"),ProfileMatrices=Environment.GetEnvironmentVariable("GEMMA_PROFILE")=="1",
             Memory=Environment.GetEnvironmentVariable("GEMMA_SWAP_DIRECTORY") is {Length:>0} swap?new Gemma4MemoryOptions{SwapDirectory=swap,
                 WeightCacheBytes=long.Parse(Environment.GetEnvironmentVariable("GEMMA_CACHE_BYTES")??"5000000000")}:null};
@@ -41,7 +42,7 @@ internal static class Gemma4Validation
                 double prefillMs=benchTimer.Elapsed.TotalMilliseconds;
                 for(int i=0;i<benchSteps;i++)
                 {
-                    ids.Add(Gemma4E2BCpuModel.Argmax(benchState.Logits));
+                    ids.Add(model.SelectToken(benchState));
                     if(i+1<benchSteps)model.Forward(ids[^1],benchPrompt.Length+i,benchState,true);
                 }
                 double totalMs=benchTimer.Elapsed.TotalMilliseconds;
@@ -52,7 +53,8 @@ internal static class Gemma4Validation
                 Console.Error.WriteLine($"iteration {iteration+1}: {totalMs:F1}ms");
             }
             var process=Process.GetCurrentProcess();
-            File.WriteAllText(args[3],JsonSerializer.Serialize(new{backend=model.Backend,threads,context,loadMs,model.WeightBytes,model.GpuWeightBytes,
+            File.WriteAllText(args[3],JsonSerializer.Serialize(new{backend=model.Backend,threads,context,loadMs,model.WeightBytes,model.GpuWeightBytes,model.GpuResidentBytes,
+                gpuForward=model.GpuStatistics is {} gs?new{gs.Calls,gs.Synchronizations,gs.DownloadBytes}:null,
                 peakWorkingSetBytes=process.PeakWorkingSet64,workingSetBytes=process.WorkingSet64,promptTokens=benchPrompt.Length,steps=benchSteps,ignoreEos=true,temperature=0,model.MemoryStatistics,results}));return;
         }
         if(args[0]=="--gemma-lifecycle")
@@ -83,13 +85,13 @@ internal static class Gemma4Validation
         void Forward(int token,int position,bool logits)
         {
             model.Forward(token,position,state,logits,tracePositions.Contains(position)?(layer,stage,data)=>
-                File.WriteAllBytes(Path.Combine(destination,$"p{position}_{layer}_{stage}.f32"),MemoryMarshal.AsBytes(data.AsSpan()).ToArray()):null);
+                File.WriteAllBytes(Path.Combine(destination,$"p{position}_{layer}_{stage}.f32"),MemoryMarshal.AsBytes(data.AsSpan()).ToArray()):null,captureLogits:true);
         }
         for(int i=0;i<prompt.Length;i++){Forward(prompt[i],i,i==prompt.Length-1);Console.Error.WriteLine($"prefill {i+1}/{prompt.Length}");}
         for(int i=0;i<steps;i++)
         {
             File.WriteAllBytes(Path.Combine(destination,$"logits-{i}.f32"),MemoryMarshal.AsBytes(state.Logits.AsSpan()).ToArray());
-            tokens.Add(Gemma4E2BCpuModel.Argmax(state.Logits));
+            tokens.Add(model.SelectToken(state));
             if(i+1<steps)Forward(i<teacher.Length?teacher[i]:tokens[^1],prompt.Length+i,true);
             Console.Error.WriteLine($"decode {i+1}/{steps}");
         }

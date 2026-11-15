@@ -6,12 +6,13 @@ import sys
 from pathlib import Path
 
 lib = c.CDLL(sys.argv[1])
-source = Path(__file__).parent / 'src/gemma_gemv.cu'
+source = Path(__file__).parent / 'src' / (sys.argv[2] if len(sys.argv)>2 else 'gemma_gemv.cu')
 target = source.with_suffix('.ptx')
 program = c.c_void_p()
 lib.nvrtcCreateProgram.argtypes = [c.POINTER(c.c_void_p), c.c_char_p, c.c_char_p, c.c_int, c.c_void_p, c.c_void_p]
-assert lib.nvrtcCreateProgram(c.byref(program), source.read_bytes(), b'gemma_gemv.cu', 0, None, None) == 0
+assert lib.nvrtcCreateProgram(c.byref(program), source.read_bytes(), source.name.encode(), 0, None, None) == 0
 options = [b'--gpu-architecture=compute_75', b'--fmad=false', b'--std=c++17']
+options.append(('--include-path='+str(source.parent)).encode())
 lib.nvrtcCompileProgram.argtypes = [c.c_void_p, c.c_int, c.POINTER(c.c_char_p)]
 status = lib.nvrtcCompileProgram(program, len(options), (c.c_char_p * len(options))(*options))
 size = c.c_size_t()

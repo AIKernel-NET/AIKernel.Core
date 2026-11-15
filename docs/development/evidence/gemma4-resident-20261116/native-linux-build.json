@@ -1,0 +1,18 @@
+{
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "flags": [
+    "gcc",
+    "-O3",
+    "-std=c11",
+    "-D_GNU_SOURCE",
+    "-shared",
+    "-fPIC",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fvisibility=hidden"
+  ],
+  "abi": 1,
+  "gemmaExport": true,
+  "sha256": "245c729c99f90c558a33c32630d8bce37c0b72e557d79a945a0a683e8de8cc74"
+}

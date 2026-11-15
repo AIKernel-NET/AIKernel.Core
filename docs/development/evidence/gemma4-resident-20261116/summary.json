@@ -1,0 +1,177 @@
+{
+  "date": "2026-11-16",
+  "baselineCommit": "f04e45f",
+  "modelSha256": "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",
+  "promptTokens": 23,
+  "outputTokens": 128,
+  "decodeForwards": 127,
+  "hash": "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+  "timing": "prefill + decode; load, allocation, wipe and HTTP excluded",
+  "rows": [
+    {
+      "id": "prior-server",
+      "label": "Server / AVX2 (previous)",
+      "medianSeconds": 53.6360706,
+      "minSeconds": 52.7915534,
+      "maxSeconds": 55.5418893,
+      "decodeMsPerToken": 395.3201826771653,
+      "prior": true,
+      "runs": [
+        53.6360706,
+        52.7915534,
+        55.5418893
+      ],
+      "percentOfPriorServer": 100.0
+    },
+    {
+      "id": "server-avx2",
+      "label": "Server / AVX2",
+      "medianSeconds": 52.0251455,
+      "minSeconds": 51.4623931,
+      "maxSeconds": 53.8865225,
+      "decodeMsPerToken": 389.3777897637795,
+      "prior": false,
+      "runs": [
+        52.0251455,
+        51.4623931,
+        53.8865225
+      ],
+      "percentOfPriorServer": 96.99656391309173
+    },
+    {
+      "id": "server-avx512",
+      "label": "Server / AVX-512",
+      "medianSeconds": 51.5957947,
+      "minSeconds": 49.6712944,
+      "maxSeconds": 55.2407172,
+      "decodeMsPerToken": 386.38441968503935,
+      "prior": false,
+      "runs": [
+        49.6712944,
+        55.2407172,
+        51.5957947
+      ],
+      "percentOfPriorServer": 96.19607499733584
+    },
+    {
+      "id": "server-vnni",
+      "label": "Server / AVX-VNNI residual",
+      "medianSeconds": 55.9151579,
+      "minSeconds": 54.600829899999994,
+      "maxSeconds": 58.5119118,
+      "decodeMsPerToken": 413.8212062992126,
+      "prior": false,
+      "runs": [
+        54.600829899999994,
+        58.5119118,
+        55.9151579
+      ],
+      "percentOfPriorServer": 104.24916902842618
+    },
+    {
+      "id": "server-vnni512",
+      "label": "Server / AVX-512 VNNI residual",
+      "medianSeconds": 63.288551700000006,
+      "minSeconds": 58.40088,
+      "maxSeconds": 63.753956599999995,
+      "decodeMsPerToken": 467.4522748031496,
+      "prior": false,
+      "runs": [
+        58.40088,
+        63.288551700000006,
+        63.753956599999995
+      ],
+      "percentOfPriorServer": 117.9962495239165
+    },
+    {
+      "id": "prior-ada",
+      "label": "RTX 4000 Ada / previous",
+      "medianSeconds": 10.499689700000001,
+      "minSeconds": 10.3295233,
+      "maxSeconds": 10.9221379,
+      "decodeMsPerToken": 73.48108740157481,
+      "prior": true,
+      "runs": [
+        10.9221379,
+        10.3295233,
+        10.499689700000001
+      ],
+      "percentOfPriorServer": 19.57579961124147
+    },
+    {
+      "id": "matrix-ada",
+      "label": "RTX 4000 Ada / matrix only",
+      "medianSeconds": 11.029171,
+      "minSeconds": 10.274574000000001,
+      "maxSeconds": 11.151395500000001,
+      "decodeMsPerToken": 77.33618661417323,
+      "prior": false,
+      "runs": [
+        11.151395500000001,
+        10.274574000000001,
+        11.029171
+      ],
+      "percentOfPriorServer": 20.56297352998115
+    },
+    {
+      "id": "resident-ada",
+      "label": "RTX 4000 Ada / resident forward",
+      "medianSeconds": 2.9071861,
+      "minSeconds": 2.894109,
+      "maxSeconds": 2.9341692,
+      "decodeMsPerToken": 19.856888976377952,
+      "prior": false,
+      "runs": [
+        2.9071861,
+        2.894109,
+        2.9341692
+      ],
+      "percentOfPriorServer": 5.420207087280551
+    },
+    {
+      "id": "prior-t1000",
+      "label": "T1000 / previous",
+      "medianSeconds": 13.1030995,
+      "minSeconds": 12.6436872,
+      "maxSeconds": 13.4088853,
+      "decodeMsPerToken": 91.42221653543308,
+      "prior": true,
+      "runs": [
+        13.1030995,
+        12.6436872,
+        13.4088853
+      ],
+      "percentOfPriorServer": 24.429641011025147
+    },
+    {
+      "id": "matrix-t1000",
+      "label": "T1000 / matrix only",
+      "medianSeconds": 13.1208691,
+      "minSeconds": 12.4822091,
+      "maxSeconds": 13.6036514,
+      "decodeMsPerToken": 92.34999842519686,
+      "prior": false,
+      "runs": [
+        13.6036514,
+        13.1208691,
+        12.4822091
+      ],
+      "percentOfPriorServer": 24.462770954738808
+    },
+    {
+      "id": "resident-t1000",
+      "label": "T1000 / resident forward",
+      "medianSeconds": 7.1977742,
+      "minSeconds": 7.0548238,
+      "maxSeconds": 8.1504573,
+      "decodeMsPerToken": 50.06654724409449,
+      "prior": false,
+      "runs": [
+        7.1977742,
+        8.1504573,
+        7.0548238
+      ],
+      "percentOfPriorServer": 13.419652333741242
+    }
+  ]
+}

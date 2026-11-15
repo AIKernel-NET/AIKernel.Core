@@ -1,0 +1,21 @@
+{
+  "pass": true,
+  "sha256": "3efffb59a465da6d414450370b6349db4292f54dc3e2fe8d90d368a9b0d3ce1c",
+  "requiredFiles": [
+    "gemma_forward.ptx",
+    "gemma_forward.cu",
+    "gemma_program.inc",
+    "build_gemma_ptx.py"
+  ],
+  "compiledFromSdist": true,
+  "gpuAbiTest": {
+    "pass": true,
+    "gpu": 0,
+    "bounds": true,
+    "argmaxTies": true,
+    "singleSync": true,
+    "eightByteResult": true,
+    "privateStateWipe": true,
+    "nonFiniteFailClosed": true
+  }
+}

@@ -1,3 +1,4 @@
 include LICENSE
 include CMakeLists.txt
-recursive-include src *.c *.h *.in *.ptx
+recursive-include src *.c *.h *.in *.inc *.cu *.ptx
+include build_gemma_ptx.py

@@ -2,10 +2,10 @@ name: native-cpu-release
 
 on:
   pull_request:
-    paths: ['native/cpu/**', '.github/workflows/native-cpu.yml']
+    paths: ['native/cpu/**', 'tests/AIKernel.Accelerator.Validation/test_*.py', '.github/workflows/native-cpu.yml']
   push:
     branches: [main, dev]
-    paths: ['native/cpu/**', '.github/workflows/native-cpu.yml']
+    paths: ['native/cpu/**', 'tests/AIKernel.Accelerator.Validation/test_*.py', '.github/workflows/native-cpu.yml']
   workflow_dispatch:
 
 permissions:
@@ -22,3 +22,7 @@ jobs:
         run: python native/cpu/check_release_flags.py build/cpu/compile_commands.json
       - name: Build
         run: cmake --build build/cpu --config Release --parallel 2
+      - name: Validate native math or reject unsupported ISA safely
+        run: |
+          python tests/AIKernel.Accelerator.Validation/test_native.py build/cpu/libaikernel_cpu_accel.so
+          python tests/AIKernel.Accelerator.Validation/test_gemma_vnni.py build/cpu/libaikernel_cpu_accel.so

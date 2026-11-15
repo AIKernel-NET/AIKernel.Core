@@ -1,0 +1,1 @@
+{"pass": true, "gpu": 1, "bounds": true, "argmaxTies": true, "singleSync": true, "eightByteResult": true, "privateStateWipe": true, "nonFiniteFailClosed": true}

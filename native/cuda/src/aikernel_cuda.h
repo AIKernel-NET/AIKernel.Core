@@ -63,6 +63,20 @@ AK_EXPORT int32_t ak_gemv_q1_0(ak_context *ctx, uint64_t weights, const float *x
 /* Encoded Gemma F16/Q4_0/Q6_K, FP32 activations, no activation quantization. */
 AK_EXPORT int32_t ak_gemv_gemma(ak_context *ctx, uint64_t weights, const float *x, float *y,
     uint32_t rows, uint32_t cols, uint32_t type);
+/* Resident Gemma graph commands. All ranges are validated at configuration; calls are serialized.
+ * Normal forward transfers only an 8-byte token/status pair, with one stream synchronization.
+ * Trace and full-logit transfers are opt-in diagnostics. Reset wipes all request buffers. */
+typedef struct ak_gemma_command {
+    uint32_t op,n,m,k,type,flags,offset,reserved;
+    uint64_t a,b,c,d;
+    float scale;
+    uint32_t padding;
+} ak_gemma_command;
+typedef struct ak_gemma_forward_stats { uint64_t calls,synchronizations,download_bytes; } ak_gemma_forward_stats;
+AK_EXPORT int32_t ak_gemma_configure(ak_context*,const ak_gemma_command*,uint32_t,uint32_t,uint64_t,size_t,uint64_t,uint64_t,uint32_t);
+AK_EXPORT int32_t ak_gemma_forward(ak_context*,uint32_t,uint32_t,uint32_t,float*,float*,uint32_t*);
+AK_EXPORT int32_t ak_gemma_reset(ak_context*);
+AK_EXPORT int32_t ak_gemma_read_stats(ak_context*,ak_gemma_forward_stats*);
 /* Capability bits 1=DP4A, 2=SM80 integer MMA. Calls on one context are serialized. */
 AK_EXPORT int32_t ak_get_int8_capabilities(ak_context *ctx, uint32_t *flags);
 AK_EXPORT int32_t ak_gemv_q1_q8(ak_context *ctx, uint64_t weights, const int8_t *x,

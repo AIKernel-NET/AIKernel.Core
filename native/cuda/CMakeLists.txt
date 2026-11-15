@@ -15,7 +15,7 @@ string(REPLACE "\"" "\\\"" PTX_LITERAL "${PTX_LITERAL}")
 string(REPLACE "\n" "\\n\"\n\"" PTX_LITERAL "${PTX_LITERAL}")
 configure_file(src/embedded_ptx.h.in embedded_ptx.h @ONLY)
 
-foreach(KERNEL q1_dp4a q1_mma gemma_gemv)
+foreach(KERNEL q1_dp4a q1_mma gemma_gemv gemma_forward)
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS src/${KERNEL}.ptx)
     file(READ "${CMAKE_CURRENT_SOURCE_DIR}/src/${KERNEL}.ptx" PTX_LITERAL)
     string(REPLACE "\\" "\\\\" PTX_LITERAL "${PTX_LITERAL}")

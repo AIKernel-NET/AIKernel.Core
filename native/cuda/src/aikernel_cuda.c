@@ -5,6 +5,7 @@
 #include "q1_dp4a.h"
 #include "q1_mma.h"
 #include "gemma_gemv.h"
+#include "gemma_forward.h"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -46,6 +47,12 @@ struct ak_context {
     int profile_enabled;
     void *profile_events[4]; /* Context-owned, reclaimed with the private context. */
     ak_matrix_profile profile;
+    ak_gemma_command *gemma_commands;
+    uint32_t gemma_command_count,gemma_context,gemma_trace_floats,gemma_position;
+    uint64_t gemma_work,gemma_logits,gemma_result;
+    size_t gemma_work_bytes;
+    void *gemma_functions[8];
+    ak_gemma_forward_stats gemma_stats;
 };
 
 uint32_t ak_abi_version(void) { return AK_ABI; }
@@ -239,11 +246,17 @@ static int within(allocation **head, uint64_t address, size_t bytes) {
 
 int32_t ak_destroy(ak_context *ctx) {
     if (!ctx) return AK_INVALID;
+    /* Host staging remains writable even when the device can no longer be entered. */
+    if(ctx->scratch_host)wipe_host(ctx->scratch_host,ctx->scratch_bytes);
     ak_driver *d = &ctx->driver;
     int status = ak_status(d->ctx_push(ctx->cuda));
     int current = status == AK_OK;
     if (current) {
         status = wipe_scratch_current(ctx);
+        if(ctx->gemma_work) {
+            int wiped=finish_stream(ctx,ctx->driver.memset8(ctx->gemma_work,0,ctx->gemma_work_bytes,ctx->stream));
+            if(!status)status=wiped;
+        }
         if (ctx->scratch_host) {
             int next = ak_status(d->host_free(ctx->scratch_host));
             if (!status) status = next;
@@ -267,6 +280,7 @@ int32_t ak_destroy(ak_context *ctx) {
     int destroyed = ak_status(d->ctx_destroy(ctx->cuda));
     if (!status) status = destroyed;
     ak_driver_close(d);
+    free(ctx->gemma_commands);
     free(ctx);
     return status;
 }
@@ -345,7 +359,11 @@ static int release(ak_context *ctx, uint64_t address, int pinned) {
     return status;
 }
 
-int32_t ak_device_free(ak_context *ctx, uint64_t address) { return release(ctx, address, 0); }
+int32_t ak_device_free(ak_context *ctx, uint64_t address) {
+    /* A configured program owns its allocations until context destruction. */
+    if(ctx&&ctx->gemma_commands)return AK_INVALID;
+    return release(ctx, address, 0);
+}
 int32_t ak_pinned_free(ak_context *ctx, void *address) { return release(ctx, (uint64_t)(uintptr_t)address, 1); }
 
 static int scratch(ak_context *ctx, size_t bytes) {
@@ -370,6 +388,8 @@ static int scratch(ak_context *ctx, size_t bytes) {
     if (!code) ctx->scratch_bytes = bytes;
     return ak_status(code);
 }
+
+#include "gemma_program.inc"
 
 int32_t ak_upload(ak_context *ctx, uint64_t address, const void *source, size_t bytes) {
     if (!ctx || !source || !bytes || !within(&ctx->device_blocks, address, bytes)) return AK_INVALID;

@@ -64,10 +64,11 @@ internal sealed class Gemma4PagedWeights : IVirtualMemorySource,IDisposable
         space.UseComputeBlock(layout.FirstPage+row/layout.RowsPerPage,(bytes,_)=>
             tensor.Encoding.Decode(bytes.Slice((row%layout.RowsPerPage)*tensor.RowBytes,tensor.RowBytes),destination.AsSpan(0,tensor.Columns)));
     }
-    internal unsafe void Multiply(GgufWeights.Tensor tensor,float[] x,float[] y,ParallelOptions parallel,bool reference)
+    internal unsafe void Multiply(GgufWeights.Tensor tensor,float[] x,float[] y,ParallelOptions parallel,bool reference,Gemma4InstructionSet isa=Gemma4InstructionSet.Auto)
     {
         if(x.Length<tensor.Columns||y.Length<tensor.Rows)throw new ArgumentException("Matrix dimensions mismatch.");
         var layout=layouts[tensor.Offset];
+        using var prepared=!reference&&tensor.Type==2&&Gemma4VnniMatrix.IsResidual(isa)?new Gemma4VnniMatrix(x.AsSpan(0,tensor.Columns)):null;
         for(int page=0;page<layout.Pages;page++)
         {
             parallel.CancellationToken.ThrowIfCancellationRequested();CheckPage();int first=page*layout.RowsPerPage,last=Math.Min(tensor.Rows,first+layout.RowsPerPage);
@@ -76,12 +77,13 @@ internal sealed class Gemma4PagedWeights : IVirtualMemorySource,IDisposable
                 fixed(byte* pointer=bytes)
                 {
                     nint address=(nint)pointer;
+                    if(prepared is not null){prepared.Multiply(address,last-first,y,first,parallel,isa);return;}
                     void Row(int row)
                     {
                         parallel.CancellationToken.ThrowIfCancellationRequested();
                         var encoded=new ReadOnlySpan<byte>((byte*)address+(row-first)*tensor.RowBytes,tensor.RowBytes);
                         if(!reference&&Gemma4CpuMatrix.Supported&&tensor.Type is 1 or 2 or 14&&tensor.Columns%32==0)
-                            y[row]=Gemma4CpuMatrix.Dot(encoded,x.AsSpan(0,tensor.Columns),tensor.Type);
+                            y[row]=Gemma4CpuMatrix.Dot(encoded,x.AsSpan(0,tensor.Columns),tensor.Type,isa);
                         else
                         {
                             Span<float> tile=stackalloc float[256];var encoding=tensor.Encoding;float sum=0;

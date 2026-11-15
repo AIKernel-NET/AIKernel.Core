@@ -1,10 +1,10 @@
 # Gemma 4 E2BのCPU／GPUテキスト生成
 
 `Gemma4E2BCpuModel` はGemma 4 E2Bの専用tokenizer、対話テンプレート、生成グラフを
-AIKernel内で実行します。CPUではAVX2 SIMDを使用し、非対応CPUでは参照経路へ戻ります。
+AIKernel内で実行します。CPUではAVX-512／AVX2のFP32 SIMDを使用し、非対応CPUでは参照経路へ戻ります。
 CPU実行にはCUDA・LibTorch・Pythonは不要です。GPUは明示的に選択でき、NVIDIAドライバーと
 AIKernelのネイティブDLLを使います。CUDA Toolkit・LibTorchは実行時に必要ありません。
-どちらもFP32の活性化を維持し、追加のINT8量子化は行いません。
+既定のCPU経路とCUDAはFP32の活性化を維持します。VNNIの残差Q8経路は明示指定専用です。
 
 ## 使用例
 
@@ -21,28 +21,47 @@ var result = await model.GenerateAsync(
 Console.WriteLine(result.Text);
 ```
 
-GPUの行列演算を使う場合は次のように指定します。従来のクラス名を維持しており、
-選択結果は `Backend`、GPUに置いた重みのバイト数は `GpuWeightBytes` で確認できます。
+forward全体をGPUに置く場合は次のように指定します。従来のクラス名を維持しており、
+選択結果は `Backend`、GPUの符号化重みは `GpuWeightBytes`、作業領域等を含む割り当て量は
+`GpuResidentBytes` で確認できます。
 
 ```csharp
 using var model = new Gemma4E2BCpuModel(
     "gemma-4-E2B_q4_0-it.gguf", 4, 1024, 4L << 30,
     new Gemma4ExecutionOptions {
-        Backend = Gemma4Backend.Cuda,
+        Backend = Gemma4Backend.CudaResident,
         CudaDeviceOrdinal = 0,
-        MaximumGpuWeightBytes = 2L << 30
+        MaximumResidentGpuBytes = 4L << 30
     });
 ```
 
-`Auto` はCPU上でAVX2の可否を判定します。CPUとGPUの速度を自動計測して選ぶ機能ではありません。
+`Auto` はCPU上でAVX-512、AVX2、参照経路の順に可否を判定します。
+CPUとGPUの速度を自動計測して選ぶ機能ではありません。
 比較用の `Reference` は改修前のスカラー計算を保ちます。CUDA指定時の未対応形式、VRAM不足、
 ドライバーエラーは呼び出し元へ返し、CPUへ黙って切り替えません。
 
-GPU経路はF16／Q4_0／Q6_Kの行列を符号化されたまま保持します。巨大なPLEトークン検索表は
-CPU上のマップに残し、FP32重みの全展開コピーを作りません。4行／128スレッドで各行を1warpが
-協調して計算します。Attention、RoPE、GELU、共有KVはCPU側です。行列ごとの同期は残っており、
-forward全体のGPU常駐化やバッチPrefillは今後の最適化項目です。
+`CudaResident` はF16／Q4_0／Q6_Kの行列、PLE検索表、共有KV、中間活性化をGPUに保持します。
+正規化、Attention、RoPE、GELU、残差、soft cap、argmaxまで同じストリームへ発行し、
+通常のforwardは最後に1回同期します。生成時の戻り値はtoken IDとエラー状態の8バイトです。
+位置ごとのRoPE定数だけは読み込み時にCPUで計算してGPUへ置きます。
+文脈2048で明示的GPU割り当ては約3.379GB。予算には重み・KV・作業領域・定数表を含め、
+ドライバー固有のメモリと診断用転送領域は含めません。ロード後はCPUの重みマップを解放します。
+
+既存の `Cuda` は行列だけをGPUへ置く比較用経路として維持しています。この経路では
+`MaximumGpuWeightBytes`（既定2GiB）が有効で、PLE検索・Attention・KVはCPU側です。
+両経路とも全重みのFP32展開コピーは作りません。バッチPrefillは今後の対象です。
 このPTX経路はCompute Capability 7.5以上を対象にしています。
+
+## CPUの命令セット指定
+
+`Gemma4ExecutionOptions.InstructionSet` に `Avx2`／`Avx512` を指定するとFP32経路を固定できます。
+`AvxVnniResidual`／`Avx512VnniResidual` は、32要素の入力を3段の残差Q8へ分け、Q4_0行列に
+整数積和を使う実験経路です。F16／Q6_KにはFP32内積を使います。対応する最新の
+`aikernel_cpu_accel` ライブラリとCPU・OSの対応が必要で、強制指定が使えなければ例外になります。
+
+残差Q8は近似計算です。検証した入力では既存の数値ゲートを維持しましたが、ビット完全一致を
+一般に保証するものではありません。今回のServer実測ではAVX2より遅く、`Auto` の候補には
+加えていません。生成結果の `ActivationPrecision` は `q8-residual-3`、`Backend` は実際の経路名です。
 
 ## Serverの7GB枠とSSDバックエンド
 
@@ -107,14 +126,16 @@ system/userは各8192文字以内で、トークン化後に「入力＋出力�
 超過した入力を切り捨てて生成しません。
 
 重みは符号化されたままマップし、最大256要素のブロックでデコードします。
-KV、ロジット、Attentionスコア、PLEと中間活性化はリクエストごとに確保し、
-成功・例外・キャンセルのいずれでもモデルの同時実行枠を返す前に消去します。
+CPUのKV、ロジット、Attentionスコア、PLEと中間活性化はリクエストごとに確保します。
+GPU常駐経路はモデル専用の作業領域を再利用し、CPU側のKVコピーは確保しません。
+いずれも成功・例外・キャンセル時にモデルの同時実行枠を返す前に利用者データを消去します。
 現段階では利用者のprefixをキャッシュしません。
 公開APIはモデルごとに生成を直列化します。`Dispose` は実行中の生成の完了を待ちます。
 
 マップされたファイルのサイズはRSSの保証ではありません。CPU／GPUの応答時間と
 Serverの7GB枠の検証は[最適化の検証記録](development/gemma4-optimization-20261115-jp.md)で
 条件を区別して記録します。Bonsaiとはモデル・入力・量子化形式が異なるため、速度を直接比較しません。
+AVX-512／VNNIとGPU全forwardの追加結果は[2026-11-16の比較記録](development/gemma4-resident-20261116-jp.md)にまとめています。
 GPU経路ではリクエストの終了時に転送用のホスト／デバイスscratchも消去します。
 消去に失敗した場合は例外を返します。CUDAコンテキストの破棄だけを「消去の成功」とは扱いません。
 

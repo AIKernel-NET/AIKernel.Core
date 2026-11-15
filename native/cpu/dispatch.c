@@ -61,6 +61,17 @@ int ak_amx_enable(void)
     if(!ready)ready=(ak_cpu_supports()&4)!=0&&amx_os(1);
     return ready;
 }
+uint32_t ak_cpu_gemma_supports(void) { return ak_cpu_supports()&3u; }
+int ak_cpu_gemma_q4_residual(const uint8_t* w,size_t bytes,const int8_t* x,const float* scales,const int32_t* sums,
+    uint32_t rows,uint32_t columns,uint32_t backend,float* y)
+{
+    if(!w||!x||!scales||!sums||!y||!rows||!columns||columns%32||columns>200000||rows>262144||
+       (uint64_t)rows*(columns/32)*18>bytes||(backend!=1&&backend!=2))return -1;
+    if((ak_cpu_gemma_supports()&(1u<<(backend-1)))==0)return -2;
+    if(backend==1)ak_gemma_vnni256(w,x,scales,sums,rows,columns,y);
+    else ak_gemma_vnni512(w,x,scales,sums,rows,columns,y);
+    return 0;
+}
 int ak_cpu_q1_q8(const uint8_t* w,size_t bytes,const int8_t* x,const float* scales,const int32_t* sums,
     uint32_t rows,uint32_t columns,uint32_t backend,float* y)
 {

@@ -36,6 +36,14 @@ internal static unsafe partial class NativeCompute
     internal static partial int GemvQ1(nint context, ulong address, float* input, float* output, uint rows, uint columns);
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_gemv_gemma")]
     internal static partial int GemvGemma(nint context,ulong address,float* input,float* output,uint rows,uint columns,uint type);
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_gemma_configure")]
+    internal static partial int GemmaConfigure(nint context,Inference.Gemma4CudaForward.Command* commands,uint count,uint capacity,ulong work,nuint bytes,ulong logits,ulong result,uint traceFloats);
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_gemma_forward")]
+    internal static partial int GemmaForward(nint context,uint token,uint position,uint computeLogits,float* logits,float* trace,uint* next);
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_gemma_reset")]
+    internal static partial int GemmaReset(nint context);
+    [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_gemma_read_stats")]
+    internal static partial int GemmaStatistics(nint context,out Inference.Gemma4CudaForward.Statistics stats);
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_get_int8_capabilities")]
     internal static partial int GetInt8Capabilities(nint context,out uint flags);
     [DefaultDllImportSearchPaths(Search), LibraryImport(Library, EntryPoint = "ak_gemv_q1_q8")]

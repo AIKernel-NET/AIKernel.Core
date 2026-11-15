@@ -79,9 +79,10 @@ AIKernel CUDA Driver library and an NVIDIA driver; CUDA Toolkit and LibTorch are
 not runtime dependencies. The CPU API above still loads no CUDA library.
 See [GPU setup, allocation limits and validation](../native/cuda/README.md#quantized-qwen3-matrix-offload).
 
-GPU functional checks and performance comparisons are separate. Development-machine
-CPU/GPU performance measurements are on hold until a reboot and a quiet background
-load; diagnostic timings from functional tests must not be presented as benchmark results.
+GPU functional checks and performance comparisons are separate. The November 15
+prototype measurements are frozen; optimization comparisons use new measurement
+directories and the documented quiet-background gate. Diagnostic timings from
+functional tests must not be presented as benchmark results.
 
 ## Validation
 
@@ -109,7 +110,7 @@ Model format references: [Bonsai 1.7B](https://huggingface.co/prism-ml/Bonsai-1.
 
 Call `TuneCpuAsync(new CpuAutoTuningOptions(privateProfileDirectory, verifiedModelSha256))` before warmup to enable calibration. The model identity must be the SHA-256 already verified when installing the immutable GGUF. The host keeps admission closed during calibration. Explicit `AIKERNEL_CPU_GEMV=scalar|avx|avx2|avx512` overrides tuning; unavailable instructions are rejected. Automatic choices include supported AVX2/FMA and AVX-512 paths (or the supported AVX/scalar fallback) and worker ceilings 1, 2, 4, 6 within the constructor and effective processor limits.
 
-Prefill and decode have separate choices. Current prefill remains sequential token GEMV; there is no batched GEMM or VNNI kernel in this engine. Calibration samples Q, FFN gate/down matrices from the first, middle and final layers; decode also samples the output projection. It checks candidate arithmetic against scalar results, warms each candidate, then uses three paired rounds with reversed order. Median timings feed a 0.25 EMA; an incumbent changes only for an estimated improvement above 5 percent. This is a workload sample, not proof of a globally optimal kernel or thread count.
+Prefill and decode have separate choices. Current prefill remains sequential token GEMV, not batched GEMM. FP32 auto uses floating-point kernels; explicitly selected Q8 modes can use native VNNI kernels. Calibration samples Q, FFN gate/down matrices from the first, middle and final layers; decode also samples the output projection. It checks candidate arithmetic against scalar results, warms each candidate, then uses three paired rounds with reversed order. Median timings feed a 0.25 EMA; an incumbent changes only for an estimated improvement above 5 percent. This is a workload sample, not proof of a globally optimal kernel or thread count.
 
 The default calibration budget is two seconds, with at most one in-flight matrix probe of overrun. Incomplete measurements do not create a winning profile. Cache keys include verified model hash and shape, CPU brand/features, affinity, effective processors, thread/context ceilings, OS/runtime and the compiled kernel module ID. Profiles are bounded JSON, atomically replaced in a private directory. Invalid, unsupported, future-dated or expired profiles are remeasured. Fixed system KV stays private to the model and can be reused across numerically validated kernel choices.
 
@@ -232,3 +233,17 @@ integer shape map so later first-request calibration can be detected. CPU result
 retain activation precision without enabling profiling, alongside actual backend
 and per-phase worker counts. Duplicate Q8 preparation and arithmetic-order/SIMD
 changes remain separate follow-up work; they are not part of this implementation.
+
+The first repeated stage comparison preserved all five token hashes for each of
+AVX2 FP32, AVX2 INT8-Q8, CUDA FP32 and CUDA DP4A on Bonsai 1.7B, and AVX2 FP32 on
+Bonsai 4B. In the 1.7B FP32 profiles, per-request GC allocation fell from about
+373 MB to 87 MB on CPU and 297 MB to 11 MB on CUDA offload. These are allocation
+totals, not resident-memory limits. RoPE time fell from about 102 ms to 22 ms on
+CPU and 98 ms to 22 ms on CUDA offload. Overall median latency did **not** show a
+consistent improvement (CPU 13.81 to 13.88 s, CUDA 9.73 to 9.99 s). Keep the public
+article as a prototype baseline until an end-to-end gain is established.
+
+The full CUDA event diagnostic added substantial overhead: 17.86 s versus 9.73 s
+with ordinary stage timing. Its 34,232 GEMV calls and transfer byte counts are
+useful diagnostics, but its intervals must not be substituted into a normal
+latency comparison. Ordinary stage profiling remains independently switchable.

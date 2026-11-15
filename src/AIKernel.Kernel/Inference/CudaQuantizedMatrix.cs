@@ -12,6 +12,7 @@ internal sealed unsafe class CudaQuantizedMatrix : IMatrixOffload
     private readonly CudaQ8Kernel? int8Kernel;
     private readonly uint int8Capabilities;
     private readonly Dictionary<(int Rows,int Columns),uint> selections=[];
+    private readonly Dictionary<string,CudaQ8Calibration> calibration=[];
     private long dp4aCalls,tensorCoreCalls;
     private readonly bool eventProfile=Environment.GetEnvironmentVariable("AIKERNEL_CUDA_EVENT_PROFILE")=="1";
     internal void BeginProfile()
@@ -32,7 +33,7 @@ internal sealed unsafe class CudaQuantizedMatrix : IMatrixOffload
     internal bool UsesInt8=>int8Kernel.HasValue;
     internal CudaQ8Statistics Statistics
     {
-        get {lock(device.Gate)return new(dp4aCalls,tensorCoreCalls,selections.ToDictionary(p=>$"{p.Key.Rows}x{p.Key.Columns}",p=>p.Value==1?"dp4a":"tensor-core-int8"));}
+        get {lock(device.Gate)return new(dp4aCalls,tensorCoreCalls,selections.ToDictionary(p=>$"{p.Key.Rows}x{p.Key.Columns}",p=>p.Value==1?"dp4a":"tensor-core-int8")){Calibration=new Dictionary<string,CudaQ8Calibration>(calibration)};}
     }
     public long WeightBytes => weights.Length;
     public string? PciBusId => device.GetPciBusId();
@@ -128,13 +129,16 @@ internal sealed unsafe class CudaQuantizedMatrix : IMatrixOffload
                             Call(2,address,qp,sp,ip,yp,rows,columns,token);
                             for(int i=0;i<rows;i++)if(!float.IsFinite(output[i])||Math.Abs(output[i]-comparison[i])>1e-5*Math.Max(1,Math.Abs(comparison[i])))
                                 throw new ArithmeticException("CUDA integer kernels disagreed during calibration.");
-                            long[][] timings=[new long[3],new long[3]];
-                            for(int pass=0;pass<3;pass++)for(int order=0;order<2;order++)
+                            double[][] timings=[new double[CudaQ8Selection.Rounds],new double[CudaQ8Selection.Rounds]];
+                            for(int pass=0;pass<CudaQ8Selection.Rounds;pass++)for(int order=0;order<2;order++)
                             {
                                 uint candidate=(uint)((order+pass)%2+1);long start=Stopwatch.GetTimestamp();
-                                Call(candidate,address,qp,sp,ip,yp,rows,columns,token);timings[candidate-1][pass]=Stopwatch.GetTimestamp()-start;
+                                for(int repeat=0;repeat<CudaQ8Selection.CallsPerRound;repeat++)Call(candidate,address,qp,sp,ip,yp,rows,columns,token);
+                                timings[candidate-1][pass]=(Stopwatch.GetTimestamp()-start)*1000.0/Stopwatch.Frequency/CudaQ8Selection.CallsPerRound;
                             }
-                            Array.Sort(timings[0]);Array.Sort(timings[1]);selected=timings[1][1]<timings[0][1]*.95?2u:1u;
+                            var evidence=CudaQ8Selection.Choose(timings[0],timings[1]);
+                            selected=evidence.SelectedKernel=="tensor-core-int8"?2u:1u;
+                            calibration.Add($"{rows}x{columns}",evidence);
                             selections.Add((rows,columns),selected);
                         }
                         finally{ArrayPool<float>.Shared.Return(comparison,clearArray:true);}

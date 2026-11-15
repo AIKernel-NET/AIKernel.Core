@@ -108,14 +108,24 @@ Unsupported forced modes throw before model upload. T1000 uses DP4A in this
 implementation. Merely exposing a Vulkan integer-dot API is not evidence of
 hardware acceleration, so the P630 FP32 shader remains the control.
 
-`Auto` warms both supported integer kernels and compares three synchronous calls
-per kernel for each matrix shape, outside reported benchmark measurements.
-It selects Tensor Core MMA only when its median is at least 5% lower than DP4A.
+`Auto` warms both supported integer kernels, then compares nine alternating
+pairs of eight synchronous calls per kernel and matrix shape during warmup.
+It selects Tensor Core MMA only when the median paired ratio shows more than a
+10% advantage and eight of nine pairs favor Tensor Core; otherwise DP4A is
+retained. The earlier three-single-call rule produced different choices across
+three process launches on the development GPU. These conservative thresholds
+reduce noisy selections; they do not guarantee the global fastest kernel.
 Results are checked against each other before timing. Decisions are local to the
 model/context; this is shape calibration, not a guarantee of global optimality
 or an online load-adaptive policy. The MMA GEMV kernel repeats the input over
 eight columns, so it is not automatically faster than DP4A. `Int8Statistics`
-reports actual kernel calls, including calibration, and the selected shape map.
+reports actual kernel calls, including calibration, the selected shape map and
+paired timing evidence. Warmup covers full-output and single-label shapes too.
+After the paired-batch change, three fresh processes on the development Ada GPU
+selected the same six shape kernels: Tensor Core for 6144x2048 and 151669x2048,
+DP4A for the other four shapes. No new shape calibration occurred during the
+subsequent requests. This finite reproducibility check does not promise identical
+choices under different GPU loads, drivers or future GPU-resident execution.
 
 Transfers use bounded reusable pinned/device scratch and one stream synchronization
 per matrix call. Attention, normalization, RoPE, KV state and sampling still run

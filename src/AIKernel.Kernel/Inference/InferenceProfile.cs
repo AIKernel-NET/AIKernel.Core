@@ -7,7 +7,7 @@ public sealed record InferenceStageProfile(long Calls,double Milliseconds);
 
 /// <summary>Opt-in diagnostics. Matrix includes quantization and offload costs; nested stages must not be added twice.
 /// ProcessAllocatedBytes is a process-wide GC allocation delta, not retained memory or exclusively this request.
-/// RequestMilliseconds includes managed state cleanup but excludes wrapper-level GPU scratch cleanup.</summary>
+/// RequestMilliseconds includes managed state cleanup but excludes GPU scratch cleanup.</summary>
 public sealed record InferenceProfile(
     IReadOnlyDictionary<string,InferenceStageProfile> Stages,double RequestMilliseconds,long ProcessAllocatedBytes,
     int Width,int HiddenSize,int Layers,int Heads,int KvHeads,int HeadSize,int ContextTokens,

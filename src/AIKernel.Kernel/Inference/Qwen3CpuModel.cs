@@ -28,6 +28,8 @@ public sealed class Qwen3CpuModel : IDisposable
     private CpuAutoTuningOptions? tuningOptions;
     private CpuTuningStatus? tuningStatus;
     private PrefixState? prefixCache;
+    private Qwen3Workspace? workspace;
+    private bool cleanupFailed;
     private sealed record PrefixState(string System,int Count,float[][] Keys,float[][] Values);
     private sealed record Layer(GgufWeights.Tensor Q,GgufWeights.Tensor K,GgufWeights.Tensor V,GgufWeights.Tensor O,
         GgufWeights.Tensor Gate,GgufWeights.Tensor Up,GgufWeights.Tensor Down,float[] Norm,float[] FfnNorm,float[] QNorm,float[] KNorm);
@@ -102,6 +104,7 @@ public sealed class Qwen3CpuModel : IDisposable
     public string RequestedInstructionSet=>requestedInstructionSet;
     /// <summary>Actual matrix instruction set(s), including tuning decisions.</summary>
     public string CpuBackend=>prefillBackend==decodeBackend?prefillBackend:$"prefill={prefillBackend};decode={decodeBackend}";
+    private string ActivationPrecision=>(gpu as CudaQuantizedMatrix)?.UsesInt8==true?"q8-int32":quantizeGpuActivations||backend.EndsWith("-q8",StringComparison.Ordinal)?"q8":"fp32";
     /// <summary>Most recent tuning decision, or null when tuning was not requested.</summary>
     public CpuTuningStatus? TuningStatus=>tuningStatus;
     /// <summary>Encoded mapped-file length, without FP32 expansion.</summary>
@@ -181,15 +184,22 @@ public sealed class Qwen3CpuModel : IDisposable
         await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            await Task.Run(()=>{
-                if(prefixCache?.System==system)return;
+            await Task.Run(()=>WithCleanup(()=>{
+                if(prefixCache?.System==system)return 0;
                 var prefix=tokenizer.Prefix(system);
                 if(prefix.Count>=context)throw new ArgumentException("System prefix exceeds the context limit.");
-                using var state=new State(this,cancellationToken);state.Options.MaxDegreeOfParallelism=prefillThreads;
+                using var state=AcquireWorkspace(cancellationToken);state.Options.MaxDegreeOfParallelism=prefillThreads;
                 for(int i=0;i<prefix.Count;i++){cancellationToken.ThrowIfCancellationRequested();Forward(prefix[i],i,state,prefillBackend);}
-                prefixCache=new(system,prefix.Count,state.Keys.Select(k=>k.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray(),
-                    state.Values.Select(v=>v.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray());
-            },cancellationToken).ConfigureAwait(false);
+                // Calibrate output and single-label shapes before request admission too.
+                if(gpu is CudaQuantizedMatrix cuda&&cuda.UsesInt8)
+                {
+                    Multiply(output,state.Normal,state.Logits,state.Options,prefillBackend);
+                    Multiply(output with {Rows=1},state.Normal,state.Logits,state.Options,prefillBackend);
+                }
+                ReplacePrefix(new(system,prefix.Count,state.Keys.Select(k=>k.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray(),
+                    state.Values.Select(v=>v.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray()));
+                return 0;
+            }),cancellationToken).ConfigureAwait(false);
         }
         finally{gate.Release();}
     }
@@ -198,7 +208,7 @@ public sealed class Qwen3CpuModel : IDisposable
     {
         if(maxNewTokens<1||maxNewTokens>256)throw new ArgumentOutOfRangeException(nameof(maxNewTokens));
         await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try{return await Task.Run(()=>Run(system,user,maxNewTokens,null,cancellationToken),cancellationToken).ConfigureAwait(false);}
+        try{return await Task.Run(()=>WithCleanup(()=>Run(system,user,maxNewTokens,null,cancellationToken)),cancellationToken).ConfigureAwait(false);}
         finally{gate.Release();}
     }
     /// <summary>Benchmark only: greedy generation for exactly tokenCount steps, including EOS tokens.
@@ -207,7 +217,7 @@ public sealed class Qwen3CpuModel : IDisposable
     {
         if(tokenCount<1||tokenCount>256)throw new ArgumentOutOfRangeException(nameof(tokenCount));
         await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try{return await Task.Run(()=>Run(system,user,tokenCount,null,cancellationToken,ignoreEos:true),cancellationToken).ConfigureAwait(false);}
+        try{return await Task.Run(()=>WithCleanup(()=>Run(system,user,tokenCount,null,cancellationToken,ignoreEos:true)),cancellationToken).ConfigureAwait(false);}
         finally{gate.Release();}
     }
     /// <summary>Scores the next token over explicitly supplied single-token labels, without fabricated confidence.</summary>
@@ -216,7 +226,7 @@ public sealed class Qwen3CpuModel : IDisposable
         if(labels.Count is <2 or >16)throw new ArgumentException("Between two and sixteen labels required.");
         int[] ids=labels.Select(label=>{var encoded=tokenizer.Encode(label);return encoded.Count==1?encoded[0]:throw new ArgumentException("Labels must each encode to one token.");}).ToArray();
         await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try{return await Task.Run(()=>Run(system,user,1,ids,cancellationToken),cancellationToken).ConfigureAwait(false);}
+        try{return await Task.Run(()=>WithCleanup(()=>Run(system,user,1,ids,cancellationToken)),cancellationToken).ConfigureAwait(false);}
         finally{gate.Release();}
     }
     private CpuGeneration Run(string system,string user,int maximum,int[]? choices,CancellationToken token,bool ignoreEos=false)
@@ -229,7 +239,7 @@ public sealed class Qwen3CpuModel : IDisposable
         profile?.Add(InferenceStage.Tokenization,stage);
         if(prompt.Count+maximum>context)throw new ArgumentException("Model context budget exceeded.");
         stage=profile?.Start()??0;
-        var state=new State(this,token);
+        var state=AcquireWorkspace(token);
         profile?.Add(InferenceStage.StateAllocation,stage);
         CpuGeneration result;
         try
@@ -239,6 +249,7 @@ public sealed class Qwen3CpuModel : IDisposable
         int prefixCount=tokenizer.Prefix(system).Count,begin=0;
         if(prefixCache is { } cached && cached.System==system)
         {
+            state.MarkUsed(cached.Count);
             for(int i=0;i<layers.Length;i++){cached.Keys[i].CopyTo(state.Keys[i],0);cached.Values[i].CopyTo(state.Values[i],0);}
             begin=cached.Count;
         }
@@ -250,8 +261,8 @@ public sealed class Qwen3CpuModel : IDisposable
             if(i+1==prefixCount)
             {
                 // Cache only trusted system instructions, never inquiry text or generated content.
-                prefixCache=new(system,prefixCount,state.Keys.Select(k=>k.AsSpan(0,prefixCount*kvSize).ToArray()).ToArray(),
-                    state.Values.Select(v=>v.AsSpan(0,prefixCount*kvSize).ToArray()).ToArray());
+                ReplacePrefix(new(system,prefixCount,state.Keys.Select(k=>k.AsSpan(0,prefixCount*kvSize).ToArray()).ToArray(),
+                    state.Values.Select(v=>v.AsSpan(0,prefixCount*kvSize).ToArray()).ToArray()));
             }
         }
         long prefillTicks=watch.ElapsedTicks;int decodeForwards=0;state.Options.MaxDegreeOfParallelism=decodeThreads;
@@ -291,7 +302,7 @@ public sealed class Qwen3CpuModel : IDisposable
         tuner?.Observe("prefill",prefillBackend+"@"+prefillThreads,prompt.Count,prompt.Count-begin,prefillMs);
         if(choices is null)tuner?.Observe("decode",decodeBackend+"@"+decodeThreads,prompt.Count+generated.Count,generated.Count,decodeMs);
         result=new(ignoreEos?string.Empty:tokenizer.DecodeReply(generated),prompt.Count,generated.Count,finish,elapsed,CpuBackend)
-        {GeneratedTokenSha256=ignoreEos?Convert.ToHexStringLower(SHA256.HashData(System.Runtime.InteropServices.MemoryMarshal.AsBytes(generated.ToArray().AsSpan()))):null,PrefillMilliseconds=prefillMs,DecodeMilliseconds=decodeMs,PrefillForwardTokens=prompt.Count-begin,DecodeForwardTokens=decodeForwards,PrefillThreads=prefillThreads,DecodeThreads=decodeThreads};
+        {ActivationPrecision=ActivationPrecision,GeneratedTokenSha256=ignoreEos?Convert.ToHexStringLower(SHA256.HashData(System.Runtime.InteropServices.MemoryMarshal.AsBytes(generated.ToArray().AsSpan()))):null,PrefillMilliseconds=prefillMs,DecodeMilliseconds=decodeMs,PrefillForwardTokens=prompt.Count-begin,DecodeForwardTokens=decodeForwards,PrefillThreads=prefillThreads,DecodeThreads=decodeThreads};
         }
         finally
         {
@@ -300,7 +311,7 @@ public sealed class Qwen3CpuModel : IDisposable
         }
         if(profile is null)return result;
         var snapshot=profile.Snapshot(width,hidden,layers.Length,heads,kvHeads,headSize,context,CpuBackend,
-            (gpu as CudaQuantizedMatrix)?.UsesInt8==true?"q8-int32":quantizeGpuActivations||backend.EndsWith("-q8",StringComparison.Ordinal)?"q8":"fp32");
+            ActivationPrecision);
         return result with {Profile=snapshot with {CudaMatrix=(gpu as CudaQuantizedMatrix)?.ReadProfile()}};
     }
     internal long DeviceWeightBytes=>gpu?.WeightBytes??0;
@@ -308,7 +319,17 @@ public sealed class Qwen3CpuModel : IDisposable
     internal CudaQ8Statistics? CudaQ8Statistics=>(gpu as CudaQuantizedMatrix)?.Statistics;
     internal object? VulkanDiagnostics=>(gpu as VulkanQuantizedMatrix)?.Diagnostics;
     internal VulkanComputeDeviceInfo? VulkanDevice=>(gpu as VulkanQuantizedMatrix)?.DeviceInfo;
-    internal void ZeroGpuScratch()=>gpu?.ZeroScratch();
+    private T WithCleanup<T>(Func<T> work)
+    {
+        if(cleanupFailed)throw new InvalidOperationException("Model disabled after GPU scratch clearing failure.");
+        // Runs inside the admission gate. A cancelled queued request must not wipe another request's scratch.
+        return gpu is null?work():InferenceRequestCleanup.Execute(work,gpu.ZeroScratch,()=>cleanupFailed=true);
+    }
+    private void ReplacePrefix(PrefixState next)
+    {
+        var old=prefixCache;prefixCache=next;
+        if(old is not null)foreach(var array in old.Keys.Concat(old.Values))Array.Clear(array);
+    }
     private void Multiply(GgufWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,string selectedBackend,InferenceProfiler? profile=null)
     {
         long started=profile?.Start()??0;
@@ -322,11 +343,13 @@ public sealed class Qwen3CpuModel : IDisposable
         else gpu.Multiply(tensor,input,output,options.CancellationToken,profile);
         profile?.Add(InferenceStage.Matrix,started);
     }
-    private void Forward(int id,int position,State s,string selectedBackend,InferenceProfiler? profile=null)
+    private void Forward(int id,int position,Qwen3Workspace s,string selectedBackend,InferenceProfiler? profile=null)
     {
         long stage=profile?.Start()??0;
+        s.MarkUsed(position+1);
         QuantizedCpuMatrix.Row(file,embedding,id,s.X);
         profile?.Add(InferenceStage.Embedding,stage);
+        stage=profile?.Start()??0;s.PrepareRope(position,frequencies,ropeAmplitude);profile?.Add(InferenceStage.Rope,stage);
         for(int index=0;index<layers.Length;index++)
         {
             s.Options.CancellationToken.ThrowIfCancellationRequested();var l=layers[index];
@@ -341,13 +364,13 @@ public sealed class Qwen3CpuModel : IDisposable
             for(int h=0;h<kvHeads;h++)Norm(s.K.AsSpan(h*headSize,headSize),l.KNorm,s.K.AsSpan(h*headSize,headSize),epsilon);
             profile?.Add(InferenceStage.Normalization,stage);
             stage=profile?.Start()??0;
-            Rope(s.Q,heads,position);Rope(s.K,kvHeads,position);
+            s.Rotate(s.Q,heads,headSize);s.Rotate(s.K,kvHeads,headSize);
             profile?.Add(InferenceStage.Rope,stage);
             stage=profile?.Start()??0;
             var keys=s.Keys[index];var values=s.Values[index];
             s.K.CopyTo(keys,position*kvSize);s.V.CopyTo(values,position*kvSize);
             Parallel.For(0,heads,s.Options,h=>{
-                var scores=new float[position+1];int kv=h/(heads/kvHeads)*headSize;float max=float.NegativeInfinity;
+                var scores=s.Scores[h];int kv=h/(heads/kvHeads)*headSize;float max=float.NegativeInfinity;
                 var q=s.Q.AsSpan(h*headSize,headSize);
                 for(int t=0;t<=position;t++){float v=Dot(q,keys.AsSpan(t*kvSize+kv,headSize))/MathF.Sqrt(headSize);scores[t]=v;max=Math.Max(max,v);}
                 float sum=0;for(int t=0;t<=position;t++){scores[t]=MathF.Exp(scores[t]-max);sum+=scores[t];}
@@ -376,39 +399,19 @@ public sealed class Qwen3CpuModel : IDisposable
         Norm(s.X,finalNorm,s.Normal,epsilon);
         profile?.Add(InferenceStage.Normalization,stage);
     }
-    private void Rope(float[] vector,int count,int position)
-    {
-        int half=headSize/2;
-        for(int h=0;h<count;h++)for(int i=0;i<half;i++)
-        {
-            float angle=position*frequencies[i],c=MathF.Cos(angle)*ropeAmplitude,s=MathF.Sin(angle)*ropeAmplitude;
-            int a=h*headSize+i,b=a+half;float x=vector[a],y=vector[b];vector[a]=x*c-y*s;vector[b]=x*s+y*c;
-        }
-    }
+    private Qwen3Workspace AcquireWorkspace(CancellationToken token)
+        =>(workspace??=new(width,hidden,querySize,kvSize,heads,headSize,file.Tokens.Length,layers.Length,context)).Acquire(token,threads);
     private static float Dot(ReadOnlySpan<float> a,ReadOnlySpan<float> b){float sum=0;for(int i=0;i<a.Length;i++)sum+=a[i]*b[i];return sum;}
     private static void Norm(ReadOnlySpan<float> x,ReadOnlySpan<float> weights,Span<float> y,float eps)
     {float sum=Dot(x,x);float scale=1/MathF.Sqrt(sum/x.Length+eps);for(int i=0;i<x.Length;i++)y[i]=x[i]*scale*weights[i];}
-    private sealed class State : IDisposable
-    {
-        public readonly float[] X,Normal,Q,K,V,Attention,Projected,Gate,Up,Logits;
-        public readonly float[][] Keys,Values;
-        public readonly ParallelOptions Options;
-        public State(Qwen3CpuModel m,CancellationToken token)
-        {
-            X=new float[m.width];Normal=new float[m.width];Q=new float[m.querySize];K=new float[m.kvSize];V=new float[m.kvSize];
-            Attention=new float[m.querySize];Projected=new float[m.width];Gate=new float[m.hidden];Up=new float[m.hidden];Logits=new float[m.file.Tokens.Length];
-            Keys=Enumerable.Range(0,m.layers.Length).Select(_=>new float[m.context*m.kvSize]).ToArray();
-            Values=Enumerable.Range(0,m.layers.Length).Select(_=>new float[m.context*m.kvSize]).ToArray();
-            Options=new(){MaxDegreeOfParallelism=m.threads,CancellationToken=token};
-        }
-        public void Dispose(){foreach(var array in new[]{X,Normal,Q,K,V,Attention,Projected,Gate,Up,Logits}.Concat(Keys).Concat(Values))Array.Clear(array);}
-    }
     /// <summary>Dispose only after active requests have stopped.</summary>
-    public void Dispose(){if(prefixCache is {} c)foreach(var a in c.Keys.Concat(c.Values))Array.Clear(a);prefixCache=null;try{gpu?.Dispose();}finally{file.Dispose();gate.Dispose();}}
+    public void Dispose(){workspace?.Dispose();workspace=null;if(prefixCache is {} c)foreach(var a in c.Keys.Concat(c.Values))Array.Clear(a);prefixCache=null;try{gpu?.Dispose();}finally{file.Dispose();gate.Dispose();}}
 }
 /// <summary>Measured result of a completed CPU generation.</summary>
 public sealed record CpuGeneration(string Text,int InputTokens,int OutputTokens,string FinishReason,long ElapsedMilliseconds,string CpuBackend)
 {
+    /// <summary>Actual activation precision, retained even when stage profiling is disabled for replay diagnostics.</summary>
+    public string ActivationPrecision {get;init;}="fp32";
     /// <summary>Optional stage diagnostics enabled at model construction by AIKERNEL_INFERENCE_PROFILE=1.</summary>
     public InferenceProfile? Profile {get;init;}
     /// <summary>Benchmark-only SHA-256 of little-endian Int32 generated token IDs, including EOS. Text is empty in benchmark mode.</summary>

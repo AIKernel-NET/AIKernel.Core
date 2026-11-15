@@ -55,7 +55,7 @@ else if(mode=="cuda")
         :new Qwen3GpuModel(args[1],device,workers,1024,1024L*1024*1024,
             precision=="dp4a"?CudaQ8Kernel.Dp4a:precision=="tensor-core"?CudaQ8Kernel.TensorCore:CudaQ8Kernel.Auto);
     await model.WarmupAsync(system,timeout.Token);
-    Log(new{kind="setup",setupMs=setup.Elapsed.TotalMilliseconds,model.DevicePciBusId,model.DeviceWeightBytes,model.ActivationPrecision});
+    Log(new{kind="setup",setupMs=setup.Elapsed.TotalMilliseconds,model.DevicePciBusId,model.DeviceWeightBytes,model.ActivationPrecision,model.Int8Statistics});
     await Measure(async()=>{var r=await model.GenerateBenchmarkAsync(system,inquiry,tokens,timeout.Token);return new Row(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,r.GeneratedTokenSha256,r.Profile);});
     Log(new{kind="integer-kernels",model.Int8Statistics});
 }

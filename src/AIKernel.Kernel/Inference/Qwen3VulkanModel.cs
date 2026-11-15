@@ -27,26 +27,22 @@ public sealed class Qwen3VulkanModel : IDisposable
     /// <summary>Precomputes a trusted system prefix.</summary>
     public async Task WarmupAsync(string system,CancellationToken cancellationToken=default)
     {
-        try{await engine.WarmupAsync(system,cancellationToken).ConfigureAwait(false);}
-        finally{engine.ZeroGpuScratch();}
+        await engine.WarmupAsync(system,cancellationToken).ConfigureAwait(false);
     }
     /// <summary>Generates a bounded reply, with serialized requests and private request state.</summary>
     public async Task<VulkanGeneration> GenerateAsync(string system,string user,int maxNewTokens=128,CancellationToken cancellationToken=default)
     {
-        try{return Convert(await engine.GenerateAsync(system,user,maxNewTokens,cancellationToken).ConfigureAwait(false));}
-        finally{engine.ZeroGpuScratch();}
+        return Convert(await engine.GenerateAsync(system,user,maxNewTokens,cancellationToken).ConfigureAwait(false));
     }
     /// <summary>Benchmark only: greedy generation for exactly tokenCount steps, ignoring EOS.</summary>
     public async Task<VulkanGeneration> GenerateBenchmarkAsync(string system,string user,int tokenCount=128,CancellationToken cancellationToken=default)
     {
-        try{return Convert(await engine.GenerateBenchmarkAsync(system,user,tokenCount,cancellationToken).ConfigureAwait(false));}
-        finally{engine.ZeroGpuScratch();}
+        return Convert(await engine.GenerateBenchmarkAsync(system,user,tokenCount,cancellationToken).ConfigureAwait(false));
     }
     /// <summary>Scores explicit single-token labels.</summary>
     public async Task<VulkanGeneration> ClassifyAsync(string system,string user,IReadOnlyList<string> labels,CancellationToken cancellationToken=default)
     {
-        try{return Convert(await engine.ClassifyAsync(system,user,labels,cancellationToken).ConfigureAwait(false));}
-        finally{engine.ZeroGpuScratch();}
+        return Convert(await engine.ClassifyAsync(system,user,labels,cancellationToken).ConfigureAwait(false));
     }
     private VulkanGeneration Convert(CpuGeneration r)=>new(r.Text,r.InputTokens,r.OutputTokens,r.FinishReason,r.ElapsedMilliseconds,
         r.PrefillMilliseconds,r.DecodeMilliseconds,r.PrefillForwardTokens,r.DecodeForwardTokens,r.PrefillThreads,r.DecodeThreads,Device,DeviceWeightBytes)

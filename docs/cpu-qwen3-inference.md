@@ -145,7 +145,7 @@ are created; existing generation timings still operate as before.
 Request-stage diagnostics include tokenization, state allocation, prefix copying
 and state clearing. The allocation delta is process-wide GC allocation, including
 runtime worker activity; it is not retained memory, RSS or solely this request.
-Managed request time excludes wrapper-level GPU scratch cleanup. External wall time
+Managed request time excludes GPU scratch cleanup. External wall time
 remains the end-to-end measurement. The actual model dimensions, CPU backend and
 activation precision accompany each profile.
 
@@ -207,3 +207,28 @@ and binary identity, rather than recording only the requested `auto` option.
 For future scale-only caches, FP16 scales add 2/18 (about 11%) of Q1 payload size;
 decoded FP32 scales add 4/18 (about 22%). Account for this difference in RAM limits.
 Neither estimate is a measured resident-memory guarantee.
+
+### First arithmetic-preserving implementation
+
+RoPE now evaluates each position's cos/sin once and reuses the exact float values
+for all layers and heads. One model-owned workspace is reused under the admission
+gate. KV and per-head attention scores are cleared through the largest touched
+position before another lease; activations and logits are cleared in full.
+Cancellation marks the possible write range before forward work starts. The
+workspace has bounded capacity equal to the configured context, including a
+small per-head score array; it is retained until model disposal, not an unbounded
+global pool. Quantization buffers still use their existing clearing pools.
+
+CUDA/Vulkan scratch cleanup now completes inside the request admission gate.
+`InferenceCleanupException` preserves both inference and wipe errors and disables
+the affected model. A queued request cancelled before acquiring the gate does
+not clear the active request's scratch. Unit tests cover partial KV clearing,
+large-then-small leases, bit-identical rotary values and cleanup failures; real
+CPU/CUDA validation covers concurrent requests and cancellation recovery.
+
+CUDA INT8 warmup covers the full output projection and single-label row shape in
+addition to layer matrices. The benchmark's setup record includes the selected
+integer shape map so later first-request calibration can be detected. CPU results
+retain activation precision without enabling profiling, alongside actual backend
+and per-phase worker counts. Duplicate Q8 preparation and arithmetic-order/SIMD
+changes remain separate follow-up work; they are not part of this implementation.

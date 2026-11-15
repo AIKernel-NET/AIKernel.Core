@@ -332,18 +332,27 @@ public sealed class Qwen3CpuModel : IDisposable
         var old=prefixCache;prefixCache=next;
         if(old is not null)foreach(var array in old.Keys.Concat(old.Values))Array.Clear(array);
     }
-    private void Multiply(GgufWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,string selectedBackend,InferenceProfiler? profile=null)
+    private void Multiply(GgufWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,string selectedBackend,InferenceProfiler? profile=null,PreparedQ8Activation? prepared=null)
     {
         long started=profile?.Start()??0;
-        if(gpu is null)QuantizedCpuMatrix.Multiply(file,tensor,input,output,options,selectedBackend,profile);
+        if(gpu is null)QuantizedCpuMatrix.Multiply(file,tensor,input,output,options,selectedBackend,profile,prepared);
         else if(quantizeGpuActivations&&tensor.Type==41)
         {
             options.CancellationToken.ThrowIfCancellationRequested();
-            using var rounded=new Q8ActivationBuffer(input,tensor.Columns,profile);
-            gpu.Multiply(tensor,rounded.Values,output,options.CancellationToken,profile);
+            using var owned=prepared is null?new PreparedQ8Activation(input,tensor.Columns,true,profile):null;
+            var activation=prepared??owned!;activation.Validate(input,tensor.Columns,rounded:true);
+            gpu.Multiply(tensor,activation.Rounded!,output,options.CancellationToken,profile);
         }
-        else gpu.Multiply(tensor,input,output,options.CancellationToken,profile);
+        else gpu.Multiply(tensor,input,output,options.CancellationToken,profile,prepared);
         profile?.Add(InferenceStage.Matrix,started);
+    }
+    private PreparedQ8Activation? PrepareShared(float[] input,string selectedBackend,bool hasQ1,InferenceProfiler? profile)
+    {
+        bool quantized=gpu is null?Int8CpuMatrix.IsBackend(selectedBackend)||Int8CpuMatrix.IsRoundedFloatBackend(selectedBackend)
+            :quantizeGpuActivations||(gpu as CudaQuantizedMatrix)?.UsesInt8==true;
+        if(!hasQ1||!quantized)return null;
+        bool rounded=gpu is null?Int8CpuMatrix.IsRoundedFloatBackend(selectedBackend):quantizeGpuActivations;
+        return new(input,input.Length,rounded,profile,InferenceStage.SharedQuantization);
     }
     private void Forward(int id,int position,Qwen3Workspace s,string selectedBackend,InferenceProfiler? profile=null)
     {
@@ -358,9 +367,12 @@ public sealed class Qwen3CpuModel : IDisposable
             stage=profile?.Start()??0;
             Norm(s.X,l.Norm,s.Normal,epsilon);
             profile?.Add(InferenceStage.Normalization,stage);
-            Multiply(l.Q,s.Normal,s.Q,s.Options,selectedBackend,profile);
-            Multiply(l.K,s.Normal,s.K,s.Options,selectedBackend,profile);
-            Multiply(l.V,s.Normal,s.V,s.Options,selectedBackend,profile);
+            using(var prepared=PrepareShared(s.Normal,selectedBackend,l.Q.Type==41||l.K.Type==41||l.V.Type==41,profile))
+            {
+                Multiply(l.Q,s.Normal,s.Q,s.Options,selectedBackend,profile,prepared);
+                Multiply(l.K,s.Normal,s.K,s.Options,selectedBackend,profile,prepared);
+                Multiply(l.V,s.Normal,s.V,s.Options,selectedBackend,profile,prepared);
+            }
             stage=profile?.Start()??0;
             for(int h=0;h<heads;h++)Norm(s.Q.AsSpan(h*headSize,headSize),l.QNorm,s.Q.AsSpan(h*headSize,headSize),epsilon);
             for(int h=0;h<kvHeads;h++)Norm(s.K.AsSpan(h*headSize,headSize),l.KNorm,s.K.AsSpan(h*headSize,headSize),epsilon);
@@ -387,8 +399,11 @@ public sealed class Qwen3CpuModel : IDisposable
             stage=profile?.Start()??0;
             Norm(s.X,l.FfnNorm,s.Normal,epsilon);
             profile?.Add(InferenceStage.Normalization,stage);
-            Multiply(l.Gate,s.Normal,s.Gate,s.Options,selectedBackend,profile);
-            Multiply(l.Up,s.Normal,s.Up,s.Options,selectedBackend,profile);
+            using(var prepared=PrepareShared(s.Normal,selectedBackend,l.Gate.Type==41||l.Up.Type==41,profile))
+            {
+                Multiply(l.Gate,s.Normal,s.Gate,s.Options,selectedBackend,profile,prepared);
+                Multiply(l.Up,s.Normal,s.Up,s.Options,selectedBackend,profile,prepared);
+            }
             stage=profile?.Start()??0;
             for(int i=0;i<hidden;i++)s.Gate[i]=s.Gate[i]/(1+MathF.Exp(-s.Gate[i]))*s.Up[i];
             profile?.Add(InferenceStage.SwiGLU,stage);

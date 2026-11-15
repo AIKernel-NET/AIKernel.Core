@@ -247,3 +247,26 @@ The full CUDA event diagnostic added substantial overhead: 17.86 s versus 9.73 s
 with ordinary stage timing. Its 34,232 GEMV calls and transfer byte counts are
 useful diagnostics, but its intervals must not be substituted into a normal
 latency comparison. Ordinary stage profiling remains independently switchable.
+
+### Shared Q8 input preparation
+
+Q/K/V now share one prepared activation, and Gate/Up share a second one. Each
+lease ends before the source activation is overwritten. CPU native INT8, rounded
+Q8-to-FP32 and CUDA DP4A/Tensor Core use the original quantizer without changing
+scales, rounding or integer sums. All rented buffers are cleared on return,
+including exception and cancellation unwinding; no cache uses array identity
+across forward calls. FP32 auto does not prepare Q8 activations.
+
+The isolated sharing change passed 810 unit tests. Frozen pre-change and changed
+binaries generated identical fixed-128 token hashes for both Bonsai 1.7B and 4B
+on AVX2 INT8-Q8, AVX2 rounded Q8, CUDA DP4A, CUDA rounded Q8 and Tensor Core
+(10 before/after pairs). These functional checks did not require an idle CPU and
+are not performance measurements. For 47 prompt and 127 decode forwards, Q8
+preparations fall from 34,232 to 19,616 (1.7B), or 43,976 to 25,184 (4B).
+`SharedQuantization` is outside `Matrix`; the ordinary per-projection
+`Quantization` stage remains nested inside `Matrix`.
+
+The separate optimization validator can capture teacher-forced full-vocabulary
+logits from frozen DLLs, and compares real mapped Q1 matrices to independently
+decoded double-precision dot products. It is a diagnostic harness, not a public
+API or a throughput benchmark.

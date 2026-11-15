@@ -5,7 +5,8 @@ namespace AIKernel.Kernel.Inference;
 /// <summary>Wall-clock aggregate for one inference stage, not the sum of worker CPU times.</summary>
 public sealed record InferenceStageProfile(long Calls,double Milliseconds);
 
-/// <summary>Opt-in diagnostics. Matrix includes quantization and offload costs; nested stages must not be added twice.
+/// <summary>Opt-in diagnostics. Matrix includes per-projection Quantization and offload costs; nested stages must not be added twice.
+/// SharedQuantization prepares Q/K/V or Gate/Up outside Matrix and is a separate non-nested stage.
 /// ProcessAllocatedBytes is a process-wide GC allocation delta, not retained memory or exclusively this request.
 /// RequestMilliseconds includes managed state cleanup but excludes GPU scratch cleanup.</summary>
 public sealed record InferenceProfile(
@@ -21,7 +22,7 @@ public sealed record InferenceProfile(
 public sealed record CudaMatrixProfile(ulong Calls,ulong UploadBytes,ulong DownloadBytes,
     double UploadMilliseconds,double KernelIntervalMilliseconds,double DownloadMilliseconds,double HostSyncMilliseconds);
 
-internal enum InferenceStage { Tokenization,StateAllocation,PrefixCopy,Embedding,Matrix,Quantization,Normalization,Rope,Attention,SwiGLU,Residual,Argmax,StateClear }
+internal enum InferenceStage { Tokenization,StateAllocation,PrefixCopy,Embedding,Matrix,Quantization,SharedQuantization,Normalization,Rope,Attention,SwiGLU,Residual,Argmax,StateClear }
 internal enum InferencePhase { Request,Prefill,Decode }
 
 // One request owns this object under the model admission gate. Worker loops do not record timestamps.

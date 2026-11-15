@@ -44,20 +44,16 @@ internal static unsafe class Int8CpuMatrix
         if((IsBackend(requested)||IsRoundedFloatBackend(requested))&&Candidates().Contains(requested))return requested;
         throw new PlatformNotSupportedException("Requested Q8 kernel needs a compatible native library, CPU and OS.");
     }
-    internal static void Multiply(GgufWeights file,GgufWeights.Tensor tensor,float[] x,float[] y,ParallelOptions options,string backend,InferenceProfiler? profile=null)
+    internal static void Multiply(GgufWeights file,GgufWeights.Tensor tensor,float[] x,float[] y,ParallelOptions options,string backend,InferenceProfiler? profile=null,PreparedQ8Activation? prepared=null)
     {
         if(Resolve(backend)!=backend)throw new ArgumentException("Resolve the Q8 backend before multiplication.");
         if(tensor.Type!=41||tensor.Columns%128!=0||x.Length<tensor.Columns||y.Length<tensor.Rows)
             throw new ArgumentException("Q8 kernel requires a dimensionally valid Q1_0 matrix.");
-        int blocks=tensor.Columns/128;
-        var q=ArrayPool<sbyte>.Shared.Rent(tensor.Columns);
-        var scales=ArrayPool<float>.Shared.Rent(blocks);
-        var sums=ArrayPool<int>.Shared.Rent(blocks);
-        try
+        options.CancellationToken.ThrowIfCancellationRequested();
+        using var owned=prepared is null?new PreparedQ8Activation(x,tensor.Columns,false,profile):null;
+        var activation=prepared??owned!;activation.Validate(x,tensor.Columns);
+        var q=activation.Quantized;var scales=activation.Scales;var sums=activation.Sums;
         {
-            long started=profile?.Start()??0;
-            Quantize(x.AsSpan(0,tensor.Columns),q,scales,sums);
-            profile?.Add(InferenceStage.Quantization,started);
             int workers=Math.Min(options.MaxDegreeOfParallelism,Math.Max(1,tensor.Rows/64));
             nint weights=(nint)file.Pointer(tensor);
             fixed(sbyte* xp=q)fixed(float* sp=scales)fixed(int* ip=sums)fixed(float* yp=y)
@@ -85,10 +81,6 @@ internal static unsafe class Int8CpuMatrix
                 }
                 if(workers==1)Work(0);else Parallel.For(0,workers,options,Work);
             }
-        }
-        finally
-        {
-            ArrayPool<sbyte>.Shared.Return(q,clearArray:true);ArrayPool<float>.Shared.Return(scales,clearArray:true);ArrayPool<int>.Shared.Return(sums,clearArray:true);
         }
     }
     internal static void Quantize(ReadOnlySpan<float> x,Span<sbyte> q,Span<float> scales,Span<int> sums)

@@ -66,6 +66,4 @@ public sealed record VulkanGeneration(string Text,int InputTokens,int OutputToke
     public string ActivationPrecision {get;init;}="fp32";
     /// <summary>Benchmark-only generated token hash; benchmark Text is empty.</summary>
     public string? GeneratedTokenSha256 {get;init;}
-    /// <summary>Benchmark-only generated token hash; benchmark Text is empty.</summary>
-    public string? GeneratedTokenSha256 {get;init;}
 }

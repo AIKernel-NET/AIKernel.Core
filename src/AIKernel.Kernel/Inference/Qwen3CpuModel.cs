@@ -361,8 +361,6 @@ public sealed record CpuGeneration(string Text,int InputTokens,int OutputTokens,
 {
     /// <summary>Benchmark-only SHA-256 of little-endian Int32 generated token IDs, including EOS. Text is empty in benchmark mode.</summary>
     public string? GeneratedTokenSha256 {get;init;}
-    /// <summary>Benchmark-only SHA-256 of little-endian Int32 generated token IDs, including EOS. Text is empty in benchmark mode.</summary>
-    public string? GeneratedTokenSha256 {get;init;}
     /// <summary>Prompt forward passes excluding already cached system-prefix work.</summary>
     public double PrefillMilliseconds {get;init;}
     /// <summary>Output projections and generated-token forward passes.</summary>

@@ -77,6 +77,4 @@ public sealed record GpuGeneration(string Text,int InputTokens,int OutputTokens,
     public string ActivationPrecision {get;init;}="fp32";
     /// <summary>Benchmark-only generated token hash; benchmark Text is empty.</summary>
     public string? GeneratedTokenSha256 {get;init;}
-    /// <summary>Benchmark-only generated token hash; benchmark Text is empty.</summary>
-    public string? GeneratedTokenSha256 {get;init;}
 }

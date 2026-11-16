@@ -139,6 +139,8 @@ ReplayLogHash が候補と一致した。PF1 単独検証時の変更前記録�
 下表は 1 回の構築と最後のハッシュ取得までの中央値。測定中の GC を除外していない。
 旧 dev の O(n²) 経路の大規模時間測定は今回再実行せず、48 ケースの互換性照合に用いた。
 時間を CI の成否条件へ追加していない。
+本作業の build / test は測定と重ねていないが、別 worktree では並行編集を観測しており、
+ホスト全体の他作業・負荷は制御していない。そのため専用の静穏環境での性能保証とは扱わない。
 
 | 経路 | 1,000 件 ms | 10,000 件 ms | 実時間比 | CPU 時間比 | 割当量比 |
 |---|---:|---:|---:|---:|---:|
@@ -167,11 +169,12 @@ ReplayLogHash が候補と一致した。PF1 単独検証時の変更前記録�
 - NET の統合済み dev worktree を保持。既存ブランチ・main・タグと全 10 リポジトリの dev は
   開始時のまま。新しい候補ブランチだけを追加した。
 - Core の別 worktree `D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci` では、
-  検証中に Bonsai 関連の未コミット変更 10 ファイルを検出した。開始時は変更なしで、
-  branch / HEAD / index は開始時と同じ。今回の作業でその worktree のソースは操作しておらず、
-  本候補にも含めていない。最初の保持照合はこの相違を検出して停止したため、開始時の記録を
-  書き換えず、並行変更の観測を別ファイルへ保存し、その後の照合で観測時の 10 ファイルも保持を確認した。
-  全 worktree の状態が開始時から一切変わらなかったとは報告しない。
+  最初に Bonsai 関連の未コミット変更 10 ファイル、その後に 12 ファイルを観測し、
+  並行編集が継続していることを確認した。開始時は変更なしで、branch / HEAD / index は開始時と同じ。
+  今回の作業でその worktree のソースは操作しておらず、本候補や検証ソースにも含めていない。
+  保持照合はこの相違を検出して停止したため、開始時の記録を上書きせず、2 回の観測を別々に保存した。
+  最終照合では元からあった未コミット 35 ファイルと既存参照・index を保護しつつ、別 worktree の
+  進行中の編集は時点ごとの観測として記録する。並行編集の内容が全期間不変だったとは主張しない。
 - dev への取り込み、push、PR、タグ作成、パッケージ公開は行っていない。
 - Linux / GitHub Actions 実行、オンライン脆弱性監査、NuGet.org からの新規取得は未実施。
 - CUDA / WebGPU / Cosmos 実機、TheoriaCast 共同受入、下流 review 同士の統合は未実施。
@@ -192,7 +195,8 @@ dev へ取り込むかは別途判断する。本検証だけで 0.1.4 の公開
 - `source-package-hashes.json` / `net-candidate-hashes.json`: 依存パッケージの識別。
 - `package-validation-settings.json`: 全 5 パッケージの評価済み互換性検証設定。
 - `preservation-before.json` / `preservation-after.json`: 未コミット変更と既存参照の保持。
-- `concurrent-worktree-observation.json`: 別 worktree で検出した並行変更 10 ファイルの記録。
+- `concurrent-worktree-observation.json` / `concurrent-worktree-observation-2.json`:
+  別 worktree の並行変更 10 / 12 ファイルを検出した時点の記録。最終観測は preservation-after.json。
 - `prepare-benchmark.py` / `run-benchmark.ps1` / `verify-benchmark.py`: 再測定と互換性照合。
 - `benchmark-baseline.json` / `benchmark-status.json` / `benchmark-candidate.csv` / `benchmark-verified.json`:
   ベンチマークの全試行と集計。

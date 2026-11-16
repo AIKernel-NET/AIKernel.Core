@@ -154,7 +154,7 @@ public sealed class Kernel : IKernel
                 result,
                 provider.ProviderId);
         }
-        catch (OperationCanceledException)
+        catch (Exception ex) when (AIKernel.Common.Results.CancellationExceptionClassifier.IsCancellation(ex))
         {
             return _failureResultFactory.CreateCanceledResult(
                 request,

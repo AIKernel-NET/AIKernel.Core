@@ -127,7 +127,7 @@ public sealed class ContextAssembler : IContextAssembler
                 .ResolvePathAsync(romId, cancellationToken)
                 .ConfigureAwait(false);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (!AIKernel.Common.Results.CancellationExceptionClassifier.IsCancellation(ex))
         {
             throw new ContextAssemblyException(
                 $"ROM path could not be resolved. RomId='{romId.Value}'.",

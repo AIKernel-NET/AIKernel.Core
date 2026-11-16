@@ -11,7 +11,7 @@ internal static class BonsaiCtgSuite
         var rules=LoadRules(governancePath);
         return await Evaluate(modelPath,rules,casesPath,output,mode,separated);
     }
-    private static Dictionary<CouncilKind,BonsaiCouncilRule> LoadRules(string governancePath)
+    internal static Dictionary<CouncilKind,BonsaiCouncilRule> LoadRules(string governancePath)
     {
         var rules=new Dictionary<CouncilKind,BonsaiCouncilRule>();
         foreach(var council in new[]{CouncilKind.Logos,CouncilKind.Ethos,CouncilKind.Pathos})

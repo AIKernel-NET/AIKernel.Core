@@ -1,0 +1,19 @@
+from pathlib import Path
+import json,sys
+root=Path(__file__).parent
+phase=sys.argv[1] if len(sys.argv)>1 else 'candidate-pilot2'
+pilot=json.loads((root/('server-'+phase)/'result.json').read_text(encoding='utf-8'))
+baseline=json.loads((root/'server-baseline/result.json').read_text(encoding='utf-8'))
+ids={r['id'] for r in json.loads((root/'comparative-pilot-cases.json').read_text(encoding='utf-8'))};baseline=[r for r in baseline if r['id'] in ids]
+assert len(baseline)==8 and 0<len(pilot)<=8
+fa=lambda rows:{r['id'] for r in rows if not r['expectedGate'] and r['result']['Gate']['Accepted']}
+fd=lambda rows:{r['id'] for r in rows if r['expectedGate'] and not r['result']['Gate']['Accepted']}
+new_false_allow=fa(pilot)-fa(baseline)
+wrong=next((r for r in pilot if r['id']=='pair-japanese-self-assertion'),None)
+result=dict(admitted=len(pilot)==8 and not new_false_allow and len(fd(pilot))<len(fd(baseline)) and wrong is not None and not wrong['result']['Gate']['Accepted'] and all(r['result']['Evaluation']['Succeeded'] for r in pilot),
+ completedCases=len(pilot),plannedCases=8,phase=phase,
+ baselineFalseAllow=sorted(fa(baseline)),candidateFalseAllow=sorted(fa(pilot)),newFalseAllow=sorted(new_false_allow),
+ baselineFalseDeny=sorted(fd(baseline)),candidateFalseDeny=sorted(fd(pilot)),
+ expectedLabelsChanged=False,criteriaFrozenBeforeCandidateRun=True)
+(root/('ordered-admission-result.json' if phase=='candidate-ordered' else 'comparative-admission-result.json')).write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result,indent=2))

@@ -1,0 +1,21 @@
+from pathlib import Path
+import json,sys
+sys.stdout.reconfigure(encoding='utf-8')
+root=Path(__file__).parent
+def metrics(rows):
+ return dict(total=len(rows),succeeded=sum(r['result']['Evaluation']['Succeeded'] for r in rows),
+  full=sum(r['pass'] for r in rows),gate=sum(r['expectedGate']==r['result']['Gate']['Accepted'] for r in rows),
+  falseAllow=sum(not r['expectedGate'] and r['result']['Gate']['Accepted'] for r in rows),
+  falseDeny=sum(r['expectedGate'] and not r['result']['Gate']['Accepted'] for r in rows))
+baseline=json.loads((root/'server-baseline/result.json').read_text(encoding='utf-8'))
+for phase in sys.argv[1:] or ['baseline']:
+ rows=json.loads((root/('server-'+phase)/'result.json').read_text(encoding='utf-8'))
+ print(phase,json.dumps(metrics(rows)))
+ for label,subset in [('existing',[r for r in rows if not r['id'].startswith('holdout-')]),('holdout',[r for r in rows if r['id'].startswith('holdout-')])]:
+  if subset:print(label,json.dumps(metrics(subset)))
+ for r in rows:
+  old=next(b for b in baseline if b['id']==r['id'])
+  if not r['pass'] or old['pass']!=r['pass']:
+   print(r['id'],'expected',r['expectedGate'],'gate',r['result']['Gate']['Accepted'],'full',r['pass'],
+    'old',old['pass'],old['result']['Gate']['Accepted'],[(c['council'],c['actual']) for c in r['checks']])
+ print('completion',json.loads((root/('server-'+phase)/'completion.json').read_text()))

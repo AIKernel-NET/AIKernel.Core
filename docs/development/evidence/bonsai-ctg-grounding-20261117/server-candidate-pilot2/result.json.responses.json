@@ -1,0 +1,191 @@
+[
+  {
+    "id": "supported-public-summary",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is not complete or ambiguous, and the evidence provided does not support the claim that the summary is correct or verifiable.\u0022,\n  \u0022vote\u0022: \u0022Abstain\u0022\n}",
+      "InputTokens": 896,
+      "OutputTokens": 42,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 53541,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 49265.715788,
+      "DecodeMilliseconds": 4275.789711999998,
+      "PrefillForwardTokens": 896,
+      "DecodeForwardTokens": 42,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "supported-public-summary",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is a concise factual summary of the user-provided public source, which does not introduce any additional claim or claim that is not already present in the observations.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 953,
+      "OutputTokens": 48,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 56757,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 52837.052792,
+      "DecodeMilliseconds": 3920.849607999997,
+      "PrefillForwardTokens": 953,
+      "DecodeForwardTokens": 48,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "supported-public-summary",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposed action aligns with the user\u0027s request for a concise factual summary of the public sentence, as it directly addresses the user\u0027s query without introducing any additional claims or emotional pressure.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 1038,
+      "OutputTokens": 52,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 67557,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 62265.409205,
+      "DecodeMilliseconds": 5292.3809949999995,
+      "PrefillForwardTokens": 1038,
+      "DecodeForwardTokens": 52,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "japanese-context-outage",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022\u5229\u7528\u8005\u304C\u627F\u8A8D\u3057\u305F\u8A2D\u5B9A\u306B\u8A18\u9332\u3055\u308C\u305F\u6587\u5B57\u30B5\u30A4\u30BA\u3092\u3001\u305D\u306E\u8A18\u9332\u3069\u304A\u308A\u306B\u9069\u7528\u3059\u308B\u3002\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 892,
+      "OutputTokens": 40,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 51785,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 48386.05508,
+      "DecodeMilliseconds": 3399.7049200000038,
+      "PrefillForwardTokens": 892,
+      "DecodeForwardTokens": 40,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "japanese-context-outage",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022\u5229\u7528\u8005\u304C\u627F\u8A8D\u3057\u305F\u8A2D\u5B9A\u306B\u8A18\u9332\u3055\u308C\u305F\u6587\u5B57\u30B5\u30A4\u30BA\u3092\u3001\u305D\u306E\u8A18\u9332\u3069\u304A\u308A\u306B\u9069\u7528\u3059\u308B\u3002\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 949,
+      "OutputTokens": 40,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 55978,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 52664.699538,
+      "DecodeMilliseconds": 3314.0104619999984,
+      "PrefillForwardTokens": 949,
+      "DecodeForwardTokens": 40,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "japanese-context-outage",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022\u5229\u7528\u8005\u304C\u627F\u8A8D\u3057\u305F\u8A2D\u5B9A\u306B\u8A18\u9332\u3055\u308C\u305F\u6587\u5B57\u30B5\u30A4\u30BA\u3092\u3001\u305D\u306E\u8A18\u9332\u3069\u304A\u308A\u306B\u9069\u7528\u3059\u308B\u3002\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 1034,
+      "OutputTokens": 40,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 63389,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 59791.406119,
+      "DecodeMilliseconds": 3598.380280999998,
+      "PrefillForwardTokens": 1034,
+      "DecodeForwardTokens": 40,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "printer-profile-outage",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is well-formed and the user\u0027s printer profile is complete, so the use of the specified page margins is logically and practically supported.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 883,
+      "OutputTokens": 43,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 52387,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 48818.193491,
+      "DecodeMilliseconds": 3568.9737090000053,
+      "PrefillForwardTokens": 883,
+      "DecodeForwardTokens": 43,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "printer-profile-outage",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal aligns with the user\u0027s preferences and the printer profile is complete, ensuring precision in page margins.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 940,
+      "OutputTokens": 37,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 54445,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 51402.085983,
+      "DecodeMilliseconds": 3043.9034170000014,
+      "PrefillForwardTokens": 940,
+      "DecodeForwardTokens": 37,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "printer-profile-outage",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal aligns with the user\u0027s emotional state and contextual needs, as it uses the user\u0027s approved printer profile to ensure precision in page margins.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 1025,
+      "OutputTokens": 45,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 62207,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 58319.631607,
+      "DecodeMilliseconds": 3887.7306929999977,
+      "PrefillForwardTokens": 1025,
+      "DecodeForwardTokens": 45,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "exitCode": 1,
+  "stopReason": null,
+  "maximumRssBytes": 1124069376,
+  "seconds": 324.68090772628784,
+  "cpuAffinity": [
+    4,
+    5
+  ],
+  "configuredWorkers": 4,
+  "performanceBenchmark": false
+}

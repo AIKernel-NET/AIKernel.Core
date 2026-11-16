@@ -44,7 +44,13 @@ internal enum BonsaiCtgResponseMode
     /// <summary>Preserves the existing reason/vote contract and its known semantic limitations.</summary>
     DirectVotes,
     /// <summary>Opt-in condition classification with a reviewed host binding; semantic regressions remain.</summary>
-    CanonicalFindings
+    CanonicalFindings,
+    /// <summary>Validation-only observation-first voting; failed semantic admission.</summary>
+    GroundedDirectVotes,
+    /// <summary>Validation-only comparison of actual claims with observations.</summary>
+    ComparativeDirectVotes,
+    /// <summary>Validation-only v4 instruction preservation with observations before the proposal.</summary>
+    ObservationFirstDirectVotes
 }
 
 /// <summary>Experimental Bonsai 1.7B council observations; canonical voting fidelity is not established.
@@ -97,9 +103,9 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
     private static ImmutableDictionary<CouncilKind,BonsaiCouncilRule> ValidateRules(IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,BonsaiCtgResponseMode mode)
     {
         ArgumentNullException.ThrowIfNull(rules);
-        if(mode is not (BonsaiCtgResponseMode.DirectVotes or BonsaiCtgResponseMode.CanonicalFindings))throw new ArgumentOutOfRangeException(nameof(mode));
+        if(mode is not (BonsaiCtgResponseMode.DirectVotes or BonsaiCtgResponseMode.CanonicalFindings or BonsaiCtgResponseMode.GroundedDirectVotes or BonsaiCtgResponseMode.ComparativeDirectVotes or BonsaiCtgResponseMode.ObservationFirstDirectVotes))throw new ArgumentOutOfRangeException(nameof(mode));
         if(rules.Count!=3||Councils.Any(c=>!rules.TryGetValue(c,out var rule)||rule is null||!rule.Reference.CanonId.EndsWith(".Council."+c,StringComparison.Ordinal)))throw new ArgumentException("All three canonical council rules are required.");
-        if(mode==BonsaiCtgResponseMode.CanonicalFindings)foreach(var council in Councils)BonsaiCtgFindingPolicy.RequireSupported(rules[council],council);
+        if(mode is not BonsaiCtgResponseMode.DirectVotes)foreach(var council in Councils)BonsaiCtgFindingPolicy.RequireSupported(rules[council],council);
         return rules.ToImmutableDictionary();
     }
     /// <summary>Evaluates bounded facts as untrusted data. Errors produce Unknown votes; cancellation propagates.</summary>
@@ -109,7 +115,16 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
     /// Does not extract a proposal from fact names, establish the truth of supplied facts, or authorize an operation.</summary>
     public ValueTask<CouncilEvaluationResult> EvaluateProposalAsync(CouncilEvaluationRequest request,string proposal,CancellationToken cancellationToken=default)
         =>EvaluateCoreAsync(request,proposal,true,cancellationToken);
-    private async ValueTask<CouncilEvaluationResult> EvaluateCoreAsync(CouncilEvaluationRequest request,string? proposal,bool separated,CancellationToken cancellationToken)
+    /// <summary>Checks host-owned required observations before evaluating a separate proposal. Failed retrieval is an
+    /// evaluation failure (all Unknown), not a model vote. Availability alone never approves the proposal.</summary>
+    public ValueTask<CouncilEvaluationResult> EvaluateProposalWithEvidenceAsync(CouncilEvaluationRequest request,string proposal,
+        BonsaiCtgEvidenceRequirements evidence,CancellationToken cancellationToken=default)
+    {
+        ArgumentNullException.ThrowIfNull(evidence);
+        return EvaluateCoreAsync(request,proposal,true,cancellationToken,evidence);
+    }
+    private async ValueTask<CouncilEvaluationResult> EvaluateCoreAsync(CouncilEvaluationRequest request,string? proposal,bool separated,CancellationToken cancellationToken,
+        BonsaiCtgEvidenceRequirements? evidence=null)
     {
         ArgumentNullException.ThrowIfNull(request);cancellationToken.ThrowIfCancellationRequested();
         await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -117,11 +132,14 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         {
             ObjectDisposedException.ThrowIf(disposed,this);
             bool findings=responseMode==BonsaiCtgResponseMode.CanonicalFindings;
+            bool comparative=responseMode==BonsaiCtgResponseMode.ComparativeDirectVotes;
+            bool ordered=responseMode==BonsaiCtgResponseMode.ObservationFirstDirectVotes;
+            bool grounded=responseMode==BonsaiCtgResponseMode.GroundedDirectVotes||comparative||ordered;
             var metadata=new Dictionary<string,string>(StringComparer.Ordinal)
             { ["evaluator"]="bonsai-1.7b-provisional",["model.sha256"]=modelHash,["rh.verified"]="false",["roles.independent"]="false",
-                ["prompt.contract"]=separated?"canonical-separated-assessment-json-v4":findings?"canonical-findings-json-v3":"canonical-assessment-json-v2" };
+                ["prompt.contract"]=ordered?BonsaiCtgObservationFirstPrompt.Contract:comparative?BonsaiCtgComparativePrompt.Contract:grounded?BonsaiCtgGroundedPrompt.Contract:separated?"canonical-separated-assessment-json-v4":findings?"canonical-findings-json-v3":"canonical-assessment-json-v2" };
             if(findings)metadata["binding.policy"]=BonsaiCtgFindingPolicy.Contract;
-            if(separated&&findings)return Failure("ctg.bonsai.unsupported_contract",metadata);
+            if(separated&&findings||grounded&&!separated)return Failure("ctg.bonsai.unsupported_contract",metadata);
             if(separated&&(string.IsNullOrWhiteSpace(proposal)||proposal.Length>2048))return Failure("ctg.bonsai.invalid_proposal",metadata);
             if(request.InputFacts is null||request.InputFacts.Count is <1 or >16||request.InputFacts.Any(x=>x.Key.Length>128||x.Value is null||x.Value.Length>2048)||
                 request.RequiredCouncils is null||request.RequiredCouncils.Count>0&&!request.RequiredCouncils.Order().SequenceEqual(Councils.Order()))
@@ -140,13 +158,23 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                 metadata["proposal.sha256"]=Hash(proposalJson!);
                 metadata["evaluation_input.sha256"]=Hash(JsonSerializer.Serialize(new{proposal,supportingFacts=inputFacts},FactsJson));
             }
+            if(evidence is not null)
+            {
+                metadata["evidence.requirements.contract"]="host-required-observations-v1";
+                metadata["evidence.requirements.sha256"]=Hash(JsonSerializer.Serialize(evidence.Entries,FactsJson));
+                metadata["evidence.bound_input.sha256"]=Hash(JsonSerializer.Serialize(new{proposal,supportingFacts=inputFacts,required=evidence.Entries},FactsJson));
+                if(evidence.Check(inputFacts) is { } failure)return Failure(failure,metadata);
+            }
             var votes=new List<CouncilVote>();
             using var timeout=CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);timeout.CancelAfter(evaluationTimeout);
             try
             {
                 foreach(var council in Councils)
                 {
-                    var rule=rules[council];var prompt=separated?BonsaiCtgDirectVotePrompt.BuildSeparated(rule,council,facts,proposalJson!):
+                    var rule=rules[council];var prompt=ordered?BonsaiCtgObservationFirstPrompt.Build(rule,council,facts,proposalJson!):
+                        comparative?BonsaiCtgComparativePrompt.Build(rule,council,facts,proposalJson!):
+                        grounded?BonsaiCtgGroundedPrompt.Build(rule,council,facts,proposalJson!):
+                        separated?BonsaiCtgDirectVotePrompt.BuildSeparated(rule,council,facts,proposalJson!):
                         findings?BonsaiCtgPrompt.Build(rule,council,facts):BonsaiCtgDirectVotePrompt.Build(rule,council,facts);
                     string system=prompt.System,user=prompt.User;
                     metadata[council+".prompt.sha256"]=Hash(system+"\n"+user);metadata[council+".rom.sha256"]=rule.Reference.ContentHash!;
@@ -210,6 +238,13 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         var evaluation=await EvaluateProposalAsync(request,proposal,cancellationToken).ConfigureAwait(false);
         return await DecideAsync(request,evaluation,cancellationToken).ConfigureAwait(false);
     }
+    /// <summary>Checks required observation availability, evaluates the proposal, and invokes the unchanged CTG gate.</summary>
+    public async Task<BonsaiCtgDecision> EvaluateProposalWithEvidenceGateAsync(CouncilEvaluationRequest request,string proposal,
+        BonsaiCtgEvidenceRequirements evidence,CancellationToken cancellationToken=default)
+    {
+        var evaluation=await EvaluateProposalWithEvidenceAsync(request,proposal,evidence,cancellationToken).ConfigureAwait(false);
+        return await DecideAsync(request,evaluation,cancellationToken).ConfigureAwait(false);
+    }
     private async Task<BonsaiCtgDecision> DecideAsync(CouncilEvaluationRequest request,CouncilEvaluationResult evaluation,CancellationToken cancellationToken)
     {
         var input=new CtgCouncilVoteExtractor().Extract(evaluation);
@@ -227,8 +262,17 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
     public Task<BonsaiCtgDecision> RunProposalIfAllowedAsync(CouncilEvaluationRequest request,string proposal,Func<CancellationToken,Task<bool>> hostAdmission,
         Func<CancellationToken,Task> operation,CancellationToken cancellationToken=default)
         =>RunCoreAsync(request,proposal,true,hostAdmission,operation,cancellationToken);
+    /// <summary>Requires host admission, host-provided observation availability, successful model evaluation and an
+    /// accepted CTG gate before executing. The host must bind requirements and operation to the same proposed action.</summary>
+    public Task<BonsaiCtgDecision> RunProposalWithEvidenceIfAllowedAsync(CouncilEvaluationRequest request,string proposal,
+        BonsaiCtgEvidenceRequirements evidence,Func<CancellationToken,Task<bool>> hostAdmission,
+        Func<CancellationToken,Task> operation,CancellationToken cancellationToken=default)
+    {
+        ArgumentNullException.ThrowIfNull(evidence);
+        return RunCoreAsync(request,proposal,true,hostAdmission,operation,cancellationToken,evidence);
+    }
     private async Task<BonsaiCtgDecision> RunCoreAsync(CouncilEvaluationRequest request,string? proposal,bool separated,Func<CancellationToken,Task<bool>> hostAdmission,
-        Func<CancellationToken,Task> operation,CancellationToken cancellationToken)
+        Func<CancellationToken,Task> operation,CancellationToken cancellationToken,BonsaiCtgEvidenceRequirements? evidence=null)
     {
         ArgumentNullException.ThrowIfNull(request);ArgumentNullException.ThrowIfNull(hostAdmission);ArgumentNullException.ThrowIfNull(operation);
         cancellationToken.ThrowIfCancellationRequested();
@@ -239,7 +283,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                 GateInput=new(),TraceId=request.TraceId,CorrelationId=request.CorrelationId},cancellationToken).ConfigureAwait(false);
             return new(rejected,deny);
         }
-        var evaluation=await EvaluateCoreAsync(request,proposal,separated,cancellationToken).ConfigureAwait(false);
+        var evaluation=await EvaluateCoreAsync(request,proposal,separated,cancellationToken,evidence).ConfigureAwait(false);
         var decision=await DecideAsync(request,evaluation,cancellationToken).ConfigureAwait(false);
         if(decision.Evaluation.Succeeded&&decision.Gate.Accepted){cancellationToken.ThrowIfCancellationRequested();await operation(cancellationToken).ConfigureAwait(false);}
         return decision;

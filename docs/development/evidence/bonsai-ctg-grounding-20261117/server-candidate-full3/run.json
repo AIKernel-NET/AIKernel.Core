@@ -1,0 +1,1 @@
+{"mode": "--bonsai-ctg-ordered-suite", "waitFor": "final-api", "postChecks": true}

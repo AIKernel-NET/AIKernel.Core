@@ -1,0 +1,18 @@
+from pathlib import Path
+import json
+root=Path(__file__).parent
+baseline=json.loads((root/'server-baseline/result.json').read_text(encoding='utf-8'))
+old=next(r for r in baseline if r['id']=='verified-arithmetic')['result']['Evaluation']['Metadata']
+probe=json.loads((root/'server-final-api/evidence-probe.json').read_text(encoding='utf-8'))
+new=probe['availableResult']['Evaluation']['Metadata']
+keys=['prompt.contract','model.sha256','facts.sha256','proposal.sha256','evaluation_input.sha256']
+keys +=[role+suffix for role in ('Logos','Ethos','Pathos') for suffix in ('.prompt.sha256','.response.sha256','.rom.sha256')]
+assert all(old[k]==new[k] for k in keys)
+assert probe['hostGuardPassed'] and probe['inferenceCalls']==3
+assert all(b['inferenceCalls']==0 and not b['result']['Gate']['Accepted'] for b in probe['blocked'])
+normal=[json.loads(line) for line in (root/'server-final-api/normal-128.log').read_text().splitlines() if line.startswith('{')][-1]
+assert normal['OutputTokens']==128 and normal['GeneratedTokenSha256']=='f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e'
+result=dict(blockedStates=3,blockedInferenceCalls=0,availableInferenceCalls=3,availablePromptAndResponseHashesMatchBaseline=True,
+ matchedMetadataKeys=keys,generation128HashMatched=True,semanticVoteContractUnchanged=True)
+(root/'guard-regression.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result,indent=2))

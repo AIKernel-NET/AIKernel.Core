@@ -28,11 +28,10 @@ public sealed class Qwen3CpuModel : IDisposable
     private CpuKernelTuner? tuner;
     private CpuAutoTuningOptions? tuningOptions;
     private CpuTuningStatus? tuningStatus;
-    private PrefixState? prefixCache;
+    private Qwen3PrefixCache prefixCache=new(1,long.MaxValue);
     private Qwen3Workspace? workspace;
     private bool cleanupFailed;
     private bool integerWarmupComplete;
-    private sealed record PrefixState(string System,int Count,float[][] Keys,float[][] Values);
     private sealed record Layer(GgufWeights.Tensor Q,GgufWeights.Tensor K,GgufWeights.Tensor V,GgufWeights.Tensor O,
         GgufWeights.Tensor Gate,GgufWeights.Tensor Up,GgufWeights.Tensor Down,float[] Norm,float[] FfnNorm,float[] QNorm,float[] KNorm);
 
@@ -107,6 +106,14 @@ public sealed class Qwen3CpuModel : IDisposable
     public CpuTuningStatus? TuningStatus=>tuningStatus;
     /// <summary>Encoded mapped-file length, without FP32 expansion.</summary>
     public long WeightBytes=>file.Length;
+    /// <summary>Trusted system-prefix payloads retained between requests. Read between requests.</summary>
+    public Qwen3PrefixCacheStatistics PrefixCacheStatistics=>prefixCache.Statistics;
+    // Constructor-time configuration for adapters that own several pinned canonical system prompts.
+    internal void ConfigureTrustedPrefixCache(int maximumPrefixes,long maximumBytes)
+    {
+        if(workspace is not null)throw new InvalidOperationException("Configure trusted prefixes before inference or warmup.");
+        var next=new Qwen3PrefixCache(maximumPrefixes,maximumBytes);prefixCache.Dispose();prefixCache=next;
+    }
 
     /// <summary>Measures supported kernels on mapped weight samples. Call at startup or while admission is closed.</summary>
     public async Task<CpuTuningStatus> TuneCpuAsync(CpuAutoTuningOptions options,bool refresh=false,CancellationToken cancellationToken=default)
@@ -183,7 +190,7 @@ public sealed class Qwen3CpuModel : IDisposable
         try
         {
             await Task.Run(()=>WithCleanup(()=>{
-                if(prefixCache?.System==system&&(gpu is not CudaQuantizedMatrix {UsesInt8:true}||integerWarmupComplete))return 0;
+                if(prefixCache.Contains(system)&&(gpu is not CudaQuantizedMatrix {UsesInt8:true}||integerWarmupComplete))return 0;
                 var prefix=tokenizer.Prefix(system);
                 if(prefix.Count>=context)throw new ArgumentException("System prefix exceeds the context limit.");
                 using var state=AcquireWorkspace(cancellationToken);state.Options.MaxDegreeOfParallelism=prefillThreads;
@@ -195,8 +202,7 @@ public sealed class Qwen3CpuModel : IDisposable
                     Multiply(output with {Rows=1},state.Normal,state.Logits,state.Options,prefillBackend);
                     integerWarmupComplete=true;
                 }
-                ReplacePrefix(new(system,prefix.Count,state.Keys.Select(k=>k.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray(),
-                    state.Values.Select(v=>v.AsSpan(0,prefix.Count*kvSize).ToArray()).ToArray()));
+                prefixCache.Store(system,prefix.Count,state.Keys,state.Values,kvSize);
                 return 0;
             }),cancellationToken).ConfigureAwait(false);
         }
@@ -246,7 +252,7 @@ public sealed class Qwen3CpuModel : IDisposable
         state.Options.MaxDegreeOfParallelism=prefillThreads;var watch=Stopwatch.StartNew();var generated=new List<int>();
         stage=profile?.Start()??0;
         int prefixCount=tokenizer.Prefix(system).Count,begin=0;
-        if(prefixCache is { } cached && cached.System==system)
+        if(prefixCache.Get(system) is { } cached)
         {
             state.MarkUsed(cached.Count);
             for(int i=0;i<layers.Length;i++){cached.Keys[i].CopyTo(state.Keys[i],0);cached.Values[i].CopyTo(state.Values[i],0);}
@@ -260,8 +266,7 @@ public sealed class Qwen3CpuModel : IDisposable
             if(i+1==prefixCount)
             {
                 // Cache only trusted system instructions, never inquiry text or generated content.
-                ReplacePrefix(new(system,prefixCount,state.Keys.Select(k=>k.AsSpan(0,prefixCount*kvSize).ToArray()).ToArray(),
-                    state.Values.Select(v=>v.AsSpan(0,prefixCount*kvSize).ToArray()).ToArray()));
+                prefixCache.Store(system,prefixCount,state.Keys,state.Values,kvSize);
             }
         }
         long prefillTicks=watch.ElapsedTicks;int decodeForwards=0;state.Options.MaxDegreeOfParallelism=decodeThreads;
@@ -323,11 +328,6 @@ public sealed class Qwen3CpuModel : IDisposable
         if(cleanupFailed)throw new InvalidOperationException("Model disabled after GPU scratch clearing failure.");
         // Runs inside the admission gate. A cancelled queued request must not wipe another request's scratch.
         return gpu is null?work():InferenceRequestCleanup.Execute(work,gpu.ZeroScratch,()=>cleanupFailed=true);
-    }
-    private void ReplacePrefix(PrefixState next)
-    {
-        var old=prefixCache;prefixCache=next;
-        if(old is not null)foreach(var array in old.Keys.Concat(old.Values))Array.Clear(array);
     }
     private void Multiply(GgufWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,string selectedBackend,InferenceProfiler? profile=null,PreparedQ8Activation? prepared=null)
     {
@@ -424,7 +424,7 @@ public sealed class Qwen3CpuModel : IDisposable
         float sum=Dot(x,x);float scale=1/MathF.Sqrt(sum/x.Length+eps);for(int i=0;i<x.Length;i++)y[i]=x[i]*scale*weights[i];
     }
     /// <summary>Dispose only after active requests have stopped.</summary>
-    public void Dispose(){workspace?.Dispose();workspace=null;if(prefixCache is {} c)foreach(var a in c.Keys.Concat(c.Values))Array.Clear(a);prefixCache=null;try{gpu?.Dispose();}finally{file.Dispose();gate.Dispose();}}
+    public void Dispose(){workspace?.Dispose();workspace=null;prefixCache.Dispose();try{gpu?.Dispose();}finally{file.Dispose();gate.Dispose();}}
 }
 /// <summary>Measured result of a completed CPU generation.</summary>
 public sealed record CpuGeneration(string Text,int InputTokens,int OutputTokens,string FinishReason,long ElapsedMilliseconds,string CpuBackend)

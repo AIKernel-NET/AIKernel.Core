@@ -1,0 +1,51 @@
+{
+  "builds": {
+    "probe": {
+      "purpose": "Pre-cache-change Qwen3 baseline for the 128-token regression; full-word diagnostic probe.",
+      "sha256": {
+        "AIKernel.Kernel.dll": "aceec491b7037ad2b98cd32923b9de6fb7d1110e54a3a8815bdd83f4c16a0cf1",
+        "AIKernel.Core.Tests.dll": "268acf54aed27782e57d04996f420467cb3b4dca2cc2baf953886854dc4455cd"
+      }
+    },
+    "excerpt-probe": {
+      "purpose": "Early Ethos exact-excerpt diagnostic, 64 output tokens; not adopted prompt.",
+      "sha256": {
+        "AIKernel.Kernel.dll": "aceec491b7037ad2b98cd32923b9de6fb7d1110e54a3a8815bdd83f4c16a0cf1",
+        "AIKernel.Core.Tests.dll": "20683372ab437044100f2e621e687f701fd7a854a9fcf6e60ec2c80fbd2ee171"
+      }
+    },
+    "candidate": {
+      "purpose": "Three-prefix cache, initial strict line parser, escaped Japanese facts; 128-token and prefix regressions.",
+      "sha256": {
+        "AIKernel.Kernel.dll": "1dded588b4ee2a04cacf98e809eba4ec968d8a56313804df7b0bb8c23c334910",
+        "AIKernel.Core.Tests.dll": "dc735639f372a8e0e6a595f0db3437417d7210a02c651af23114f0019802cad0"
+      }
+    },
+    "review": {
+      "purpose": "Readable Japanese facts and bounded 512 MiB cache; interrupted after diagnosing inline vote parsing.",
+      "sha256": {
+        "AIKernel.Kernel.dll": "8107609b12e5712d6aba308d2bc84bd4187921e1f3ee5f5c5a08eb7e0c25e00c",
+        "AIKernel.Core.Tests.dll": "a2ed0a385c141cd074836916c7e0706aa5a395fc0ecf1d8a1fc50b30a860e28b"
+      }
+    },
+    "final": {
+      "purpose": "Final production code; ten-case suite and original two-case rerun.",
+      "sha256": {
+        "AIKernel.Kernel.dll": "d1dfc3746c536e3add8d34ff59ca61b61488cc66dc79bd763a9a2cc49aa79869",
+        "AIKernel.Core.Tests.dll": "2550e1584e9adbbe85399c026c4466d3b6e1a8638bf31117746eb783a757e061"
+      }
+    }
+  },
+  "finalSources": {
+    "src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs": "76d80c37ce96f3405d304a647955f15a9862f5e8a05c218033be42fa1e08194a",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgPrompt.cs": "dbb9c7d8d84c92125919a327e8710e221f3e1cc7aa6216c9db9518b5385fce9c",
+    "src/AIKernel.Kernel/Inference/Qwen3CpuModel.cs": "faeb254c03b61fb3d1a79f4a21d159e14813edf0fe76217ceb43759ef6fbbfd3",
+    "src/AIKernel.Kernel/Inference/Qwen3PrefixCache.cs": "c7b2dd756d5f21e31253e97cfa3e227343a68eb7044860baed5bc5f850be8b38",
+    "tests/AIKernel.Core.Tests/Inference/BonsaiCtgTests.cs": "15d99064250bfee7a391f640d7f85ed677315bbc517136218af381991c9a9176",
+    "tests/AIKernel.Core.Tests/Inference/Qwen3PrefixCacheTests.cs": "09888f43e99f77b87e02c4f818b6de66a470b1b3acd90c7f0fadc3fa49086851",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgSuite.cs": "81173c71eff2528c8b13c66840bd466e5dcd48b86c442e2b3b407d105bfe936e",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgProbe.cs": "797a9408c273ec739550c02b792140a74173a1c2d70d3401b7142b21ced924fa",
+    "tests/AIKernel.Inference.Optimization.Validation/Program.cs": "c84e6f261996298c55c4af4d9e7cd668b063ad262d1fd38da3621bcb12b94446",
+    "tests/AIKernel.Inference.Optimization.Validation/fixtures/bonsai-ctg-cases.json": "851d1ae0107d1e03692cd55840e1535d71e8a14897af5bb3515cf24d5d39bb76"
+  }
+}

@@ -1,6 +1,9 @@
 using AIKernel.Kernel.Inference;
 using System.Text.Json;
 
+if(args.Length==5&&args[0]=="--bonsai-ctg-suite"){await BonsaiCtgSuite.Run(args[1],args[2],args[3],args[4]);return;}
+if(args.Length==3&&args[0]=="--bonsai-prefix-regression"){await BonsaiCtgSuite.PrefixRegression(args[1],args[2]);return;}
+if(args.Length==4&&args[0]=="--bonsai-ctg-probe"){await BonsaiCtgProbe.Run(args[1],args[2],args[3]);return;}
 if(args.Length==3&&args[0]=="--cosmos-artifact-verify")
 {
     var family=CosmosModelDefinition.Read(Path.Combine(args[1],"config.json")).Family;

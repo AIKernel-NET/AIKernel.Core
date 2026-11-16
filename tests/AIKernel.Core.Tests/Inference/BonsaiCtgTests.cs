@@ -7,7 +7,7 @@ using AIKernel.Enums.Governance;
 
 namespace AIKernel.Core.Tests.Inference;
 
-public sealed class BonsaiCtgTests
+public sealed partial class BonsaiCtgTests
 {
     private static readonly CouncilKind[] Councils=[CouncilKind.Logos,CouncilKind.Ethos,CouncilKind.Pathos];
     private static Dictionary<CouncilKind,BonsaiCouncilRule> Rules()

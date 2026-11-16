@@ -6,10 +6,10 @@ using AIKernel.Enums.Governance;
 
 internal static class BonsaiCtgSuite
 {
-    internal static async Task<bool> Run(string modelPath,string governancePath,string casesPath,string output,BonsaiCtgResponseMode mode=BonsaiCtgResponseMode.DirectVotes)
+    internal static async Task<bool> Run(string modelPath,string governancePath,string casesPath,string output,BonsaiCtgResponseMode mode=BonsaiCtgResponseMode.DirectVotes,bool separated=false)
     {
         var rules=LoadRules(governancePath);
-        return await Evaluate(modelPath,rules,casesPath,output,mode);
+        return await Evaluate(modelPath,rules,casesPath,output,mode,separated);
     }
     private static Dictionary<CouncilKind,BonsaiCouncilRule> LoadRules(string governancePath)
     {
@@ -32,7 +32,7 @@ internal static class BonsaiCtgSuite
         }).ToArray();
         Console.WriteLine(JsonSerializer.Serialize(verified,new JsonSerializerOptions{WriteIndented=true}));
     }
-    private static async Task<bool> Evaluate(string modelPath,Dictionary<CouncilKind,BonsaiCouncilRule> rules,string casesPath,string output,BonsaiCtgResponseMode mode)
+    private static async Task<bool> Evaluate(string modelPath,Dictionary<CouncilKind,BonsaiCouncilRule> rules,string casesPath,string output,BonsaiCtgResponseMode mode,bool separated)
     {
         using var evaluator=new BonsaiCtgCouncilEvaluator(modelPath,"3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",rules,evaluationTimeout:TimeSpan.FromMinutes(10),responseMode:mode);
         string current="";var observations=new List<object>();
@@ -48,7 +48,8 @@ internal static class BonsaiCtgSuite
             string id=item.GetProperty("id").GetString()!;bool expected=item.GetProperty("expectedGate").GetBoolean();
             current=id;
             var facts=item.GetProperty("facts").EnumerateObject().ToDictionary(p=>p.Name,p=>p.Value.GetString()!);
-            var result=await evaluator.EvaluateGateAsync(new(){OperationId=id,StepId="observation",InputFacts=facts});
+            var request=new CouncilEvaluationRequest{OperationId=id,StepId="observation",InputFacts=facts};
+            var result=separated?await evaluator.EvaluateProposalGateAsync(request,item.GetProperty("proposal").GetString()!):await evaluator.EvaluateGateAsync(request);
             var checks=item.GetProperty("requiredVotes").EnumerateObject().Select(p=>new{council=p.Name,
                 expected=p.Value.EnumerateArray().Select(v=>v.GetString()!).ToArray(),
                 actual=result.Evaluation.Decision.Votes.Single(v=>v.CouncilKind.ToString()==p.Name).VoteValue.ToString()}).ToArray();

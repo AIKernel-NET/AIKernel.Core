@@ -1,0 +1,86 @@
+[
+  {
+    "id": "verified-arithmetic",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is logically coherent and completes the requested calculation, but it lacks supporting evidence and is not verifiable.\u0022,\n  \u0022vote\u0022: \u0022Abstain\u0022\n}",
+      "InputTokens": 787,
+      "OutputTokens": 38,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 68912,
+      "CpuBackend": "avx2",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 63396.083,
+      "DecodeMilliseconds": 5516.812399999995,
+      "PrefillForwardTokens": 787,
+      "DecodeForwardTokens": 38,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "verified-arithmetic",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal assumes that the user\u0027s request to calculate 2^2 is a valid input and that the result is an integer, which is not explicitly stated in the supporting facts. The lack of explicit confirmation of the user\u0027s request and the absence of any evidence for the calculation being valid or the result being an integer makes the proposal unreliable.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 844,
+      "OutputTokens": 82,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 90637,
+      "CpuBackend": "avx2",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 80047.592,
+      "DecodeMilliseconds": 10589.652099999992,
+      "PrefillForwardTokens": 844,
+      "DecodeForwardTokens": 82,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "verified-arithmetic",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is emotionally appropriate and aligns with the user\u0027s request to calculate 2 \\u002B 2, as it directly addresses the user\u0027s request and provides the correct result.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 929,
+      "OutputTokens": 55,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 98573,
+      "CpuBackend": "avx2",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 90021.5562,
+      "DecodeMilliseconds": 8551.722599999994,
+      "PrefillForwardTokens": 929,
+      "DecodeForwardTokens": 55,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "supported-public-summary",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal lacks a clear and verifiable supporting fact that justifies the claim that the SDK supports local CPU inference.\u0022,\n  \u0022vote\u0022: \u0022Abstain\u0022\n}",
+      "InputTokens": 790,
+      "OutputTokens": 39,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 20318,
+      "CpuBackend": "avx2",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 15323.8387,
+      "DecodeMilliseconds": 4994.3544,
+      "PrefillForwardTokens": 141,
+      "DecodeForwardTokens": 39,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  }
+]

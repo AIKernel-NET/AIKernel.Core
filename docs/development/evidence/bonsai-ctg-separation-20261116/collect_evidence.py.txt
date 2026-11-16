@@ -1,0 +1,146 @@
+import hashlib
+import json
+import re
+import shutil
+import subprocess
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+ROOT = Path(__file__).parent
+REPO = Path(r'D:\AIKernel\artifacts\cuda-driver-native\core-context-free-pci')
+DEST = REPO / 'docs/development/evidence/bonsai-ctg-separation-20261116'
+FIXTURES = REPO / 'tests/AIKernel.Inference.Optimization.Validation/fixtures'
+PRIOR = REPO / 'docs/development/evidence/bonsai-ctg-findings-20261116'
+MODEL = Path(r'D:\AIKernel\models\bonsai1.7b\Bonsai-1.7B-Q1_0.gguf')
+ROM = Path(r'D:\AIKernel\repos\AIKernel.NET\rom\governance')
+
+def read(path):
+    return json.loads(path.read_text(encoding='utf-8-sig'))
+
+def sha(path):
+    with path.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+def write(name, data):
+    (DEST / name).write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+subprocess.run([__import__('sys').executable, str(ROOT / 'analyze.py')], check=True, stdout=subprocess.DEVNULL)
+candidate = read(ROOT / 'candidate.json')
+responses = read(ROOT / 'candidate.json.responses.json')
+fixtures = read(FIXTURES / 'bonsai-ctg-separated-20261116.json')
+assert len(candidate) == len(fixtures) == 38
+assert [row['id'] for row in candidate] == [row['id'] for row in fixtures]
+assert all(row['answer']['CpuBackend'] == 'avx2' and row['answer']['ActivationPrecision'] == 'fp32' for row in responses)
+assert all(row['answer']['OutputTokens'] <= 192 and row['answer']['InputTokens'] <= 2048 for row in responses)
+assert len(read(ROOT / 'baseline-pairs.json')) == 8
+by_id = {row['id']: row for row in fixtures}
+for name in ('bonsai-ctg-cases.json', 'bonsai-ctg-holdout-20261116.json', 'bonsai-ctg-findings-holdout-20261116.json'):
+    for old in read(FIXTURES / name):
+        current = by_id[old['id']]
+        assert dict(current['facts'], proposal=current['proposal']) == old['facts']
+        assert (current['expectedGate'], current['requiredVotes']) == (old['expectedGate'], old['requiredVotes'])
+for old in read(ROOT / 'baseline-pairs-input.json'):
+    current = by_id[old['id']]
+    assert dict(current['facts'], proposal=current['proposal']) == old['facts']
+    assert (current['expectedGate'], current['requiredVotes']) == (old['expectedGate'], old['requiredVotes'])
+
+regression = read(ROOT / 'generation128.json')
+assert regression['OutputTokens'] == 128
+assert regression['GeneratedTokenSha256'] == 'f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e'
+exit_codes = read(ROOT / 'exit-codes.json')
+assert len(exit_codes) == 3, exit_codes
+prior_build = read(PRIOR / 'tested-build.json')
+baseline_dir = ROOT.parent / 'bonsai-ctg-findings-20261116/final'
+assert all(sha(baseline_dir / name) == expected for name, expected in prior_build['finalAssemblySha256'].items())
+trx = ROOT / 'tests/separation-final.trx'
+counters = ET.parse(trx).getroot().find('.//{*}Counters').attrib
+assert int(counters['failed']) == 0 and int(counters['passed']) == 959
+model_hash = sha(MODEL)
+assert model_hash == '3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3'
+rom_hashes = {'council.' + role + '.monolith.md': sha(ROM / ('council.' + role + '.monolith.md')) for role in ('logos', 'ethos', 'pathos')}
+assert rom_hashes == prior_build['romSha256']
+for row in candidate:
+    metadata = row['result']['Evaluation']['Metadata']
+    assert metadata['model.sha256'] == model_hash
+    assert metadata['prompt.contract'] == 'canonical-separated-assessment-json-v4'
+    assert 'proposal.sha256' in metadata and 'evaluation_input.sha256' in metadata
+    for role in ('Logos', 'Ethos', 'Pathos'):
+        if role + '.rom.sha256' in metadata:
+            assert metadata[role + '.rom.sha256'] == rom_hashes['council.' + role.lower() + '.monolith.md']
+actual_by_id = {row['id']: row['result']['Evaluation']['Metadata'] for row in candidate}
+for left, right in [('pair-counter-true', 'pair-counter-conflict'), ('pair-contacts-count', 'pair-contacts-disclose'),
+                    ('pair-japanese-correct', 'pair-japanese-self-assertion')]:
+    assert actual_by_id[left]['facts.sha256'] == actual_by_id[right]['facts.sha256']
+    assert actual_by_id[left]['proposal.sha256'] != actual_by_id[right]['proposal.sha256']
+    assert actual_by_id[left]['evaluation_input.sha256'] != actual_by_id[right]['evaluation_input.sha256']
+left, right = actual_by_id['pair-setting-readable'], actual_by_id['pair-setting-unavailable']
+assert left['proposal.sha256'] == right['proposal.sha256'] and left['facts.sha256'] != right['facts.sha256']
+
+DEST.mkdir(parents=True, exist_ok=True)
+(DEST / '.gitattributes').write_text('* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol\n', encoding='utf-8')
+files = ['candidate.json', 'candidate.json.responses.json', 'baseline-pairs-input.json', 'baseline-pairs.json',
+         'baseline-pairs.json.responses.json', 'comparison.json', 'prior-proposal-citations.json',
+         'generation128.json', 'rom-preflight.json', 'exit-codes.json', 'baseline-exit.txt']
+for name in files:
+    shutil.copyfile(ROOT / name, DEST / name)
+incomplete_ids = {row['id'] for row in candidate if not row['result']['Evaluation']['Succeeded']}
+write('retry-incomplete-input.json', [row for row in fixtures if row['id'] in incomplete_ids])
+for suffix in ('.json', '.json.responses.json'):
+    shutil.copyfile(ROOT / ('candidate-v4' + suffix), DEST / ('rejected-first-pilot' + suffix))
+pilot_sources = DEST / 'rejected-first-pilot-source'
+pilot_sources.mkdir(exist_ok=True)
+for path in (ROOT / 'first-pilot-source').glob('*.cs'):
+    shutil.copyfile(path, pilot_sources / (path.name + '.txt'))
+for name in ('analyze.py', 'collect_evidence.py'):
+    shutil.copyfile(ROOT / name, DEST / (name + '.txt'))
+source_paths = ['src/AIKernel.Kernel/Inference/' + name for name in
+                ('BonsaiCtgCouncilEvaluator.cs', 'BonsaiCtgPrompt.cs', 'BonsaiCtgDirectVotePrompt.cs', 'BonsaiCtgFindingPolicy.cs')]
+source_paths += ['src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs',
+                'tests/AIKernel.Core.Tests/Inference/BonsaiCtgTests.cs',
+                'tests/AIKernel.Core.Tests/Inference/BonsaiCtgSeparatedTests.cs',
+                'tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgSuite.cs',
+                'tests/AIKernel.Inference.Optimization.Validation/Program.cs']
+payloads = [int(row['result']['Evaluation']['Metadata']['prefix_cache.bytes']) for row in candidate
+            if 'prefix_cache.bytes' in row['result']['Evaluation']['Metadata']]
+manifest = {
+    'baseCommit': 'dc004db', 'legacyContract': 'canonical-assessment-json-v2',
+    'separatedContract': 'canonical-separated-assessment-json-v4',
+    'legacyPublicApiPreserved': True, 'separationRequiresExplicitMethod': True,
+    'legacyPromptGoldenHashesPreserved': True, 'canonicalExcerptsPreserved': True,
+    'baselineFinalAssemblyVerified': True, 'modelSha256': model_hash,
+    'finalAssemblySha256': {name: sha(ROOT / 'final' / name) for name in ('AIKernel.Kernel.dll', 'AIKernel.Core.Tests.dll')},
+    'sourceSha256': {name: sha(REPO / name) for name in source_paths},
+    'fixtureSha256': sha(FIXTURES / 'bonsai-ctg-separated-20261116.json'),
+    'prior30CaseMigrationVerified': True, 'new8BaselineInputsVerified': True,
+    'contrastPairInputHashesVerified': True,
+    'romSha256': rom_hashes, 'unitTests': dict(counters), 'trxSha256': sha(trx),
+    'generation128HashMatched': True, 'backend': 'AVX2/FP32', 'cpuWorkers': 4, 'contextTokens': 2048,
+    'recordedCouncilResponses': len(responses), 'responseBackendAndTokenBoundsVerified': True,
+    'maximumReplyTokens': 192, 'prefixPayloadCapBytes': 536870912,
+    'maximumObservedCandidatePrefixPayloadBytes': max(payloads),
+    'suiteDeadlineMinutes': 10, 'defaultDeadlineMinutes': 3,
+    'performanceBenchmark': False, 'server7GBRevalidated': False,
+    'rejectedFirstPilot': {'completedCases': len(read(ROOT / 'candidate-v4.json')), 'aborted': True, 'adopted': False,
+                          'assemblySha256': {name: sha(ROOT / 'candidate-v4' / name) for name in ('AIKernel.Kernel.dll', 'AIKernel.Core.Tests.dll')}},
+    'summary': read(ROOT / 'comparison.json')['summary'],
+    'matchedCompleted': read(ROOT / 'comparison.json')['matchedCompleted'],
+    'notes': [
+        'The proposal and supporting observations are separate parameters and JSON sections. The host must supply observations rather than self-assertions.',
+        'This input contract does not verify the truth or relevance of a supporting fact. No model vote is overridden by scenario names or keywords.',
+        'The baseline combines 30 stored DirectVotes results and eight additional cases run with the preserved previous binary.',
+        'All 38 cases preserve expected labels. The eight new contrast cases were frozen before candidate trials and were not used to tune the final prompt.',
+        'The first rejected wording was revised using the first existing arithmetic case. Its incomplete result and source snapshots are retained.',
+        'The final 38-case suite ran in one process. Stored baseline groups ran in separate processes; timings are not performance comparisons.',
+        'The intervention changes input layout and its explanation together, not a layout-only ablation.',
+        'No arithmetic kernels, numerical precision, canonical ROM or CTG voting rules changed. No proposal operation was executed.',
+        'All roles share one model. Semantic failures remain; this is not an RH proof or a production authorization authority.',
+        'The last case timed out under observed host CPU saturation. Its all-Unknown denial is not treated as a semantic pass. A matched-completed comparison excludes it from both sides.',
+        'The user chose to continue broadcasting and other work. No applications were stopped; the one incomplete case remains available in retry-incomplete-input.json for a lower-load rerun.',
+        'Prefix payload bytes are not process RSS. No new Server 7GB or GPU validation was performed.'
+    ]
+}
+write('tested-build.json', manifest)
+write('evidence-sha256.json', {path.relative_to(DEST).as_posix(): sha(path) for path in DEST.rglob('*')
+                             if path.is_file() and path.name != 'evidence-sha256.json'})
+print(json.dumps({'unitTests': counters['passed'], 'candidateCases': len(candidate), 'prefixPayloadBytes': max(payloads),
+                  'summary': manifest['summary']}, ensure_ascii=False, indent=2))

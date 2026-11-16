@@ -6,7 +6,12 @@ using AIKernel.Enums.Governance;
 
 internal static class BonsaiCtgSuite
 {
-    internal static async Task Run(string modelPath,string governancePath,string casesPath,string output)
+    internal static async Task<bool> Run(string modelPath,string governancePath,string casesPath,string output)
+    {
+        var rules=LoadRules(governancePath);
+        return await Evaluate(modelPath,rules,casesPath,output);
+    }
+    private static Dictionary<CouncilKind,BonsaiCouncilRule> LoadRules(string governancePath)
     {
         var rules=new Dictionary<CouncilKind,BonsaiCouncilRule>();
         foreach(var council in new[]{CouncilKind.Logos,CouncilKind.Ethos,CouncilKind.Pathos})
@@ -15,6 +20,20 @@ internal static class BonsaiCtgSuite
             rules.Add(council,BonsaiCouncilRule.FromUtf8(bytes,new(){CanonId="Canon.CTG.Monolith.Council."+council,Path="rom/governance/"+name,
                 ContentHash=Convert.ToHexStringLower(SHA256.HashData(bytes))}));
         }
+        return rules;
+    }
+    internal static void VerifyRules(string governancePath)
+    {
+        var verified=LoadRules(governancePath).Select(pair=>
+        {
+            var prompt=BonsaiCtgPrompt.Build(pair.Value,pair.Key,"{}");
+            return new{council=pair.Key.ToString(),prompt.Reference,
+                excerptSha256=Convert.ToHexStringLower(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(prompt.Excerpt)))};
+        }).ToArray();
+        Console.WriteLine(JsonSerializer.Serialize(verified,new JsonSerializerOptions{WriteIndented=true}));
+    }
+    private static async Task<bool> Evaluate(string modelPath,Dictionary<CouncilKind,BonsaiCouncilRule> rules,string casesPath,string output)
+    {
         using var evaluator=new BonsaiCtgCouncilEvaluator(modelPath,"3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",rules,evaluationTimeout:TimeSpan.FromMinutes(10));
         string current="";var observations=new List<object>();
         evaluator.Observation=(council,answer)=>
@@ -23,6 +42,7 @@ internal static class BonsaiCtgSuite
             File.WriteAllText(output+".responses.json",JsonSerializer.Serialize(observations,new JsonSerializerOptions{WriteIndented=true}));
         };
         using var cases=JsonDocument.Parse(File.ReadAllText(casesPath));var results=new List<object>();
+        bool allPassed=cases.RootElement.GetArrayLength()>0;
         foreach(var item in cases.RootElement.EnumerateArray())
         {
             string id=item.GetProperty("id").GetString()!;bool expected=item.GetProperty("expectedGate").GetBoolean();
@@ -33,10 +53,12 @@ internal static class BonsaiCtgSuite
                 expected=p.Value.EnumerateArray().Select(v=>v.GetString()!).ToArray(),
                 actual=result.Evaluation.Decision.Votes.Single(v=>v.CouncilKind.ToString()==p.Name).VoteValue.ToString()}).ToArray();
             bool pass=result.Evaluation.Succeeded&&result.Gate.Accepted==expected&&checks.All(c=>c.expected.Contains(c.actual));
+            allPassed&=pass;
             results.Add(new{id,pass,expectedGate=expected,checks,result});
             File.WriteAllText(output,JsonSerializer.Serialize(results,new JsonSerializerOptions{WriteIndented=true}));
             Console.WriteLine(JsonSerializer.Serialize(new{id,pass,result.Evaluation.Succeeded,result.Evaluation.ErrorCode,result.Gate.Accepted,checks}));
         }
+        return allPassed;
     }
     internal static async Task PrefixRegression(string modelPath,string output)
     {

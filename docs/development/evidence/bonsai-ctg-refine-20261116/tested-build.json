@@ -1,0 +1,77 @@
+{
+  "baseCommit": "464bc61",
+  "promptContract": "canonical-assessment-json-v2",
+  "semanticComparisonAssemblySha256": {
+    "AIKernel.Kernel.dll": "157af65edeae36d508b5c00bf03fec5f30545d53494cb817031cb46c934c6b0b",
+    "AIKernel.Core.Tests.dll": "6295ecb7f015226530d6aa9eaa4dfa3bf91540f3b4c72b255a8356c87eff0454"
+  },
+  "finalAssemblySha256": {
+    "AIKernel.Kernel.dll": "40977ec2c5ff9f1a6b1f2f93b66b612f33bdeee6b80988b7ac45e5503d690c85",
+    "AIKernel.Core.Tests.dll": "b56ac0003595bcb67e204f2ab784d26af1c3816e819d39a8d59ff8d93fb2576c"
+  },
+  "baselineAssemblySha256": {
+    "AIKernel.Kernel.dll": "d1dfc3746c536e3add8d34ff59ca61b61488cc66dc79bd763a9a2cc49aa79869",
+    "AIKernel.Core.Tests.dll": "2550e1584e9adbbe85399c026c4466d3b6e1a8638bf31117746eb783a757e061"
+  },
+  "sourceSha256": {
+    "src/AIKernel.Kernel/Inference/BonsaiCtgPrompt.cs": "0581bbf8508c2ae9f39828a933e8cbc78b097e34b54db1ab4621f600dbb84df7",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs": "53653e3592f5d0e92890345e90a0a1804516f9cc7a436b557a1d28bab7d62b55",
+    "tests/AIKernel.Core.Tests/Inference/BonsaiCtgTests.cs": "8fa9ffa402eee42b8a821b22f02c4d81a8229cc6e3e98ec53bc5df60770c8da4",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgSuite.cs": "dabcb5cec2915055c8c6223f02bda80c877d1b082386af2543b2d06ba7afb83e",
+    "tests/AIKernel.Inference.Optimization.Validation/Program.cs": "62529faa8b2460a01d31567b60ccf4ceea2196ca43c7f8ffc832206fde105b98"
+  },
+  "fixtureSha256": {
+    "bonsai-ctg-cases.json": "851d1ae0107d1e03692cd55840e1535d71e8a14897af5bb3515cf24d5d39bb76",
+    "bonsai-ctg-holdout-20261116.json": "864c99ad9be8941a9d1869d58f0003ddc80a5bd714edf4b9c7501be84df63a1b"
+  },
+  "governanceSha256": {
+    "rom\\governance\\council.ethos.monolith.md": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "rom\\governance\\council.logos.monolith.md": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "rom\\governance\\council.pathos.monolith.md": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+  },
+  "unitTests": {
+    "total": "938",
+    "executed": "938",
+    "passed": "938",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "trxSha256": "12f4f304c5fd17918ecee3fe5e566bd7d368c16a246ce0f06db93effd25d335d",
+  "unitTestKernelSha256": "40977ec2c5ff9f1a6b1f2f93b66b612f33bdeee6b80988b7ac45e5503d690c85",
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "generation128HashMatched": true,
+  "performanceBenchmark": false,
+  "server7GBRevalidated": false,
+  "backend": "AVX2/FP32",
+  "cpuWorkers": 4,
+  "contextTokens": 2048,
+  "maximumVoteTokens": 192,
+  "prefixPayloadCapBytes": 536870912,
+  "suiteDeadlineMinutes": 10,
+  "semanticSuiteExitCodes": {
+    "baseline-holdout": 0,
+    "candidate-existing": 1,
+    "candidate-holdout": 1
+  },
+  "notes": [
+    "Historical baseline collector exited zero despite semantic failures. New collector exits one if any expectation fails.",
+    "After the semantic comparison, final review added ROM header identity validation, malformed empty-fence rejection and a preflight command. Prompts and arithmetic did not change.",
+    "The final build passed all 938 tests, the real three-ROM preflight, and the same 128-token hash check.",
+    "No equations, arithmetic kernels or CTG decision gate rules were modified.",
+    "Fixture expectations were frozen before candidate measurements. No fixture-specific vote overrides were added.",
+    "The new holdout is additional validation, not a statistical estimate or future unseen test after this run.",
+    "All model responses here concern synthetic scenarios. No proposal was executed.",
+    "Wall-clock timings were observed under uncontrolled background load and are not performance measurements."
+  ]
+}

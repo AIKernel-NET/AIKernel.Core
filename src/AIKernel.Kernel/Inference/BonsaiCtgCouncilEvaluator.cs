@@ -29,6 +29,8 @@ public sealed class BonsaiCouncilRule
             throw new InvalidDataException("Council ROM identity or digest mismatch.");
         string text=new UTF8Encoding(false,true).GetString(utf8);
         if(text.Length>6500 || text.Contains("<|",StringComparison.Ordinal))throw new InvalidDataException("Council ROM exceeds the prompt contract or contains model control delimiters.");
+        var ids=text.Split('\n').Select(line=>line.TrimEnd('\r')).Where(line=>line.StartsWith("ID:",StringComparison.Ordinal)).ToArray();
+        if(ids.Length!=1||ids[0]!="ID: "+expected.CanonId)throw new InvalidDataException("Council ROM header identity mismatch or duplication.");
         return new(text,expected);
     }
 }
@@ -67,7 +69,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         var info=GgufModelInspector.Inspect(modelPath);
         if(info.Architecture!="qwen3" || info.StoredParameters is <1_500_000_000 or >2_000_000_000)throw new NotSupportedException("This evaluator requires the pinned Bonsai 1.7B family.");
         model=new(modelPath,cpuThreads,2048,"auto");model.ConfigureTrustedPrefixCache(3,maximumPrefixCacheBytes);
-        classify=(system,user,token)=>model.GenerateAsync(system,user,128,token);
+        classify=(system,user,token)=>model.GenerateAsync(system,user,192,token);
     }
     internal BonsaiCtgCouncilEvaluator(Func<string,string,CancellationToken,Task<CpuGeneration>> classify,IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,IKernelClock? clock=null)
     {this.classify=classify;this.rules=ValidateRules(rules);this.clock=clock??KernelClock.System();modelHash="test-double";evaluationTimeout=TimeSpan.FromMinutes(3);}
@@ -93,7 +95,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             ObjectDisposedException.ThrowIf(disposed,this);
             var metadata=new Dictionary<string,string>(StringComparer.Ordinal)
             { ["evaluator"]="bonsai-1.7b-provisional",["model.sha256"]=modelHash,["rh.verified"]="false",["roles.independent"]="false",
-                ["prompt.contract"]="canonical-voting-sections-v1" };
+                ["prompt.contract"]="canonical-assessment-json-v2" };
             if(request.InputFacts is null||request.InputFacts.Count is <1 or >16||request.InputFacts.Any(x=>x.Key.Length>128||x.Value is null||x.Value.Length>2048)||
                 request.RequiredCouncils is null||request.RequiredCouncils.Count>0&&!request.RequiredCouncils.Order().SequenceEqual(Councils.Order()))
                 return Failure("ctg.bonsai.invalid_request",metadata);

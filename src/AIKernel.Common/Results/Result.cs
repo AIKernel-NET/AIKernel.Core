@@ -142,10 +142,26 @@ public readonly struct Result<T>
     /// [EN] Returns this result when successful, otherwise evaluates a deterministic fallback.
     /// [JA] 成功時はこの result を返し、失敗時は決定論的 fallback を評価します。
     /// </summary>
+    /// <remarks>
+    /// [EN] A throwing fallback becomes UNHANDLED_EXCEPTION. Source error fields are retained under
+    /// source_error_* metadata keys, and source metadata keys are prefixed with source_error_metadata.
+    /// [JA] fallback内の例外はUNHANDLED_EXCEPTIONとなり、元のエラー項目をsource_error_*に、
+    /// 元のMetadataをsource_error_metadata.接頭辞付きで保持します。
+    /// </remarks>
     public Result<T> OrElse(Func<ErrorContext, Result<T>> fallback)
     {
         ArgumentNullException.ThrowIfNull(fallback);
-        return IsSuccess ? this : fallback(Error!);
+        if (IsSuccess)
+            return this;
+
+        try
+        {
+            return fallback(Error!);
+        }
+        catch (Exception exception)
+        {
+            return Fail(CreateFallbackError(exception, Error));
+        }
     }
 
     /// <summary>
@@ -189,4 +205,35 @@ public readonly struct Result<T>
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Common.Results.Result.ToString']/summary" />
     public override string ToString()
         => IsSuccess ? $"Success({Value})" : $"Fail({Error})";
+
+    private static ErrorContext CreateFallbackError(Exception exception, ErrorContext? source)
+    {
+        var error = ErrorContext.FromException(exception);
+        if (source is null)
+            return error;
+
+        var metadata = new Dictionary<string, string>(error.Metadata!, StringComparer.Ordinal);
+        AddSourceField(ResultMetadataKeys.SourceErrorCode, source.Code);
+        AddSourceField("source_error_message", source.Message);
+        AddSourceField("source_error_is_retryable", source.IsRetryable.ToString());
+        AddSourceField("source_error_failure_kind", source.FailureKind?.ToString());
+        AddSourceField("source_error_origin_step", source.OriginStep?.ToString());
+        AddSourceField("source_error_semantic_slot", source.SemanticSlot?.ToString());
+
+        // Separate the original metadata from both the new exception and the source fields.
+        // Prefixing every key also preserves prior causes when fallbacks fail repeatedly.
+        if (source.Metadata is not null)
+        {
+            foreach (var pair in source.Metadata)
+                metadata["source_error_metadata." + pair.Key] = pair.Value;
+        }
+
+        return error with { Metadata = metadata };
+
+        void AddSourceField(string key, string? value)
+        {
+            if (value is not null)
+                metadata[key] = value;
+        }
+    }
 }

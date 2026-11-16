@@ -58,7 +58,9 @@ public readonly struct ResultStep<TState, TValue>
     /// <summary>[EN] Documents this public package API member. [JA] ReplayLogHash を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ReplayLogHash']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Common.Results.ResultStep.ReplayLogHash']/summary" />
-    public string ReplayLogHash { get; }
+    public string ReplayLogHash => ReplayLog is PersistentReplayLog persistent ? persistent.Hash : _replayLogHash!;
+
+    private readonly string? _replayLogHash;
 
     private ResultStep(
         bool isSuccess,
@@ -83,8 +85,10 @@ public readonly struct ResultStep<TState, TValue>
                 IsSuccess,
                 Error?.Code)
             : stepId;
-        ReplayLog = replayLog ?? Array.Empty<ResultStepReplayLogEntry>();
-        ReplayLogHash = ResultStepIdentity.CreateReplayLogHash(ReplayLog);
+        ReplayLog = replayLog ?? PersistentReplayLog.Empty;
+        // Preserve construction-time hashing for externally mutable data. Only our immutable
+        // log may safely defer hashing; its canonical payload and hash format are unchanged.
+        _replayLogHash = ReplayLog is PersistentReplayLog ? null : ResultStepIdentity.CreateReplayLogHash(ReplayLog);
     }
 
     /// <summary>[EN] Documents this public package API member. [JA] Success を取得します。</summary>
@@ -432,6 +436,9 @@ public readonly struct ResultStep<TState, TValue>
         IReadOnlyList<ResultStepReplayLogEntry> replayLog,
         ResultStepReplayLogEntry entry)
     {
+        if (replayLog is PersistentReplayLog persistent && PersistentReplayLog.HasImmutableMetadata(entry))
+            return persistent.Append(entry);
+
         var entries = new ResultStepReplayLogEntry[replayLog.Count + 1];
 
         for (var i = 0; i < replayLog.Count; i++)
@@ -453,6 +460,9 @@ public readonly struct ResultStep<TState, TValue>
         if (second.Count == 0)
             return first;
 
+        if (first is PersistentReplayLog prefix && second is PersistentReplayLog suffix)
+            return prefix.AppendRange(suffix);
+
         var entries = new ResultStepReplayLogEntry[first.Count + second.Count];
 
         for (var i = 0; i < first.Count; i++)
@@ -472,6 +482,9 @@ public readonly struct ResultStep<TState, TValue>
         IReadOnlyList<ResultStepReplayLogEntry> replayLog,
         string parentStepId)
     {
+        if (replayLog is PersistentReplayLog persistent)
+            return persistent.Count == 0 ? persistent : persistent.Rebase(parentStepId);
+
         if (replayLog.Count == 0)
             return Array.Empty<ResultStepReplayLogEntry>();
 
@@ -509,14 +522,24 @@ public readonly struct ResultStep<TState, TValue>
                 isSuccess: false,
                 error.Code);
 
-            return [
+            return PersistentReplayLog.Empty.Append(
                 new ResultStepReplayLogEntry(
                     stepId,
                     ParentStepId: null,
                     SemanticDelta.Empty,
                     IsSuccess: false,
-                    error.Code)
-            ];
+                    error.Code));
+        }
+
+        if (replayLog is PersistentReplayLog persistent)
+        {
+            var last = persistent[^1];
+            return persistent.ReplaceLast(last with
+            {
+                StepId = ResultStepIdentity.Create(last.ParentStepId, last.SemanticDelta, isSuccess: false, error.Code),
+                IsSuccess = false,
+                ErrorCode = error.Code
+            });
         }
 
         var entries = new ResultStepReplayLogEntry[replayLog.Count];

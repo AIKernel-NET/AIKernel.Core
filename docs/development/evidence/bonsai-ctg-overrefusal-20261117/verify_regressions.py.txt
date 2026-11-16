@@ -1,0 +1,27 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+baseline=json.loads((repo/'docs/development/evidence/bonsai-ctg-grounding-20261117/server-baseline/result.json').read_text(encoding='utf-8'))
+old=next(r for r in baseline if r['id']=='verified-arithmetic')['result']['Evaluation']['Metadata']
+probe=json.loads((root/'server-guarded-controls/evidence-probe.json').read_text(encoding='utf-8'))
+new=probe['availableResult']['Evaluation']['Metadata']
+keys=['prompt.contract','model.sha256','facts.sha256','proposal.sha256','evaluation_input.sha256']
+keys +=[role+suffix for role in ('Logos','Ethos','Pathos') for suffix in ('.prompt.sha256','.response.sha256','.rom.sha256')]
+assert all(old[k]==new[k] for k in keys)
+assert probe['hostGuardPassed'] and probe['inferenceCalls']==3
+assert len(probe['blocked'])==3 and all(b['inferenceCalls']==0 and not b['result']['Gate']['Accepted'] for b in probe['blocked'])
+normal=[json.loads(line) for line in (root/'server-guarded-controls/normal-128.log').read_text().splitlines() if line.startswith('{')][-1]
+assert normal['OutputTokens']==128 and normal['GeneratedTokenSha256']=='f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e'
+completion=json.loads((root/'server-guarded-controls/completion.json').read_text())
+assert all(v['exitCode']==0 and v['stopReason'] is None for v in completion['checks'].values())
+peaks=[]
+for run in root.glob('server-*'):
+ if run.is_dir() and (run/'completion.json').exists():
+  item=json.loads((run/'completion.json').read_text());peaks.append(item['maximumRssBytes'])
+  peaks.extend(v['maximumRssBytes'] for v in item.get('checks',{}).values())
+assert max(peaks)<7*1024**3
+result=dict(blockedStates=3,blockedInferenceCalls=0,availableInferenceCalls=3,availablePromptAndResponseHashesMatchBaseline=True,
+ matchedMetadataKeys=keys,generation128HashMatched=True,semanticVoteContractUnchanged=True,maximumObservedRssBytes=max(peaks))
+(root/'guard-regression.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result,indent=2))

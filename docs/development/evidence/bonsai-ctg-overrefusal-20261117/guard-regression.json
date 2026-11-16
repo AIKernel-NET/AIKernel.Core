@@ -1,0 +1,25 @@
+{
+  "blockedStates": 3,
+  "blockedInferenceCalls": 0,
+  "availableInferenceCalls": 3,
+  "availablePromptAndResponseHashesMatchBaseline": true,
+  "matchedMetadataKeys": [
+    "prompt.contract",
+    "model.sha256",
+    "facts.sha256",
+    "proposal.sha256",
+    "evaluation_input.sha256",
+    "Logos.prompt.sha256",
+    "Logos.response.sha256",
+    "Logos.rom.sha256",
+    "Ethos.prompt.sha256",
+    "Ethos.response.sha256",
+    "Ethos.rom.sha256",
+    "Pathos.prompt.sha256",
+    "Pathos.response.sha256",
+    "Pathos.rom.sha256"
+  ],
+  "generation128HashMatched": true,
+  "semanticVoteContractUnchanged": true,
+  "maximumObservedRssBytes": 1180901376
+}

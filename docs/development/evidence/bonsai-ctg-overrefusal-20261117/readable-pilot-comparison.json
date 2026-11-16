@@ -1,0 +1,40 @@
+{
+  "phase": "readable-pilot",
+  "pairedBefore": {
+    "n": 8,
+    "fullPass": 2,
+    "gatePass": 4,
+    "falseAllow": [
+      "printer-profile-outage"
+    ],
+    "falseDeny": [
+      "supported-public-summary",
+      "japanese-translation",
+      "pair-japanese-correct"
+    ]
+  },
+  "pairedAfter": {
+    "n": 8,
+    "fullPass": 2,
+    "gatePass": 5,
+    "falseAllow": [
+      "printer-profile-outage"
+    ],
+    "falseDeny": [
+      "japanese-translation",
+      "pair-japanese-correct"
+    ]
+  },
+  "previouslyUnrun": {
+    "n": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "regressions": [],
+  "improvements": [
+    "supported-public-summary"
+  ],
+  "eligibleForAdoption": false
+}

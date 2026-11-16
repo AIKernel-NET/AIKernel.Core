@@ -1,0 +1,68 @@
+[
+  {
+    "run": "full-tests",
+    "fileSha256": "7da0d249157b631d19527be7f37b0b37acc09ed5b4b724a9f4f27cef0badc59f",
+    "counters": {
+      "total": "989",
+      "executed": "989",
+      "passed": "989",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  {
+    "run": "scope-tests",
+    "fileSha256": "dc8c7aa1b57b583c06c86a0cbc2a9114903765ff0650c7929185c99dd3ab1ace",
+    "counters": {
+      "total": "991",
+      "executed": "991",
+      "passed": "991",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  {
+    "run": "guarded-tests",
+    "fileSha256": "e29cf3968f122882b053a401de4480e892e76cad429653c9f6128c099b17c920",
+    "counters": {
+      "total": "998",
+      "executed": "998",
+      "passed": "998",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  }
+]

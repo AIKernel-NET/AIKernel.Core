@@ -1,0 +1,12 @@
+{
+  "exitCode": -15,
+  "stopReason": "semantic-regression",
+  "maximumRssBytes": 1171021824,
+  "seconds": 981.0448241233826,
+  "cpuAffinity": [
+    4,
+    5
+  ],
+  "configuredWorkers": 4,
+  "performanceBenchmark": false
+}

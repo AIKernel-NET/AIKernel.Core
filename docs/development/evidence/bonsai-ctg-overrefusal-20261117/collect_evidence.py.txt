@@ -1,0 +1,40 @@
+from pathlib import Path
+import json,hashlib,xml.etree.ElementTree as ET
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+dest=repo/'docs/development/evidence/bonsai-ctg-overrefusal-20261117'
+dest.mkdir(parents=True,exist_ok=True)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+root_names=['admission.json','scope-admission.json','baseline-gates.json','all-cases.json','pilot-cases.json','scope-pilot-cases.json',
+ 'readable-tested-build.json','scope-tested-build.json','server-probe.json','server-final-state.json',
+ 'readable-pilot-comparison.json','readable-full-comparison.json','scope-pilot-comparison.json','scope-full-comparison.json',
+ 'scope-pilot-unchanged-roles.json','scope-full-unchanged-roles.json','local-load-samples.json','local-retry-status.json',
+ 'local-baseline-retry.json','local-baseline-retry.json.responses.json','local-baseline-retry.log',
+ 'guarded-cases.json','guarded-admission.json','guarded-tested-build.json','guarded-comparison.json',
+ 'controls-baseline-cases.json','guarded-controls-cases.json','diagnostic-continuation.json','extended-comparison.json','guard-regression.json']
+for name in root_names:
+ if (root/name).exists():(dest/name).write_bytes((root/name).read_bytes())
+for name in ['prepare.py','prepare_full.py','prepare_scope.py','compare.py','verify_scope.py','record_build.py',
+             'remote_runner.py','server_transfer.py','public_runner.py','wait_local_retry.ps1','collect_evidence.py',
+             'prepare_guarded.py','compare_guarded.py','server_final_state.py','prepare_controls.py','compare_extended.py','verify_regressions.py','check_staged_evidence.py']:
+ (dest/(name+'.txt')).write_bytes((root/name).read_bytes())
+for phase in ['readable-pilot','readable-full','scope-pilot','scope-full','guarded-full','controls-baseline','guarded-controls','final-api']:
+ source=root/('server-'+phase)
+ if not source.exists():continue
+ assert (source/'completion.json').exists(),phase+' has not completed'
+ target=dest/source.name;target.mkdir(exist_ok=True)
+ for file in source.iterdir():
+  assert file.is_file() and file.suffix in ('.json','.log','.py'),file
+  (target/(file.name+('.txt' if file.suffix=='.py' else ''))).write_bytes(file.read_bytes())
+tests=[]
+ns={'t':'http://microsoft.com/schemas/VisualStudio/TeamTest/2010'}
+for directory in ['full-tests','scope-tests','guarded-tests']:
+ for file in (root/directory).glob('*.trx'):
+  data=ET.parse(file);counters=data.find('.//t:Counters',ns)
+  assert counters is not None and counters.attrib['failed']=='0'
+  tests.append({'run':directory,'fileSha256':sha(file),'counters':counters.attrib})
+(dest/'unit-tests.json').write_text(json.dumps(tests,indent=2)+'\n')
+(dest/'.gitattributes').write_text('* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol\n')
+manifest={p.relative_to(dest).as_posix():sha(p) for p in sorted(dest.rglob('*')) if p.is_file() and p.name!='evidence-sha256.json'}
+(dest/'evidence-sha256.json').write_text(json.dumps(manifest,indent=2)+'\n')
+print(json.dumps({'files':len(manifest),'destination':str(dest)}))

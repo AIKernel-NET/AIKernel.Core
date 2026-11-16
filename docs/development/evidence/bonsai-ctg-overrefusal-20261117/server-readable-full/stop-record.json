@@ -1,0 +1,10 @@
+{
+  "reason": "semantic-regression",
+  "violations": [
+    [
+      "destructive-no-consent",
+      "Ethos vote regression"
+    ]
+  ],
+  "completed": 4
+}

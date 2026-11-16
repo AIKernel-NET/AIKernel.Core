@@ -1,0 +1,27 @@
+from pathlib import Path
+import sys,subprocess,json
+sys.path.insert(0,r'D:/AIKernel/.wp-predelete-backup')
+from xserver_ssh import connection
+root=Path(__file__).parent
+parents={p.stem.removesuffix('-transfer'):json.loads(p.read_text())['runnerPid'] for p in root.glob('*-transfer.json')}
+script=r'''from pathlib import Path
+import json,time
+root=Path.home()/'.aikernel-inquiry-014/ctg-overrefusal-20261117'
+parents=PARENTS
+active=[]
+for phase,parent in parents.items():
+ out=root/phase;pids={parent}
+ if (out/'pid.json').exists():
+  record=json.loads((out/'pid.json').read_text());pids.update(record[k] for k in ('pid','runnerPid') if k in record)
+ for pid in pids:
+  try:cmd=(Path('/proc')/str(pid)/'cmdline').read_bytes().split(b'\0')
+  except OSError:continue
+  if any(str(out).encode()+b'/' in arg for arg in cmd):active.append({'phase':phase,'pid':pid})
+print(json.dumps({'activeOwnedValidationProcesses':active,'checkedPhases':sorted(parents),'utcSeconds':time.time()}))
+'''.replace('PARENTS',repr(parents))
+with connection() as ssh:
+ p=subprocess.run(ssh+['/usr/bin/python3.6 -'],input=script.encode(),capture_output=True,timeout=60,creationflags=subprocess.CREATE_NO_WINDOW)
+if p.returncode:raise RuntimeError(p.stderr.decode(errors='replace'))
+result=json.loads(p.stdout)
+(root/'server-final-state.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result,indent=2));assert not result['activeOwnedValidationProcesses']

@@ -1,0 +1,41 @@
+from pathlib import Path
+import json
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+base=json.loads((repo/'docs/development/evidence/bonsai-ctg-grounding-20261117/server-baseline/result.json').read_text())
+base+=json.loads((root/'server-controls-baseline/result.json').read_text())
+old={r['id']:r for r in base};assert len(old)==50
+rows=json.loads((root/'server-guarded-full/result.json').read_text())+json.loads((root/'server-guarded-controls/result.json').read_text())
+assert len(rows)==len({r['id'] for r in rows})==50
+blocked=[r for r in rows if r['expectedHostBlock']];active=[r for r in rows if not r['expectedHostBlock']]
+assert len(blocked)==7 and len(active)==43 and all(r['pipelinePass'] and r['inferenceCalls']==0 for r in blocked)
+regressions=[];improvements=[]
+for row in active:
+ b=old[row['id']];before=b['result']['Evaluation']['Metadata'];after=row['result']['Evaluation']['Metadata']
+ assert b['result']['Evaluation']['Succeeded'] and row['result']['Evaluation']['Succeeded']
+ assert b['expectedGate']==row['expectedGate']
+ for key in ['facts.sha256','proposal.sha256','evaluation_input.sha256']+[r+'.prompt.sha256' for r in ('Logos','Ethos','Pathos')]:
+  assert row['legacyPromptWitness'][key]==before[key],(row['id'],key,'v4 prompt witness')
+ for role in ('Logos','Ethos'):
+  for key in ('prompt.sha256','response.sha256','rom.sha256','excerpt.sha256','backend','activation_precision'):
+   assert before[role+'.'+key]==after[role+'.'+key],(row['id'],role,key)
+ old_gate=b['result']['Gate']['Accepted'];new_gate=row['result']['Gate']['Accepted']
+ if old_gate==b['expectedGate'] and new_gate!=row['expectedGate']:regressions.append([row['id'],'gate',old_gate,new_gate])
+ if old_gate!=b['expectedGate'] and new_gate==row['expectedGate']:improvements.append(row['id'])
+ checks={c['council']:c for c in b['checks']}
+ for c in row['checks']:
+  bc=checks[c['council']]
+  assert bc['expected']==c['expected']
+  if bc['actual'] in bc['expected'] and c['actual'] not in c['expected']:regressions.append([row['id'],c['council'],bc['actual'],c['actual']])
+def totals(data):
+ return {'n':len(data),'fullPass':sum(r['pass'] for r in data),'gatePass':sum(r['expectedGate']==r['result']['Gate']['Accepted'] for r in data),
+ 'falseAllow':[r['id'] for r in data if not r['expectedGate'] and r['result']['Gate']['Accepted']],
+ 'falseDeny':[r['id'] for r in data if r['expectedGate'] and not r['result']['Gate']['Accepted']]}
+fresh_ids={r['id'] for r in json.loads((root/'server-controls-baseline/result.json').read_text())}
+result={'purpose':'diagnose the failed frozen admission; not a replacement adoption criterion','eligibleForAdoption':False,
+ 'modelBefore':totals([old[r['id']] for r in active]),'modelAfter':totals(active),
+ 'freshBefore':totals([old[i] for i in fresh_ids]),'freshAfter':totals([r for r in active if r['id'] in fresh_ids]),
+ 'hostBlocks':len(blocked),'modelCasesWithUnchangedLogosEthosHashes':len(active),
+ 'regressions':regressions,'improvements':improvements}
+(root/'extended-comparison.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result,indent=2))

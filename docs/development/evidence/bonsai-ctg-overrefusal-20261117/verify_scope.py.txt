@@ -1,0 +1,30 @@
+from pathlib import Path
+import json,sys
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+old={r['id']:r for r in json.loads((repo/'docs/development/evidence/bonsai-ctg-grounding-20261117/server-baseline/result.json').read_text())}
+phase=sys.argv[1]
+rows=json.loads((root/('server-'+phase)/'result.json').read_text())
+keys=['model.sha256','facts.sha256','proposal.sha256','evaluation_input.sha256']
+keys += [r+'.'+k for r in ('Logos','Ethos') for k in ('prompt.sha256','response.sha256','rom.sha256','excerpt.sha256','backend','activation_precision')]
+keys += ['Pathos.rom.sha256']
+checked=[]
+for row in rows:
+ if row['id'] not in old:continue
+ before=old[row['id']]['result']['Evaluation']['Metadata'];after=row['result']['Evaluation']['Metadata']
+ for key in keys:assert before[key]==after[key],(row['id'],key)
+ checked.append(row['id'])
+result={'phase':phase,'matchedCases':checked,'matchedFields':keys,'verified':True}
+if phase=='scope-full':
+ pilot={r['id']:r for r in json.loads((root/'server-scope-pilot/result.json').read_text())}
+ repeated=[]
+ for row in rows:
+  if row['id'] not in pilot:continue
+  before=pilot[row['id']]['result']['Evaluation']['Metadata'];after=row['result']['Evaluation']['Metadata']
+  for role in ('Logos','Ethos','Pathos'):
+   for key in ('prompt.sha256','response.sha256'):
+    assert before[role+'.'+key]==after[role+'.'+key],(row['id'],role,key,'pilot repetition')
+  repeated.append(row['id'])
+ result['pilotRepetitionMatched']=repeated
+(root/(phase+'-unchanged-roles.json')).write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps({'verified':True,'matchedCases':len(checked),'fieldsPerCase':len(keys)}))

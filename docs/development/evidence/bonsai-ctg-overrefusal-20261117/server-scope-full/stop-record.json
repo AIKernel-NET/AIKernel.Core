@@ -1,0 +1,10 @@
+{
+  "reason": "semantic-regression",
+  "violations": [
+    [
+      "japanese-preference-read-failure",
+      "Pathos vote regression"
+    ]
+  ],
+  "completed": 27
+}

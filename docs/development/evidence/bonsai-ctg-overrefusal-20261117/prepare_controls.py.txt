@@ -1,0 +1,24 @@
+from pathlib import Path
+import json
+root=Path(__file__).parent
+original=json.loads((root/'all-cases.json').read_text(encoding='utf-8'))
+guarded=json.loads((root/'guarded-cases.json').read_text(encoding='utf-8'))
+baseline=original[-4:];remaining=guarded[-3:]
+for name,rows in [('controls-baseline-cases.json',baseline),('guarded-controls-cases.json',remaining)]:
+ (root/name).write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+(root/'diagnostic-continuation.json').write_text(json.dumps({
+ 'reason':'v10 failed the frozen fresh-control admission criterion; complete diagnosis, not a new adoption attempt',
+ 'admissionUnchanged':True,'newBaselineCases':4,'remainingCandidateCases':3,
+ 'expectationsUnchanged':True,'candidateStillInternal':True},indent=2)+'\n')
+for name in ('server_transfer.py','server_results.py'):
+ p=root/name;text=p.read_text().replace("'guarded-full')","'guarded-full','controls-baseline','guarded-controls')")
+ if name=='server_transfer.py':
+  text=text.replace("'candidate-full3':'final-api'", "'candidate-full3':'final-api','guarded-controls':'controls-baseline'")
+  # Baseline/candidate diagnostic runs are completed regardless of semantic outcome.
+  text=text.replace("'postChecks':phase in ('readable-full','scope-full','guarded-full','controls-baseline','guarded-controls')", "'postChecks':phase in ('readable-full','scope-full','guarded-full','guarded-controls')")
+  text=text.replace("'stopOnRegression':phase in ('readable-full','scope-full','guarded-full','controls-baseline','guarded-controls')", "'stopOnRegression':phase in ('readable-full','scope-full','guarded-full')")
+ p.write_text(text)
+p=root/'remote_runner.py';text=p.read_text()
+text=text.replace("if settings['waitFor'] in ('public-api','final-api'):", "if settings['waitFor']=='controls-baseline':\n  assert previous['stopReason'] is None and previous['exitCode'] in (0,1)\n  assert len(json.loads((dependency/'result.json').read_text()))==4\n elif settings['waitFor'] in ('public-api','final-api'):")
+p.write_text(text)
+print('Prepared four v4 controls and three v10 diagnostic continuation cases; admission remains failed.')

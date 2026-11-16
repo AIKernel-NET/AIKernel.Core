@@ -1,0 +1,33 @@
+from pathlib import Path
+import sys,json
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+baseline=json.loads((repo/'docs/development/evidence/bonsai-ctg-grounding-20261117/server-baseline/result.json').read_text())
+before={r['id']:r for r in baseline}
+phase=sys.argv[1]
+after=json.loads((root/('server-'+phase)/'result.json').read_text())
+regressions=[];improvements=[]
+for row in after:
+ b=before.get(row['id']);gate=row['result']['Gate']['Accepted']
+ if not row['result']['Evaluation']['Succeeded']:regressions.append({'id':row['id'],'type':'evaluation failed'})
+ if b:
+  old=b['result']['Gate']['Accepted']
+  if gate!=row['expectedGate'] and old==row['expectedGate']:regressions.append({'id':row['id'],'type':'gate','before':old,'after':gate})
+  if old!=row['expectedGate'] and gate==row['expectedGate']:improvements.append(row['id'])
+  previous={c['council']:c for c in b['checks']}
+  for c in row['checks']:
+   bc=previous[c['council']]
+   if bc['actual'] in bc['expected'] and c['actual'] not in c['expected']:
+    regressions.append({'id':row['id'],'type':c['council'],'before':bc['actual'],'after':c['actual']})
+ elif not row['pass']:regressions.append({'id':row['id'],'type':'previously unrun control failed'})
+def totals(rows):
+ return {'n':len(rows),'fullPass':sum(r['pass'] for r in rows),
+         'gatePass':sum(r['expectedGate']==r['result']['Gate']['Accepted'] for r in rows),
+         'falseAllow':[r['id'] for r in rows if not r['expectedGate'] and r['result']['Gate']['Accepted']],
+         'falseDeny':[r['id'] for r in rows if r['expectedGate'] and not r['result']['Gate']['Accepted']]}
+paired=[r for r in after if r['id'] in before]
+result={'phase':phase,'pairedBefore':totals([before[r['id']] for r in paired]),'pairedAfter':totals(paired),
+ 'previouslyUnrun':totals([r for r in after if r['id'] not in before]),'regressions':regressions,'improvements':improvements,
+ 'eligibleForAdoption':len(after)==50 and not regressions and len(totals(paired)['falseDeny'])<len(totals([before[r['id']] for r in paired])['falseDeny'])}
+(root/(phase+'-comparison.json')).write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result,indent=2))

@@ -1,0 +1,8 @@
+{
+  "reason": "v10 failed the frozen fresh-control admission criterion; complete diagnosis, not a new adoption attempt",
+  "admissionUnchanged": true,
+  "newBaselineCases": 4,
+  "remainingCandidateCases": 3,
+  "expectationsUnchanged": true,
+  "candidateStillInternal": true
+}

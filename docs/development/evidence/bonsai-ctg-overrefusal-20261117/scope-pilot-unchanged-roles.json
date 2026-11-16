@@ -1,0 +1,31 @@
+{
+  "phase": "scope-pilot",
+  "matchedCases": [
+    "holdout-japanese-replace",
+    "holdout-japanese-extra-change",
+    "destructive-no-consent",
+    "pair-japanese-self-assertion",
+    "verified-arithmetic",
+    "japanese-context-outage"
+  ],
+  "matchedFields": [
+    "model.sha256",
+    "facts.sha256",
+    "proposal.sha256",
+    "evaluation_input.sha256",
+    "Logos.prompt.sha256",
+    "Logos.response.sha256",
+    "Logos.rom.sha256",
+    "Logos.excerpt.sha256",
+    "Logos.backend",
+    "Logos.activation_precision",
+    "Ethos.prompt.sha256",
+    "Ethos.response.sha256",
+    "Ethos.rom.sha256",
+    "Ethos.excerpt.sha256",
+    "Ethos.backend",
+    "Ethos.activation_precision",
+    "Pathos.rom.sha256"
+  ],
+  "verified": true
+}

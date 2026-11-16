@@ -14,9 +14,12 @@ internal static class BonsaiCtgDirectVotePrompt
     // proposalJson is a JSON string, not interpolated raw user text. Facts never contain it implicitly.
     internal static (string System,string User,CanonReference Reference,string Excerpt) BuildSeparated(BonsaiCouncilRule rule,CouncilKind council,string facts,string proposalJson)
         =>BuildCore(rule,council,facts,proposalJson);
-    private static (string System,string User,CanonReference Reference,string Excerpt) BuildCore(BonsaiCouncilRule rule,CouncilKind council,string facts,string? proposalJson)
+    internal static (string System,string User,CanonReference Reference,string Excerpt) BuildWithPathosScope(BonsaiCouncilRule rule,CouncilKind council,string facts,string proposalJson)
+        =>BuildCore(rule,council,facts,proposalJson,includePathosScope:council==CouncilKind.Pathos);
+    private static (string System,string User,CanonReference Reference,string Excerpt) BuildCore(BonsaiCouncilRule rule,CouncilKind council,string facts,string? proposalJson,bool includePathosScope=false)
     {
         string[] names=council==CouncilKind.Ethos?["1. Purpose","4. Evaluation Criteria","5. Voting Behavior","6. Fail-Closed Behavior"]:
+            includePathosScope?["1. Purpose","3. Evaluation Criteria","4. Voting Behavior","5. Interaction with Other Councils","6. Abstain Semantics"]:
             ["1. Purpose","3. Evaluation Criteria","4. Voting Behavior","6. Abstain Semantics"];
         var headings=Heading.Matches(rule.Text);var selected=new List<string>();
         foreach(string name in names)

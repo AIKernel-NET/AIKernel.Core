@@ -50,7 +50,13 @@ internal enum BonsaiCtgResponseMode
     /// <summary>Validation-only comparison of actual claims with observations.</summary>
     ComparativeDirectVotes,
     /// <summary>Validation-only v4 instruction preservation with observations before the proposal.</summary>
-    ObservationFirstDirectVotes
+    ObservationFirstDirectVotes,
+    /// <summary>Validation-only readable JSON punctuation with the unchanged v4 instructions.</summary>
+    ReadableDirectVotes,
+    /// <summary>Validation-only exact Pathos interaction section; Logos and Ethos retain v4.</summary>
+    PathosScopeDirectVotes,
+    /// <summary>Validation-only Pathos scope gated by mandatory host-owned evidence requirements.</summary>
+    EvidenceScopedDirectVotes
 }
 
 /// <summary>Experimental Bonsai 1.7B council observations; canonical voting fidelity is not established.
@@ -103,7 +109,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
     private static ImmutableDictionary<CouncilKind,BonsaiCouncilRule> ValidateRules(IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,BonsaiCtgResponseMode mode)
     {
         ArgumentNullException.ThrowIfNull(rules);
-        if(mode is not (BonsaiCtgResponseMode.DirectVotes or BonsaiCtgResponseMode.CanonicalFindings or BonsaiCtgResponseMode.GroundedDirectVotes or BonsaiCtgResponseMode.ComparativeDirectVotes or BonsaiCtgResponseMode.ObservationFirstDirectVotes))throw new ArgumentOutOfRangeException(nameof(mode));
+        if(mode is not (BonsaiCtgResponseMode.DirectVotes or BonsaiCtgResponseMode.CanonicalFindings or BonsaiCtgResponseMode.GroundedDirectVotes or BonsaiCtgResponseMode.ComparativeDirectVotes or BonsaiCtgResponseMode.ObservationFirstDirectVotes or BonsaiCtgResponseMode.ReadableDirectVotes or BonsaiCtgResponseMode.PathosScopeDirectVotes or BonsaiCtgResponseMode.EvidenceScopedDirectVotes))throw new ArgumentOutOfRangeException(nameof(mode));
         if(rules.Count!=3||Councils.Any(c=>!rules.TryGetValue(c,out var rule)||rule is null||!rule.Reference.CanonId.EndsWith(".Council."+c,StringComparison.Ordinal)))throw new ArgumentException("All three canonical council rules are required.");
         if(mode is not BonsaiCtgResponseMode.DirectVotes)foreach(var council in Councils)BonsaiCtgFindingPolicy.RequireSupported(rules[council],council);
         return rules.ToImmutableDictionary();
@@ -134,12 +140,16 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             bool findings=responseMode==BonsaiCtgResponseMode.CanonicalFindings;
             bool comparative=responseMode==BonsaiCtgResponseMode.ComparativeDirectVotes;
             bool ordered=responseMode==BonsaiCtgResponseMode.ObservationFirstDirectVotes;
+            bool readable=responseMode==BonsaiCtgResponseMode.ReadableDirectVotes;
+            bool requiresEvidence=responseMode==BonsaiCtgResponseMode.EvidenceScopedDirectVotes;
+            bool scoped=responseMode==BonsaiCtgResponseMode.PathosScopeDirectVotes||requiresEvidence;
             bool grounded=responseMode==BonsaiCtgResponseMode.GroundedDirectVotes||comparative||ordered;
             var metadata=new Dictionary<string,string>(StringComparer.Ordinal)
             { ["evaluator"]="bonsai-1.7b-provisional",["model.sha256"]=modelHash,["rh.verified"]="false",["roles.independent"]="false",
-                ["prompt.contract"]=ordered?BonsaiCtgObservationFirstPrompt.Contract:comparative?BonsaiCtgComparativePrompt.Contract:grounded?BonsaiCtgGroundedPrompt.Contract:separated?"canonical-separated-assessment-json-v4":findings?"canonical-findings-json-v3":"canonical-assessment-json-v2" };
+                ["prompt.contract"]=requiresEvidence?"canonical-evidence-scope-json-v10":scoped?"canonical-pathos-scope-json-v9":readable?BonsaiCtgReadableJson.Contract:ordered?BonsaiCtgObservationFirstPrompt.Contract:comparative?BonsaiCtgComparativePrompt.Contract:grounded?BonsaiCtgGroundedPrompt.Contract:separated?"canonical-separated-assessment-json-v4":findings?"canonical-findings-json-v3":"canonical-assessment-json-v2" };
             if(findings)metadata["binding.policy"]=BonsaiCtgFindingPolicy.Contract;
-            if(separated&&findings||grounded&&!separated)return Failure("ctg.bonsai.unsupported_contract",metadata);
+            if(separated&&findings||(grounded||readable||scoped)&&!separated)return Failure("ctg.bonsai.unsupported_contract",metadata);
+            if(requiresEvidence&&evidence is null)return Failure("ctg.bonsai.evidence_contract_required",metadata);
             if(separated&&(string.IsNullOrWhiteSpace(proposal)||proposal.Length>2048))return Failure("ctg.bonsai.invalid_proposal",metadata);
             if(request.InputFacts is null||request.InputFacts.Count is <1 or >16||request.InputFacts.Any(x=>x.Key.Length>128||x.Value is null||x.Value.Length>2048)||
                 request.RequiredCouncils is null||request.RequiredCouncils.Count>0&&!request.RequiredCouncils.Order().SequenceEqual(Councils.Order()))
@@ -151,6 +161,11 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             string facts=findings?JsonSerializer.Serialize(inputFacts.Select((pair,id)=>new{id,key=pair.Key,text=pair.Value}),FactsJson):
                 JsonSerializer.Serialize(inputFacts,FactsJson);
             string? proposalJson=separated?JsonSerializer.Serialize(proposal,FactsJson):null;
+            if(readable)
+            {
+                facts=BonsaiCtgReadableJson.Serialize(inputFacts);
+                proposalJson=BonsaiCtgReadableJson.Serialize(proposal);
+            }
             if(facts.Length+(proposalJson?.Length??0)>3000)return Failure("ctg.bonsai.input_budget",metadata);
             metadata["facts.sha256"]=Hash(facts);
             if(separated)
@@ -171,7 +186,8 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             {
                 foreach(var council in Councils)
                 {
-                    var rule=rules[council];var prompt=ordered?BonsaiCtgObservationFirstPrompt.Build(rule,council,facts,proposalJson!):
+                    var rule=rules[council];var prompt=scoped?BonsaiCtgDirectVotePrompt.BuildWithPathosScope(rule,council,facts,proposalJson!):
+                        ordered?BonsaiCtgObservationFirstPrompt.Build(rule,council,facts,proposalJson!):
                         comparative?BonsaiCtgComparativePrompt.Build(rule,council,facts,proposalJson!):
                         grounded?BonsaiCtgGroundedPrompt.Build(rule,council,facts,proposalJson!):
                         separated?BonsaiCtgDirectVotePrompt.BuildSeparated(rule,council,facts,proposalJson!):

@@ -40,9 +40,10 @@ internal sealed class CosmosVisionEncoder
     {
         int count=input.Count,w=d.VisionWidth,hs=w/d.VisionHeads,frame=input.Height*input.Width;
         float attentionScale=(float)Math.Pow(hs,-.5);
-        using var work=new CosmosWorkspace();var hidden=work.Rows(count,w);var qkv=work.Rows(count,w*3);
+        using var work=new CosmosWorkspace(weights.Budget);var hidden=work.Rows(count,w);var qkv=work.Rows(count,w*3);
         var norm=work.Rent(w);var projected=work.Rent(w);var patchInput=work.Rent(1536);var mlp=work.Rent(d.VisionHidden);
         var cos=work.Rows(frame,hs/2);var sin=work.Rows(frame,hs/2);
+        var positions=work.Rent(checked((int)position.Count));position.CopyTo(positions);
         int grid=(int)Math.Sqrt(d.VisionPositions);
         for(int t=0;t<input.Time;t++)for(int by=0;by<input.Height/2;by++)for(int bx=0;bx<input.Width/2;bx++)for(int my=0;my<2;my++)for(int mx=0;mx<2;mx++)
         {
@@ -52,8 +53,8 @@ internal sealed class CosmosVisionEncoder
             float py=input.Height==1?0:(float)y*(grid-1)/(input.Height-1),px=input.Width==1?0:(float)x*(grid-1)/(input.Width-1);
             int y0=(int)py,x0=(int)px,y1=Math.Min(y0+1,grid-1),x1=Math.Min(x0+1,grid-1);float dy=py-y0,dx=px-x0;
             for(int c=0;c<w;c++)hidden[row][c]+=
-                position.At((y0*grid+x0)*w+c)*(1-dy)*(1-dx)+position.At((y0*grid+x1)*w+c)*(1-dy)*dx+
-                position.At((y1*grid+x0)*w+c)*dy*(1-dx)+position.At((y1*grid+x1)*w+c)*dy*dx;
+                positions[(y0*grid+x0)*w+c]*(1-dy)*(1-dx)+positions[(y0*grid+x1)*w+c]*(1-dy)*dx+
+                positions[(y1*grid+x0)*w+c]*dy*(1-dx)+positions[(y1*grid+x1)*w+c]*dy*dx;
             if(t==0)for(int i=0;i<hs/2;i++)
             {
                 int coordinate=i<hs/4?y:x;float angle=coordinate*(1/MathF.Pow(10000f,(float)(i%(hs/4)*2)/(hs/2)));
@@ -99,7 +100,7 @@ internal sealed class CosmosVisionEncoder
     }
     private float[][] Merge(float[][] hidden,Merger m,CosmosWorkspace arena,ParallelOptions options)
     {
-        using var work=new CosmosWorkspace();int width=d.VisionWidth;
+        using var work=new CosmosWorkspace(weights.Budget);int width=d.VisionWidth;
         var input=work.Rent(width*4);var norm=work.Rent(width*4);var up=work.Rent(width*4);var result=arena.Rows(hidden.Length/4,d.Width);
         for(int row=0;row<result.Length;row++)
         {

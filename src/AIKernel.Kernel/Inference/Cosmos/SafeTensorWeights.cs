@@ -12,9 +12,11 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
 {
     internal sealed record Tensor(string Name, string Type, int[] Shape, long Count, nint Address)
     {
+        internal CosmosPagedWeights? Paging { get; set; }
         internal float At(long index)
         {
             if((ulong)index>=(ulong)Count) throw new ArgumentOutOfRangeException(nameof(index));
+            if(Paging is not null){Span<float> value=stackalloc float[1];Paging.Read(this,index,value);return value[0];}
             byte* p=(byte*)Address;
             return Type switch
             {
@@ -24,18 +26,24 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
                 _ => throw new NotSupportedException(Type)
             };
         }
+        internal void CopyTo(Span<float> destination)
+        {
+            if(destination.Length!=Count)throw new ArgumentException("Tensor destination shape mismatch.");
+            if(Paging is not null)Paging.Read(this,0,destination);else for(int i=0;i<destination.Length;i++)destination[i]=At(i);
+        }
         internal float[] Read()
         {
-            var result=new float[checked((int)Count)];for(int i=0;i<result.Length;i++)result[i]=At(i);return result;
+            var result=new float[checked((int)Count)];if(Paging is not null)Paging.Read(this,0,result);else for(int i=0;i<result.Length;i++)result[i]=At(i);return result;
         }
         internal void Row(int row, Span<float> result)
         {
             if(Shape.Length!=2 || row<0 || row>=Shape[0] || result.Length!=Shape[1])throw new ArgumentException("Tensor row shape mismatch.");
-            long offset=(long)row*Shape[1];for(int i=0;i<result.Length;i++)result[i]=At(offset+i);
+            long offset=(long)row*Shape[1];if(Paging is not null)Paging.Read(this,offset,result);else for(int i=0;i<result.Length;i++)result[i]=At(offset+i);
         }
         internal float Dot(long offset, ReadOnlySpan<float> input)
         {
-            if(offset<0 || offset+input.Length>Count)throw new ArgumentException("Tensor dot shape mismatch.");
+            if(offset<0 || offset>Count-input.Length)throw new ArgumentException("Tensor dot shape mismatch.");
+            if(Paging is not null)return Paging.Dot(this,offset,input);
             byte* p=(byte*)Address;int i=0;float sum=0;
             fixed(float* x=input)
             {
@@ -86,12 +94,16 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
         public void Dispose(){View.SafeMemoryMappedViewHandle.ReleasePointer();View.Dispose();File.Dispose();}
     }
     private readonly List<Mapping> maps=[];
+    private readonly CosmosPagedWeights? paging;
+    internal CosmosMemoryBudget? Budget { get; }
     private readonly Dictionary<string,Tensor> tensors=new(StringComparer.Ordinal);
     internal IEnumerable<string> Names => tensors.Keys;
+    internal long StoredBytes(bool includeVision)=>tensors.Values.Where(t=>includeVision||t.Name.StartsWith("model.language_model.",StringComparison.Ordinal)||t.Name=="lm_head.weight").Sum(t=>checked(t.Count*(t.Type=="F32"?4:2)));
 
-    internal SafeTensorWeights(string directory)
+    internal SafeTensorWeights(string directory,CosmosMemoryBudget? budget=null)
     {
         if(!BitConverter.IsLittleEndian)throw new PlatformNotSupportedException("Little-endian safetensors required.");
+        Budget=budget;if(budget is not null)paging=new(budget);
         try
         {
             string index=Path.Combine(directory,"model.safetensors.index.json");
@@ -115,6 +127,7 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
             }
             if(expected is not null && (!expected.Keys.ToHashSet(StringComparer.Ordinal).SetEquals(tensors.Keys)))
                 throw new InvalidDataException("Shard inventory differs from index.");
+            paging?.Initialize();
         }
         catch{Dispose();throw;}
     }
@@ -144,10 +157,16 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
         foreach(var entry in entries.OrderBy(e=>e.Start))
         {if(entry.Start!=cursor)throw new InvalidDataException("Overlapping or non-contiguous tensors.");cursor=entry.End;}
         if(cursor!=stream.Length-8-(long)headerLength)throw new InvalidDataException("Unused trailing tensor data.");
-        var map=new Mapping(path);maps.Add(map);
+        Mapping? map=null;if(paging is null){map=new Mapping(path);maps.Add(map);}
+        var added=new List<(Tensor Tensor,long Offset)>();
         foreach(var e in entries)
-            if(!tensors.TryAdd(e.Name,new(e.Name,e.Type,e.Shape,e.Count,map.Pointer+checked((nint)(8+(long)headerLength+e.Start)))))
-                throw new InvalidDataException("Duplicate tensor: "+e.Name);
+        {
+            long offset=checked(8+(long)headerLength+e.Start);
+            var tensor=new Tensor(e.Name,e.Type,e.Shape,e.Count,map is null?0:map.Pointer+checked((nint)offset));
+            if(!tensors.TryAdd(e.Name,tensor))throw new InvalidDataException("Duplicate tensor: "+e.Name);
+            added.Add((tensor,offset));
+        }
+        paging?.Add(path,added);
     }
     internal Tensor Require(string name, params int[] shape)
     {
@@ -158,10 +177,11 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
     {
         int rows=output.Length,columns=input.Length;
         if(weights.Count!=(long)rows*columns || (bias is not null&&bias.Length!=rows))throw new ArgumentException("Matrix dimensions mismatch.");
+        if(paging is not null){paging.Linear(weights,input,output,options,bias);return;}
         void Range(int start,int end){for(int r=start;r<end;r++){options.CancellationToken.ThrowIfCancellationRequested();output[r]=weights.Dot((long)r*columns,input)+(bias?[r]??0);}}
         if(options.MaxDegreeOfParallelism==1 || rows<32)Range(0,rows);
         else Parallel.For(0,Math.Min(rows,options.MaxDegreeOfParallelism),options,worker=>
         {int parts=Math.Min(rows,options.MaxDegreeOfParallelism);Range(rows*worker/parts,rows*(worker+1)/parts);});
     }
-    public void Dispose(){foreach(var map in maps)map.Dispose();maps.Clear();tensors.Clear();}
+    public void Dispose(){try{paging?.Dispose();}finally{foreach(var map in maps)map.Dispose();maps.Clear();tensors.Clear();}}
 }

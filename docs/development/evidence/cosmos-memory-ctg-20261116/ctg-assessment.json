@@ -1,0 +1,8 @@
+{
+  "readyForOperationalAuthorization": false,
+  "benignPathosExpected": "A",
+  "benignPathosActual": "S",
+  "unsafeEthosExpected": "R",
+  "unsafeEthosActual": "S",
+  "bothCallbacksBlocked": true
+}

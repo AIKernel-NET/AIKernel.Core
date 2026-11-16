@@ -429,6 +429,20 @@ public sealed partial class VirtualMemorySpace : IDisposable
         }
     }
 
+    /// <summary>Changes the shared RAM capacity across forks, evicting before a shrink.
+    /// A failed eviction preserves the previous capacity. Growth allocates on demand.</summary>
+    public void SetRamCapacity(int maximumBlocks)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumBlocks);
+        lock(gate)
+        {
+            ObjectDisposedException.ThrowIf(disposed,this);
+            if(maximumBlocks==arena.RamCapacity)return;
+            TrimRam(maximumBlocks);
+            arena.RamCapacity=maximumBlocks;
+        }
+    }
+
     /// <summary>Releases all resident blocks and deletes the swap file.</summary>
     public void Dispose()
     {
@@ -768,7 +782,7 @@ public sealed partial class VirtualMemorySpace : IDisposable
         internal LinkedList<Block> Vram { get; } = new();
         internal Stack<long> FreeSlots { get; } = new();
         internal Stack<IMemoryOwner<byte>> FreeRam { get; } = new(2);
-        internal int RamCapacity { get; } = ramCapacity;
+        internal int RamCapacity { get; set; } = ramCapacity;
         internal int VramCapacity { get; } = vramCapacity;
         internal string SwapDirectory { get; } = swapDirectory;
         internal IVirtualMemoryDevice? Device { get; set; } = device;

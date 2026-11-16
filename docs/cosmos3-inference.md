@@ -24,8 +24,9 @@ BF16の内積はFP64で累積して最後にFP32へ丸める。視覚LayerNorm�
 
 公開モデルの4B／16Bという呼称には生成側も含まれる。このAPIは公式Transformersのreasonerが必要とする
 テンソルだけを取り込む。再量子化はしない。KV・視覚特徴・OSのページキャッシュなどは上の重み量に含まれない。
-**Cosmos3のGPU実行、Serverの7GB上限、AIKernelのSSD退避による上限保証は未検証・未実装**。
-Gemmaで確認済みの7GBページングの結果を、この経路に適用できるとは扱わない。
+CPUの重み・KVは `CosmosExecutionOptions.Memory` を指定するとAIKernel仮想メモリ層でページングする。
+既定は従来のマップ方式。GPU対応、Server実機の7GB枠、OSによる厳密な上限保証は未検証。
+詳細は [メモリ制御とCTG接続](development/cosmos-memory-ctg-20261116-jp.md) を参照。
 
 ## 重みの準備
 
@@ -93,3 +94,36 @@ Nanoはモデルディレクトリーと `Cosmos3Variant.Nano` を指定する�
 128トークン固定の性能比較や、GPU／Serverの比較グラフには流用しない。
 
 旧Reason2のAPIと [検証記録](cosmos-reason2-inference.md) は残している。Edge／Nanoを旧Reason2として読み込むことはできない。
+
+## 仮想メモリと動的予算
+
+```csharp
+using var model = new Cosmos3Model(directory, Cosmos3Variant.Edge, new()
+{
+    ContextTokens = 2048,
+    Memory = new()
+    {
+        MaximumResidentBytes = 7_000_000_000,
+        WeightCacheBytes = 5_000_000_000,
+        KvCacheBytes = 128_000_000,
+        RuntimeReserveBytes = 1_000_000_000,
+        ProtectedResidentBytes = 0, // 外部の常駐基盤を確保する場合は追加予約
+        SwapDirectory = privateSwapDirectory,
+        ExpectedImportManifestSha256 = trustedManifestSha256
+    }
+});
+```
+
+- 重みは4MiBの行境界ページ。原本のsafetensorsが読み取り専用の裏付けとなり、重複したswapコピーを作らない。
+- KVは64トークン単位で使用した分だけ確保。退避時は既存のAES-GCM swapを使い、終了・例外・取消時に消去する。
+- 注意機構の計算順序を保つため、現在の層の使用済みKVを小さな作業領域へ読み戻す。これはブロック版Attentionの新カーネルではない。
+- KVの論理長も、要求の入力＋出力上限に合わせる。短い要求で設定上限すべてを予約しない。
+- 作業領域の確保前とページ境界でプロセスRSS相当を観測し、キャッシュ容量を縮小・拡張する。予算不足は例外で拒否する。
+- テキスト要求では言語側のみを起動し、視覚エンコーダーとprojectorは画像・動画が初めて要求された時に初期化する。
+- pagingを有効にするとimport manifestのリポジトリ・revision・シャード集合・設定/tokenizer/テンプレートと重みのSHA-256を検証する。外部から信頼したmanifestハッシュを固定すれば、manifestの置換も検出する。メタデータハッシュを持たない古いmanifestは再取り込みが必要。
+- ハッシュ整合性はRH署名検証の代替ではない。モデル配置先はホストが管理し、検証後に第三者が変更できないようにする。
+
+`CosmosGeneration.MemoryPlan` に能力選択と論理容量、`Artifact` に取り込み出自、
+`Cosmos3Model.MemoryStatistics` に観測メモリ・キャッシュ容量・再読込回数を返す。
+統計は要求間に参照する。ライブラリの協調制御であり、外部コードの確保・OSファイルキャッシュ・
+瞬間的スパイクを含むシステム全体の物理メモリ制限にはならない。厳密な上限はホスト側制御も必要。

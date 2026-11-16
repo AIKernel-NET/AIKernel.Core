@@ -19,6 +19,8 @@ public sealed record CosmosExecutionOptions
 {
     /// <summary>Maximum simultaneous matrix workers.</summary>
     public int CpuThreads { get; init; } = 4;
+    /// <summary>Enables bounded weight/KV paging and adaptive cache allocation. Null preserves the mapped path.</summary>
+    public CosmosMemoryOptions? Memory { get; init; }
     /// <summary>Total prompt and output token admission limit.</summary>
     public int ContextTokens { get; init; } = 2048;
     /// <summary>Total unmerged visual patches per request. A 256×256 image has 256 patches.</summary>

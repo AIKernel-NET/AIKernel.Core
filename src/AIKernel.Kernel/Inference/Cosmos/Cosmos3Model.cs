@@ -23,6 +23,8 @@ public sealed class Cosmos3Model : IDisposable
     /// RGB dimensions must be multiples of 32; callers explicitly resize/sample media before admission.</summary>
     public Task<CosmosGeneration> GenerateAsync(string system,IReadOnlyList<CosmosContent> content,int maxNewTokens=128,CancellationToken cancellationToken=default)
         =>runtime.GenerateAsync(system,content,maxNewTokens,cancellationToken);
+    /// <summary>Memory paging counters; null when paging is disabled. Read between requests.</summary>
+    public CosmosMemoryStatistics? MemoryStatistics=>runtime.MemoryStatistics;
     /// <summary>Waits for active generation, then releases model mappings.</summary>
     public void Dispose()=>runtime.Dispose();
 }

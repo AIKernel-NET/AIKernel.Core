@@ -1,0 +1,18 @@
+[
+  {
+    "path": "docs/papers/03-pre-inference-admissibility-governance/aikernel_phase1_paper03_pre_inference_admissibility_governance_v0_2_0/paper-en.md",
+    "sha256": "31a0e389070b550c85bb5ac00169504d7f5d0790258f656569464ea4f2b051de"
+  },
+  {
+    "path": "docs/papers/11-dynamicslm-capability-modular/aikernel_dynamicslm_capability_modular_self_improving_slm_v0_1_0_canonical_en_rev4_final_clean/paper-en.md",
+    "sha256": "d37e3bbac91621be5c4f181a808f7f0fc4b0d845d50ac62030eae0a79d395195"
+  },
+  {
+    "path": "docs/papers/12-canonical-trajectory-governance/aikernel_canonical_trajectory_governance_ctg_v0_1_0_canonical_en_rev1_final_clean/paper-en.md",
+    "sha256": "e9c6156cba57add7ae890454d40c5ff8be6917008de4a563b067638e1b27e816"
+  },
+  {
+    "path": "docs/papers/13-resident-intelligence-kernel-sslm-dslm/aikernel_resident_intelligence_kernel_seedslm_dynamicslm_v0_1_0_canonical_en_rev1_final_clean/paper-en.md",
+    "sha256": "6e8c1e1a5a4958bbe0923e8002e053735c853e47461fd19816df5d2f92e59a89"
+  }
+]

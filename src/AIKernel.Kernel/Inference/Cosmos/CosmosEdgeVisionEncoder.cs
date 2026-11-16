@@ -55,13 +55,14 @@ internal sealed class CosmosEdgeVisionEncoder
     {
         int w=d.VisionWidth,count=input.Count,frame=input.Height*input.Width,hs=w/d.VisionHeads;
         float attentionScale=(float)Math.Pow(hs,-.5);
-        using var work=new CosmosWorkspace();var hidden=work.Rows(count,w);var queries=work.Rows(count,w);var keys=work.Rows(count,w);var values=work.Rows(count,w);
+        using var work=new CosmosWorkspace(weights.Budget);var hidden=work.Rows(count,w);var queries=work.Rows(count,w);var keys=work.Rows(count,w);var values=work.Rows(count,w);
         var attention=work.Rows(count,w);var norm=work.Rent(w);var projection=work.Rent(w);var mlp=work.Rent(d.VisionHidden);var patchInput=work.Rent(768);
+        var positions=work.Rent(checked((int)position.Count));position.CopyTo(positions);
         int grid=(int)Math.Sqrt(d.VisionPositions);var horizontal=ResizeWeights(grid,input.Width);var vertical=ResizeWeights(grid,input.Height);
         var resizedX=work.Rows(grid*input.Width,w);var resized=work.Rows(frame,w);
         for(int y=0;y<grid;y++)for(int x=0;x<input.Width;x++)for(int c=0;c<w;c++)
         {
-            var filter=horizontal[x];float sum=0;for(int k=0;k<filter.Weights.Length;k++)sum+=position.At(((long)y*grid+filter.Start+k)*w+c)*filter.Weights[k];
+            var filter=horizontal[x];float sum=0;for(int k=0;k<filter.Weights.Length;k++)sum+=positions[(y*grid+filter.Start+k)*w+c]*filter.Weights[k];
             resizedX[y*input.Width+x][c]=sum;
         }
         for(int y=0;y<input.Height;y++)for(int x=0;x<input.Width;x++)for(int c=0;c<w;c++)

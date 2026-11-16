@@ -1,6 +1,13 @@
 using AIKernel.Kernel.Inference;
 using System.Text.Json;
 
+if(args.Length==3&&args[0]=="--cosmos-artifact-verify")
+{
+    var family=CosmosModelDefinition.Read(Path.Combine(args[1],"config.json")).Family;
+    Console.WriteLine(JsonSerializer.Serialize(CosmosArtifactVerifier.Verify(args[1],family,args[2])));return;
+}
+if(args.Length==4&&args[0]=="--bonsai-ctg"){await BonsaiCtgValidation.Run(args[1],args[2],args[3]);return;}
+if(args.Length==3&&args[0]=="--cosmos-paged-reference"){CosmosValidation.Run(args[1],args[2],paged:true);return;}
 if(args.Length==3&&args[0]=="--cosmos-reference"){CosmosValidation.Run(args[1],args[2]);return;}
 if(args.Length==3&&args[0]=="--cosmos-vision-reference"){CosmosValidation.Run(args[1],args[2],visionOnly:true);return;}
 if((args.Length==4||args.Length==5&&args[4]=="sequential")&&args[0]=="--cosmos-reference-mode"&&args[1] is "text" or "image" or "video")

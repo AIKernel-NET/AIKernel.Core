@@ -28,26 +28,28 @@ internal sealed class CosmosTextDecoder
     }
     internal sealed class State : IDisposable
     {
-        private readonly CosmosWorkspace arena=new();
+        private readonly CosmosWorkspace arena;
+        internal readonly CosmosPagedKv? PagedKv;
         internal readonly float[][] Keys,Values,Scores;
         internal readonly float[] X,Norm,Q,K,V,Attention,Projection,Gate,Up,Logits,Cos,Sin;
         internal readonly ParallelOptions Options;
         internal readonly int Context;
-        internal State(CosmosModelDefinition d,int context,int workers,CancellationToken token)
+        internal State(CosmosModelDefinition d,int context,int workers,CancellationToken token,CosmosMemoryBudget? budget=null)
         {
-            Context=context;Options=new(){MaxDegreeOfParallelism=workers,CancellationToken=token};
+            arena=new(budget);Context=context;Options=new(){MaxDegreeOfParallelism=workers,CancellationToken=token};
             long kv=checked((long)d.Layers*context*d.KvHeads*d.HeadSize*8);
-            if(kv>2_000_000_000)throw new ArgumentException("Cosmos KV allocation exceeds the initial 2 GB workspace limit.");
+            if(budget is null && kv>2_000_000_000)throw new ArgumentException("Cosmos KV allocation exceeds the initial 2 GB workspace limit; enable paging.");
             try
             {
-                Keys=arena.Rows(d.Layers,checked(context*d.KvHeads*d.HeadSize));Values=arena.Rows(d.Layers,checked(context*d.KvHeads*d.HeadSize));
+                if(budget is not null)PagedKv=new(d.Layers,d.KvHeads*d.HeadSize,context,budget);
+                Keys=arena.Rows(budget is null?d.Layers:1,checked(context*d.KvHeads*d.HeadSize));Values=arena.Rows(budget is null?d.Layers:1,checked(context*d.KvHeads*d.HeadSize));
                 X=arena.Rent(d.Width);Norm=arena.Rent(d.Width);Q=arena.Rent(d.Width);K=arena.Rent(d.KvHeads*d.HeadSize);V=arena.Rent(K.Length);
                 Attention=arena.Rent(d.Width);Projection=arena.Rent(d.Width);Gate=arena.Rent(d.Hidden);Up=arena.Rent(d.Hidden);
                 Logits=arena.Rent(d.Vocabulary);Cos=arena.Rent(d.HeadSize/2);Sin=arena.Rent(d.HeadSize/2);Scores=arena.Rows(workers,context);
             }
-            catch{arena.Dispose();throw;}
+            catch{try{PagedKv?.Dispose();}finally{arena.Dispose();}throw;}
         }
-        public void Dispose()=>arena.Dispose();
+        public void Dispose(){try{PagedKv?.Dispose();}finally{arena.Dispose();}}
     }
     internal void Forward(int token,int index,(int T,int H,int W) position,State s,float[]? visual=null,float[][]? deep=null,bool logits=true)
     {
@@ -65,8 +67,9 @@ internal sealed class CosmosTextDecoder
             {var v=s.Q.AsSpan(h*hs,hs);if(!d.IsEdge)InferenceVectorMath.Norm(v,l.QNorm,v,d.Epsilon);CosmosMath.Rotate(v,s.Cos,s.Sin);}
             for(int h=0;h<d.KvHeads;h++)
             {var v=s.K.AsSpan(h*hs,hs);if(!d.IsEdge)InferenceVectorMath.Norm(v,l.KNorm,v,d.Epsilon);CosmosMath.Rotate(v,s.Cos,s.Sin);}
-            s.K.CopyTo(s.Keys[layer],index*kv);s.V.CopyTo(s.Values[layer],index*kv);
-            var keys=s.Keys[layer];var values=s.Values[layer];
+            var keys=s.Keys[s.PagedKv is null?layer:0];var values=s.Values[s.PagedKv is null?layer:0];
+            if(s.PagedKv is null){s.K.CopyTo(keys,index*kv);s.V.CopyTo(values,index*kv);}
+            else{s.PagedKv.Append(layer,index,s.K,s.V);s.PagedKv.ReadLayer(layer,keys,values);}
             Parallel.For(0,s.Options.MaxDegreeOfParallelism,s.Options,worker=>
             {
                 var scores=s.Scores[worker].AsSpan(0,index+1);

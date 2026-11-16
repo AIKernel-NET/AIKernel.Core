@@ -1,11 +1,16 @@
 namespace AIKernel.Kernel.Inference;
 
-internal sealed class CosmosWorkspace : IDisposable
+internal sealed class CosmosWorkspace(CosmosMemoryBudget? budget=null) : IDisposable
 {
     private readonly List<float[]> buffers=[];
-    internal float[] Rent(int count){var a=new float[count];buffers.Add(a);return a;}
+    internal CosmosMemoryBudget? Budget => budget;
+    internal float[] Rent(int count)
+    {
+        long bytes=checked((long)count*sizeof(float));budget?.Reserve(bytes);
+        try{var a=new float[count];buffers.Add(a);return a;}catch{budget?.Release(bytes);throw;}
+    }
     internal float[][] Rows(int rows,int columns)=>Enumerable.Range(0,rows).Select(_=>Rent(columns)).ToArray();
-    public void Dispose(){foreach(var a in buffers)Array.Clear(a);buffers.Clear();}
+    public void Dispose(){foreach(var a in buffers){Array.Clear(a);budget?.Release((long)a.Length*sizeof(float));}buffers.Clear();}
 }
 
 internal static class CosmosMath

@@ -1,0 +1,14 @@
+{
+  "MaximumResidentBytes": 7000000000,
+  "ObservedResidentBytes": 1102757888,
+  "PeakObservedResidentBytes": 1160187904,
+  "WeightCacheCapacityBytes": 536870912,
+  "WeightResidentBytes": 536870912,
+  "KvCacheCapacityBytes": 0,
+  "KvResidentBytes": 0,
+  "LiveWorkspaceBytes": 0,
+  "PeakWorkspaceBytes": 8555616,
+  "BudgetAdjustments": 4,
+  "WeightBackingReads": 197373,
+  "KvSwapReads": 0
+}

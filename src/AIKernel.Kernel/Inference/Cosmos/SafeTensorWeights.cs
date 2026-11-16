@@ -41,20 +41,31 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
             {
                 if(Avx2.IsSupported && Type=="BF16")
                 {
-                    var a=Vector256<float>.Zero;var b=a;
-                    for(;i+16<=input.Length;i+=16)
+                    // BF16 weights times FP32 activations need up to 32
+                    // significant product bits. Accumulate in FP64 and round
+                    // once, avoiding long-row cancellation in the vision/LLM path.
+                    var low=Vector256<double>.Zero;var high=low;
+                    for(;i+8<=input.Length;i+=8)
                     {
-                        var w0=Avx2.ShiftLeftLogical(Avx2.ConvertToVector256Int32(Sse2.LoadVector128((ushort*)p+offset+i)),16).AsSingle();
-                        var w1=Avx2.ShiftLeftLogical(Avx2.ConvertToVector256Int32(Sse2.LoadVector128((ushort*)p+offset+i+8)),16).AsSingle();
-                        a+=w0*Avx.LoadVector256(x+i);b+=w1*Avx.LoadVector256(x+i+8);
+                        var w=Bfloat((ushort*)p+offset+i);var value=Avx.LoadVector256(x+i);
+                        low+=Avx.ConvertToVector256Double(w.GetLower())*Avx.ConvertToVector256Double(value.GetLower());
+                        high+=Avx.ConvertToVector256Double(w.GetUpper())*Avx.ConvertToVector256Double(value.GetUpper());
                     }
-                    sum=Vector256.Sum(a+b);
+                    double exact=Vector256.Sum(low+high);
+                    for(;i<input.Length;i++)exact+=(double)At(offset+i)*input[i];
+                    return (float)exact;
+                }
+                else if(Type=="BF16")
+                {
+                    double exact=0;for(;i<input.Length;i++)exact+=(double)At(offset+i)*input[i];return (float)exact;
                 }
                 else if(Type=="F32")return InferenceVectorMath.Dot(new ReadOnlySpan<float>((float*)p+offset,input.Length),input);
                 for(;i<input.Length;i++)sum+=At(offset+i)*input[i];
             }
             return sum;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Vector256<float> Bfloat(ushort* p)=>Avx2.ShiftLeftLogical(Avx2.ConvertToVector256Int32(Sse2.LoadVector128(p)),16).AsSingle();
     }
 
     private sealed class Mapping : IDisposable

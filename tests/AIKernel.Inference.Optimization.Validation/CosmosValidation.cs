@@ -1,6 +1,7 @@
 using AIKernel.Kernel.Inference;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Security.Cryptography;
 
 internal static class CosmosValidation
 {
@@ -23,9 +24,14 @@ internal static class CosmosValidation
                 _=>throw new ArgumentException("Unknown content type.")
             });
         }
-        using var model=new CosmosReason2Model(modelDirectory);
-        var result=await model.GenerateAsync(r.TryGetProperty("system",out var s)?s.GetString()!:"",content,
-            r.TryGetProperty("maxNewTokens",out var n)?n.GetInt32():32,timeout.Token);
+        var definition=CosmosModelDefinition.Read(Path.Combine(modelDirectory,"config.json"));
+        var options=new CosmosExecutionOptions{ContextTokens=512,EnableThinking=!r.TryGetProperty("enableThinking",out var thinking)||thinking.GetBoolean()};
+        string system=r.TryGetProperty("system",out var s)?s.GetString()!:"";int maxTokens=r.TryGetProperty("maxNewTokens",out var n)?n.GetInt32():32;
+        CosmosGeneration result;
+        if(definition.Family=="qwen3_vl")
+        {using var model=new CosmosReason2Model(modelDirectory,options);result=await model.GenerateAsync(system,content,maxTokens,timeout.Token);}
+        else
+        {using var model=new Cosmos3Model(modelDirectory,definition.IsEdge?Cosmos3Variant.Edge:Cosmos3Variant.Nano,options);result=await model.GenerateAsync(system,content,maxTokens,timeout.Token);}
         File.WriteAllText(resultFile,JsonSerializer.Serialize(result,new JsonSerializerOptions{WriteIndented=true}));
         Console.WriteLine(JsonSerializer.Serialize(new{result.InputTokens,OutputTokens=result.TokenIds.Length,result.FinishReason,result.ElapsedMilliseconds}));
     }
@@ -47,8 +53,9 @@ internal static class CosmosValidation
     }
     internal static void Tokenizer(string directory)
     {
-        string model=Path.Combine(directory,"public-base");var definition=CosmosModelDefinition.Read(Path.Combine(model,"config.json"));
-        CosmosModelDefinition.ValidateProcessor(model);
+        string model=Directory.Exists(Path.Combine(directory,"public-base"))?Path.Combine(directory,"public-base"):directory;
+        var definition=CosmosModelDefinition.Read(Path.Combine(model,"config.json"));
+        CosmosModelDefinition.ValidateProcessor(model,definition);
         var tokenizer=new CosmosTokenizer(Path.Combine(model,"tokenizer.json"),definition.Vocabulary);
         using var doc=JsonDocument.Parse(File.ReadAllText(Path.Combine(directory,"prompt-reference.json")));
         foreach(var item in doc.RootElement.GetProperty("tokenizer").EnumerateArray())
@@ -62,7 +69,7 @@ internal static class CosmosValidation
             if(mode=="image")content.Add(new CosmosContent.Image(frames[0]));if(mode=="video")content.Add(new CosmosContent.Video(frames));
             if(mode=="mixed")content.AddRange([new CosmosContent.Image(frames[0]),new CosmosContent.Text(" 比較: "),new CosmosContent.Video(frames),new CosmosContent.Image(frames[1])]);
             content.Add(new CosmosContent.Text(item.GetProperty("text").GetString()!));
-            using var p=CosmosPrompt.Build(tokenizer,definition,item.GetProperty("system").GetString()!,content,new());
+            using var p=CosmosPrompt.Build(tokenizer,definition,item.GetProperty("system").GetString()!,content,new(){EnableThinking=!item.TryGetProperty("thinking",out var thinking)||thinking.GetBoolean()});
             int[] expected=item.GetProperty("tokens").EnumerateArray().Select(x=>x.GetInt32()).ToArray();
             if(!p.Tokens.SequenceEqual(expected))throw new InvalidDataException("Chat prompt differs: "+mode+"\n"+JsonSerializer.Serialize(p.Tokens)+"\n"+JsonSerializer.Serialize(expected));
             var positions=item.GetProperty("positions").EnumerateArray().Select(x=>(x[0].GetInt32(),x[1].GetInt32(),x[2].GetInt32()));
@@ -73,35 +80,42 @@ internal static class CosmosValidation
             rotaryPositionsExact=true,controlTokenInjectionRejected=true}));
         Console.WriteLine("Tokenizer, text/image/video templates and control-token isolation passed.");
     }
-    internal static void Run(string directory,string destination)
+    internal static void Run(string directory,string destination,bool visionOnly=false,string? onlyMode=null,bool sequential=false)
     {
         Directory.CreateDirectory(destination);var d=CosmosModelDefinition.Read(Path.Combine(directory,"config.json"));
-        using var weights=new SafeTensorWeights(directory);var vision=new CosmosVisionEncoder(weights,d);var decoder=new CosmosTextDecoder(weights,d);
+        using var provenance=JsonDocument.Parse(File.ReadAllText(Path.Combine(directory,"provenance.json")));
+        float numericGate=provenance.RootElement.GetProperty("synthetic").GetBoolean()?1e-5f:1e-3f;
+        using var weights=new SafeTensorWeights(directory);
+        Func<CosmosPatches,CosmosWorkspace,ParallelOptions,CosmosVisionEncoder.Features> vision=d.IsEdge?new CosmosEdgeVisionEncoder(weights,d).Forward:new CosmosVisionEncoder(weights,d).Forward;
+        var decoder=new CosmosTextDecoder(weights,d);
         var checks=new List<object>();
         foreach(string mode in new[]{"text","image","video"})
         {
-            string source=Path.Combine(directory,mode);using var doc=JsonDocument.Parse(File.ReadAllText(Path.Combine(source,"input.json")));
+            if(visionOnly && mode=="text")continue;
+            if(onlyMode is not null && mode!=onlyMode)continue;
+            string source=Path.Combine(directory,mode);using var doc=JsonDocument.Parse(File.ReadAllText(Path.Combine(source,sequential?"sequential-input.json":"input.json")));
             var root=doc.RootElement;using var arena=new CosmosWorkspace();
             var tokens=root.GetProperty("tokens").EnumerateArray().Select(x=>x.GetInt32()).ToArray();
             var indices=root.GetProperty("visualIndices").EnumerateArray().Select(x=>x.GetInt32()).ToArray();
             var positions=root.GetProperty("positions").EnumerateArray().Select(x=>(x[0].GetInt32(),x[1].GetInt32(),x[2].GetInt32())).ToArray();
-            using var state=new CosmosTextDecoder.State(d,64,2,CancellationToken.None);
+            using var state=new CosmosTextDecoder.State(d,Math.Max(64,tokens.Length+8),4,CancellationToken.None);
             CosmosVisionEncoder.Features? features=null;
             if(mode!="text")
             {
                 var frames=root.GetProperty("frames").EnumerateArray().Select(x=>new CosmosRgbFrame(x.GetProperty("width").GetInt32(),x.GetProperty("height").GetInt32(),
                     File.ReadAllBytes(Path.Combine(source,x.GetProperty("file").GetString()!)),x.GetProperty("time").GetDouble())).ToArray();
-                using var patches=CosmosMediaProcessor.Prepare(frames,mode=="video",new());Check(mode,"patches",patches.Values,0);
-                features=vision.Forward(patches,arena,state.Options);Check(mode,"vision",features.Embeddings.SelectMany(x=>x).ToArray(),1e-5f);
-                for(int i=0;i<features.DeepStack.Length;i++)Check(mode,$"deep-{i}",features.DeepStack[i].SelectMany(x=>x).ToArray(),1e-5f);
+                using var patches=CosmosMediaProcessor.Prepare(frames,mode=="video",new(),d.TemporalPatchSize);Check(mode,"patches",patches.Values,0);
+                features=vision(patches,arena,state.Options);Check(mode,"vision",features.Embeddings.SelectMany(x=>x).ToArray(),numericGate);
+                for(int i=0;i<features.DeepStack.Length;i++)Check(mode,$"deep-{i}",features.DeepStack[i].SelectMany(x=>x).ToArray(),numericGate);
             }
+            if(visionOnly)continue;
             var logits=new List<float>();
             for(int i=0;i<tokens.Length;i++)
             {
                 int ix=indices[i];decoder.Forward(tokens[i],i,positions[i],state,ix<0?null:features!.Embeddings[ix],ix<0?null:features!.DeepStack.Select(x=>x[ix]).ToArray());
                 logits.AddRange(state.Logits);
             }
-            Check(mode,"logits",logits.ToArray(),1e-5f);
+            Check(mode,"logits",logits.ToArray(),numericGate);
             var generation=new List<float>();var generated=new List<int>();int nextPosition=root.GetProperty("nextPosition").GetInt32();
             for(int step=0;step<8;step++)
             {
@@ -109,16 +123,22 @@ internal static class CosmosValidation
                 if(step<7){int p=nextPosition+step;decoder.Forward(next,tokens.Length+step,(p,p,p),state);}
             }
             if(!generated.SequenceEqual(root.GetProperty("generated").EnumerateArray().Select(x=>x.GetInt32())))throw new InvalidDataException("Generated tokens differ: "+mode);
-            Check(mode,"generation",generation.ToArray(),1e-5f);
+            File.WriteAllText(Path.Combine(destination,mode+"-tokens.json"),JsonSerializer.Serialize(new{pass=true,tokens=generated,
+                sha256=Convert.ToHexStringLower(SHA256.HashData(MemoryMarshal.AsBytes(CollectionsMarshal.AsSpan(generated))))}));
+            Check(mode,"generation",generation.ToArray(),numericGate);
         }
         File.WriteAllText(Path.Combine(destination,"comparison.json"),JsonSerializer.Serialize(checks,new JsonSerializerOptions{WriteIndented=true}));
         void Check(string mode,string name,float[] actual,float gate)
         {
-            float[] expected=MemoryMarshal.Cast<byte,float>(File.ReadAllBytes(Path.Combine(directory,mode,name+".f32"))).ToArray();
+            string prefix=sequential && name is "logits" or "generation"?"sequential-":"";
+            float[] expected=MemoryMarshal.Cast<byte,float>(File.ReadAllBytes(Path.Combine(directory,mode,prefix+name+".f32"))).ToArray();
             if(expected.Length!=actual.Length)throw new InvalidDataException("Shape differs: "+name);
-            float max=0;double square=0;for(int i=0;i<actual.Length;i++){float delta=Math.Abs(actual[i]-expected[i]);if(!float.IsFinite(delta))throw new ArithmeticException("Non-finite reference difference.");max=Math.Max(max,delta);square+=(double)delta*delta;}
-            var check=new{mode,name,elements=actual.Length,maxAbsolute=max,rms=Math.Sqrt(square/actual.Length),pass=max<=gate};checks.Add(check);
-            Console.WriteLine(JsonSerializer.Serialize(check));if(max>gate)throw new InvalidDataException("Official synthetic reference gate exceeded: "+name);
+            float max=0;int at=0;double square=0;
+            for(int i=0;i<actual.Length;i++){float delta=Math.Abs(actual[i]-expected[i]);if(!float.IsFinite(delta))throw new ArithmeticException("Non-finite reference difference.");if(delta>max){max=delta;at=i;}square+=(double)delta*delta;}
+            var check=new{mode,name,elements=actual.Length,maxAbsolute=max,rms=Math.Sqrt(square/actual.Length),maximumIndex=at,
+                expectedAtMaximum=expected[at],actualAtMaximum=actual[at],gate,pass=max<=gate};checks.Add(check);
+            File.WriteAllText(Path.Combine(destination,"comparison.json"),JsonSerializer.Serialize(checks,new JsonSerializerOptions{WriteIndented=true}));
+            Console.WriteLine(JsonSerializer.Serialize(check));if(max>gate)throw new InvalidDataException("Official reference gate exceeded: "+name);
         }
     }
 }

@@ -7,6 +7,29 @@ namespace AIKernel.Core.Tests.Inference;
 public sealed class CosmosInferenceTests
 {
     [Fact]
+    public void EdgePatchesUseHwcAndKeepEveryVideoFrame()
+    {
+        byte[] rgb=new byte[32*32*3];
+        for(int i=0;i<rgb.Length;i+=3){rgb[i]=255;rgb[i+1]=127;rgb[i+2]=0;}
+        using var patches=CosmosMediaProcessor.Prepare([new(32,32,rgb,0),Frame(0,.5),Frame(255,1)],true,new(),1);
+        Assert.Equal(3,patches.Time);Assert.Equal(new[]{0d,.5,1},patches.Timestamps);
+        Assert.Equal(1,patches.Values[0]);Assert.Equal((127-127.5f)/127.5f,patches.Values[1]);Assert.Equal(-1,patches.Values[2]);
+        Assert.Equal(-1,patches.Values[4*768]);Assert.Equal(1,patches.Values[8*768]);
+    }
+
+    [Theory]
+    [InlineData(16,4)] [InlineData(16,6)] [InlineData(4,6)] [InlineData(4,4)]
+    public void EdgePositionResizePreservesConstantsAndBounds(int source,int target)
+    {
+        var filters=CosmosEdgeVisionEncoder.ResizeWeights(source,target);
+        Assert.Equal(target,filters.Length);
+        foreach(var (start,weights) in filters)
+        {
+            Assert.InRange(start,0,source-1);Assert.InRange(start+weights.Length,1,source);
+            Assert.InRange(Math.Abs(weights.Sum()-1),0,1e-6f);Assert.All(weights,w=>Assert.InRange(w,0,1));
+        }
+    }
+    [Fact]
     public void VideoPatchesPadOddFrameAndPreserveSourceTime()
     {
         var frames=new[]{Frame(0,0),Frame(255,.5),Frame(127,1.1)};
@@ -46,6 +69,22 @@ public sealed class CosmosInferenceTests
         for(int row=0;row<3;row++)Assert.Equal(Enumerable.Range(0,33).Sum(i=>decoded[row*33+i]*x[i]),actual[row]);
         Assert.Throws<InvalidDataException>(()=>store.Require("w",33,3));
         Assert.Throws<ArgumentOutOfRangeException>(()=>tensor.At(99));
+    }
+    [Theory]
+    [InlineData(64)] [InlineData(127)] [InlineData(2048)] [InlineData(4097)]
+    public void LongBfloatDotAndTailsMatchDoubleReference(int columns)
+    {
+        using var folder=new Folder();var random=new Random(71);byte[] data=new byte[columns*2];var decoded=new float[columns];var x=new float[columns];
+        double expected=0;
+        for(int i=0;i<columns;i++)
+        {
+            ushort bits=(ushort)(BitConverter.SingleToInt32Bits((float)(random.NextDouble()-.5))>>16);
+            BinaryPrimitives.WriteUInt16LittleEndian(data.AsSpan(i*2),bits);decoded[i]=BitConverter.Int32BitsToSingle(bits<<16);
+            x[i]=(float)(random.NextDouble()*2-1);expected+=(double)decoded[i]*x[i];
+        }
+        Save(folder.Path,new Dictionary<string,object>{{"w",new{dtype="BF16",shape=new[]{1,columns},data_offsets=new[]{0,data.Length}}}},data);
+        using var store=new SafeTensorWeights(folder.Path);float[] actual=new float[1];store.Linear(store.Require("w",1,columns),x,actual,new(){MaxDegreeOfParallelism=1});
+        Assert.InRange(Math.Abs(actual[0]-expected),0,0.000063);
     }
     [Fact]
     public void MalformedWeightRangesAndShardTraversalFail()

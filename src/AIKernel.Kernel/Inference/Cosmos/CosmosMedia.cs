@@ -8,7 +8,7 @@ public abstract record CosmosContent
 {
     /// <summary>Ordinary user text; model control tokens are not activated.</summary>
     public sealed record Text(string Value) : CosmosContent;
-    /// <summary>An RGB image. Preprocessing duplicates it over the temporal patch.</summary>
+    /// <summary>An RGB image. Temporal packing follows the selected model.</summary>
     public sealed record Image(CosmosRgbFrame Frame) : CosmosContent;
     /// <summary>Sampled RGB video frames with original timestamps, in chronological order.</summary>
     public sealed record Video(IReadOnlyList<CosmosRgbFrame> Frames) : CosmosContent;
@@ -25,6 +25,9 @@ public sealed record CosmosExecutionOptions
     public int MaximumVisionPatches { get; init; } = 1024;
     /// <summary>Maximum decoded video frames in one content item.</summary>
     public int MaximumVideoFrames { get; init; } = 64;
+    /// <summary>Cosmos3 Edge template option. True preserves the published thinking
+    /// prefix; false uses its empty-think prefix. Nano's template does not use this option.</summary>
+    public bool EnableThinking { get; init; } = true;
 
     internal void Validate()
     {
@@ -42,7 +45,7 @@ internal sealed class CosmosPatches : IDisposable
     internal int Tokens => Count / 4;
     internal CosmosPatches(float[] values, int time, int height, int width, double[] timestamps)
     { Values=values; Time=time; Height=height; Width=width; Timestamps=timestamps; }
-    public void Dispose() => Array.Clear(Values);
+    public void Dispose() { Array.Clear(Values); Array.Clear(Timestamps); }
 }
 
 internal static class CosmosMediaProcessor
@@ -50,13 +53,14 @@ internal static class CosmosMediaProcessor
     // Exactly the Qwen3-VL layout: time, block-row, block-column, merge-row,
     // merge-column, channel, temporal-slice, patch-row, patch-column.
     // No hidden resize or synthetic FPS. Caller can supply any multiple of 32.
-    internal static CosmosPatches Prepare(IReadOnlyList<CosmosRgbFrame> frames, bool video, CosmosExecutionOptions limits)
+    internal static CosmosPatches Prepare(IReadOnlyList<CosmosRgbFrame> frames, bool video, CosmosExecutionOptions limits, int temporalPatch=2)
     {
+        if(temporalPatch is not (1 or 2))throw new ArgumentOutOfRangeException(nameof(temporalPatch));
         if(frames.Count==0 || frames.Count>(video?limits.MaximumVideoFrames:1)) throw new ArgumentException("Invalid frame count.");
         var first=frames[0]; int height=first.Height, width=first.Width;
         if(height<32 || width<32 || height%32!=0 || width%32!=0 || height>16384 || width>16384)
             throw new ArgumentException("RGB dimensions must be bounded positive multiples of 32; resize before admission.");
-        int time=(frames.Count+1)/2, gh=height/16, gw=width/16;
+        int time=(frames.Count+temporalPatch-1)/temporalPatch, gh=height/16, gw=width/16;
         long patches=(long)time*gh*gw;
         if(patches>limits.MaximumVisionPatches) throw new ArgumentException("Visual patch budget exceeded.");
         for(int f=0;f<frames.Count;f++)
@@ -67,20 +71,28 @@ internal static class CosmosMediaProcessor
                 (f>0 && frame.TimestampSeconds<frames[f-1].TimestampSeconds))
                 throw new ArgumentException("Invalid RGB shape or non-monotonic video timestamp.");
         }
-        var values=new float[checked((int)patches*1536)];var times=new double[time];int target=0;
+        var values=new float[checked((int)patches*768*temporalPatch)];var times=new double[time];int target=0;
         for(int t=0;t<time;t++)
         {
-            times[t]=(frames[t*2].TimestampSeconds+frames[Math.Min(t*2+1,frames.Count-1)].TimestampSeconds)/2;
+            times[t]=(frames[t*temporalPatch].TimestampSeconds+frames[Math.Min(t*temporalPatch+temporalPatch-1,frames.Count-1)].TimestampSeconds)/2;
             for(int by=0;by<gh/2;by++) for(int bx=0;bx<gw/2;bx++)
             for(int my=0;my<2;my++) for(int mx=0;mx<2;mx++)
-            for(int channel=0;channel<3;channel++) for(int dt=0;dt<2;dt++)
             {
-                var pixels=frames[Math.Min(t*2+dt,frames.Count-1)].Pixels.Span;
-                for(int y=0;y<16;y++) for(int x=0;x<16;x++)
+                if(temporalPatch==1)
                 {
-                    int offset=(((by*2+my)*16+y)*width+(bx*2+mx)*16+x)*3+channel;
-                    // Official Torchvision backend fuses rescale with mean/std.
-                    values[target++]=(pixels[offset]-127.5f)/127.5f;
+                    // Edge's SigLIP2 projection uses HWC inside each patch.
+                    var pixels=frames[t].Pixels.Span;
+                    for(int y=0;y<16;y++)for(int x=0;x<16;x++)for(int c=0;c<3;c++)
+                        values[target++]=(pixels[(((by*2+my)*16+y)*width+(bx*2+mx)*16+x)*3+c]-127.5f)/127.5f;
+                }
+                else for(int channel=0;channel<3;channel++)for(int dt=0;dt<temporalPatch;dt++)
+                {
+                    var pixels=frames[Math.Min(t*temporalPatch+dt,frames.Count-1)].Pixels.Span;
+                    for(int y=0;y<16;y++) for(int x=0;x<16;x++)
+                    {
+                        int offset=(((by*2+my)*16+y)*width+(bx*2+mx)*16+x)*3+channel;
+                        values[target++]=(pixels[offset]-127.5f)/127.5f;
+                    }
                 }
             }
         }

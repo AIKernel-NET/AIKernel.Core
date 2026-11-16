@@ -1,0 +1,21 @@
+{
+  "src/AIKernel.Kernel/Inference/Cosmos/Cosmos3Model.cs": "f23b2bd70fb6b7e9f3a9910b9557f2bef50423cf664e8fe6e5cbc7744f10cb10",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosEdgeVisionEncoder.cs": "c3f85f377605fece8ed9b42e2f66a9093ffc6487565b9c4248268bd6793ebc1f",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosMath.cs": "72ce76b2ecc49d7d3db7093c86598c2cd92d00ca980539bb54a5471e9038a3a5",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosMedia.cs": "ea525f49aa5f5c8dc8540bcc1976cb48eb00b7523163153b792441f0dd731f3a",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosMediaDecoder.cs": "81fd5387433353c39260c32ed3757615f3ded15eae48339177740f084c80562b",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosModelDefinition.cs": "3022feeace259805c65ac89ffcb4a33cf0c119fbd4bd308ec4dacba0c6e0d768",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosReason2Model.cs": "5775d53ec79f5d5d14b8bb0edb14b9440ef8a288b88ec2c6fe5cc27814a1b49c",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosTextDecoder.cs": "3bed8f5d7a4aacc397bbc99b65e20b4a60face2d473b833c9e5f7bc1db9e2bb1",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosTokenizer.cs": "c7e1d7ca87172a670ca0230dc0419ce2f0fed456994b542fbab837069d6a5b09",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosVisionEncoder.cs": "ef29ec68de12a2d719a7782760a4f9320f6a411b485f106eebe1f6dd0230f445",
+  "src/AIKernel.Kernel/Inference/Cosmos/SafeTensorWeights.cs": "245ef1576bec6eab3a94767444539899ea88aa2cf36b548f32869ab3135873be",
+  "tests/AIKernel.Inference.Optimization.Validation/compare_cosmos3_reference_modes.py": "52859312ae9df7f962824a890286774fd27ba044b045088b00a10f512b1e65e8",
+  "tests/AIKernel.Inference.Optimization.Validation/CosmosValidation.cs": "2a08790f02738755845282108a3c312ef3b38f58ac24c11fd9e9c23201300b57",
+  "tests/AIKernel.Inference.Optimization.Validation/create_cosmos3_prompt_reference.py": "309cda1907a3b52eb3aa03aeb239e633c057474f1602c41fffd5a436455da22c",
+  "tests/AIKernel.Inference.Optimization.Validation/create_cosmos3_real_reference.py": "25a27cedd32b80d4e254e9cb59a7e350bb74078ecb5263cdfb0abe672f4385c8",
+  "tests/AIKernel.Inference.Optimization.Validation/create_cosmos3_reference.py": "83fa8131a9109f3bd18d9f75b39793ed61bd4a5f3d4e839328a9708289bb2513",
+  "tests/AIKernel.Inference.Optimization.Validation/Program.cs": "c219ffd18a75b04b26b448ea07fa0f33c8a60f1c102442c467b9aaea1f863044",
+  "tools/models/import_cosmos3.py": "f8058702e9da8e4f58ea785d6641ad06d2877515eb2321ff768fdda51a81f2da",
+  "tools/models/test_import_cosmos3.py": "7681eec874b01402efbf483721bab035dc2557dc3c62a45ed81ca83454294e64"
+}

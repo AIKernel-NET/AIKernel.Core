@@ -8,7 +8,7 @@ internal sealed class CosmosTextDecoder
     private readonly float[] finalNorm;
     private readonly Layer[] layers;
     private sealed record Layer(SafeTensorWeights.Tensor Q,SafeTensorWeights.Tensor K,SafeTensorWeights.Tensor V,SafeTensorWeights.Tensor O,
-        SafeTensorWeights.Tensor Gate,SafeTensorWeights.Tensor Up,SafeTensorWeights.Tensor Down,float[] Norm,float[] FfnNorm,float[] QNorm,float[] KNorm);
+        SafeTensorWeights.Tensor Gate,SafeTensorWeights.Tensor? Up,SafeTensorWeights.Tensor Down,float[] Norm,float[] FfnNorm,float[] QNorm,float[] KNorm);
     internal CosmosTextDecoder(SafeTensorWeights weights,CosmosModelDefinition d)
     {
         this.weights=weights;this.d=d;const string p="model.language_model.";
@@ -20,10 +20,10 @@ internal sealed class CosmosTextDecoder
             string l=p+$"layers.{i}.";int q=d.Heads*d.HeadSize,k=d.KvHeads*d.HeadSize;
             return new Layer(weights.Require(l+"self_attn.q_proj.weight",q,d.Width),weights.Require(l+"self_attn.k_proj.weight",k,d.Width),
                 weights.Require(l+"self_attn.v_proj.weight",k,d.Width),weights.Require(l+"self_attn.o_proj.weight",d.Width,q),
-                weights.Require(l+"mlp.gate_proj.weight",d.Hidden,d.Width),weights.Require(l+"mlp.up_proj.weight",d.Hidden,d.Width),
-                weights.Require(l+"mlp.down_proj.weight",d.Width,d.Hidden),
+                weights.Require(l+(d.IsEdge?"mlp.fc1.weight":"mlp.gate_proj.weight"),d.Hidden,d.Width),d.IsEdge?null:weights.Require(l+"mlp.up_proj.weight",d.Hidden,d.Width),
+                weights.Require(l+(d.IsEdge?"mlp.fc2.weight":"mlp.down_proj.weight"),d.Width,d.Hidden),
                 weights.Require(l+"input_layernorm.weight",d.Width).Read(),weights.Require(l+"post_attention_layernorm.weight",d.Width).Read(),
-                weights.Require(l+"self_attn.q_norm.weight",d.HeadSize).Read(),weights.Require(l+"self_attn.k_norm.weight",d.HeadSize).Read());
+                d.IsEdge?[]:weights.Require(l+"self_attn.q_norm.weight",d.HeadSize).Read(),d.IsEdge?[]:weights.Require(l+"self_attn.k_norm.weight",d.HeadSize).Read());
         }).ToArray();
     }
     internal sealed class State : IDisposable
@@ -56,14 +56,15 @@ internal sealed class CosmosTextDecoder
         if(visual is null)embedding.Row(token,s.X);else
         {if(visual.Length!=d.Width)throw new ArgumentException("Visual feature width mismatch.");visual.CopyTo(s.X,0);}
         CosmosMath.TextFrequencies(d,position,s.Cos,s.Sin);int kv=d.KvHeads*d.HeadSize,hs=d.HeadSize;
+        float attentionScale=(float)Math.Pow(hs,-.5);
         for(int layer=0;layer<layers.Length;layer++)
         {
             var l=layers[layer];InferenceVectorMath.Norm(s.X,l.Norm,s.Norm,d.Epsilon);
             weights.Linear(l.Q,s.Norm,s.Q,s.Options);weights.Linear(l.K,s.Norm,s.K,s.Options);weights.Linear(l.V,s.Norm,s.V,s.Options);
             for(int h=0;h<d.Heads;h++)
-            {var v=s.Q.AsSpan(h*hs,hs);InferenceVectorMath.Norm(v,l.QNorm,v,d.Epsilon);CosmosMath.Rotate(v,s.Cos,s.Sin);}
+            {var v=s.Q.AsSpan(h*hs,hs);if(!d.IsEdge)InferenceVectorMath.Norm(v,l.QNorm,v,d.Epsilon);CosmosMath.Rotate(v,s.Cos,s.Sin);}
             for(int h=0;h<d.KvHeads;h++)
-            {var v=s.K.AsSpan(h*hs,hs);InferenceVectorMath.Norm(v,l.KNorm,v,d.Epsilon);CosmosMath.Rotate(v,s.Cos,s.Sin);}
+            {var v=s.K.AsSpan(h*hs,hs);if(!d.IsEdge)InferenceVectorMath.Norm(v,l.KNorm,v,d.Epsilon);CosmosMath.Rotate(v,s.Cos,s.Sin);}
             s.K.CopyTo(s.Keys[layer],index*kv);s.V.CopyTo(s.Values[layer],index*kv);
             var keys=s.Keys[layer];var values=s.Values[layer];
             Parallel.For(0,s.Options.MaxDegreeOfParallelism,s.Options,worker=>
@@ -72,14 +73,16 @@ internal sealed class CosmosTextDecoder
                 for(int h=worker;h<d.Heads;h+=s.Options.MaxDegreeOfParallelism)
                 {
                     int kh=h/(d.Heads/d.KvHeads);var query=s.Q.AsSpan(h*hs,hs);
-                    for(int t=0;t<=index;t++)scores[t]=InferenceVectorMath.Dot(query,keys.AsSpan(t*kv+kh*hs,hs))/MathF.Sqrt(hs);
+                    for(int t=0;t<=index;t++)scores[t]=InferenceVectorMath.Dot(query,keys.AsSpan(t*kv+kh*hs,hs))*attentionScale;
                     CosmosMath.Softmax(scores);var target=s.Attention.AsSpan(h*hs,hs);target.Clear();
                     for(int t=0;t<=index;t++)for(int c=0;c<hs;c++)target[c]+=scores[t]*values[t*kv+kh*hs+c];
                 }
             });
             weights.Linear(l.O,s.Attention,s.Projection,s.Options);InferenceVectorMath.Add(s.X,s.Projection);
-            InferenceVectorMath.Norm(s.X,l.FfnNorm,s.Norm,d.Epsilon);weights.Linear(l.Gate,s.Norm,s.Gate,s.Options);weights.Linear(l.Up,s.Norm,s.Up,s.Options);
-            InferenceVectorMath.SwiGlu(s.Gate,s.Up);weights.Linear(l.Down,s.Gate,s.Projection,s.Options);InferenceVectorMath.Add(s.X,s.Projection);
+            InferenceVectorMath.Norm(s.X,l.FfnNorm,s.Norm,d.Epsilon);weights.Linear(l.Gate,s.Norm,s.Gate,s.Options);
+            if(d.IsEdge){for(int i=0;i<s.Gate.Length;i++){float x=MathF.Max(s.Gate[i],0);s.Gate[i]=x*x;}}
+            else{weights.Linear(l.Up!,s.Norm,s.Up,s.Options);InferenceVectorMath.SwiGlu(s.Gate,s.Up);}
+            weights.Linear(l.Down,s.Gate,s.Projection,s.Options);InferenceVectorMath.Add(s.X,s.Projection);
             if(deep is not null&&layer<deep.Length)InferenceVectorMath.Add(s.X,deep[layer]);
         }
         if(logits){InferenceVectorMath.Norm(s.X,finalNorm,s.Norm,d.Epsilon);weights.Linear(output,s.Norm,s.Logits,s.Options);}

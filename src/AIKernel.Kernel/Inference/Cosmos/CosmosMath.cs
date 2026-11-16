@@ -10,12 +10,14 @@ internal sealed class CosmosWorkspace : IDisposable
 
 internal static class CosmosMath
 {
-    internal static void LayerNorm(ReadOnlySpan<float> x,ReadOnlySpan<float> weight,ReadOnlySpan<float> bias,Span<float> result)
+    internal static void LayerNorm(ReadOnlySpan<float> x,ReadOnlySpan<float> weight,ReadOnlySpan<float> bias,Span<float> result,float epsilon=1e-6f)
     {
-        float mean=0;foreach(float v in x)mean+=v;mean/=x.Length;
-        float variance=0;foreach(float v in x){float diff=v-mean;variance+=diff*diff;}
-        float inverse=1/MathF.Sqrt(variance/x.Length+1e-6f);
-        for(int i=0;i<x.Length;i++)result[i]=(x[i]-mean)*inverse*weight[i]+bias[i];
+        // Long vision rows otherwise accumulate mean/variance error through all
+        // 27 layers. Keep reduction statistics in double, then the graph in FP32.
+        double mean=0;foreach(float v in x)mean+=v;mean/=x.Length;
+        double variance=0;foreach(float v in x){double diff=v-mean;variance+=diff*diff;}
+        float center=(float)mean,inverse=(float)(1/Math.Sqrt(variance/x.Length+epsilon));
+        for(int i=0;i<x.Length;i++)result[i]=(x[i]-center)*inverse*weight[i]+bias[i];
     }
     internal static void Softmax(Span<float> scores)
     {

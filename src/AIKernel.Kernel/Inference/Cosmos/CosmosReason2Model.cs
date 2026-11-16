@@ -3,36 +3,53 @@ using System.Diagnostics;
 
 namespace AIKernel.Kernel.Inference;
 
-/// <summary>A Cosmos Reason2 reply generated locally from text, RGB images and timestamped video frames.</summary>
+/// <summary>A Cosmos reply generated locally from text, RGB images and timestamped video frames.</summary>
 public sealed record CosmosGeneration(string Text,ImmutableArray<int> TokenIds,int InputTokens,string FinishReason,long ElapsedMilliseconds);
 
 /// <summary>Managed CPU Qwen3-VL inference for Cosmos-Reason2-2B safetensors. No Python, LibTorch or remote API is used.
 /// Caller-decoded RGB inputs make resizing and video sampling explicit. This initial path does not implement GPU offload.</summary>
 public sealed class CosmosReason2Model : IDisposable
 {
+    private readonly CosmosModelRuntime runtime;
+    /// <summary>Loads the original Reason2 2B preview checkpoint.</summary>
+    public CosmosReason2Model(string modelDirectory,CosmosExecutionOptions? execution=null)=>runtime=new(modelDirectory,execution,"qwen3_vl");
+    /// <summary>Generates a greedy reply from local text, images and video frames.</summary>
+    public Task<CosmosGeneration> GenerateAsync(string system,IReadOnlyList<CosmosContent> content,int maxNewTokens=128,CancellationToken cancellationToken=default)
+        =>runtime.GenerateAsync(system,content,maxNewTokens,cancellationToken);
+    /// <summary>Releases weight mappings after active requests finish.</summary>
+    public void Dispose()=>runtime.Dispose();
+}
+
+internal sealed class CosmosModelRuntime : IDisposable
+{
     private readonly SafeTensorWeights weights;
     private readonly CosmosModelDefinition definition;
     private readonly CosmosTokenizer tokenizer;
-    private readonly CosmosVisionEncoder vision;
+    private readonly Func<CosmosPatches,CosmosWorkspace,ParallelOptions,CosmosVisionEncoder.Features> vision;
     private readonly CosmosTextDecoder decoder;
     private readonly CosmosExecutionOptions options;
     private readonly SemaphoreSlim gate=new(1,1);
     private bool disposed;
 
     /// <summary>Loads local model, tokenizer, processor and chat-template metadata plus safetensors weights.</summary>
-    public CosmosReason2Model(string modelDirectory,CosmosExecutionOptions? execution=null)
+    internal CosmosModelRuntime(string modelDirectory,CosmosExecutionOptions? execution,string requiredFamily)
     {
         options=execution??new();options.Validate();definition=CosmosModelDefinition.Read(Path.Combine(modelDirectory,"config.json"));
-        CosmosModelDefinition.ValidateProcessor(modelDirectory);
+        CosmosModelDefinition.ValidateProcessor(modelDirectory,definition);
         if(options.ContextTokens>definition.MaximumContext)throw new ArgumentException("Requested context exceeds the model definition.");
-        if(definition.Width!=2048 || definition.Layers!=28 || definition.VisionWidth!=1024 || definition.VisionLayers!=24)
-            throw new NotSupportedException("This public entry point requires the Cosmos Reason2 2B architecture.");
+        if(definition.Family!=requiredFamily)throw new NotSupportedException("Checkpoint does not match the requested Cosmos family.");
+        if(requiredFamily=="qwen3_vl" && (definition.Width!=2048 || definition.Layers!=28 || definition.VisionWidth!=1024 || definition.VisionLayers!=24))
+            throw new NotSupportedException("This entry point requires the Cosmos Reason2 2B architecture.");
         tokenizer=new(Path.Combine(modelDirectory,"tokenizer.json"),definition.Vocabulary);
         foreach(var (name,id) in new[]{("<|image_pad|>",definition.ImageToken),("<|video_pad|>",definition.VideoToken),
             ("<|vision_start|>",definition.VisionStart),("<|vision_end|>",definition.VisionEnd),("<|im_end|>",definition.EndToken)})
             if(tokenizer.Special(name)!=id)throw new InvalidDataException("Tokenizer/config control ID mismatch.");
         weights=new(modelDirectory);
-        try{vision=new(weights,definition);decoder=new(weights,definition);}
+        try
+        {
+            vision=definition.IsEdge?new CosmosEdgeVisionEncoder(weights,definition).Forward:new CosmosVisionEncoder(weights,definition).Forward;
+            decoder=new(weights,definition);
+        }
         catch{weights.Dispose();throw;}
     }
 
@@ -61,7 +78,7 @@ public sealed class CosmosReason2Model : IDisposable
         var watch=Stopwatch.StartNew();
         foreach(var media in prompt.Media)
         {
-            var features=vision.Forward(media,arena,state.Options);embeddings.AddRange(features.Embeddings);
+            var features=vision(media,arena,state.Options);embeddings.AddRange(features.Embeddings);
             for(int i=0;i<deep.Length;i++)deep[i].AddRange(features.DeepStack[i]);
         }
         for(int i=0;i<prompt.Tokens.Count;i++)

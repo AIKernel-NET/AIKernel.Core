@@ -2,6 +2,9 @@ using AIKernel.Kernel.Inference;
 using System.Text.Json;
 
 if(args.Length==3&&args[0]=="--cosmos-reference"){CosmosValidation.Run(args[1],args[2]);return;}
+if(args.Length==3&&args[0]=="--cosmos-vision-reference"){CosmosValidation.Run(args[1],args[2],visionOnly:true);return;}
+if((args.Length==4||args.Length==5&&args[4]=="sequential")&&args[0]=="--cosmos-reference-mode"&&args[1] is "text" or "image" or "video")
+{CosmosValidation.Run(args[2],args[3],onlyMode:args[1],sequential:args.Length==5);return;}
 if(args.Length==2&&args[0]=="--cosmos-tokenizer"){CosmosValidation.Tokenizer(args[1]);return;}
 if(args.Length==3&&args[0]=="--cosmos-media"){await CosmosValidation.MediaAsync(args[1],args[2]);return;}
 if(args.Length==4&&args[0]=="--cosmos-generate"){await CosmosValidation.GenerateAsync(args[1],args[2],args[3]);return;}

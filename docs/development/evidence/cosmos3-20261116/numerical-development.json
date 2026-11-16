@@ -1,0 +1,72 @@
+[
+  {
+    "implementation": "initial-fp32",
+    "mode": "video",
+    "name": "logits",
+    "elements": 13218432,
+    "maxAbsolute": 0.0025634766,
+    "rms": 4.624305109604835e-05,
+    "pass": false
+  },
+  {
+    "implementation": "scale-multiply",
+    "mode": "video",
+    "name": "logits",
+    "elements": 13218432,
+    "maxAbsolute": 0.002436161,
+    "rms": 4.659324477937573e-05,
+    "pass": false
+  },
+  {
+    "implementation": "eight-accumulators-layernorm-double",
+    "mode": "video",
+    "name": "logits",
+    "elements": 13218432,
+    "maxAbsolute": 0.0010641217,
+    "rms": 2.6367989073713725e-05,
+    "maximumIndex": 5784365,
+    "expectedAtMaximum": 0.1318348,
+    "actualAtMaximum": 0.13289893,
+    "gate": 0.001,
+    "pass": false
+  },
+  {
+    "implementation": "fma-rejected",
+    "mode": "video",
+    "name": "logits",
+    "elements": 13218432,
+    "maxAbsolute": 0.0014705658,
+    "rms": 4.086837248038748e-05,
+    "maximumIndex": 7985933,
+    "expectedAtMaximum": -15.244059,
+    "actualAtMaximum": -15.242588,
+    "gate": 0.001,
+    "pass": false
+  },
+  {
+    "implementation": "rms-softmax-double-rejected",
+    "mode": "video",
+    "name": "logits",
+    "elements": 13218432,
+    "maxAbsolute": 0.0016174316,
+    "rms": 4.175298067015516e-05,
+    "maximumIndex": 7985933,
+    "expectedAtMaximum": -15.244059,
+    "actualAtMaximum": -15.242441,
+    "gate": 0.001,
+    "pass": false
+  },
+  {
+    "implementation": "fp64-dot-adopted",
+    "mode": "video",
+    "name": "logits",
+    "elements": 13218432,
+    "maxAbsolute": 0.00085926056,
+    "rms": 2.5234583540386303e-05,
+    "maximumIndex": 7985933,
+    "expectedAtMaximum": -15.244059,
+    "actualAtMaximum": -15.243199,
+    "gate": 0.001,
+    "pass": true
+  }
+]

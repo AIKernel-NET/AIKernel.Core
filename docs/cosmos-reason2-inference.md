@@ -1,5 +1,9 @@
 # Cosmos-Reason2-2B 推論プレビュー
 
+2026-11-16追記：利用者の指定により、開発対象を **Cosmos3 Edge／Nano** に変更した。
+新しい利用手順と実重みの検証結果は [Cosmos3推論](cosmos3-inference.md) を参照。
+以下はReason2の合成重み検証時点の記録であり、Reason2のアクセス申請を進める必要はない。
+
 対象は NVIDIA の [Cosmos-Reason2-2B](https://huggingface.co/nvidia/Cosmos-Reason2-2B)。
 テキスト・画像・動画を扱う Qwen3-VL の CPU 経路を AIKernel.Kernel 内に実装した。
 **実際のCosmos重みでの生成検証は未完了**。2026-11-16時点では、保存済み認証情報を使った公式checkpointの取得が401となり、アクセス許可待ちである。

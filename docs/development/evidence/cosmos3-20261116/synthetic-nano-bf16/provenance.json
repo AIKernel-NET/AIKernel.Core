@@ -1,0 +1,9 @@
+{
+  "transformers": "5.24.0.dev0",
+  "torch": "2.15.0+cpu",
+  "seed": 437,
+  "weightDtype": "bf16",
+  "synthetic": true,
+  "family": "Nano",
+  "weightsSha256": "d8ed12314aeb545939149bd0b298ed20c2ac52daade03e4b268d285f95bdad10"
+}

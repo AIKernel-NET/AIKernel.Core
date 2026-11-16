@@ -1,0 +1,9 @@
+{
+  "transformers": "5.24.0.dev0",
+  "torch": "2.15.0+cpu",
+  "seed": 437,
+  "weightDtype": "bf16",
+  "synthetic": true,
+  "family": "Edge",
+  "weightsSha256": "d343d073cf0443d4bcd55eb55eebc951bd5fc2eb9b81fe676b6e3334d22f267c"
+}

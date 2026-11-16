@@ -39,6 +39,7 @@ internal sealed class CosmosVisionEncoder
     internal Features Forward(CosmosPatches input,CosmosWorkspace arena,ParallelOptions options)
     {
         int count=input.Count,w=d.VisionWidth,hs=w/d.VisionHeads,frame=input.Height*input.Width;
+        float attentionScale=(float)Math.Pow(hs,-.5);
         using var work=new CosmosWorkspace();var hidden=work.Rows(count,w);var qkv=work.Rows(count,w*3);
         var norm=work.Rent(w);var projected=work.Rent(w);var patchInput=work.Rent(1536);var mlp=work.Rent(d.VisionHidden);
         var cos=work.Rows(frame,hs/2);var sin=work.Rows(frame,hs/2);
@@ -79,7 +80,7 @@ internal sealed class CosmosVisionEncoder
                     options.CancellationToken.ThrowIfCancellationRequested();int start=r/frame*frame;
                     for(int h=0;h<d.VisionHeads;h++)
                     {
-                        for(int k=0;k<frame;k++)score[k]=InferenceVectorMath.Dot(qkv[r].AsSpan(h*hs,hs),qkv[start+k].AsSpan(w+h*hs,hs))/MathF.Sqrt(hs);
+                        for(int k=0;k<frame;k++)score[k]=InferenceVectorMath.Dot(qkv[r].AsSpan(h*hs,hs),qkv[start+k].AsSpan(w+h*hs,hs))*attentionScale;
                         CosmosMath.Softmax(score);var target=attention[r].AsSpan(h*hs,hs);target.Clear();
                         for(int k=0;k<frame;k++)for(int c=0;c<hs;c++)target[c]+=score[k]*qkv[start+k][2*w+h*hs+c];
                     }

@@ -1,0 +1,74 @@
+{
+  "repository": "nvidia/Cosmos3-Nano",
+  "revision": "45666784803b3a7ad577e0def405f9afcc3bddb2",
+  "mode": "text-image-video-to-text",
+  "requiredTensors": 750,
+  "excludedSourceTensors": 415,
+  "transformations": "tensor names only; dtype and data bytes unchanged",
+  "shards": [
+    {
+      "source": "transformer/diffusion_pytorch_model-00001-of-00007.safetensors",
+      "sourceSha256": "7d0f718198cac14cf323d58568c78aa1290b4bd1dcced6481624b5b9c6d70dc2",
+      "sourceBytes": 4902257280,
+      "output": "reasoner-01.safetensors",
+      "outputSha256": "90bdd50ef4245a6df491f36199967d9e82ca8bf903467dcf0414add43c4bc197",
+      "tensorCount": 54
+    },
+    {
+      "source": "transformer/diffusion_pytorch_model-00002-of-00007.safetensors",
+      "sourceSha256": "7e6e7d270c193a58a1aec0cbc89f6f5afcaef6e3b951d86b0a432244c449e34e",
+      "sourceBytes": 4999863656,
+      "output": "reasoner-02.safetensors",
+      "outputSha256": "99b973f7e7ce32e4fc3424a24031fe575ff7fed74e5883a80da7a5762b5113cc",
+      "tensorCount": 74
+    },
+    {
+      "source": "transformer/diffusion_pytorch_model-00003-of-00007.safetensors",
+      "sourceSha256": "15d08936149a7e77c6668e5b1cd47dc92a35e33741f0090d619045b66da9ff8d",
+      "sourceBytes": 4932719448,
+      "output": "reasoner-03.safetensors",
+      "outputSha256": "361d4b42804e5f3af30dd6fce32885a3f4dd33dc15d67390019a74ac9d3f98f6",
+      "tensorCount": 69
+    },
+    {
+      "source": "transformer/diffusion_pytorch_model-00004-of-00007.safetensors",
+      "sourceSha256": "02cebbb557bced701eb825901e1de5f86d2e1feb49cb9a8d1fb7d1b878fdb31b",
+      "sourceBytes": 4983084656,
+      "output": "reasoner-04.safetensors",
+      "outputSha256": "323b937de3fc70bed10a9c5c524c1cebf64bcab0b2c4fa0f3f6095e1cecc4bda",
+      "tensorCount": 71
+    },
+    {
+      "source": "transformer/diffusion_pytorch_model-00005-of-00007.safetensors",
+      "sourceSha256": "a5e3edd742b8f1fcf27a3eb3878c67dfcb0e6881588fa35deef503d640ea69d1",
+      "sourceBytes": 4949498576,
+      "output": "reasoner-05.safetensors",
+      "outputSha256": "7a79bada5d90554a948d81941368a26b5204c1e6fc99bb538b657ca0e49cc019",
+      "tensorCount": 71
+    },
+    {
+      "source": "transformer/diffusion_pytorch_model-00006-of-00007.safetensors",
+      "sourceSha256": "1bb99750f7ab4a47f8b0403a87aa43fefc9648660609ab2ace4cab361b957cd0",
+      "sourceBytes": 4261644464,
+      "output": "reasoner-06.safetensors",
+      "outputSha256": "eac9d74eaa9ec585c69c4439a6a191cb4d7926f14eb30e969407074af8370382",
+      "tensorCount": 59
+    },
+    {
+      "source": "transformer/diffusion_pytorch_model-00007-of-00007.safetensors",
+      "sourceSha256": "3f159bc8b82477adde771ae9e4f54f76564e02844a2fc6267903bd745111d7f6",
+      "sourceBytes": 1318361208,
+      "output": "reasoner-07.safetensors",
+      "outputSha256": "8b5d0d53177e13bcc761ca51d7a56a86d12944c1a38bfc6f15d217b86d415ee0",
+      "tensorCount": 1
+    },
+    {
+      "source": "vision_encoder/model.safetensors",
+      "sourceSha256": "b0c0f719fcf5f2cdadb676701477c236020713657976592ad046583707a6a95a",
+      "sourceBytes": 1152811416,
+      "output": "reasoner-08.safetensors",
+      "outputSha256": "a421e602000058e7b1c52063277a1a4fb891ed4084ebcdc90d2ffa0095324998",
+      "tensorCount": 351
+    }
+  ]
+}

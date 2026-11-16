@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
     <StablePackageVersion>0.1.3</StablePackageVersion>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>0.1.3</PackageValidationBaselineVersion>
     <LocalPackageVersionPrefix>0.1.3</LocalPackageVersionPrefix>
     <LocalPackageBuildNumber Condition="'$(LocalPackageBuildNumber)' == ''">0</LocalPackageBuildNumber>
     <UseLocalPackageVersion Condition="'$(UseLocalPackageVersion)' == ''">false</UseLocalPackageVersion>

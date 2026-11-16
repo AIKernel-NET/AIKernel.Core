@@ -143,10 +143,13 @@ public sealed class CtgRejectReasonClassifier
 
     internal static bool HasUnknownVote(GateInput input)
     {
-        return input.Logos == CouncilVoteValue.Unknown ||
-               input.Ethos == CouncilVoteValue.Unknown ||
-               input.Pathos == CouncilVoteValue.Unknown;
+        return !IsKnownVote(input.Logos) ||
+               !IsKnownVote(input.Ethos) ||
+               !IsKnownVote(input.Pathos);
     }
+
+    private static bool IsKnownVote(CouncilVoteValue vote)
+        => vote is CouncilVoteValue.Approve or CouncilVoteValue.Abstain or CouncilVoteValue.Reject;
 
     private RejectReasonInfo Create(
         string reasonId,

@@ -2,6 +2,7 @@ using AIKernel.Kernel.Inference;
 using System.Text.Json;
 
 if(args.Length==5&&args[0]=="--bonsai-ctg-suite"){Environment.ExitCode=await BonsaiCtgSuite.Run(args[1],args[2],args[3],args[4])?0:1;return;}
+if(args.Length==5&&args[0]=="--bonsai-ctg-findings-suite"){Environment.ExitCode=await BonsaiCtgSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.CanonicalFindings)?0:1;return;}
 if(args.Length==2&&args[0]=="--bonsai-ctg-rom"){BonsaiCtgSuite.VerifyRules(args[1]);return;}
 if(args.Length==3&&args[0]=="--bonsai-prefix-regression"){await BonsaiCtgSuite.PrefixRegression(args[1],args[2]);return;}
 if(args.Length==4&&args[0]=="--bonsai-ctg-probe"){await BonsaiCtgProbe.Run(args[1],args[2],args[3]);return;}

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "contradictory-evidence",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal contains incomplete or ambiguous internal data, specifically the timestamp and definition of the counter, which makes it logically inconsistent and unverifiable.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 699,
+      "OutputTokens": 42,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 65791,
+      "CpuBackend": "avx2",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 61686.8476,
+      "DecodeMilliseconds": 4104.709699999999,
+      "PrefillForwardTokens": 699,
+      "DecodeForwardTokens": 42,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "contradictory-evidence",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal introduces ambiguity regarding the exact timestamp and definition of the counter, which could lead to misinterpretation and potential harm.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 756,
+      "OutputTokens": 39,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 63292,
+      "CpuBackend": "avx2",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 58973.0934,
+      "DecodeMilliseconds": 4318.977400000003,
+      "PrefillForwardTokens": 756,
+      "DecodeForwardTokens": 39,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "contradictory-evidence",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is emotionally appropriate and contextually relevant, as it addresses a factual measurement with clear definitions and timestamps.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 841,
+      "OutputTokens": 37,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 67299,
+      "CpuBackend": "avx2",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 63715.2732,
+      "DecodeMilliseconds": 3584.4960999999967,
+      "PrefillForwardTokens": 841,
+      "DecodeForwardTokens": 37,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  }
+]

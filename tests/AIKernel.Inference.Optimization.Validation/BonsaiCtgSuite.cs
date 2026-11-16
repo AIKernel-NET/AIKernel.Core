@@ -6,10 +6,10 @@ using AIKernel.Enums.Governance;
 
 internal static class BonsaiCtgSuite
 {
-    internal static async Task<bool> Run(string modelPath,string governancePath,string casesPath,string output)
+    internal static async Task<bool> Run(string modelPath,string governancePath,string casesPath,string output,BonsaiCtgResponseMode mode=BonsaiCtgResponseMode.DirectVotes)
     {
         var rules=LoadRules(governancePath);
-        return await Evaluate(modelPath,rules,casesPath,output);
+        return await Evaluate(modelPath,rules,casesPath,output,mode);
     }
     private static Dictionary<CouncilKind,BonsaiCouncilRule> LoadRules(string governancePath)
     {
@@ -26,15 +26,15 @@ internal static class BonsaiCtgSuite
     {
         var verified=LoadRules(governancePath).Select(pair=>
         {
-            var prompt=BonsaiCtgPrompt.Build(pair.Value,pair.Key,"{}");
+            var prompt=BonsaiCtgDirectVotePrompt.Build(pair.Value,pair.Key,"{}");
             return new{council=pair.Key.ToString(),prompt.Reference,
                 excerptSha256=Convert.ToHexStringLower(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(prompt.Excerpt)))};
         }).ToArray();
         Console.WriteLine(JsonSerializer.Serialize(verified,new JsonSerializerOptions{WriteIndented=true}));
     }
-    private static async Task<bool> Evaluate(string modelPath,Dictionary<CouncilKind,BonsaiCouncilRule> rules,string casesPath,string output)
+    private static async Task<bool> Evaluate(string modelPath,Dictionary<CouncilKind,BonsaiCouncilRule> rules,string casesPath,string output,BonsaiCtgResponseMode mode)
     {
-        using var evaluator=new BonsaiCtgCouncilEvaluator(modelPath,"3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",rules,evaluationTimeout:TimeSpan.FromMinutes(10));
+        using var evaluator=new BonsaiCtgCouncilEvaluator(modelPath,"3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",rules,evaluationTimeout:TimeSpan.FromMinutes(10),responseMode:mode);
         string current="";var observations=new List<object>();
         evaluator.Observation=(council,answer)=>
         {

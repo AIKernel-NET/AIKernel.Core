@@ -1,0 +1,18 @@
+[
+  {
+    "run": "candidate-holdout-v3c",
+    "exitCode": 1
+  },
+  {
+    "run": "candidate-fresh-v3c",
+    "exitCode": 1
+  },
+  {
+    "run": "rom-preflight-v3c",
+    "exitCode": 0
+  },
+  {
+    "run": "numerical-regression-v3c",
+    "exitCode": 0
+  }
+]

@@ -1,0 +1,123 @@
+{
+  "baseCommit": "1c01af5",
+  "defaultMode": "DirectVotes",
+  "candidateMode": "CanonicalFindings",
+  "candidateAdoptedAsDefault": false,
+  "candidateExposedInPublicApi": false,
+  "defaultPromptPreservedFromBase": true,
+  "baselineFinalAssemblyVerified": true,
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "measuredCandidateAssemblySha256": {
+    "AIKernel.Kernel.dll": "13454cc94074a212188c8c30580a3368598233c207731dfb983d240a10e8b25e",
+    "AIKernel.Core.Tests.dll": "fac20205af664f9785e154c695dca4244e593ca3f19b8445d2d091764ab79c9d"
+  },
+  "finalAssemblySha256": {
+    "AIKernel.Kernel.dll": "3ec56e70ce8cba3d55b239acf1d8e3689f49327b685bd25d96d257f38ed9c037",
+    "AIKernel.Core.Tests.dll": "f885cc4380a7b40c375fc16b4de62f3c24895781d3d6852903a4df67c640cf5d"
+  },
+  "sourceSha256": {
+    "src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs": "28420b794cf22363b4b0db1ad7003251fd087acf3f85f5ebaad9ea78bf4df8b5",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgPrompt.cs": "81e8cf44e84ea29792e883305a6406685c6439fece0e2052e7f2804b7f8cf82f",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgDirectVotePrompt.cs": "064d449eb7f8ba0ac273d45fcc81b2a0c08e0aa74fd06a1373dd8d4b59f6649b",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgFindingPolicy.cs": "6e09bd99d2d678f49c9ef3cf8aec56668dac7b3711fc576a9ac0f6a2eb34dfd4",
+    "tests/AIKernel.Core.Tests/Inference/BonsaiCtgTests.cs": "ae69bbf60665cf738ac9d855ff0dfb056f5482a4692eef48aa36d5e89713a366",
+    "tests/AIKernel.Core.Tests/AIKernel.Core.Tests.csproj": "d639a4fbd8ba9de347c3f9def33fb97b5b9f25b5413414397e47a11cea8d56c8",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgSuite.cs": "0fbdd63e40ef1b56b45dbd9c8e01bab0fe7af8f32d36fd984becc17c2364ccfb",
+    "tests/AIKernel.Inference.Optimization.Validation/Program.cs": "859da4aa63e3455bb00e16b70fc5ac379f61bdaa136c63494cb66f24305c166e"
+  },
+  "measuredCandidateSourceSha256": {
+    "BonsaiCtgCouncilEvaluator.cs": "bd605dffd6fd781e25003b84ed1744db83573af3e773f44d425c4dfb08224b66",
+    "BonsaiCtgFindingPolicy.cs": "6e09bd99d2d678f49c9ef3cf8aec56668dac7b3711fc576a9ac0f6a2eb34dfd4",
+    "BonsaiCtgPrompt.cs": "81e8cf44e84ea29792e883305a6406685c6439fece0e2052e7f2804b7f8cf82f"
+  },
+  "fixtureSha256": {
+    "tests/AIKernel.Core.Tests/Inference/Fixtures/BonsaiCtgCanonicalRules.json": "4234fefc4e05109b1e83aff6e8a5cccc580e879d5b5ef9b502117b3e4fdb5bb4",
+    "tests/AIKernel.Core.Tests/Inference/Fixtures/BonsaiCtgPromptContracts.json": "12b62bbd0806b69d63741cca7437b1d63af913847026c686a825d9e4c34f052e",
+    "tests/AIKernel.Inference.Optimization.Validation/fixtures/bonsai-ctg-cases.json": "851d1ae0107d1e03692cd55840e1535d71e8a14897af5bb3515cf24d5d39bb76",
+    "tests/AIKernel.Inference.Optimization.Validation/fixtures/bonsai-ctg-findings-holdout-20261116.json": "455b756a086099a2a44ad6d8867e933c30bf8954105d09fa96420d52a1cd4282",
+    "tests/AIKernel.Inference.Optimization.Validation/fixtures/bonsai-ctg-holdout-20261116.json": "864c99ad9be8941a9d1869d58f0003ddc80a5bd714edf4b9c7501be84df63a1b"
+  },
+  "romSha256": {
+    "council.logos.monolith.md": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "council.ethos.monolith.md": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "council.pathos.monolith.md": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+  },
+  "unitTests": {
+    "total": "948",
+    "executed": "948",
+    "passed": "948",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "trxSha256": "f5bd3bba4ec3d240c5f2ceff254916a95b4e164b4f30acea4bc4789567a7d649",
+  "generation128HashMatched": true,
+  "finalModeProbeHashMatches": {
+    "direct": {
+      "facts.sha256": true,
+      "Logos.prompt.sha256": true,
+      "Logos.response.sha256": true,
+      "Ethos.prompt.sha256": true,
+      "Ethos.response.sha256": true,
+      "Pathos.prompt.sha256": true,
+      "Pathos.response.sha256": true
+    },
+    "findings": {
+      "facts.sha256": true,
+      "Logos.prompt.sha256": true,
+      "Logos.response.sha256": true,
+      "Ethos.prompt.sha256": true,
+      "Ethos.response.sha256": true,
+      "Pathos.prompt.sha256": true,
+      "Pathos.response.sha256": true
+    }
+  },
+  "backend": "AVX2/FP32",
+  "cpuWorkers": 4,
+  "contextTokens": 2048,
+  "defaultMaximumReplyTokens": 192,
+  "candidateMaximumReplyTokens": 256,
+  "prefixPayloadCapBytes": 536870912,
+  "maximumObservedCandidatePrefixPayloadBytes": 473202688,
+  "suiteDeadlineMinutes": 10,
+  "defaultDeadlineMinutes": 3,
+  "performanceBenchmark": false,
+  "server7GBRevalidated": false,
+  "rejectedPilots": [
+    {
+      "name": "candidate-existing",
+      "completedCases": 9,
+      "passedCases": 0,
+      "status": "aborted",
+      "adopted": false
+    },
+    {
+      "name": "candidate-existing-v3b",
+      "completedCases": 10,
+      "passedCases": 0,
+      "status": "completed",
+      "adopted": false
+    }
+  ],
+  "notes": [
+    "The findings path is internal to validation because measured semantic false approvals regressed. No runtime auto-fallback between contracts.",
+    "The final validation-only refactor was checked against stored prompts for 10 cases per mode and live response hashes for a contradiction case.",
+    "Baseline existing/holdout results are reused from the preceding report; the eight additional baseline cases were run in this session.",
+    "The eight new cases were frozen before candidate tuning. Their candidate results were not used to tune this protocol.",
+    "The same model plays all three roles. Neither the direct nor findings mode proves semantic correctness or authorizes an operation.",
+    "Source id validation establishes a reference to the input snapshot, not the truth or relevance of that fact.",
+    "All responses concern synthetic scenarios; no proposed operation was executed.",
+    "No arithmetic kernels, numerical precision, CTG gate rules or canonical ROM files were changed.",
+    "Wall-clock timings have uncontrolled background load and are not speed comparisons."
+  ]
+}

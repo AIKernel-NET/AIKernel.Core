@@ -1,0 +1,18 @@
+[
+  {
+    "run": "rom-preflight-final",
+    "exitCode": 0
+  },
+  {
+    "run": "numerical-regression-final",
+    "exitCode": 0
+  },
+  {
+    "run": "final-direct-probe",
+    "exitCode": 0
+  },
+  {
+    "run": "final-findings-probe",
+    "exitCode": 1
+  }
+]

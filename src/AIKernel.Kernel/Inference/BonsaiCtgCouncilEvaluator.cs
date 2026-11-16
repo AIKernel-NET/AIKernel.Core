@@ -38,6 +38,15 @@ public sealed class BonsaiCouncilRule
 /// <summary>Evaluation evidence plus the existing deterministic CTG gate. This is not an RH cryptographic proof.</summary>
 public sealed record BonsaiCtgDecision(CouncilEvaluationResult Evaluation,DecisionGateResult Gate);
 
+/// <summary>Experimental model response contracts. Neither mode establishes authorization or RH verification.</summary>
+internal enum BonsaiCtgResponseMode
+{
+    /// <summary>Preserves the existing reason/vote contract and its known semantic limitations.</summary>
+    DirectVotes,
+    /// <summary>Opt-in condition classification with a reviewed host binding; semantic regressions remain.</summary>
+    CanonicalFindings
+}
+
 /// <summary>Experimental Bonsai 1.7B council observations; canonical voting fidelity is not established.
 /// The three roles share one model and are not independent judges. Never use as an authorization authority.</summary>
 public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
@@ -50,6 +59,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
     private readonly IKernelClock clock;
     private readonly string modelHash;
     private readonly Qwen3CpuModel? model;
+    private readonly BonsaiCtgResponseMode responseMode;
     private readonly TimeSpan evaluationTimeout;
     private readonly SemaphoreSlim gate=new(1,1);
     private bool disposed;
@@ -60,8 +70,12 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
     /// <summary>Loads the operator-pinned 1.7B checkpoint. The caller supplies verified canonical council ROMs.</summary>
     public BonsaiCtgCouncilEvaluator(string modelPath,string expectedModelSha256,IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,
         int cpuThreads=4,IKernelClock? clock=null,TimeSpan? evaluationTimeout=null,long maximumPrefixCacheBytes=512L<<20)
+        :this(modelPath,expectedModelSha256,rules,BonsaiCtgResponseMode.DirectVotes,cpuThreads,clock,evaluationTimeout,maximumPrefixCacheBytes){}
+    // Findings failed the semantic admission check. Keep the comparison path internal to the validation harness.
+    internal BonsaiCtgCouncilEvaluator(string modelPath,string expectedModelSha256,IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,
+        BonsaiCtgResponseMode responseMode,int cpuThreads=4,IKernelClock? clock=null,TimeSpan? evaluationTimeout=null,long maximumPrefixCacheBytes=512L<<20)
     {
-        this.rules=ValidateRules(rules);this.clock=clock??KernelClock.System();
+        this.rules=ValidateRules(rules,responseMode);this.responseMode=responseMode;this.clock=clock??KernelClock.System();
         this.evaluationTimeout=ValidateTimeout(evaluationTimeout);
         if(maximumPrefixCacheBytes<0||maximumPrefixCacheBytes>2L<<30)throw new ArgumentOutOfRangeException(nameof(maximumPrefixCacheBytes));
         using(var stream=File.OpenRead(modelPath))modelHash=Convert.ToHexStringLower(SHA256.HashData(stream));
@@ -69,20 +83,23 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         var info=GgufModelInspector.Inspect(modelPath);
         if(info.Architecture!="qwen3" || info.StoredParameters is <1_500_000_000 or >2_000_000_000)throw new NotSupportedException("This evaluator requires the pinned Bonsai 1.7B family.");
         model=new(modelPath,cpuThreads,2048,"auto");model.ConfigureTrustedPrefixCache(3,maximumPrefixCacheBytes);
-        classify=(system,user,token)=>model.GenerateAsync(system,user,192,token);
+        classify=(system,user,token)=>model.GenerateAsync(system,user,responseMode==BonsaiCtgResponseMode.CanonicalFindings?256:192,token);
     }
-    internal BonsaiCtgCouncilEvaluator(Func<string,string,CancellationToken,Task<CpuGeneration>> classify,IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,IKernelClock? clock=null)
-    {this.classify=classify;this.rules=ValidateRules(rules);this.clock=clock??KernelClock.System();modelHash="test-double";evaluationTimeout=TimeSpan.FromMinutes(3);}
+    internal BonsaiCtgCouncilEvaluator(Func<string,string,CancellationToken,Task<CpuGeneration>> classify,IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,IKernelClock? clock=null,
+        BonsaiCtgResponseMode responseMode=BonsaiCtgResponseMode.DirectVotes)
+    {this.classify=classify;this.rules=ValidateRules(rules,responseMode);this.responseMode=responseMode;this.clock=clock??KernelClock.System();modelHash="test-double";evaluationTimeout=TimeSpan.FromMinutes(3);}
     private static TimeSpan ValidateTimeout(TimeSpan? value)
     {
         var timeout=value??TimeSpan.FromMinutes(3);
         if(timeout<TimeSpan.FromMilliseconds(1)||timeout>TimeSpan.FromMinutes(30))throw new ArgumentOutOfRangeException(nameof(value));
         return timeout;
     }
-    private static ImmutableDictionary<CouncilKind,BonsaiCouncilRule> ValidateRules(IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules)
+    private static ImmutableDictionary<CouncilKind,BonsaiCouncilRule> ValidateRules(IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,BonsaiCtgResponseMode mode)
     {
         ArgumentNullException.ThrowIfNull(rules);
+        if(mode is not (BonsaiCtgResponseMode.DirectVotes or BonsaiCtgResponseMode.CanonicalFindings))throw new ArgumentOutOfRangeException(nameof(mode));
         if(rules.Count!=3||Councils.Any(c=>!rules.TryGetValue(c,out var rule)||rule is null||!rule.Reference.CanonId.EndsWith(".Council."+c,StringComparison.Ordinal)))throw new ArgumentException("All three canonical council rules are required.");
+        if(mode==BonsaiCtgResponseMode.CanonicalFindings)foreach(var council in Councils)BonsaiCtgFindingPolicy.RequireSupported(rules[council],council);
         return rules.ToImmutableDictionary();
     }
     /// <summary>Evaluates bounded facts as untrusted data. Errors produce Unknown votes; cancellation propagates.</summary>
@@ -93,13 +110,20 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         try
         {
             ObjectDisposedException.ThrowIf(disposed,this);
+            bool findings=responseMode==BonsaiCtgResponseMode.CanonicalFindings;
             var metadata=new Dictionary<string,string>(StringComparer.Ordinal)
             { ["evaluator"]="bonsai-1.7b-provisional",["model.sha256"]=modelHash,["rh.verified"]="false",["roles.independent"]="false",
-                ["prompt.contract"]="canonical-assessment-json-v2" };
+                ["prompt.contract"]=findings?"canonical-findings-json-v3":"canonical-assessment-json-v2" };
+            if(findings)metadata["binding.policy"]=BonsaiCtgFindingPolicy.Contract;
             if(request.InputFacts is null||request.InputFacts.Count is <1 or >16||request.InputFacts.Any(x=>x.Key.Length>128||x.Value is null||x.Value.Length>2048)||
                 request.RequiredCouncils is null||request.RequiredCouncils.Count>0&&!request.RequiredCouncils.Order().SequenceEqual(Councils.Order()))
                 return Failure("ctg.bonsai.invalid_request",metadata);
-            string facts=JsonSerializer.Serialize(request.InputFacts.OrderBy(x=>x.Key,StringComparer.Ordinal).ToDictionary(x=>x.Key,x=>x.Value),FactsJson);
+            // Prompt text and citation validation must refer to the same snapshot across awaits.
+            var inputFacts=request.InputFacts.ToImmutableSortedDictionary(StringComparer.Ordinal);
+            if(inputFacts.Count is <1 or >16||inputFacts.Any(x=>string.IsNullOrWhiteSpace(x.Key)||x.Key.Length>128||x.Value is null||x.Value.Length>2048))
+                return Failure("ctg.bonsai.invalid_request",metadata);
+            string facts=findings?JsonSerializer.Serialize(inputFacts.Select((pair,id)=>new{id,key=pair.Key,text=pair.Value}),FactsJson):
+                JsonSerializer.Serialize(inputFacts,FactsJson);
             if(facts.Length>3000)return Failure("ctg.bonsai.input_budget",metadata);
             metadata["facts.sha256"]=Hash(facts);
             var votes=new List<CouncilVote>();
@@ -108,7 +132,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             {
                 foreach(var council in Councils)
                 {
-                    var rule=rules[council];var prompt=BonsaiCtgPrompt.Build(rule,council,facts);
+                    var rule=rules[council];var prompt=findings?BonsaiCtgPrompt.Build(rule,council,facts):BonsaiCtgDirectVotePrompt.Build(rule,council,facts);
                     string system=prompt.System,user=prompt.User;
                     metadata[council+".prompt.sha256"]=Hash(system+"\n"+user);metadata[council+".rom.sha256"]=rule.Reference.ContentHash!;
                     metadata[council+".excerpt.sha256"]=Hash(prompt.Excerpt);
@@ -122,10 +146,22 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     metadata[council+".input_tokens"]=answer.InputTokens.ToString(System.Globalization.CultureInfo.InvariantCulture);
                     metadata[council+".elapsed_ms"]=answer.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
                     metadata[council+".prefill_forward_tokens"]=answer.PrefillForwardTokens.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                    CouncilVoteValue value;
-                    try{value=BonsaiCtgPrompt.Parse(answer);}catch(InvalidDataException){return Failure("ctg.bonsai.invalid_vote",metadata);}
-                    votes.Add(new(){CouncilKind=council,VoteValue=value,CanonReferences=[prompt.Reference],ObservedAt=clock.Now,
-                        Metadata=new Dictionary<string,string>{["label"]=value.ToString(),["prompt.sha256"]=metadata[council+".prompt.sha256"]}});
+                    CouncilVoteValue value;var voteMetadata=new Dictionary<string,string>{["prompt.sha256"]=metadata[council+".prompt.sha256"]};
+                    try
+                    {
+                        if(findings)
+                        {
+                            var assessment=BonsaiCtgPrompt.Parse(answer,council,inputFacts);value=assessment.Vote;
+                            voteMetadata["finding"]=metadata[council+".finding"]=assessment.Finding;
+                            voteMetadata["evidence.sha256"]=metadata[council+".evidence.sha256"]=assessment.EvidenceSha256;
+                            voteMetadata["evidence.source"]=metadata[council+".evidence.source"]=assessment.SourceId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            voteMetadata["binding.policy"]=BonsaiCtgFindingPolicy.Contract;
+                        }
+                        else value=BonsaiCtgDirectVotePrompt.Parse(answer);
+                    }
+                    catch(InvalidDataException){return Failure(findings?"ctg.bonsai.invalid_assessment":"ctg.bonsai.invalid_vote",metadata);}
+                    voteMetadata["label"]=value.ToString();
+                    votes.Add(new(){CouncilKind=council,VoteValue=value,CanonReferences=[prompt.Reference],ObservedAt=clock.Now,Metadata=voteMetadata});
                 }
             }
             catch(OperationCanceledException) when(!cancellationToken.IsCancellationRequested){return Failure("ctg.bonsai.timeout",metadata);}

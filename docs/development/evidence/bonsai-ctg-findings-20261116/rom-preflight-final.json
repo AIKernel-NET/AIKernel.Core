@@ -1,0 +1,35 @@
+[
+  {
+    "council": "Logos",
+    "Reference": {
+      "CanonId": "Canon.CTG.Monolith.Council.Logos",
+      "Path": "rom/governance/council.logos.monolith.md",
+      "Section": "1. Purpose; 3. Evaluation Criteria; 4. Voting Behavior; 6. Abstain Semantics",
+      "Anchor": null,
+      "ContentHash": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f"
+    },
+    "excerptSha256": "772dfe320b71b33f5b054fa005e9de03ec4ba975924dfad0bc1183d843874bec"
+  },
+  {
+    "council": "Ethos",
+    "Reference": {
+      "CanonId": "Canon.CTG.Monolith.Council.Ethos",
+      "Path": "rom/governance/council.ethos.monolith.md",
+      "Section": "1. Purpose; 4. Evaluation Criteria; 5. Voting Behavior; 6. Fail-Closed Behavior",
+      "Anchor": null,
+      "ContentHash": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52"
+    },
+    "excerptSha256": "b351bbc9fff6b71dd59eec9cc7931c853b990917b052568a7783f5b465308b9b"
+  },
+  {
+    "council": "Pathos",
+    "Reference": {
+      "CanonId": "Canon.CTG.Monolith.Council.Pathos",
+      "Path": "rom/governance/council.pathos.monolith.md",
+      "Section": "1. Purpose; 3. Evaluation Criteria; 4. Voting Behavior; 6. Abstain Semantics",
+      "Anchor": null,
+      "ContentHash": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+    },
+    "excerptSha256": "98ceffd73687d487ac6795ac8d9f601706705a404da2772181644003279e9af2"
+  }
+]

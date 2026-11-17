@@ -27,6 +27,21 @@ internal sealed class CompiledDslPipeline :
         _capabilityRegistry = capabilityRegistry ?? throw new ArgumentNullException(nameof(capabilityRegistry));
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
     }
+
+    // Implicit invocations must use the same clock as LoopUntil. Explicit
+    // execution contexts retain their supplied origin, including during replay.
+    internal DateTimeOffset GetExecutionStartedAtUtc()
+        => UsesClock(_root) ? _clock.Now : DateTimeOffset.UnixEpoch;
+
+    private static bool UsesClock(PipelineNode node)
+        => node switch
+        {
+            PipelineRootNode pipeline => pipeline.Steps.Any(UsesClock),
+            LoopNode loop => loop.MaxIterations > 0 && loop.BodyNodes.Any(UsesClock),
+            LoopUntilNode loop => loop.MaxIterations > 0,
+            _ => false
+        };
+
     /// <summary>
     /// EN: Gets Execute.
     /// [EN] Documents this public package API member. [JA] Execute を取得します。

@@ -133,6 +133,18 @@ internal interface IKernelPipeline
 {
     ResultStep<DslPipelineState, DslPipelineValue> Execute(
         DslPipelineExecutionContext context);
+
+    // Compatibility path for internal synchronous pipelines; cancellation never detaches running work.
+    async Task<ResultStep<DslPipelineState, DslPipelineValue>> ExecuteAsync(
+        DslPipelineExecutionContext context, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
+        cancellationToken.ThrowIfCancellationRequested();
+        var result = Execute(context);
+        cancellationToken.ThrowIfCancellationRequested();
+        return result;
+    }
 }
 
 internal interface IDslPipelineCompiler
@@ -148,4 +160,17 @@ internal interface IDslCapabilityRegistry
         string name,
         DslPipelineValue input,
         IReadOnlyDictionary<string, string> args);
+
+    // Synchronous implementations remain usable; asynchronous implementations override this method.
+    async Task<Result<DslPipelineValue>> InvokeAsync(
+        string name, DslPipelineValue input, IReadOnlyDictionary<string, string> args,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
+        cancellationToken.ThrowIfCancellationRequested();
+        var result = Invoke(name, input, args);
+        cancellationToken.ThrowIfCancellationRequested();
+        return result;
+    }
 }

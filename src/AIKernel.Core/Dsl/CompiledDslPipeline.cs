@@ -6,7 +6,7 @@ using AIKernel.Core.Time;
 using AIKernel.Dtos.Execution;
 using AIKernel.Enums;
 
-internal sealed class CompiledDslPipeline :
+internal sealed partial class CompiledDslPipeline :
     IKernelPipeline,
     AIKernel.Abstractions.Dsl.IKernelPipeline
 {
@@ -76,14 +76,14 @@ internal sealed class CompiledDslPipeline :
                 });
     }
 
-    Task<AIKernel.Dtos.Dsl.DslPipelineExecutionResult>
+    async Task<AIKernel.Dtos.Dsl.DslPipelineExecutionResult>
         AIKernel.Abstractions.Dsl.IKernelPipeline.ExecuteAsync(
             AIKernel.Dtos.Dsl.DslPipelineExecutionContext context,
             CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var result = Execute(DslContractMapper.ToCore(context));
+        var result = await ExecuteAsync(DslContractMapper.ToCore(context), cancellationToken).ConfigureAwait(false);
         var projection = result.Match(
             (state, error) => (
                 Status: ExecutionStatus.Failed,
@@ -99,7 +99,7 @@ internal sealed class CompiledDslPipeline :
                 Error: (ExecutionError?)null,
                 Metadata: ImmutableDictionary<string, string>.Empty));
 
-        return Task.FromResult(new AIKernel.Dtos.Dsl.DslPipelineExecutionResult
+        return new AIKernel.Dtos.Dsl.DslPipelineExecutionResult
         {
             Status = projection.Status,
             State = DslContractMapper.ToContract(projection.State),
@@ -108,7 +108,7 @@ internal sealed class CompiledDslPipeline :
             ReplayLogCount = result.ReplayLog.Count,
             ReplayLogHash = result.ReplayLogHash,
             Metadata = projection.Metadata
-        });
+        };
     }
 
     private static ResultStep<DslPipelineState, DslPipelineValue> InvalidExecutionContext(

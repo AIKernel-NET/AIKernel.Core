@@ -1,0 +1,19 @@
+from pathlib import Path
+import json,hashlib,subprocess,sys
+root=Path(__file__).parent;repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+label=sys.argv[1] if len(sys.argv)>1 else 'defined'
+build=json.loads((root/(label+'-tested-build.json')).read_text(encoding='utf-8'))
+tested=repo/'tests/AIKernel.Core.Tests/bin/Release/net10.0/AIKernel.Kernel.dll'
+assert sha(tested)==build['assemblySha256']['AIKernel.Kernel.dll']
+for path,digest in build['sourceSha256'].items():assert sha(repo/path)==digest,path
+old=json.loads((root.parent/'ctg-reading-20261117/focused-tested-build.json').read_text(encoding='utf-8'))
+assert old['canonicalRomSha256']==build['canonicalRomSha256']
+unchanged=['src/AIKernel.Kernel/Inference/BonsaiCtgFindingPolicy.cs','src/AIKernel.Kernel/Inference/BonsaiCtgEvidenceRequirements.cs',
+           'src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs','src/AIKernel.Kernel/Inference/Qwen3CpuModel.cs']
+for name in unchanged:
+ before=subprocess.check_output(['git','show','6c90bb2:'+name],cwd=repo)
+ assert before.replace(b'\r\n',b'\n')==(repo/name).read_bytes().replace(b'\r\n',b'\n'),name
+data=dict(coreTestKernelSha256=sha(tested),matchesPublishedKernel=True,governanceMatchesPrevious=True,unchangedSource=unchanged)
+(root/('build-verification-effects.json' if label=='effects' else 'build-verification.json')).write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(data,indent=2))

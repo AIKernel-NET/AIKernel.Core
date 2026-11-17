@@ -1,0 +1,59 @@
+{
+  "phase": "effects-pilot",
+  "before": {
+    "count": 1,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count"
+    ]
+  },
+  "after": {
+    "count": 1,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count"
+    ]
+  },
+  "existingBefore": {
+    "count": 1,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count"
+    ]
+  },
+  "existingAfter": {
+    "count": 1,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count"
+    ]
+  },
+  "hostBlocks": [],
+  "legacyPromptWitnessMatched": [
+    "pair-contacts-count"
+  ],
+  "regressions": [
+    [
+      "pair-contacts-count",
+      "Pathos",
+      "Approve",
+      "Reject"
+    ]
+  ],
+  "additionalControlsEvaluated": 0,
+  "additionalControlsAllPass": false,
+  "complete50": false,
+  "semanticAdmissionPassed": false
+}

@@ -74,7 +74,11 @@ internal enum BonsaiCtgResponseMode
     /// <summary>Validation-only separate findings for every canonical criterion.</summary>
     PerCriterionFindings,
     /// <summary>Validation-only open reading aid before the three canonical assessments.</summary>
-    FocusedReadingVotes
+    FocusedReadingVotes,
+    /// <summary>Validation-only reading with the exact core responsibility definitions restored.</summary>
+    DefinedReadingVotes,
+    /// <summary>Validation-only reading of the actual action and its observation-supported effects.</summary>
+    ActionEffectReadingVotes
 }
 
 /// <summary>Experimental Bonsai 1.7B council observations; canonical voting fidelity is not established.
@@ -116,7 +120,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         if(expectedModelSha256 is not {Length:64} || !string.Equals(modelHash,expectedModelSha256,StringComparison.OrdinalIgnoreCase))throw new InvalidDataException("Bonsai model digest mismatch.");
         var info=GgufModelInspector.Inspect(modelPath);
         if(info.Architecture!="qwen3" || info.StoredParameters is <1_500_000_000 or >2_000_000_000)throw new NotSupportedException("This evaluator requires the pinned Bonsai 1.7B family.");
-        model=new(modelPath,cpuThreads,2048,"auto");model.ConfigureTrustedPrefixCache(responseMode==BonsaiCtgResponseMode.FocusedReadingVotes?4:3,maximumPrefixCacheBytes);
+        model=new(modelPath,cpuThreads,2048,"auto");model.ConfigureTrustedPrefixCache(responseMode is BonsaiCtgResponseMode.FocusedReadingVotes or BonsaiCtgResponseMode.DefinedReadingVotes or BonsaiCtgResponseMode.ActionEffectReadingVotes?4:3,maximumPrefixCacheBytes);
         classify=(system,user,token)=>model.GenerateAsync(system,user,responseMode is BonsaiCtgResponseMode.CitedDirectVotes or BonsaiCtgResponseMode.CitedFindings or BonsaiCtgResponseMode.CanonicalFindings?256:192,token);
     }
     internal BonsaiCtgCouncilEvaluator(Func<string,string,CancellationToken,Task<CpuGeneration>> classify,IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,IKernelClock? clock=null,
@@ -131,7 +135,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
     private static ImmutableDictionary<CouncilKind,BonsaiCouncilRule> ValidateRules(IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,BonsaiCtgResponseMode mode)
     {
         ArgumentNullException.ThrowIfNull(rules);
-        if(mode is not (BonsaiCtgResponseMode.DirectVotes or BonsaiCtgResponseMode.CanonicalFindings or BonsaiCtgResponseMode.GroundedDirectVotes or BonsaiCtgResponseMode.ComparativeDirectVotes or BonsaiCtgResponseMode.ObservationFirstDirectVotes or BonsaiCtgResponseMode.ReadableDirectVotes or BonsaiCtgResponseMode.PathosScopeDirectVotes or BonsaiCtgResponseMode.EvidenceScopedDirectVotes or BonsaiCtgResponseMode.CitedDirectVotes or BonsaiCtgResponseMode.CitedFindings or BonsaiCtgResponseMode.PacketDirectVotes or BonsaiCtgResponseMode.DemonstratedPacketVotes or BonsaiCtgResponseMode.ReviewedPacketVotes or BonsaiCtgResponseMode.CouncilScopedDirectVotes or BonsaiCtgResponseMode.ProvenanceDirectVotes or BonsaiCtgResponseMode.PerCriterionFindings or BonsaiCtgResponseMode.FocusedReadingVotes))throw new ArgumentOutOfRangeException(nameof(mode));
+        if(mode is not (BonsaiCtgResponseMode.DirectVotes or BonsaiCtgResponseMode.CanonicalFindings or BonsaiCtgResponseMode.GroundedDirectVotes or BonsaiCtgResponseMode.ComparativeDirectVotes or BonsaiCtgResponseMode.ObservationFirstDirectVotes or BonsaiCtgResponseMode.ReadableDirectVotes or BonsaiCtgResponseMode.PathosScopeDirectVotes or BonsaiCtgResponseMode.EvidenceScopedDirectVotes or BonsaiCtgResponseMode.CitedDirectVotes or BonsaiCtgResponseMode.CitedFindings or BonsaiCtgResponseMode.PacketDirectVotes or BonsaiCtgResponseMode.DemonstratedPacketVotes or BonsaiCtgResponseMode.ReviewedPacketVotes or BonsaiCtgResponseMode.CouncilScopedDirectVotes or BonsaiCtgResponseMode.ProvenanceDirectVotes or BonsaiCtgResponseMode.PerCriterionFindings or BonsaiCtgResponseMode.FocusedReadingVotes or BonsaiCtgResponseMode.DefinedReadingVotes or BonsaiCtgResponseMode.ActionEffectReadingVotes))throw new ArgumentOutOfRangeException(nameof(mode));
         if(rules.Count!=3||Councils.Any(c=>!rules.TryGetValue(c,out var rule)||rule is null||!rule.Reference.CanonId.EndsWith(".Council."+c,StringComparison.Ordinal)))throw new ArgumentException("All three canonical council rules are required.");
         if(mode is not BonsaiCtgResponseMode.DirectVotes)foreach(var council in Councils)BonsaiCtgFindingPolicy.RequireSupported(rules[council],council);
         return rules.ToImmutableDictionary();
@@ -168,7 +172,9 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             bool reviewed=responseMode==BonsaiCtgResponseMode.ReviewedPacketVotes;
             bool demonstrated=responseMode==BonsaiCtgResponseMode.DemonstratedPacketVotes||reviewed;
             bool packet=responseMode==BonsaiCtgResponseMode.PacketDirectVotes||demonstrated;
-            bool focused=responseMode==BonsaiCtgResponseMode.FocusedReadingVotes;
+            bool effects=responseMode==BonsaiCtgResponseMode.ActionEffectReadingVotes;
+            bool defined=effects||responseMode==BonsaiCtgResponseMode.DefinedReadingVotes;
+            bool focused=defined||responseMode==BonsaiCtgResponseMode.FocusedReadingVotes;
             bool perCriterion=responseMode==BonsaiCtgResponseMode.PerCriterionFindings;
             bool provenance=responseMode==BonsaiCtgResponseMode.ProvenanceDirectVotes;
             bool councilScoped=responseMode==BonsaiCtgResponseMode.CouncilScopedDirectVotes||provenance;
@@ -177,7 +183,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             bool grounded=responseMode==BonsaiCtgResponseMode.GroundedDirectVotes||comparative||ordered;
             var metadata=new Dictionary<string,string>(StringComparer.Ordinal)
             { ["evaluator"]="bonsai-1.7b-provisional",["model.sha256"]=modelHash,["rh.verified"]="false",["roles.independent"]="false",
-                ["prompt.contract"]=focused?BonsaiCtgFocusedPrompt.Contract:perCriterion?BonsaiCtgCriteriaPrompt.Contract:provenance?BonsaiCtgProvenancePrompt.Contract:councilScoped?BonsaiCtgProvenancePrompt.ScopeContract:reviewed?BonsaiCtgReviewPrompt.Contract:demonstrated?BonsaiCtgDemonstrationPrompt.Contract:packet?BonsaiCtgPacketPrompt.Contract:citedFinding?BonsaiCtgCitedFindingPrompt.Contract:cited?BonsaiCtgCitationPrompt.Contract:requiresEvidence?"canonical-evidence-scope-json-v10":scoped?"canonical-pathos-scope-json-v9":readable?BonsaiCtgReadableJson.Contract:ordered?BonsaiCtgObservationFirstPrompt.Contract:comparative?BonsaiCtgComparativePrompt.Contract:grounded?BonsaiCtgGroundedPrompt.Contract:separated?"canonical-separated-assessment-json-v4":findings?"canonical-findings-json-v3":"canonical-assessment-json-v2" };
+                ["prompt.contract"]=effects?BonsaiCtgFocusedPrompt.EffectsContract:defined?BonsaiCtgFocusedPrompt.DefinedContract:focused?BonsaiCtgFocusedPrompt.Contract:perCriterion?BonsaiCtgCriteriaPrompt.Contract:provenance?BonsaiCtgProvenancePrompt.Contract:councilScoped?BonsaiCtgProvenancePrompt.ScopeContract:reviewed?BonsaiCtgReviewPrompt.Contract:demonstrated?BonsaiCtgDemonstrationPrompt.Contract:packet?BonsaiCtgPacketPrompt.Contract:citedFinding?BonsaiCtgCitedFindingPrompt.Contract:cited?BonsaiCtgCitationPrompt.Contract:requiresEvidence?"canonical-evidence-scope-json-v10":scoped?"canonical-pathos-scope-json-v9":readable?BonsaiCtgReadableJson.Contract:ordered?BonsaiCtgObservationFirstPrompt.Contract:comparative?BonsaiCtgComparativePrompt.Contract:grounded?BonsaiCtgGroundedPrompt.Contract:separated?"canonical-separated-assessment-json-v4":findings?"canonical-findings-json-v3":"canonical-assessment-json-v2" };
             if(reviewed)metadata["draft.binding"]="false";
             if(findings||citedFinding)metadata["binding.policy"]=BonsaiCtgFindingPolicy.Contract;
             if(separated&&findings||(grounded||readable||scoped)&&!separated)return Failure("ctg.bonsai.unsupported_contract",metadata);
@@ -219,7 +225,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                 string? actionReading=null;
                 if(focused)
                 {
-                    var readingPrompt=BonsaiCtgFocusedPrompt.Reading(facts,proposalJson!);
+                    var readingPrompt=BonsaiCtgFocusedPrompt.Reading(facts,proposalJson!,effects);
                     var readingAnswer=await classify(readingPrompt.System,readingPrompt.User,timeout.Token).ConfigureAwait(false);
                     ReadingObservation?.Invoke(readingAnswer);
                     metadata["reading.prompt.sha256"]=Hash(readingPrompt.System+"\n"+readingPrompt.User);
@@ -259,7 +265,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                             Metadata=new Dictionary<string,string>{{"label",combined.ToString()},{"binding.policy",BonsaiCtgCriteriaPrompt.Binding},{"prompt.sha256",metadata[council+".prompt.sha256"]}}});
                         continue;
                     }
-                    var rule=rules[council];var prompt=focused?BonsaiCtgFocusedPrompt.Build(rule,council,facts,proposalJson!,actionReading!):
+                    var rule=rules[council];var prompt=focused?BonsaiCtgFocusedPrompt.Build(rule,council,facts,proposalJson!,actionReading!,defined):
                         provenance?BonsaiCtgProvenancePrompt.Build(rule,council,facts,proposalJson!):
                         councilScoped?BonsaiCtgDirectVotePrompt.BuildWithCouncilScopes(rule,council,facts,proposalJson!):
                         reviewed?BonsaiCtgReviewPrompt.Build(rule,council,facts,proposalJson!):

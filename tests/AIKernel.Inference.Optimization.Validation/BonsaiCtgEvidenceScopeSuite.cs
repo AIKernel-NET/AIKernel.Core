@@ -9,7 +9,7 @@ internal static class BonsaiCtgEvidenceScopeSuite
     {
         var rules=BonsaiCtgSuite.LoadRules(governancePath);
         using var evaluator=new BonsaiCtgCouncilEvaluator(modelPath,"3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",rules,
-            responseMode:mode,evaluationTimeout:TimeSpan.FromMinutes(10),maximumPrefixCacheBytes:mode is BonsaiCtgResponseMode.FocusedReadingVotes or BonsaiCtgResponseMode.PerCriterionFindings or BonsaiCtgResponseMode.CitedFindings or BonsaiCtgResponseMode.DemonstratedPacketVotes or BonsaiCtgResponseMode.ReviewedPacketVotes?1024L<<20:512L<<20);
+            responseMode:mode,evaluationTimeout:TimeSpan.FromMinutes(10),maximumPrefixCacheBytes:mode is BonsaiCtgResponseMode.ActionEffectReadingVotes or BonsaiCtgResponseMode.DefinedReadingVotes or BonsaiCtgResponseMode.FocusedReadingVotes or BonsaiCtgResponseMode.PerCriterionFindings or BonsaiCtgResponseMode.CitedFindings or BonsaiCtgResponseMode.DemonstratedPacketVotes or BonsaiCtgResponseMode.ReviewedPacketVotes?1024L<<20:512L<<20);
         int calls=0;string current="";var observations=new List<object>();var rows=new List<object>();
         evaluator.ReadingObservation=answer=>
         {
@@ -55,7 +55,7 @@ internal static class BonsaiCtgEvidenceScopeSuite
             bool hostPass=blocked&&!expected&&calls==0&&legacyCalls==0&&!witness.Succeeded&&!result.Evaluation.Succeeded&&
                 witness.ErrorCode=="ctg.bonsai.required_evidence_unavailable"&&result.Evaluation.ErrorCode==witness.ErrorCode&&!result.Gate.Accepted&&
                 result.Evaluation.Decision.Votes.All(v=>v.VoteValue==CouncilVoteValue.Unknown);
-            bool pass=blocked?hostPass:modelPass&&calls==(mode==BonsaiCtgResponseMode.FocusedReadingVotes?4:mode==BonsaiCtgResponseMode.PerCriterionFindings?16:mode==BonsaiCtgResponseMode.ReviewedPacketVotes?6:3)&&legacyCalls==3;
+            bool pass=blocked?hostPass:modelPass&&calls==(mode is BonsaiCtgResponseMode.ActionEffectReadingVotes or BonsaiCtgResponseMode.DefinedReadingVotes or BonsaiCtgResponseMode.FocusedReadingVotes?4:mode==BonsaiCtgResponseMode.PerCriterionFindings?16:mode==BonsaiCtgResponseMode.ReviewedPacketVotes?6:3)&&legacyCalls==3;
             all&=pass;
             rows.Add(new{id=current,pass=modelPass,pipelinePass=pass,expectedHostBlock=blocked,inferenceCalls=calls,expectedGate=expected,
                 legacyPromptWitness=witness.Metadata,checks,result});

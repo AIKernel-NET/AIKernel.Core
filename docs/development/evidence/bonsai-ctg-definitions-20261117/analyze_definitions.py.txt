@@ -1,0 +1,38 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent
+load=lambda p:json.loads((root/p).read_text(encoding='utf-8'))
+fixture=load('definition-diagnostics.json')
+data=load('server-grounding-matrix/result.json')
+assert data['diagnosticOnly'] and data['planned']==len(fixture)==12
+assert len(data['rows'])==12
+assert data['modelHash']=='3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3'
+completion=load('server-grounding-matrix/completion.json')
+assert completion['exitCode']==0 and completion['stopReason'] is None
+source={r['id']:r for r in fixture};assert len(source)==12
+pilot={r['id']:r for r in load('server-focus-pilot/result.json')}
+observed={ (r['id'],r['council']):r['answer']['Text'] for r in load('server-focus-pilot/result.json.responses.json') if r['stage']=='final'}
+rows=[]
+for row in data['rows']:
+ case=source[row['id']];answer=row['answer'];text=answer['Text']
+ assert row['promptSha256']==case['promptSha256']
+ assert row['responseSha256']==hashlib.sha256(text.encode()).hexdigest()
+ assert answer['FinishReason']=='stop' and answer['InputTokens']+192<=2048
+ assert answer['ActivationPrecision']=='fp32' and answer['CpuBackend']=='avx512'
+ verdict=json.loads(text);assert set(verdict)=={'reason','vote'}
+ original=case['variant']=='original';base=row['id'].rsplit('-',2)[0];role=row['id'].rsplit('-',2)[1]
+ parity=None
+ if original:
+  assert case['promptSha256']==case['originalPromptSha256']
+  parity=row['responseSha256']==case['originalResponseSha256'];assert parity,row['id']
+ core_parity=None
+ if case['variant']=='core' and base in pilot:
+  metadata=pilot[base]['result']['Evaluation']['Metadata']
+  assert metadata[role+'.prompt.sha256']==row['promptSha256']
+  core_parity=observed[(base,role)]==text;assert core_parity,row['id']
+ rows.append(dict(id=row['id'],variant=case['variant'],originalResponseMatched=parity,fullCandidateResponseMatched=core_parity,
+                  vote=verdict['vote'],reason=verdict['reason'],inputTokens=answer['InputTokens']))
+result=dict(diagnosticOnly=True,modelHash=data['modelHash'],complete=12,originalConditionsMatched=sum(r['originalResponseMatched'] is True for r in rows),
+            candidateConditionsMatched=sum(r['fullCandidateResponseMatched'] is True for r in rows),rows=rows)
+(root/'definition-analysis.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result,indent=2))

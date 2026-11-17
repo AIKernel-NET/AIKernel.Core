@@ -18,13 +18,18 @@ internal static class BonsaiCtgDirectVotePrompt
         =>BuildCore(rule,council,facts,proposalJson,includePathosScope:council==CouncilKind.Pathos);
     internal static (string System,string User,CanonReference Reference,string Excerpt) BuildWithCouncilScopes(BonsaiCouncilRule rule,CouncilKind council,string facts,string proposalJson)
         =>BuildCore(rule,council,facts,proposalJson,includeAllCouncilScopes:true);
-    private static (string System,string User,CanonReference Reference,string Excerpt) BuildCore(BonsaiCouncilRule rule,CouncilKind council,string facts,string? proposalJson,bool includePathosScope=false,bool includeAllCouncilScopes=false)
+    internal static (string System,string User,CanonReference Reference,string Excerpt) BuildWithResponsibilities(BonsaiCouncilRule rule,CouncilKind council,string facts,string proposalJson)
+        =>BuildCore(rule,council,facts,proposalJson,includeAllCouncilScopes:true,includeCoreResponsibilities:true);
+    private static (string System,string User,CanonReference Reference,string Excerpt) BuildCore(BonsaiCouncilRule rule,CouncilKind council,string facts,string? proposalJson,bool includePathosScope=false,bool includeAllCouncilScopes=false,bool includeCoreResponsibilities=false)
     {
         string[] names=council==CouncilKind.Ethos?(includeAllCouncilScopes?
             ["1. Purpose","4. Evaluation Criteria","5. Voting Behavior","6. Fail-Closed Behavior","7. Interaction with Other Councils"]:
             ["1. Purpose","4. Evaluation Criteria","5. Voting Behavior","6. Fail-Closed Behavior"]):
             includePathosScope||includeAllCouncilScopes?["1. Purpose","3. Evaluation Criteria","4. Voting Behavior","5. Interaction with Other Councils","6. Abstain Semantics"]:
             ["1. Purpose","3. Evaluation Criteria","4. Voting Behavior","6. Abstain Semantics"];
+        // Criteria refer to terms defined here (e.g. Ethos transparency means auditable reasoning).
+        // Preserve the exact ROM section and every existing criterion; this is not a replacement rule.
+        if(includeCoreResponsibilities)names=[names[0],"2. Core Responsibilities",..names[1..]];
         var headings=Heading.Matches(rule.Text);var selected=new List<string>();
         foreach(string name in names)
         {

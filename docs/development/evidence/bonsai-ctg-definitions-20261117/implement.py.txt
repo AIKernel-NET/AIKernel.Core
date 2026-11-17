@@ -1,0 +1,40 @@
+from pathlib import Path
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+root=Path(__file__).parent
+def edit(path,changes):
+ p=repo/path;s=p.read_text(encoding='utf-8')
+ for old,new in changes:
+  assert old in s,(path,old)
+  s=s.replace(old,new)
+ p.write_text(s,encoding='utf-8',newline='\n')
+edit('src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs',[
+ ('    FocusedReadingVotes\n','    FocusedReadingVotes,\n    /// <summary>Validation-only reading with the exact core responsibility definitions restored.</summary>\n    DefinedReadingVotes\n'),
+ ('responseMode==BonsaiCtgResponseMode.FocusedReadingVotes?4:3','responseMode is BonsaiCtgResponseMode.FocusedReadingVotes or BonsaiCtgResponseMode.DefinedReadingVotes?4:3'),
+ ('or BonsaiCtgResponseMode.FocusedReadingVotes))','or BonsaiCtgResponseMode.FocusedReadingVotes or BonsaiCtgResponseMode.DefinedReadingVotes))'),
+ ('bool focused=responseMode==BonsaiCtgResponseMode.FocusedReadingVotes;','bool defined=responseMode==BonsaiCtgResponseMode.DefinedReadingVotes;\n            bool focused=defined||responseMode==BonsaiCtgResponseMode.FocusedReadingVotes;'),
+ ('["prompt.contract"]=focused?','["prompt.contract"]=defined?BonsaiCtgFocusedPrompt.DefinedContract:focused?'),
+ ('facts,proposalJson!,actionReading!)','facts,proposalJson!,actionReading!,defined)')])
+edit('tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgEvidenceScopeSuite.cs',[
+ ('mode is BonsaiCtgResponseMode.FocusedReadingVotes or','mode is BonsaiCtgResponseMode.DefinedReadingVotes or BonsaiCtgResponseMode.FocusedReadingVotes or'),
+ ('mode==BonsaiCtgResponseMode.FocusedReadingVotes?4:','mode is BonsaiCtgResponseMode.DefinedReadingVotes or BonsaiCtgResponseMode.FocusedReadingVotes?4:')])
+edit('tests/AIKernel.Inference.Optimization.Validation/Program.cs',[
+ ('if(args.Length==5&&args[0]=="--bonsai-ctg-focused-suite")','if(args.Length==5&&args[0]=="--bonsai-ctg-defined-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.DefinedReadingVotes)?0:1;return;}\nif(args.Length==5&&args[0]=="--bonsai-ctg-focused-suite")')])
+# Exercise the same safety boundary in both contracts; bool avoids exposing the internal enum.
+edit('tests/AIKernel.Core.Tests/Inference/BonsaiCtgFocusedTests.cs',[
+ ('[InlineData(false)]\n    [InlineData(true)]','[InlineData(false,false)]\n    [InlineData(true,false)]\n    [InlineData(false,true)]\n    [InlineData(true,true)]'),
+ ('ReadingIsNotAVoteAndFinalEthosCanVetoIt(bool veto)','ReadingIsNotAVoteAndFinalEthosCanVetoIt(bool veto,bool defined)'),
+ ('[InlineData(1,"ctg.bonsai.invalid_reading")]\n    [InlineData(4,"ctg.bonsai.invalid_vote")]','[InlineData(1,"ctg.bonsai.invalid_reading",false)]\n    [InlineData(4,"ctg.bonsai.invalid_vote",false)]\n    [InlineData(1,"ctg.bonsai.invalid_reading",true)]\n    [InlineData(4,"ctg.bonsai.invalid_vote",true)]'),
+ ('InvalidReadingOrFinalVoteDiscardsEveryApproval(int failAt,string error)','InvalidReadingOrFinalVoteDiscardsEveryApproval(int failAt,string error,bool defined)'),
+ ('[Fact]\n    public async Task RequiredObservationChecksPrecedeEvenTheReadingStage()','[Theory]\n    [InlineData(false)]\n    [InlineData(true)]\n    public async Task RequiredObservationChecksPrecedeEvenTheReadingStage(bool defined)'),
+ ('[Fact]\n    public async Task CancellationAfterReadingPropagatesWithoutRunningAnOperation()','[Theory]\n    [InlineData(false)]\n    [InlineData(true)]\n    public async Task CancellationAfterReadingPropagatesWithoutRunningAnOperation(bool defined)'),
+ ('responseMode:BonsaiCtgResponseMode.FocusedReadingVotes','responseMode:defined?BonsaiCtgResponseMode.DefinedReadingVotes:BonsaiCtgResponseMode.FocusedReadingVotes'),
+ ('Assert.Equal(BonsaiCtgFocusedPrompt.Contract,result.Evaluation.Metadata["prompt.contract"])','Assert.Equal(defined?BonsaiCtgFocusedPrompt.DefinedContract:BonsaiCtgFocusedPrompt.Contract,result.Evaluation.Metadata["prompt.contract"])')])
+# Isolated new scratch helpers. The historical evidence remains immutable.
+prior=root.parent/'ctg-reading-20261117'
+for name in ['guarded-cases.json']:(root/name).write_bytes((prior/name).read_bytes())
+for name in ['server_transfer.py','remote_runner.py']:
+ p=root/name;s=p.read_text(encoding='utf-8').replace("'--bonsai-ctg-focused-suite'","'--bonsai-ctg-focused-suite','--bonsai-ctg-defined-suite'")
+ p.write_text(s,encoding='utf-8')
+p=root/'record_build.py';s=p.read_text(encoding='utf-8').replace("'baseCommit':'001263e'","'baseCommit':'6c90bb2'").replace("'tests/AIKernel.Core.Tests/Inference/BonsaiCtgFocusedTests.cs'","'tests/AIKernel.Core.Tests/Inference/BonsaiCtgFocusedTests.cs','tests/AIKernel.Core.Tests/Inference/BonsaiCtgDefinedTests.cs'")
+p.write_text(s,encoding='utf-8')
+print('Implemented isolated v20 candidate and shared boundary tests.')

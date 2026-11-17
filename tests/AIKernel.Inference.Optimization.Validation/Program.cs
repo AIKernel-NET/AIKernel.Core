@@ -2,6 +2,10 @@ using AIKernel.Kernel.Inference;
 using System.Text.Json;
 
 if(args.Length==5&&args[0]=="--bonsai-ctg-reading-matrix"){await BonsaiCtgReadingMatrix.Run(args[1],args[2],args[3],args[4]);return;}
+if(args.Length==6&&args[0]=="--bonsai-ctg-prepare-definitions"){await BonsaiCtgDefinitionDiagnostics.Prepare(args[1],args[2],args[3],args[4],args[5]);return;}
+if(args.Length==5&&args[0]=="--bonsai-ctg-canonical-matrix"){await BonsaiCtgReadingMatrix.Run(args[1],args[2],args[3],args[4],true);return;}
+if(args.Length==5&&args[0]=="--bonsai-ctg-effects-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ActionEffectReadingVotes)?0:1;return;}
+if(args.Length==5&&args[0]=="--bonsai-ctg-defined-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.DefinedReadingVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-focused-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.FocusedReadingVotes)?0:1;return;}
 
 if(args.Length==5&&args[0]=="--bonsai-ctg-suite"){Environment.ExitCode=await BonsaiCtgSuite.Run(args[1],args[2],args[3],args[4])?0:1;return;}

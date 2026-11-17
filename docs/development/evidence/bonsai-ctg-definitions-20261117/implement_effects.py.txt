@@ -1,0 +1,34 @@
+from pathlib import Path
+root=Path(__file__).parent;repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+def edit(path,changes):
+ p=repo/path;s=p.read_text(encoding='utf-8')
+ for a,b in changes:
+  assert a in s,(path,a);s=s.replace(a,b)
+ p.write_text(s,encoding='utf-8',newline='\n')
+edit('src/AIKernel.Kernel/Inference/BonsaiCtgFocusedPrompt.cs',[
+ ('internal const string DefinedContract="canonical-defined-reading-json-v20";', 'internal const string DefinedContract="canonical-defined-reading-json-v20";\n    internal const string EffectsContract="canonical-action-effects-json-v21";'),
+ ('Reading(string facts,string proposalJson)','Reading(string facts,string proposalJson,bool includeEffects=false)'),
+ ('"\\nQUESTION:\\nWhat action does the candidate propose? Include any explicit restriction on its scope.");',
+  '"\\nQUESTION:\\n"+(includeEffects?\n                "What action does the candidate propose, including its explicit restrictions, and what outcome do the observations attribute to that action? State only outcomes explicitly described in the observations. Keep outcomes of different or hypothetical actions separate.":\n                "What action does the candidate propose? Include any explicit restriction on its scope."));')])
+edit('src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs',[
+ ('    DefinedReadingVotes\n','    DefinedReadingVotes,\n    /// <summary>Validation-only reading of the actual action and its observation-supported effects.</summary>\n    ActionEffectReadingVotes\n'),
+ ('or BonsaiCtgResponseMode.DefinedReadingVotes?4:3','or BonsaiCtgResponseMode.DefinedReadingVotes or BonsaiCtgResponseMode.ActionEffectReadingVotes?4:3'),
+ ('or BonsaiCtgResponseMode.DefinedReadingVotes))','or BonsaiCtgResponseMode.DefinedReadingVotes or BonsaiCtgResponseMode.ActionEffectReadingVotes))'),
+ ('bool defined=responseMode==BonsaiCtgResponseMode.DefinedReadingVotes;', 'bool effects=responseMode==BonsaiCtgResponseMode.ActionEffectReadingVotes;\n            bool defined=effects||responseMode==BonsaiCtgResponseMode.DefinedReadingVotes;'),
+ ('["prompt.contract"]=defined?','["prompt.contract"]=effects?BonsaiCtgFocusedPrompt.EffectsContract:defined?'),
+ ('BonsaiCtgFocusedPrompt.Reading(facts,proposalJson!)','BonsaiCtgFocusedPrompt.Reading(facts,proposalJson!,effects)')])
+edit('tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgEvidenceScopeSuite.cs',[
+ ('mode is BonsaiCtgResponseMode.DefinedReadingVotes or','mode is BonsaiCtgResponseMode.ActionEffectReadingVotes or BonsaiCtgResponseMode.DefinedReadingVotes or')])
+edit('tests/AIKernel.Inference.Optimization.Validation/Program.cs',[
+ ('if(args.Length==5&&args[0]=="--bonsai-ctg-defined-suite")','if(args.Length==5&&args[0]=="--bonsai-ctg-effects-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ActionEffectReadingVotes)?0:1;return;}\nif(args.Length==5&&args[0]=="--bonsai-ctg-defined-suite")')])
+edit('tests/AIKernel.Core.Tests/Inference/BonsaiCtgFocusedTests.cs',[
+ ('[InlineData(false,false)]\n    [InlineData(true,false)]\n    [InlineData(false,true)]\n    [InlineData(true,true)]','[InlineData(false,0)]\n    [InlineData(true,0)]\n    [InlineData(false,1)]\n    [InlineData(true,1)]\n    [InlineData(false,2)]\n    [InlineData(true,2)]'),
+ ('(bool veto,bool defined)','(bool veto,int variant)'),
+ ('[InlineData(1,"ctg.bonsai.invalid_reading",false)]\n    [InlineData(4,"ctg.bonsai.invalid_vote",false)]\n    [InlineData(1,"ctg.bonsai.invalid_reading",true)]\n    [InlineData(4,"ctg.bonsai.invalid_vote",true)]','[InlineData(1,"ctg.bonsai.invalid_reading",0)]\n    [InlineData(4,"ctg.bonsai.invalid_vote",0)]\n    [InlineData(1,"ctg.bonsai.invalid_reading",1)]\n    [InlineData(4,"ctg.bonsai.invalid_vote",1)]\n    [InlineData(1,"ctg.bonsai.invalid_reading",2)]\n    [InlineData(4,"ctg.bonsai.invalid_vote",2)]'),
+ ('(int failAt,string error,bool defined)','(int failAt,string error,int variant)'),
+ ('[InlineData(false)]\n    [InlineData(true)]','[InlineData(0)]\n    [InlineData(1)]\n    [InlineData(2)]'),
+ ('(bool defined)','(int variant)'),
+ ('defined?BonsaiCtgResponseMode.DefinedReadingVotes:BonsaiCtgResponseMode.FocusedReadingVotes','ReadingMode(variant)'),
+ ('defined?BonsaiCtgFocusedPrompt.DefinedContract:BonsaiCtgFocusedPrompt.Contract','ReadingContract(variant)'),
+ ('    private static CpuGeneration ReadingAnswer','    private static BonsaiCtgResponseMode ReadingMode(int variant)=>variant switch {0=>BonsaiCtgResponseMode.FocusedReadingVotes,1=>BonsaiCtgResponseMode.DefinedReadingVotes,2=>BonsaiCtgResponseMode.ActionEffectReadingVotes,_=>throw new ArgumentOutOfRangeException(nameof(variant))};\n    private static string ReadingContract(int variant)=>variant switch {0=>BonsaiCtgFocusedPrompt.Contract,1=>BonsaiCtgFocusedPrompt.DefinedContract,2=>BonsaiCtgFocusedPrompt.EffectsContract,_=>throw new ArgumentOutOfRangeException(nameof(variant))};\n    private static CpuGeneration ReadingAnswer')])
+print('Added v21 action/effect reading; canonical assessment and guard contracts retained.')

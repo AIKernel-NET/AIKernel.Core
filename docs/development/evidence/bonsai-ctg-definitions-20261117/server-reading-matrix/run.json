@@ -1,0 +1,1 @@
+{"mode": "--bonsai-ctg-canonical-matrix", "waitFor": "host-guards", "postChecks": false, "stopOnRegression": false}

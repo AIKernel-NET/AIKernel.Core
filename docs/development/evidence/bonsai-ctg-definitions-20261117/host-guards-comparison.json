@@ -1,0 +1,50 @@
+{
+  "phase": "host-guards",
+  "before": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "after": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "existingBefore": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "existingAfter": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "hostBlocks": [
+    "external-context-outage",
+    "policy-service-unavailable",
+    "japanese-context-outage",
+    "printer-profile-outage",
+    "japanese-preference-read-failure",
+    "pair-setting-unavailable",
+    "holdout-profile-unavailable"
+  ],
+  "legacyPromptWitnessMatched": [],
+  "regressions": [],
+  "additionalControlsEvaluated": 0,
+  "additionalControlsAllPass": false,
+  "complete50": false,
+  "semanticAdmissionPassed": false
+}

@@ -1,0 +1,28 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent;prior=root.parent/'ctg-reading-20261117'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+fixtures=['all-cases.json','guarded-cases.json','pilot-cases.json','host-guard-cases.json','baseline-gates.json']
+for name in fixtures:assert sha(root/name)==sha(prior/name),name
+record=json.loads((prior/'admission.json').read_text(encoding='utf-8'))
+record.update(baseCommit='6c90bb2',candidate='v20 exact Core Responsibilities added to v19',definitionsAreVerbatim=True,defaultChanged=False)
+(root/'admission.json').write_text(json.dumps(record,indent=2)+'\n',encoding='utf-8')
+(root/'fixture-sha256.json').write_text(json.dumps({p:sha(root/p) for p in fixtures+['definition-diagnostics.json']},indent=2)+'\n',encoding='utf-8')
+for name in ['inspect_responses.py','collect_evidence.py','check_evidence.py']:
+ s=(prior/name).read_text(encoding='utf-8').replace('ctg-reading-20261117','ctg-definitions-20261117')
+ if name=='collect_evidence.py':
+  s=s.replace("'reading-matrix.json','grounding-matrix.json','grounding-reordered.json','reading-analysis.json','grounding-analysis.json'","'definition-diagnostics.json','definition-analysis.json'")
+  s=s.replace("('diagnostic','focused')","('defined',)").replace("root/'tests-focused'","root/'tests'").replace("=='1081'","=='1088'")
+ if name=='check_evidence.py':
+  s=s.replace("'focused-tested-build.json'","'defined-tested-build.json'").replace("('diagnostic','focused')","('defined',)")
+  s=s.replace("label='diagnostic' if run.name in ('server-reading-matrix','server-grounding-matrix','server-grounding-reordered') else 'focused'","label='defined'")
+ (root/name).write_text(s,encoding='utf-8')
+p=root/'record_build.py';s=p.read_text(encoding='utf-8').replace("['BonsaiCtgReadingMatrix','Program'","['BonsaiCtgDefinitionDiagnostics','BonsaiCtgReadingMatrix','Program'")
+p.write_text(s,encoding='utf-8')
+# The normal regression job must start after the diagnostic inference, not overlap it.
+p=root/'public_runner.py';s=p.read_text(encoding='utf-8').replace("out.parent/'focus-pilot'","out.parent/'grounding-matrix'")
+start=s.index("assert (previous['stopReason']")
+end=s.index('assert {4,5}',start)
+s=s[:start]+"assert previous['stopReason'] is None and previous['exitCode']==0\ndiagnostic=json.loads((dependency/'result.json').read_text())\nassert diagnostic['diagnosticOnly'] and len(diagnostic['rows'])==diagnostic['planned']==12\n"+s[end:]
+p.write_text(s,encoding='utf-8')
+print('Frozen fixtures match the previous run; adoption criteria preserved.')

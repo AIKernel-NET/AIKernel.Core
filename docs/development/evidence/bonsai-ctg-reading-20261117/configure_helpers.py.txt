@@ -1,0 +1,15 @@
+from pathlib import Path
+root=Path(__file__).parent
+for name in ('server_transfer.py','server_results.py'):
+ p=root/name;t=p.read_text(encoding='utf-8')
+ t=t.replace("'host-guards-fixed')","'host-guards-fixed','reading-matrix','focus-pilot','focus-full')")
+ if name=='server_transfer.py':
+  t=t.replace("'--bonsai-ctg-criteria-suite')","'--bonsai-ctg-criteria-suite','--bonsai-ctg-reading-matrix','--bonsai-ctg-focused-suite')")
+  t=t.replace("'criteria-pilot-fixed')}).encode()","'criteria-pilot-fixed','focus-pilot','focus-full')}).encode()")
+  t=t.replace("'criteria-full'),'stopOnRegression'","'criteria-full','focus-full'),'stopOnRegression'")
+  t=t.replace("'host-guards':'final-v18'","'host-guards':'final-api'")
+ else:t=t.replace("r['kind']","r.get('kind','reading-matrix')")
+ p.write_text(t,encoding='utf-8')
+p=root/'remote_runner.py';t=p.read_text(encoding='utf-8').replace("'--bonsai-ctg-criteria-suite')","'--bonsai-ctg-criteria-suite','--bonsai-ctg-reading-matrix','--bonsai-ctg-focused-suite')");p.write_text(t,encoding='utf-8')
+p=root/'public_runner.py';t=(root.parent/'ctg-binding-20261117/criteria_public_runner.py').read_text(encoding='utf-8').replace("'criteria-pilot'","'focus-pilot'");p.write_text(t,encoding='utf-8')
+print('Helpers configured for isolated sequential runs.')

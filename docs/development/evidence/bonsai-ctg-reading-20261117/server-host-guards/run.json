@@ -1,0 +1,1 @@
+{"mode": "--bonsai-ctg-focused-suite", "waitFor": "final-api", "postChecks": false, "stopOnRegression": false}

@@ -1,0 +1,13 @@
+[
+  "src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs",
+  "src/AIKernel.Kernel/Inference/BonsaiCtgDirectVotePrompt.cs",
+  "src/AIKernel.Kernel/Inference/BonsaiCtgProvenancePrompt.cs",
+  "src/AIKernel.Kernel/Inference/BonsaiCtgFocusedPrompt.cs",
+  "src/AIKernel.Kernel/Inference/BonsaiCtgFindingPolicy.cs",
+  "src/AIKernel.Kernel/Inference/BonsaiCtgEvidenceRequirements.cs",
+  "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgReadingMatrix.cs",
+  "tests/AIKernel.Inference.Optimization.Validation/Program.cs",
+  "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgEvidenceScopeSuite.cs",
+  "tests/AIKernel.Core.Tests/Inference/BonsaiCtgFocusedTests.cs",
+  "src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs"
+]

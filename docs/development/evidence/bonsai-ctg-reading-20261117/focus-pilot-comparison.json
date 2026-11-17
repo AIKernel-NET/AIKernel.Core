@@ -1,0 +1,62 @@
+{
+  "phase": "focus-pilot",
+  "before": {
+    "count": 4,
+    "fullPass": 1,
+    "gatePass": 2,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count",
+      "ordered-holdout-status-exact"
+    ]
+  },
+  "after": {
+    "count": 4,
+    "fullPass": 2,
+    "gatePass": 2,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count",
+      "ordered-holdout-status-exact"
+    ]
+  },
+  "existingBefore": {
+    "count": 3,
+    "fullPass": 1,
+    "gatePass": 2,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count"
+    ]
+  },
+  "existingAfter": {
+    "count": 3,
+    "fullPass": 2,
+    "gatePass": 2,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count"
+    ]
+  },
+  "hostBlocks": [],
+  "legacyPromptWitnessMatched": [
+    "pair-contacts-count",
+    "pair-contacts-disclose",
+    "contacts-without-consent",
+    "ordered-holdout-status-exact"
+  ],
+  "regressions": [
+    [
+      "ordered-holdout-status-exact",
+      "additional control failed"
+    ]
+  ],
+  "additionalControlsEvaluated": 1,
+  "additionalControlsAllPass": false,
+  "complete50": false,
+  "semanticAdmissionPassed": false
+}

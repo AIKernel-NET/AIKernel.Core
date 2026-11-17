@@ -1,0 +1,45 @@
+param([ValidateRange(1,30)][int]$WaitMinutes=30)
+$ErrorActionPreference='Stop'
+$taskRoot='D:\AIKernel\.website-audit\ctg-reading-20261117'
+$baseline='D:\AIKernel\.website-audit\bonsai-ctg-separation-20261116\final'
+$repo='D:\AIKernel\artifacts\cuda-driver-native\core-context-free-pci'
+function Write-TaskJson([string]$name,$value) {
+    $target=Join-Path $taskRoot $name
+    $temporary=$target+'.writing.'+$PID
+    [IO.File]::WriteAllText($temporary,($value | ConvertTo-Json -Depth 4))
+    for($attempt=0;$attempt -lt 20;$attempt++) {
+        try { [IO.File]::Move($temporary,$target,$true); return }
+        catch [IO.IOException] { if($attempt -eq 19){throw}; Start-Sleep -Milliseconds 200 }
+    }
+}
+if (Test-Path -LiteralPath ($taskRoot+'\local-retry-status.json')) {
+    $previous=Get-Content -Raw -LiteralPath ($taskRoot+'\local-retry-status.json') | ConvertFrom-Json
+    if ($previous.state -eq 'completed') { exit 0 }
+}
+$record=Get-Content -Raw -LiteralPath ($repo+'\docs\development\evidence\bonsai-ctg-separation-20261116\tested-build.json') | ConvertFrom-Json
+foreach ($entry in $record.finalAssemblySha256.PSObject.Properties) {
+    if ((Get-FileHash -LiteralPath (Join-Path $baseline $entry.Name) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $entry.Value) { throw 'Baseline assembly mismatch' }
+}
+$samples=[Collections.Generic.List[object]]::new()
+if (Test-Path -LiteralPath ($taskRoot+'\local-load-samples.json')) {
+    foreach ($priorSample in (Get-Content -Raw -LiteralPath ($taskRoot+'\local-load-samples.json') | ConvertFrom-Json)) { $samples.Add($priorSample) }
+}
+$deadline=(Get-Date).AddMinutes($WaitMinutes)
+$consecutive=0
+while ((Get-Date) -lt $deadline) {
+    $sample=Get-CimInstance Win32_PerfFormattedData_PerfOS_Processor | Where-Object Name -eq '_Total'
+    $usage=[double]$sample.PercentProcessorTime
+    $samples.Add([pscustomobject]@{utc=[DateTime]::UtcNow.ToString('o');cpuPercent=$usage})
+    Write-TaskJson 'local-load-samples.json' $samples
+    if ($usage -le 10) { $consecutive++ } else { $consecutive=0 }
+    if ($consecutive -ge 3) {
+        Write-TaskJson 'local-retry-status.json' ([pscustomobject]@{state='running';threshold=10;consecutive=$consecutive;utc=[DateTime]::UtcNow.ToString('o')})
+        & ($baseline+'\AIKernel.Core.Tests.exe') --bonsai-ctg-separated-suite 'D:\AIKernel\models\bonsai1.7b\Bonsai-1.7B-Q1_0.gguf' 'D:\AIKernel\repos\AIKernel.NET\rom\governance' ($repo+'\docs\development\evidence\bonsai-ctg-separation-20261116\retry-incomplete-input.json') ($taskRoot+'\local-baseline-retry.json') > ($taskRoot+'\local-baseline-retry.log') 2>&1
+        $result=$LASTEXITCODE
+        Write-TaskJson 'local-retry-status.json' ([pscustomobject]@{state='completed';exitCode=$result;utc=[DateTime]::UtcNow.ToString('o')})
+        exit 0
+    }
+    Write-TaskJson 'local-retry-status.json' ([pscustomobject]@{state='waiting';threshold=10;cpuPercent=$usage;consecutive=$consecutive;utc=[DateTime]::UtcNow.ToString('o')})
+    Start-Sleep -Seconds 15
+}
+Write-TaskJson 'local-retry-status.json' ([pscustomobject]@{state='deferred-high-load';threshold=10;utc=[DateTime]::UtcNow.ToString('o')})

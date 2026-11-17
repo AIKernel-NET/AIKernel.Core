@@ -1,0 +1,29 @@
+{
+  "baseCommit": "001263e",
+  "sourceSha256": {
+    "src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs": "a80dfb79254cca55125bc0dec27e1d1e77b5412e925242d1ffee6eda4db69e53",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgDirectVotePrompt.cs": "14cb1d390a976f6499c5bda07e63e16ba204c3f65976c51162e40ea08f4aa878",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgProvenancePrompt.cs": "7d18e6c76bde75894fcc67fe61fe304fc02571d723e08849ab0526a943b754f1",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgFindingPolicy.cs": "6e09bd99d2d678f49c9ef3cf8aec56668dac7b3711fc576a9ac0f6a2eb34dfd4",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgEvidenceRequirements.cs": "2ce215b98eb6ba948c4c7672657f4e368682126661d8e3a9df236569217f8fc6",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgReadingMatrix.cs": "161200c663025975d956230288ed514e210965226ac4dd3c43ee82ab682ae925",
+    "tests/AIKernel.Inference.Optimization.Validation/Program.cs": "cb47c4167accc3aee1ba5d5a3b5a96ec30f1a539622aa3596ba203ccb703e00f",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgEvidenceScopeSuite.cs": "039cea6ac63c3a485b642e2edb3fcdf928916f599671e073d1dc4b130b25de77",
+    "src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs": "d05ec8567ef419a612b4c8c96d0b366ac058c445a19a4584f9e9dbdadf24ea57"
+  },
+  "assemblySha256": {
+    "AIKernel.Abstractions.dll": "d321b8bf8bc28cfe39e360a1d847ef9daca0ff8114ae33c6a59336185335402b",
+    "AIKernel.Common.dll": "a0cd428aea280b4886c1beab50139917ac3c503cd587adb2c84c15f9f836ec52",
+    "AIKernel.Core.dll": "ed3faafac6ea7e8b450147b6f620817a6d1f723ee16bef4559f040aedd6173e9",
+    "AIKernel.Core.Tests.dll": "9bd51f916d6689e0ba0357860d2607d828e673d5243a6c391242ded6a86ab5fb",
+    "AIKernel.Dtos.dll": "a1021628aea83069fa38c80d71dbe42683c2f75925d7d033bb4bd4fc9cc5745b",
+    "AIKernel.Enums.dll": "746b2d42c474c2620beaf7768671c77c6a47bda12236b6650ff2cd42ba48fb3f",
+    "AIKernel.Kernel.dll": "58cbb152d8c7f2b52246f1546beb9d17bb2fd7725940be389a5d9610d40502dc"
+  },
+  "canonicalRomSha256": {
+    "council.ethos.monolith.md": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "council.logos.monolith.md": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "council.pathos.monolith.md": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+  },
+  "kernelAssembliesMatchBaseline": true
+}

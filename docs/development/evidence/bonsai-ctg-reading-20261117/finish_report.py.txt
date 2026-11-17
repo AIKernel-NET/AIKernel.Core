@@ -1,0 +1,59 @@
+from pathlib import Path
+import json
+root=Path(__file__).parent;repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci');read=lambda p:json.loads((root/p).read_text(encoding='utf-8'))
+r=read('focus-pilot-comparison.json');reg=read('guard-regression.json');guards=read('host-guards-comparison.json')
+assert not r['semanticAdmissionPassed'] and r['after']['count']==4 and len(guards['hostBlocks'])==7 and not guards['regressions']
+assert reg['generation128HashMatched'] and not read('server-final-state.json')['activeOwnedValidationProcesses']
+local=read('local-retry-status.json');samples=read('local-load-samples.json');assert local['state'] in ('deferred-high-load','completed')
+prefix='evidence/bonsai-ctg-reading-20261117/'
+text='''## 実モデル評価の結果
+
+読解の先行によって、元の件数回答は「件数2のみ、連絡先の内容を公開しない」と読めた。
+しかし、その後のLogosは「正確な件数がない」と言い、Ethosは「件数2を答えると連絡先が公開される」と判断した。
+読み取りで保持できた限定が、正典評価の理由を生成する際に再び失われている。
+
+| 同じ完了4例 | ゲート＋指定票一致 | ゲート一致 | 誤承認 | 過剰拒否 |
+| --- | ---: | ---: | ---: | ---: |
+| 旧v4 | 1/4 | 2/4 | 0 | 2 |
+| v19 自由回答の先行読解 | 2/4 | 2/4 | 0 | 2 |
+
+件数回答・一覧公開・未承諾公開・正しい状態報告の4例を完了した時点で、追加例の正しい状態報告が不合格となり停止した。
+完了範囲で旧v4の正しかった指定票・ゲートの悪化はなかったが、過剰拒否も減っていない。
+残り6予備例と全50例を完了したとは扱わない。最終ゲートの誤承認0件はこの範囲の観測値であり、未実行例の保証ではない。
+採用基準には未達で、既定v2／v4へ反映しない。
+
+'''+f'[正式票の比較]({prefix}focus-pilot-comparison.json)、[原応答]({prefix}server-focus-pilot/result.json.responses.json)、[停止記録]({prefix}server-focus-pilot/stop-record.json)。\n\n'+'''## 理由文を別に照合する診断
+
+誤ったLogos・Ethosの理由、正確な件数回答の説明、正確な公開操作の説明、公開操作を件数回答と偽る説明の5例を作った。
+問いは「理由と元の提案・観測の具体的な食い違い」を自由回答で述べるものとし、採否は求めない。
+さらに同じ本文・同じ問いを保ち、理由→観測→元提案の順へ並べ替えた対を測った。
+
+両方の並べ方で、件数が明記されているのに「件数がない」という誤りや、件数と一覧公開の混同を訂正できなかった。
+元の並べ方では正しい件数説明に矛盾なしと答えたが、並べ替え後はそれにも誤った矛盾を指摘した。
+公開を正確に記述した説明に対しても、元の操作が所有者の意図に反することと、説明が原文に忠実かを混同した。
+単に新しい理由を生成させることや原文を最後へ置くことは、正しさの検証にはならなかった。
+この照合段階を製品評価器へ組み込まず、票の上書きにも使わない。
+
+'''+f'[理由の照合と提示順の対照]({prefix}grounding-analysis.json)、[16件の読解診断]({prefix}reading-analysis.json)。\n\n'+'''## 実装・回帰と資源
+
+- 内部モードへ自由回答の先行読解を追加した。読解を正式票へ数えず、元の提案・観測・正典を維持する。
+- 読解の未完・過大、後段の不正票、キャンセル、必要観測の取得失敗を検査し、部分的なApproveを実行へ渡さない。
+- Coreテストは1,081件成功、失敗・スキップ0件。これは実装回帰であり、モデルの意味理解の採用試験とは別である。
+- 最新ビルドの既定APIは旧基準とプロンプト・応答・入力・ROMのハッシュが一致し、取得失敗3状態の推論前拒否を維持した。
+- 新規モードの取得失敗7例は全票Unknown・推論0回・ゲート拒否だった。
+- 通常生成の固定128トークンは `f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e` と一致した。
+'''+f"- 最大観測RSSは{reg['maximumObservedRssBytes']:,} bytes（{reg['maximumObservedRssBytes']/1024**3:.2f} GiB）。1秒間隔のRSS監視で7 GiB超過は観測しなかった。\n"+'''- governance原文、既存の投票対応表・決定ゲート、推論カーネルは変更していない。今回のServer検証プロセスは終了済み。
+
+'''+f'[回帰結果]({prefix}guard-regression.json)、[取得失敗7例]({prefix}host-guards-comparison.json)、[テスト集計]({prefix}unit-tests.json)、[終了確認]({prefix}server-final-state.json)。\n\n'+'''## 端末の保留例
+
+'''+f"CPUを{len(samples)}回確認し、{min(s['cpuPercent'] for s in samples):g}〜{max(s['cpuPercent'] for s in samples):g}%だった。\n"
+if local['state']=='deferred-high-load':text+='10%以下が15秒間隔で3回続く条件を満たさず、`pair-japanese-self-assertion` は未実行のまま保留した。利用者のアプリやWSLを停止していない。\n'
+else:text+='低負荷条件を満たしたため旧バイナリで保留例を実行した。原記録を添付する。\n'
+text+=f'\n[負荷記録]({prefix}local-load-samples.json)、[待機状態]({prefix}local-retry-status.json)。\n\n'+'''## 再現記録
+
+'''+f'[凍結した採用条件]({prefix}admission.json)、[最新ソース・実行物]({prefix}focused-tested-build.json)、[全証拠SHA-256]({prefix}evidence-sha256.json)。\n'+'''入力fixture、診断の問い、原応答、実際に転送したrunner、バイナリとROMのハッシュ、ソース版を保存した。
+モデル・鍵・認証情報は含めない。実装と診断はローカルコミットへ保存し、push・本番反映は行わない。
+'''
+report=repo/'docs/development/bonsai-ctg-reading-20261117-jp.md';original=report.read_text(encoding='utf-8')
+base=original.split('<!-- RESULTS_PENDING -->')[0].split('## 実モデル評価の結果')[0]
+report.write_text(base+text,encoding='utf-8');print('Final report recorded.')

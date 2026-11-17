@@ -1,6 +1,9 @@
 using AIKernel.Kernel.Inference;
 using System.Text.Json;
 
+if(args.Length==5&&args[0]=="--bonsai-ctg-reading-matrix"){await BonsaiCtgReadingMatrix.Run(args[1],args[2],args[3],args[4]);return;}
+if(args.Length==5&&args[0]=="--bonsai-ctg-focused-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.FocusedReadingVotes)?0:1;return;}
+
 if(args.Length==5&&args[0]=="--bonsai-ctg-suite"){Environment.ExitCode=await BonsaiCtgSuite.Run(args[1],args[2],args[3],args[4])?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-separated-suite"){Environment.ExitCode=await BonsaiCtgSuite.Run(args[1],args[2],args[3],args[4],separated:true)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-grounded-suite"){Environment.ExitCode=await BonsaiCtgSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.GroundedDirectVotes,separated:true)?0:1;return;}

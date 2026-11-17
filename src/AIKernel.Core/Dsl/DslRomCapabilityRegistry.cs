@@ -91,11 +91,7 @@ internal sealed partial class DslRomCapabilityRegistry :
         DslPipelineValue input)
         => Try
             .Run(() => snapshot.Pipeline.Execute(
-                new DslPipelineExecutionContext(
-                    input,
-                    snapshot.Pipeline is CompiledDslPipeline compiled
-                        ? compiled.GetExecutionStartedAtUtc()
-                        : DateTimeOffset.UnixEpoch)))
+                CreateExecutionContext(snapshot, input)))
             .Match(
                 error => Result<ResultStep<DslPipelineState, DslPipelineValue>>.Fail(AttachRomMetadata(
                     error with
@@ -106,6 +102,14 @@ internal sealed partial class DslRomCapabilityRegistry :
                     },
                     snapshot.Metadata)),
                 Result<ResultStep<DslPipelineState, DslPipelineValue>>.Success);
+
+    // Both entry points must start the ROM with its own execution clock.
+    private static DslPipelineExecutionContext CreateExecutionContext(
+        DslRomSnapshot snapshot,
+        DslPipelineValue input)
+        => new(input, snapshot.Pipeline is CompiledDslPipeline compiled
+            ? compiled.GetExecutionStartedAtUtc()
+            : DateTimeOffset.UnixEpoch);
 
     private static Result<DslPipelineValue> RequirePipelineValue(
         DslRomMetadata metadata,

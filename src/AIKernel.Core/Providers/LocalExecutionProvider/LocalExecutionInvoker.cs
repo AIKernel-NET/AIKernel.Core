@@ -81,7 +81,7 @@ public sealed class LocalExecutionInvoker : ICapabilityModuleInvoker
                         execution = await ExecutePipelineAsync(pipeline.Value!, ReadInput(request), cancellationToken)
                             .ConfigureAwait(false);
                     }
-                    catch (OperationCanceledException) { throw; }
+                    catch (Exception cancellation) when (CancellationExceptionClassifier.IsCancellation(cancellation)) { throw; }
                     catch (Exception exception)
                     {
                         execution = Result<DslPipelineExecutionResult>.Fail(ErrorContext.FromException(exception));
@@ -154,7 +154,7 @@ public sealed class LocalExecutionInvoker : ICapabilityModuleInvoker
             cancellationToken.ThrowIfCancellationRequested();
             return Result<IKernelPipeline>.Success(pipeline);
         }
-        catch (OperationCanceledException) { throw; }
+        catch (Exception cancellation) when (CancellationExceptionClassifier.IsCancellation(cancellation)) { throw; }
         catch (Exception exception)
         {
             return Result<IKernelPipeline>.Fail(ErrorContext.FromException(exception))
@@ -179,7 +179,7 @@ public sealed class LocalExecutionInvoker : ICapabilityModuleInvoker
             cancellationToken.ThrowIfCancellationRequested();
             return Result<DslPipelineExecutionResult>.Success(result);
         }
-        catch (OperationCanceledException) { throw; }
+        catch (Exception cancellation) when (CancellationExceptionClassifier.IsCancellation(cancellation)) { throw; }
         catch (Exception exception)
         {
             return Result<DslPipelineExecutionResult>.Fail(ErrorContext.FromException(exception))

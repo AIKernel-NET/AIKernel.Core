@@ -17,7 +17,7 @@ internal sealed partial class DslRomCapabilityRegistry
         {
             Result<DslPipelineValue> result;
             try { result = await _inner.InvokeAsync(name, input, args, cancellationToken).ConfigureAwait(false); }
-            catch (OperationCanceledException) { throw; }
+            catch (Exception cancellation) when (CancellationExceptionClassifier.IsCancellation(cancellation)) { throw; }
             catch (Exception exception)
             {
                 result = Result<DslPipelineValue>.Fail(CapabilityException(name, ErrorContext.FromException(exception)));
@@ -37,10 +37,10 @@ internal sealed partial class DslRomCapabilityRegistry
         ResultStep<DslPipelineState, DslPipelineValue> executed;
         try
         {
-            executed = await value.Pipeline.ExecuteAsync(DslPipelineExecutionContext.Create(input), cancellationToken)
+            executed = await value.Pipeline.ExecuteAsync(CreateExecutionContext(value, input), cancellationToken)
                 .ConfigureAwait(false);
         }
-        catch (OperationCanceledException) { throw; }
+        catch (Exception cancellation) when (CancellationExceptionClassifier.IsCancellation(cancellation)) { throw; }
         catch (Exception exception)
         {
             return Result<DslPipelineValue>.Fail(AttachRomMetadata(ErrorContext.FromException(exception) with

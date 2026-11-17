@@ -69,7 +69,7 @@ internal sealed partial class CompiledDslPipeline
             invoked = await _capabilityRegistry.InvokeAsync(node.Name, current.Value!, node.Args, cancellationToken)
                 .ConfigureAwait(false);
         }
-        catch (OperationCanceledException) { throw; }
+        catch (Exception cancellation) when (CancellationExceptionClassifier.IsCancellation(cancellation)) { throw; }
         catch (Exception exception)
         {
             invoked = Result<DslPipelineValue>.Fail(DslExecutionErrors.CapabilityException(node.Name, exception));
@@ -130,7 +130,7 @@ internal sealed partial class CompiledDslPipeline
             cancellationToken.ThrowIfCancellationRequested();
             DateTimeOffset now;
             try { now = _clock.Now; }
-            catch (OperationCanceledException) { throw; }
+            catch (Exception cancellation) when (CancellationExceptionClassifier.IsCancellation(cancellation)) { throw; }
             catch (Exception exception)
             {
                 var delta = DslSemanticDeltaFactory.CreateLoopUntilDelta(iteration, timestamp: null, "clock_failed");

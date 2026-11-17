@@ -1,0 +1,18 @@
+{
+  "reason": "semantic-regression",
+  "violations": [
+    [
+      "ordered-holdout-status-exact",
+      "additional control failed"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "evaluation failed"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "previously unrun control failed"
+    ]
+  ],
+  "completed": 1
+}

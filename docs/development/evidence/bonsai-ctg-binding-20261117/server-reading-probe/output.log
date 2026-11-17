@@ -1,0 +1,5 @@
+Unhandled exception. System.InvalidOperationException: Configure trusted prefixes before inference or warmup.
+   at AIKernel.Kernel.Inference.Qwen3CpuModel.ConfigureTrustedPrefixCache(Int32 maximumPrefixes, Int64 maximumBytes)
+   at BonsaiCtgReadingProbe.Run(String modelPath, String governancePath, String casesPath, String output)
+   at Program.<Main>$(String[] args)
+   at Program.<Main>(String[] args)

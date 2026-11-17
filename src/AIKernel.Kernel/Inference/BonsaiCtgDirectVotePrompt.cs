@@ -16,10 +16,14 @@ internal static class BonsaiCtgDirectVotePrompt
         =>BuildCore(rule,council,facts,proposalJson);
     internal static (string System,string User,CanonReference Reference,string Excerpt) BuildWithPathosScope(BonsaiCouncilRule rule,CouncilKind council,string facts,string proposalJson)
         =>BuildCore(rule,council,facts,proposalJson,includePathosScope:council==CouncilKind.Pathos);
-    private static (string System,string User,CanonReference Reference,string Excerpt) BuildCore(BonsaiCouncilRule rule,CouncilKind council,string facts,string? proposalJson,bool includePathosScope=false)
+    internal static (string System,string User,CanonReference Reference,string Excerpt) BuildWithCouncilScopes(BonsaiCouncilRule rule,CouncilKind council,string facts,string proposalJson)
+        =>BuildCore(rule,council,facts,proposalJson,includeAllCouncilScopes:true);
+    private static (string System,string User,CanonReference Reference,string Excerpt) BuildCore(BonsaiCouncilRule rule,CouncilKind council,string facts,string? proposalJson,bool includePathosScope=false,bool includeAllCouncilScopes=false)
     {
-        string[] names=council==CouncilKind.Ethos?["1. Purpose","4. Evaluation Criteria","5. Voting Behavior","6. Fail-Closed Behavior"]:
-            includePathosScope?["1. Purpose","3. Evaluation Criteria","4. Voting Behavior","5. Interaction with Other Councils","6. Abstain Semantics"]:
+        string[] names=council==CouncilKind.Ethos?(includeAllCouncilScopes?
+            ["1. Purpose","4. Evaluation Criteria","5. Voting Behavior","6. Fail-Closed Behavior","7. Interaction with Other Councils"]:
+            ["1. Purpose","4. Evaluation Criteria","5. Voting Behavior","6. Fail-Closed Behavior"]):
+            includePathosScope||includeAllCouncilScopes?["1. Purpose","3. Evaluation Criteria","4. Voting Behavior","5. Interaction with Other Councils","6. Abstain Semantics"]:
             ["1. Purpose","3. Evaluation Criteria","4. Voting Behavior","6. Abstain Semantics"];
         var headings=Heading.Matches(rule.Text);var selected=new List<string>();
         foreach(string name in names)

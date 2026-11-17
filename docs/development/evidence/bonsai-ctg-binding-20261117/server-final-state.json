@@ -1,0 +1,18 @@
+{
+  "activeOwnedValidationProcesses": [],
+  "checkedPhases": [
+    "criteria-pilot",
+    "criteria-pilot-fixed",
+    "final-api",
+    "final-complete",
+    "final-fixed",
+    "final-v18",
+    "host-guards",
+    "host-guards-fixed",
+    "provenance-pilot",
+    "reading-probe",
+    "reading-probe-fixed",
+    "scope-pilot"
+  ],
+  "utcSeconds": 1794923557.839953
+}

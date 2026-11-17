@@ -1,0 +1,1 @@
+{"mode": "--bonsai-ctg-criteria-suite", "waitFor": "reading-probe-fixed", "postChecks": false, "stopOnRegression": true}

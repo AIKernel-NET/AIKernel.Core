@@ -1,0 +1,26 @@
+[
+  {
+    "phase": "criteria-pilot",
+    "pid": 3292499,
+    "stopped": false,
+    "inferenceStarted": false
+  },
+  {
+    "phase": "final-v18",
+    "pid": 3294894,
+    "stopped": true,
+    "inferenceStarted": false
+  },
+  {
+    "phase": "host-guards",
+    "pid": 3296616,
+    "stopped": true,
+    "inferenceStarted": false
+  },
+  {
+    "phase": "final-fixed",
+    "pid": 3335311,
+    "stopped": true,
+    "inferenceStarted": false
+  }
+]

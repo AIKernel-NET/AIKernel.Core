@@ -9,6 +9,10 @@ if(args.Length==5&&args[0]=="--bonsai-ctg-ordered-suite"){Environment.ExitCode=a
 if(args.Length==5&&args[0]=="--bonsai-ctg-readable-suite"){Environment.ExitCode=await BonsaiCtgSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ReadableDirectVotes,separated:true)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-scope-suite"){Environment.ExitCode=await BonsaiCtgSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.PathosScopeDirectVotes,separated:true)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-evidence-scope-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4])?0:1;return;}
+if(args.Length==5&&args[0]=="--bonsai-ctg-criteria-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.PerCriterionFindings)?0:1;return;}
+if(args.Length==5&&args[0]=="--bonsai-ctg-reading-probe"){await BonsaiCtgReadingProbe.Run(args[1],args[2],args[3],args[4]);return;}
+if(args.Length==5&&args[0]=="--bonsai-ctg-council-scope-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.CouncilScopedDirectVotes)?0:1;return;}
+if(args.Length==5&&args[0]=="--bonsai-ctg-provenance-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ProvenanceDirectVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-citation-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.CitedDirectVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-cited-findings-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.CitedFindings)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-packet-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.PacketDirectVotes)?0:1;return;}

@@ -1,0 +1,58 @@
+from pathlib import Path
+import sys, subprocess, json, io, tarfile
+sys.path.insert(0, r'D:/AIKernel/.wp-predelete-backup')
+from xserver_ssh import connection
+ROOT=Path(__file__).parent
+action,phase=sys.argv[1:]
+assert action in ('status','fetch')
+assert phase in ('scope-pilot', 'provenance-pilot', 'scope-full', 'provenance-full', 'host-guards', 'final-api', 'reading-probe', 'criteria-pilot', 'criteria-full', 'final-v18', 'final-fixed', 'reading-probe-fixed', 'criteria-pilot-fixed', 'final-complete', 'host-guards-fixed')
+remote=r'''from pathlib import Path
+import json,sys,tarfile
+out=Path.home()/'.aikernel-inquiry-014/ctg-binding-20261117'/PHASE
+if ACTION=='status':
+ result={}
+ for name in ('completion.json','pid.json'):
+  if (out/name).exists():result[name]=json.loads((out/name).read_text())
+ if (out/'result.json').exists():
+  try:
+   rows=json.loads((out/'result.json').read_text())
+   if isinstance(rows,dict) and rows.get('diagnosticOnly'):
+    result.update(diagnosticOnly=True,diagnosticRows=len(rows['rows']))
+    result['diagnostics']=[{'id':r['id'],'kind':r['kind'],'text':r.get('answer',{}).get('Text'),'match':r.get('match')} for r in rows['rows']]
+   else:
+    result.update(count=len(rows),passed=sum(r['pass'] for r in rows),last=rows[-1]['id'])
+    if any('expectedHostBlock' in r for r in rows):
+     result['hostBlocks']=sum(r.get('expectedHostBlock',False) for r in rows)
+     result['hostGuardPass']=sum(r.get('expectedHostBlock',False) and r.get('pipelinePass',False) and r.get('inferenceCalls')==0 for r in rows)
+     result['modelEvaluations']=sum(not r.get('expectedHostBlock',False) and r['result']['Evaluation']['Succeeded'] for r in rows)
+    result['falseAllow']=[r['id'] for r in rows if not r['expectedGate'] and r['result']['Gate']['Accepted']]
+    result['falseDeny']=[r['id'] for r in rows if r['expectedGate'] and not r['result']['Gate']['Accepted']]
+  except ValueError:result['writing']=True
+ if (out/'result.json.responses.json').exists():
+  try:
+   rows=json.loads((out/'result.json.responses.json').read_text());result['lastResponse']={k:rows[-1].get(k) for k in ('id','council','stage')}
+   result['lastResponse'].update({k:rows[-1]['answer'].get(k) for k in ('CpuBackend','ElapsedMilliseconds','InputTokens','PrefillForwardTokens','OutputTokens')})
+  except ValueError:pass
+ result['runnerLog']=(out/'runner.log').read_text()[-2000:] if (out/'runner.log').exists() else ''
+ result['outputTail']=(out/'output.log').read_text()[-1500:] if (out/'output.log').exists() else ''
+ print(json.dumps(result))
+else:
+ assert (out/'completion.json').exists(),'Run is not complete'
+ with tarfile.open(fileobj=sys.stdout.buffer,mode='w|gz') as archive:
+  for name in ('result.json','result.json.responses.json','completion.json','output.log','runner.log','transferred-files.json','pid.json','run.json','cases.json','probe-cases.json','checks.json','evidence-probe.json','evidence-probe.log','normal-128.log','stop-record.json','external-stop.json','runner.py','baseline-gates.json'):
+   if (out/name).exists():archive.add(str(out/name),arcname=name)
+'''.replace('PHASE',repr(phase)).replace('ACTION',repr(action))
+with connection() as ssh:
+ p=subprocess.run(ssh+['/usr/bin/python3.6 -'],input=remote.encode(),capture_output=True,timeout=90,creationflags=subprocess.CREATE_NO_WINDOW)
+if p.returncode:raise RuntimeError(p.stderr.decode(errors='replace')[-1800:])
+if action=='status':
+ result=json.loads(p.stdout)
+ (ROOT/(phase+'-status.json')).write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+ print(json.dumps({k:v for k,v in result.items() if k!='outputTail'},ensure_ascii=True,indent=2))
+else:
+ target=ROOT/('server-'+phase);target.mkdir(exist_ok=True)
+ with tarfile.open(fileobj=io.BytesIO(p.stdout),mode='r:gz') as archive:
+  for item in archive:
+   assert item.isfile() and Path(item.name).name==item.name and not item.name.startswith('.')
+   archive.extract(item,str(target),filter='data')
+ print(json.dumps({'destination':str(target),'bytes':len(p.stdout)}))

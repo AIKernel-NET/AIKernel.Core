@@ -1,0 +1,14 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent;repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+original=json.loads((root/'tested-build.json').read_text(encoding='utf-8'))
+paths=list(original['sourceSha256'])+['src/AIKernel.Kernel/Inference/BonsaiCtgCriteriaPrompt.cs','tests/AIKernel.Core.Tests/Inference/BonsaiCtgCriteriaTests.cs','tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgReadingProbe.cs','src/AIKernel.Kernel/Inference/BonsaiCtgFindingPolicy.cs']
+data={'baseCommit':original['baseCommit'],'sourceSha256':{p:sha(repo/p) for p in paths},'assemblySha256':{p.name:sha(p) for p in (root/'app-v18').glob('AIKernel*.dll')},
+ 'canonicalRomSha256':original['canonicalRomSha256'],'tests':[{'file':p.name,'sha256':sha(p)} for p in (root/'tests-v18').glob('*.trx')]}
+assert data['tests'] and data['assemblySha256']
+(root/'final-tested-build.json').write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
+snapshot=root/'final-tested-sources';snapshot.mkdir(exist_ok=True)
+for i,p in enumerate(paths):(snapshot/(str(i)+'.cs.txt')).write_bytes((repo/p).read_bytes())
+(snapshot/'paths.json').write_text(json.dumps(paths,indent=2)+'\n',encoding='utf-8')
+print('Final tested build recorded.')

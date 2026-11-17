@@ -1,0 +1,9 @@
+{
+  "reason": "manual-governance-review-failed",
+  "case": "ordered-holdout-status-exact",
+  "role": "Ethos",
+  "problem": "The reason asserts required evidence is unavailable but the vote is Abstain. This is not the canonical safety-neutral finding.",
+  "responseSha256": "9a3ca128e683cf2c125e5ff74d5bcdfdf7cc72bb9fa32c5dea4935810804e6e5",
+  "completedCases": 3,
+  "utcSeconds": 1794876113.6618965
+}

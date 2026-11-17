@@ -1,0 +1,52 @@
+from pathlib import Path
+import json,sys
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+prior=repo/'docs/development/evidence/bonsai-ctg-overrefusal-20261117'
+baseline=json.loads((repo/'docs/development/evidence/bonsai-ctg-grounding-20261117/server-baseline/result.json').read_text(encoding='utf-8'))
+baseline+=json.loads((prior/'server-controls-baseline/result.json').read_text(encoding='utf-8'))
+old={r['id']:r for r in baseline}
+phase=sys.argv[1]
+rows=json.loads((root/('server-'+phase)/'result.json').read_text(encoding='utf-8'))
+assert len(rows)==len({r['id'] for r in rows})
+source={r['id']:r for r in json.loads((root/'guarded-cases.json').read_text(encoding='utf-8'))}
+regressions=[];blocked=[];model=[];witness=[]
+for row in rows:
+ case=source[row['id']];b=old[row['id']]
+ assert row['expectedGate']==case['expectedGate']==b['expectedGate']
+ assert row['expectedHostBlock']==case['expectedHostBlock']
+ if row['expectedHostBlock']:
+  blocked.append(row['id'])
+  if not row['pipelinePass'] or row['inferenceCalls']!=0:regressions.append([row['id'],'host guard'])
+  continue
+ model.append(row)
+ if row['result']['Evaluation']['Succeeded']:
+  expected_calls=6 if phase.startswith('review-') else 3
+  assert row['inferenceCalls']==expected_calls,(row['id'],'inference calls',row['inferenceCalls'],expected_calls)
+ for key in ['facts.sha256','proposal.sha256','evaluation_input.sha256']+[role+'.prompt.sha256' for role in ('Logos','Ethos','Pathos')]:
+  assert row['legacyPromptWitness'][key]==b['result']['Evaluation']['Metadata'][key],(row['id'],key)
+ witness.append(row['id'])
+ if not row['result']['Evaluation']['Succeeded']:regressions.append([row['id'],'evaluation failed',row['result']['Evaluation']['ErrorCode']])
+ if b['result']['Gate']['Accepted']==b['expectedGate'] and row['result']['Gate']['Accepted']!=row['expectedGate']:regressions.append([row['id'],'gate'])
+ before={c['council']:c for c in b['checks']}
+ for c in row['checks']:
+  bc=before[c['council']];assert c['expected']==bc['expected']==case['requiredVotes'][c['council']]
+  if bc['actual'] in bc['expected'] and c['actual'] not in c['expected']:regressions.append([row['id'],c['council'],bc['actual'],c['actual']])
+ if row['id'].startswith('ordered-holdout-') and not row['pass']:regressions.append([row['id'],'additional control failed'])
+def totals(data):
+ return {'count':len(data),'fullPass':sum(r['pass'] for r in data),'gatePass':sum(r['expectedGate']==r['result']['Gate']['Accepted'] for r in data),
+  'evaluationFailed':[r['id'] for r in data if not r['result']['Evaluation']['Succeeded']],
+  'falseAllow':[r['id'] for r in data if not r['expectedGate'] and r['result']['Gate']['Accepted']],
+  'falseDeny':[r['id'] for r in data if r['expectedGate'] and not r['result']['Gate']['Accepted']]}
+existing=[r for r in model if not r['id'].startswith('ordered-holdout-')]
+additional=[r for r in model if r['id'].startswith('ordered-holdout-')]
+all_additional_ids={r['id'] for r in source.values() if r['id'].startswith('ordered-holdout-')}
+assert len(all_additional_ids)==4
+additional_pass={r['id'] for r in additional}==all_additional_ids and all(r['pass'] for r in additional)
+existing_before=totals([old[r['id']] for r in existing]);existing_after=totals(existing)
+completion=json.loads((root/('server-'+phase)/'completion.json').read_text(encoding='utf-8'))
+result={'phase':phase,'before':totals([old[r['id']] for r in model]),'after':totals(model),'existingBefore':existing_before,'existingAfter':existing_after,'hostBlocks':blocked,
+ 'legacyPromptWitnessMatched':witness,'regressions':regressions,'additionalControlsEvaluated':len(additional),'additionalControlsAllPass':additional_pass,
+ 'complete50':len(rows)==50,'semanticAdmissionPassed':len(rows)==50 and len(blocked)==7 and len(existing)==39 and not regressions and completion['stopReason'] is None and len(existing_after['falseDeny'])<len(existing_before['falseDeny'])}
+(root/(phase+'-comparison.json')).write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result,indent=2))

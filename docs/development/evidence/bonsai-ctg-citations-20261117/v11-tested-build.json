@@ -1,0 +1,33 @@
+{
+  "baseCommit": "bb60e4ae448cadc0a6c54ce71d8b480add82b7d7",
+  "sourceSha256": {
+    "src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs": "fe8158b35b54b0e9f199fc85d5d57c34e2e6067b918e58d4994bd89f5b834fbd",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgCitationPrompt.cs": "5a71795215c73480c7806c95dcad5899f075f31a8326e6a41a90e00f19cedcfb",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgDirectVotePrompt.cs": "cb942ad33989cede41400b125ff5b140e672ae04f2f39cf84904b3f3676bd639",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgEvidenceRequirements.cs": "2ce215b98eb6ba948c4c7672657f4e368682126661d8e3a9df236569217f8fc6",
+    "src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs": "d05ec8567ef419a612b4c8c96d0b366ac058c445a19a4584f9e9dbdadf24ea57",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgEvidenceScopeSuite.cs": "fd08e127d8f49456fa5e56c0065248765c0ca1fb9b2cdd7c9228562eb096349a",
+    "tests/AIKernel.Inference.Optimization.Validation/Program.cs": "1a243d93cef36aa8a1f2a56d3618162a2831d1a53b269610b38852409618ee7d",
+    "tests/AIKernel.Core.Tests/Inference/BonsaiCtgCitationTests.cs": "879995501ad03da3d2d4d0c281ab2a0a0efb67d0ec2d72329a3e2888411d909c"
+  },
+  "assemblySha256": {
+    "AIKernel.Abstractions.dll": "d321b8bf8bc28cfe39e360a1d847ef9daca0ff8114ae33c6a59336185335402b",
+    "AIKernel.Common.dll": "40c204b7ba9bc087e2cd1cf0acede2b727067e32fbe5b852e7d514eb5eae936f",
+    "AIKernel.Core.dll": "c6c29cba649a1f27b83e1eb462776b78b2ad0ea8dc8e74599bf2deeb876896b5",
+    "AIKernel.Core.Tests.dll": "77be88eff310221f4c469fcb6740978c3775eea0cb242ef87aca9936af8370fc",
+    "AIKernel.Dtos.dll": "a1021628aea83069fa38c80d71dbe42683c2f75925d7d033bb4bd4fc9cc5745b",
+    "AIKernel.Enums.dll": "746b2d42c474c2620beaf7768671c77c6a47bda12236b6650ff2cd42ba48fb3f",
+    "AIKernel.Kernel.dll": "45d0d714e6db3234f7b28cb0c8292ababbf519e2aa6dda1cd605c8d503dceeea"
+  },
+  "canonicalRomSha256": {
+    "council.ethos.monolith.md": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "council.logos.monolith.md": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "council.pathos.monolith.md": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+  },
+  "tests": [
+    {
+      "file": "HP_DESKTOP-9L863PA_2026-11-17_09_26_32_net10.0.trx",
+      "sha256": "b320cdfb8869845fdaf20d60285dd8118fc137bbb673bca8f9ef7a0412f3f61c"
+    }
+  ]
+}

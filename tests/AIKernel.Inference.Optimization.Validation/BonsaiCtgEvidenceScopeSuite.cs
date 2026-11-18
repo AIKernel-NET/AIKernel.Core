@@ -56,7 +56,9 @@ internal static class BonsaiCtgEvidenceScopeSuite
             bool hostPass=blocked&&!expected&&calls==0&&legacyCalls==0&&!witness.Succeeded&&!result.Evaluation.Succeeded&&
                 witness.ErrorCode=="ctg.bonsai.required_evidence_unavailable"&&result.Evaluation.ErrorCode==witness.ErrorCode&&!result.Gate.Accepted&&
                 result.Evaluation.Decision.Votes.All(v=>v.VoteValue==CouncilVoteValue.Unknown);
-            bool pass=blocked?hostPass:modelPass&&calls==(hasReading?4:mode==BonsaiCtgResponseMode.PerCriterionFindings?16:mode==BonsaiCtgResponseMode.ReviewedPacketVotes?6:3)&&legacyCalls==3;
+            bool reasoned = mode == BonsaiCtgResponseMode.ReasonedFindingVotes && result.Evaluation.Metadata.ContainsKey("comparison.sha256");
+            int expectedCalls = reasoned ? 7 : hasReading ? 4 : mode == BonsaiCtgResponseMode.PerCriterionFindings ? 16 : mode == BonsaiCtgResponseMode.ReviewedPacketVotes ? 6 : 3;
+            bool pass=blocked?hostPass:modelPass&&calls==expectedCalls&&legacyCalls==3;
             all&=pass;
             rows.Add(new{id=current,pass=modelPass,pipelinePass=pass,expectedHostBlock=blocked,inferenceCalls=calls,expectedGate=expected,
                 legacyPromptWitness=witness.Metadata,checks,result});

@@ -90,7 +90,9 @@ internal enum BonsaiCtgResponseMode
     /// <summary>Validation-only canonical findings for reports with a literal comparison.</summary>
     RecordFindingVotes,
     /// <summary>Validation-only model classification using the same council's independently generated explanation.</summary>
-    ReasonedFindingVotes
+    ReasonedFindingVotes,
+    /// <summary>Validation only. Allows one bounded replacement for a token-limited council explanation.</summary>
+    CompletedReasonedFindingVotes
 }
 
 /// <summary>Experimental Bonsai 1.7B council observations; canonical voting fidelity is not established.
@@ -102,6 +104,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
     private static readonly JsonSerializerOptions FactsJson=new(){Encoder=JavaScriptEncoder.Create(UnicodeRanges.All)};
     private readonly Func<string,string,CancellationToken,Task<CpuGeneration>> classify;
     private readonly Func<string,string,IReadOnlyList<string>,CancellationToken,Task<CpuGeneration>>? select;
+    private readonly Func<string,string,CancellationToken,Task<CpuGeneration>>? retryReason;
     private readonly ImmutableDictionary<CouncilKind,BonsaiCouncilRule> rules;
     private readonly IKernelClock clock;
     private readonly string modelHash;
@@ -135,12 +138,15 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         if(info.Architecture!="qwen3" || info.StoredParameters is <1_500_000_000 or >2_000_000_000)throw new NotSupportedException("This evaluator requires the pinned Bonsai 1.7B family.");
         model=new(modelPath,cpuThreads,2048,"auto");model.ConfigureTrustedPrefixCache(ReadingContract(responseMode) is null?3:4,maximumPrefixCacheBytes);
         select=model.ClassifyAsync;
+        if (responseMode == BonsaiCtgResponseMode.CompletedReasonedFindingVotes)
+            retryReason = (system, user, token) => model.GenerateAsync(system, user, 256, token);
         classify=(system,user,token)=>model.GenerateAsync(system,user,responseMode is BonsaiCtgResponseMode.CitedDirectVotes or BonsaiCtgResponseMode.CitedFindings or BonsaiCtgResponseMode.CanonicalFindings?256:192,token);
     }
     internal BonsaiCtgCouncilEvaluator(Func<string,string,CancellationToken,Task<CpuGeneration>> classify,IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,IKernelClock? clock=null,
         BonsaiCtgResponseMode responseMode=BonsaiCtgResponseMode.DirectVotes,
-        Func<string,string,IReadOnlyList<string>,CancellationToken,Task<CpuGeneration>>? select=null)
-    {this.classify=classify;this.select=select;this.rules=ValidateRules(rules,responseMode);this.responseMode=responseMode;this.clock=clock??KernelClock.System();modelHash="test-double";evaluationTimeout=TimeSpan.FromMinutes(3);}
+        Func<string,string,IReadOnlyList<string>,CancellationToken,Task<CpuGeneration>>? select=null,
+        Func<string,string,CancellationToken,Task<CpuGeneration>>? retryReason=null)
+    {this.classify=classify;this.select=select;this.retryReason=retryReason;this.rules=ValidateRules(rules,responseMode);this.responseMode=responseMode;this.clock=clock??KernelClock.System();modelHash="test-double";evaluationTimeout=TimeSpan.FromMinutes(3);}
     private static TimeSpan ValidateTimeout(TimeSpan? value)
     {
         var timeout=value??TimeSpan.FromMinutes(3);
@@ -157,6 +163,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         BonsaiCtgResponseMode.RoutedReadingVotes => BonsaiCtgFocusedPrompt.RoutedContract,
         BonsaiCtgResponseMode.ComparedReadingVotes => BonsaiCtgFocusedPrompt.ComparisonContract,
         BonsaiCtgResponseMode.RecordFindingVotes => BonsaiCtgRecordFindingPrompt.Contract,
+        BonsaiCtgResponseMode.CompletedReasonedFindingVotes => "canonical-completed-reasoned-finding-v29",
         BonsaiCtgResponseMode.ReasonedFindingVotes => BonsaiCtgReasonedFindingPrompt.Contract,
         _ => null
     };
@@ -254,7 +261,8 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             try
             {
                 string? actionReading=null;
-                bool compareLiterals = responseMode is BonsaiCtgResponseMode.ComparedReadingVotes or BonsaiCtgResponseMode.RecordFindingVotes or BonsaiCtgResponseMode.ReasonedFindingVotes;
+                bool reasoned = responseMode is BonsaiCtgResponseMode.ReasonedFindingVotes or BonsaiCtgResponseMode.CompletedReasonedFindingVotes;
+                bool compareLiterals = reasoned || responseMode is BonsaiCtgResponseMode.ComparedReadingVotes or BonsaiCtgResponseMode.RecordFindingVotes;
                 var witness = compareLiterals ? BonsaiCtgLiteralComparison.TryCreate(proposal!, inputFacts) : null;
                 string? comparison = witness?.ToPromptData();
                 if (comparison is not null) metadata["comparison.sha256"] = Hash(comparison);
@@ -262,7 +270,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     ? BonsaiCtgRecordFindingPrompt.FormatComparison(witness, inputFacts.Keys)
                     : null;
                 if (recordComparison is not null) metadata["binding.policy"] = BonsaiCtgFindingPolicy.Contract;
-                string? reasonedComparison = responseMode == BonsaiCtgResponseMode.ReasonedFindingVotes ? witness?.DescribeForCouncil() : null;
+                string? reasonedComparison = reasoned ? witness?.DescribeForCouncil() : null;
                 if (reasonedComparison is not null)
                 {
                     metadata["binding.policy"] = BonsaiCtgFindingPolicy.Contract;
@@ -338,6 +346,22 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     var answer=await classify(system,user,timeout.Token).ConfigureAwait(false);
                     if(reviewed || reasonedComparison is not null)
                     {
+                        if (responseMode == BonsaiCtgResponseMode.CompletedReasonedFindingVotes && reasonedComparison is not null &&
+                            answer.FinishReason == "length" && retryReason is not null)
+                        {
+                            // Keep the incomplete attempt for replay only. It never enters the replacement or selection prompt.
+                            string key = council + ".draft.initial";
+                            metadata[key + ".prompt.sha256"] = metadata[council + ".prompt.sha256"];
+                            metadata[key + ".response.sha256"] = Hash(answer.Text);
+                            metadata[key + ".finish_reason"] = answer.FinishReason;
+                            metadata[key + ".output_tokens"] = answer.OutputTokens.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            CriterionObservation?.Invoke(council, "truncated_reason", answer);
+                            timeout.Token.ThrowIfCancellationRequested();
+                            metadata[council + ".draft.retry.max_output_tokens"] = "256";
+                            answer = await retryReason(system, user, timeout.Token).ConfigureAwait(false);
+                            metadata[council + ".draft.retry.finish_reason"] = answer.FinishReason;
+                            timeout.Token.ThrowIfCancellationRequested();
+                        }
                         ProvisionalObservation?.Invoke(council,answer);
                         metadata[council+".draft.prompt.sha256"]=metadata[council+".prompt.sha256"];
                         metadata[council+".draft.response.sha256"]=Hash(answer.Text);

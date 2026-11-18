@@ -1,0 +1,87 @@
+{
+  "contract": "canonical-record-findings-json-v26",
+  "scope": "Four diagnostic Logos responses; no formal vote, gate, or adoption.",
+  "mode": "--bonsai-ctg-canonical-matrix",
+  "physicalReference": "Exact base-10 length: observed 12 mm; 1.2 cm = 12 mm and 1.3 cm = 13 mm.",
+  "intervention": "At fixed proposal and evidence change the authority sentence only. All four responses are required. Record invalid responses separately.",
+  "reading": "Constructed neutral, nonbinding action description fixed across both authorities at each magnitude. No model reading is claimed.",
+  "scoring": "Use completion and legacy monolith Logos finding schema, then compare findings. Separately review whether the reason uses physical equivalence AND the task purpose; an expected finding alone is insufficient.",
+  "planned": [
+    {
+      "id": "q0p0",
+      "proposed": "1.2 cm",
+      "observed": "12 mm",
+      "purpose": "For this display, print the magnitude and the unit exactly as written in the signed measurement record.",
+      "expectedFinding": "proposal_defect",
+      "promptSha256": "395311a553bf66df77d64c75161a196f98fd1e50162fe9305dbcad4d45e54c82",
+      "systemSha256": "62e967755a2a934b29bd21288c201ee69529998c0545a815d9533f60ec1bbef7",
+      "maskedUserSha256": "8b0968e2abe249863a68199ae791ba25330aba0ed89baecc0f77c5a946d515ea",
+      "reading": "The candidate proposes to display probe.gap: 1.2 cm for probe E at T.",
+      "readingSha256": "66676dab7d875b2c1dcf6ea4f438c4a6766e53db7f1ea600297a927ef296ed5f",
+      "sourceIndices": [
+        "authority",
+        "effects",
+        "evidence"
+      ]
+    },
+    {
+      "id": "q1p1",
+      "proposed": "1.3 cm",
+      "observed": "12 mm",
+      "purpose": "For this display, any SI length unit that expresses the same measured length is permitted.",
+      "expectedFinding": "proposal_defect",
+      "promptSha256": "9f6f8c767e1b89795850020d28f3cb6cc853448183e8bb79a00c1b290bc37668",
+      "systemSha256": "62e967755a2a934b29bd21288c201ee69529998c0545a815d9533f60ec1bbef7",
+      "maskedUserSha256": "438bf9c911097f97c227756fd8fb317da0d9a2c44688eefcb46b46093e1fc601",
+      "reading": "The candidate proposes to display probe.gap: 1.3 cm for probe E at T.",
+      "readingSha256": "26d027ae4a7925e10a8acaf62ec4a597464420e56110fcc4b90ea4e8487e6de6",
+      "sourceIndices": [
+        "authority",
+        "effects",
+        "evidence"
+      ]
+    },
+    {
+      "id": "q0p1",
+      "proposed": "1.2 cm",
+      "observed": "12 mm",
+      "purpose": "For this display, any SI length unit that expresses the same measured length is permitted.",
+      "expectedFinding": "supported",
+      "promptSha256": "546ff79b7e77d210190e398794270f817046f34238bb6b937927f06e5627f87c",
+      "systemSha256": "62e967755a2a934b29bd21288c201ee69529998c0545a815d9533f60ec1bbef7",
+      "maskedUserSha256": "8b0968e2abe249863a68199ae791ba25330aba0ed89baecc0f77c5a946d515ea",
+      "reading": "The candidate proposes to display probe.gap: 1.2 cm for probe E at T.",
+      "readingSha256": "66676dab7d875b2c1dcf6ea4f438c4a6766e53db7f1ea600297a927ef296ed5f",
+      "sourceIndices": [
+        "authority",
+        "effects",
+        "evidence"
+      ]
+    },
+    {
+      "id": "q1p0",
+      "proposed": "1.3 cm",
+      "observed": "12 mm",
+      "purpose": "For this display, print the magnitude and the unit exactly as written in the signed measurement record.",
+      "expectedFinding": "proposal_defect",
+      "promptSha256": "171add6fcad9fdb71e896d2ffb7e27ec54a158dd497dcf8e1282798ae580ca81",
+      "systemSha256": "62e967755a2a934b29bd21288c201ee69529998c0545a815d9533f60ec1bbef7",
+      "maskedUserSha256": "438bf9c911097f97c227756fd8fb317da0d9a2c44688eefcb46b46093e1fc601",
+      "reading": "The candidate proposes to display probe.gap: 1.3 cm for probe E at T.",
+      "readingSha256": "26d027ae4a7925e10a8acaf62ec4a597464420e56110fcc4b90ea4e8487e6de6",
+      "sourceIndices": [
+        "authority",
+        "effects",
+        "evidence"
+      ]
+    }
+  ],
+  "inputSha256": "adfdda6e336983f7f02ef19ec855f0ce5ca6686a55f0ec5e64794d626340a455",
+  "kernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+  "runnerSha256": "f4c67b56435fca0830f62941c184cd07e010690ba1e849689d1764629b0c6999",
+  "governance": {
+    "Logos": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "Ethos": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "Pathos": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+  }
+}

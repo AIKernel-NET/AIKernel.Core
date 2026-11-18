@@ -1,0 +1,36 @@
+{
+  "diagnosticOnly": true,
+  "expected": [
+    {
+      "id": "ordered-holdout-status-invented-Logos",
+      "council": "Logos",
+      "expectedFinding": "proposal_defect"
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Logos",
+      "council": "Logos",
+      "expectedFinding": "proposal_defect"
+    },
+    {
+      "id": "ordered-holdout-status-invented-Ethos",
+      "council": "Ethos",
+      "expectedFinding": "proposal_defect"
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Ethos",
+      "council": "Ethos",
+      "expectedFinding": "proposal_defect"
+    },
+    {
+      "id": "ordered-holdout-status-exact-Logos",
+      "council": "Logos",
+      "expectedFinding": "supported"
+    },
+    {
+      "id": "ordered-holdout-dimension-exact-Logos",
+      "council": "Logos",
+      "expectedFinding": "supported"
+    }
+  ],
+  "protocol": "Run all six primary cells. Run all six reversed cells only if every primary cell selects the expected finding with one classified token. No cell is a formal council vote."
+}

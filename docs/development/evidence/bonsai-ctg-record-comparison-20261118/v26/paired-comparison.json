@@ -1,0 +1,188 @@
+{
+  "phase": "paired",
+  "v19Compared": [
+    "ordered-holdout-status-exact",
+    "pair-contacts-count",
+    "pair-contacts-disclose"
+  ],
+  "before": {
+    "count": 5,
+    "fullPass": 1,
+    "gatePass": 2,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "ordered-holdout-status-exact",
+      "ordered-holdout-dimension-exact",
+      "pair-contacts-count"
+    ]
+  },
+  "after": {
+    "count": 5,
+    "fullPass": 2,
+    "gatePass": 3,
+    "evaluationFailed": [
+      "ordered-holdout-status-exact",
+      "ordered-holdout-dimension-wrong",
+      "ordered-holdout-dimension-exact"
+    ],
+    "falseAllow": [],
+    "falseDeny": [
+      "ordered-holdout-status-exact",
+      "ordered-holdout-dimension-exact"
+    ]
+  },
+  "existingBefore": {
+    "count": 2,
+    "fullPass": 1,
+    "gatePass": 1,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count"
+    ]
+  },
+  "existingAfter": {
+    "count": 2,
+    "fullPass": 2,
+    "gatePass": 2,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "hostBlocks": [],
+  "legacyPromptWitnessMatched": [
+    "ordered-holdout-status-exact",
+    "ordered-holdout-dimension-wrong",
+    "ordered-holdout-dimension-exact",
+    "pair-contacts-count",
+    "pair-contacts-disclose"
+  ],
+  "regressions": [
+    [
+      "ordered-holdout-status-exact",
+      "evaluation failed",
+      "ctg.bonsai.invalid_assessment"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "additional control failed"
+    ],
+    [
+      "ordered-holdout-dimension-wrong",
+      "evaluation failed",
+      "ctg.bonsai.invalid_assessment"
+    ],
+    [
+      "ordered-holdout-dimension-wrong",
+      "Ethos",
+      "Reject",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-dimension-wrong",
+      "additional control failed"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "evaluation failed",
+      "ctg.bonsai.invalid_assessment"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "Ethos",
+      "Approve",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "additional control failed"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "v19 Pathos",
+      "Approve",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "v24 gate"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "v24 Logos",
+      "Approve",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "v24 Ethos",
+      "Approve",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "v24 Pathos",
+      "Approve",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "v24 gate"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "v24 Logos",
+      "Approve",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "v24 Ethos",
+      "Approve",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "v25 gate"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "v25 Logos",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "v25 Ethos",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "v25 Pathos",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "v25 gate"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "v25 Logos",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "v25 Ethos",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "v25 Pathos",
+      "Unknown"
+    ]
+  ],
+  "additionalControlsEvaluated": 3,
+  "additionalControlsAllPass": false,
+  "complete50": false,
+  "semanticAdmissionPassed": false
+}

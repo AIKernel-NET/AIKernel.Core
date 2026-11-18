@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>AIKernel.Core.Tests</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Choice.cs" />
+    <Reference Include="../app-v26/AIKernel.Kernel.dll" />
+    <Reference Include="../app-v26/AIKernel.Dtos.dll" />
+    <Reference Include="../app-v26/AIKernel.Enums.dll" />
+    <Reference Include="../app-v26/AIKernel.Common.dll" />
+    <Reference Include="../app-v26/AIKernel.Core.dll" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,20 @@
+{
+  "diagnosticOnly": true,
+  "algorithm": "Qwen3CpuModel.ClassifyAsync over the next-token logits of all eligible single-token symbols",
+  "stop": "Score all 6 original-order cells. Only run reversed mapping on all 6 original-order cells passing.",
+  "files": {
+    "Choice.cs": "cd0a8b598c5ec8b8477420297765bb93e91c39a08a10d0ee6475ec2b4af7ceb7",
+    "Choice.csproj": "baf9ab00c3876103da2af944c44bc18dd51a92133f37dc39007e9a33ca2aebe1",
+    "prepare_inputs.py": "e59069290e5da8d0bae038a6b1bc03080885ad0ef62fc22acfc0baa4f3c38e39",
+    "score.py": "30ecf0ef93ac8b5c57f94dbcada54182d5b53fe578778b52e5dddb6c386ccbcf",
+    "source-inputs.json": "982f9b12bb527bcb60655f9cd78f689b18a14e71cb0abfd9ec2f5e4b461e0857",
+    "source-hashes.json": "0305523d8ca7c41beba28d00fd44730036dafb69083bceebd09242f03c340771",
+    "expectations.json": "28560249e635068f0a69dd2398048e3374ce7a5b7441143ea41160df15231a21",
+    "primary-cases.json": "ce3c173f10eb7897ab0ef4ec8b44e656dc47465abff394b05ee30c64153db58c",
+    "primary-mapping.json": "c8ca724e9fb526510d612f2a0c592b86fd2a21a76e7d0164b5d5b7fae42d33c3",
+    "reverse-cases.json": "d1e936057090e563c34aa8689ffa1175345eeaf98f9b4ab788c17772e27e27c2",
+    "reverse-mapping.json": "df86b33285b16deec1f3b888006a8aed7b420c9263b72778238ecaff576dea18",
+    "app/AIKernel.Core.Tests.dll": "116a4594debe9069d497f134477e668e604584ffac39ee69da68353bff954734",
+    "app/AIKernel.Kernel.dll": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492"
+  }
+}

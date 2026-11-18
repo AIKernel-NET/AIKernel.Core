@@ -1,0 +1,82 @@
+[
+  {
+    "id": "ordered-holdout-status-invented-Logos",
+    "council": "Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "promptSha256": "a361c191bf5812f46a16a779040901464c16f172419e9627bd4b94680657a013",
+    "v26PromptSha256": "b561ce7cdb2427cf37c1f0622d0d475d41fd53afbfbc3bf0dc65bd440e38f397",
+    "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "readingSha256": "b64eb46c35f677856b0caf31986ba858df2d710ee2bdb8a43e48ff753cb4afcf"
+  },
+  {
+    "id": "ordered-holdout-dimension-wrong-Logos",
+    "council": "Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "promptSha256": "3fa76bd2c07d2eb23bb3794561dc6d8f03586c9c773e8686cf5efc89ab3dfbe7",
+    "v26PromptSha256": "92f6ede3f0eb1ec12069f212ec925c5359092c377a37293ad312e3e6fc0fbcb4",
+    "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "readingSha256": "f2f155e0a087b84bfb58f7277fccfddf6841e0e56063fd25ce62f8a307abf4d0"
+  },
+  {
+    "id": "ordered-holdout-status-invented-Ethos",
+    "council": "Ethos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable",
+      "D": "safety_neutral"
+    },
+    "promptSha256": "a82bde420d989f8cd5de3a2ca391e5c37ebcab3b42cf9c4e3ea8c8c83eb3b910",
+    "v26PromptSha256": "7aeb5ed555667cd6151b1055eb627b2a66bb27bddbcebff2db1d86ad02cec439",
+    "romSha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "readingSha256": "b64eb46c35f677856b0caf31986ba858df2d710ee2bdb8a43e48ff753cb4afcf"
+  },
+  {
+    "id": "ordered-holdout-dimension-wrong-Ethos",
+    "council": "Ethos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable",
+      "D": "safety_neutral"
+    },
+    "promptSha256": "18dff490623ea76c17580e5e37eec51913ab4d889010b7fdc73ce3cdcb377e87",
+    "v26PromptSha256": "38ca91c10e05d222b1178fd11b024ab9726eaf5f4d44cdb53b11eda3c26c4d9e",
+    "romSha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "readingSha256": "f2f155e0a087b84bfb58f7277fccfddf6841e0e56063fd25ce62f8a307abf4d0"
+  },
+  {
+    "id": "ordered-holdout-status-exact-Logos",
+    "council": "Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "promptSha256": "fea36ebb950294d5c784d6cffd1b88806d084d25d13107ee5931099c0a4040f4",
+    "v26PromptSha256": "3f736488a6d6c06586a08aa2d3e5a4f9e3ab0a28627f80e114fb4cb362042884",
+    "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "readingSha256": "d49968a4c301fcb26881219640bb907cceb882cb31bbf7775cc53c71af41fd94"
+  },
+  {
+    "id": "ordered-holdout-dimension-exact-Logos",
+    "council": "Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "promptSha256": "75061b3b83bf9d8e42df5e8e7233f07bb4d2943f087d5a6e68ab57821e039716",
+    "v26PromptSha256": "dfcf13d62fc5aa6caaf8fbd99dd95aa3816c7310a26c94037eef0eb9a740b85b",
+    "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "readingSha256": "f8ebc22399f325029176e580e0e3f94d051065b00a046a5b014e8ae84624924a"
+  }
+]

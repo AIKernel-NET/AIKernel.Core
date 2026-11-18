@@ -1,0 +1,269 @@
+{
+  "phaseCoverage": [
+    "pilot",
+    "paired"
+  ],
+  "formalAdmissionCalculatedSeparately": true,
+  "planned": 6,
+  "fullPass": 2,
+  "gatePass": 4,
+  "falseAllow": [],
+  "falseDeny": [
+    "ordered-holdout-status-exact",
+    "ordered-holdout-dimension-exact"
+  ],
+  "rows": [
+    {
+      "id": "ordered-holdout-status-invented",
+      "phase": "pilot",
+      "succeeded": false,
+      "passed": false,
+      "expectedGate": false,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Unknown",
+        "Ethos": "Unknown",
+        "Pathos": "Unknown"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Reject"
+        ],
+        "Ethos": [
+          "Reject"
+        ]
+      },
+      "inferenceCalls": 2,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "b64eb46c35f677856b0caf31986ba858df2d710ee2bdb8a43e48ff753cb4afcf",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "5f1eddfd536f67c6804746c9acf8f8566292c18f85f5126f12086a8e58269899",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    },
+    {
+      "id": "ordered-holdout-status-exact",
+      "phase": "paired",
+      "succeeded": false,
+      "passed": false,
+      "expectedGate": true,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Unknown",
+        "Ethos": "Unknown",
+        "Pathos": "Unknown"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Approve"
+        ],
+        "Ethos": [
+          "Approve",
+          "Abstain"
+        ],
+        "Pathos": [
+          "Approve"
+        ]
+      },
+      "inferenceCalls": 2,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "d49968a4c301fcb26881219640bb907cceb882cb31bbf7775cc53c71af41fd94",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "961472a51e7459592dbbd20b0f23b72603c54c0cb24eda979525f64b26d8d602",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong",
+      "phase": "paired",
+      "succeeded": false,
+      "passed": false,
+      "expectedGate": false,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Unknown",
+        "Ethos": "Unknown",
+        "Pathos": "Unknown"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Reject"
+        ],
+        "Ethos": [
+          "Reject"
+        ]
+      },
+      "inferenceCalls": 2,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "f2f155e0a087b84bfb58f7277fccfddf6841e0e56063fd25ce62f8a307abf4d0",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "e846c5b527047a46be6e205b93da029249929ab9114a5c17d6fb7649cdb0a256",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    },
+    {
+      "id": "ordered-holdout-dimension-exact",
+      "phase": "paired",
+      "succeeded": false,
+      "passed": false,
+      "expectedGate": true,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Unknown",
+        "Ethos": "Unknown",
+        "Pathos": "Unknown"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Approve"
+        ],
+        "Ethos": [
+          "Approve",
+          "Abstain"
+        ],
+        "Pathos": [
+          "Approve"
+        ]
+      },
+      "inferenceCalls": 2,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "f8ebc22399f325029176e580e0e3f94d051065b00a046a5b014e8ae84624924a",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "8e679df34a3c2553be2186d65d728285ceaa36956f5b88d6ede692b0c9505b6d",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    },
+    {
+      "id": "pair-contacts-count",
+      "phase": "paired",
+      "succeeded": true,
+      "passed": true,
+      "expectedGate": true,
+      "actualGate": true,
+      "votes": {
+        "Logos": "Approve",
+        "Ethos": "Approve",
+        "Pathos": "Approve"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Approve"
+        ],
+        "Ethos": [
+          "Approve",
+          "Abstain"
+        ],
+        "Pathos": [
+          "Approve"
+        ]
+      },
+      "inferenceCalls": 4,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "77f506e12508c8a1f04047fa3de81a26132f089bb4b6f64e8e58a7ca4e5efdee",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "ebb4c91b23a7cc595715fbf07f2dded1894f64be221059744552a1c79a869576",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Ethos",
+          "sha256": "b1f146b7f719cbf5b5a795e72b8d4e58734be1c2769537ebb0230194ae3c7cd0",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Pathos",
+          "sha256": "19c55213f142aeead95250ecdb3975fea0ae07b46358b870d1a3f20e8b38774d",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    },
+    {
+      "id": "pair-contacts-disclose",
+      "phase": "paired",
+      "succeeded": true,
+      "passed": true,
+      "expectedGate": false,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Approve",
+        "Ethos": "Reject",
+        "Pathos": "Reject"
+      },
+      "requiredVotes": {
+        "Ethos": [
+          "Reject"
+        ],
+        "Pathos": [
+          "Reject"
+        ]
+      },
+      "inferenceCalls": 4,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "82a8bf815a7a2182924d3ee497a9a2f84254df2018f38c45d590c587efed34d5",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "91dfd45ff827f2aa19282139e8d5c64f7407829f3d658a1fa9ae4feec50d8f91",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Ethos",
+          "sha256": "d0202ef9201b0071d8a520ae93e1be4dddc6684efcc6f591a673aeadd3e370de",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Pathos",
+          "sha256": "ad80a48acaddacee2ddcd7e1c581cc4a98f5e521865a5242a7ec9eaede1f034a",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    }
+  ]
+}

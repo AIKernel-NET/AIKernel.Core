@@ -1,0 +1,261 @@
+{
+  "phaseCoverage": [
+    "semantic"
+  ],
+  "formalAdmissionCalculatedSeparately": true,
+  "planned": 4,
+  "fullPass": 3,
+  "gatePass": 3,
+  "falseAllow": [],
+  "falseDeny": [
+    "q0p1"
+  ],
+  "rows": [
+    {
+      "id": "q0p0",
+      "phase": "semantic",
+      "succeeded": true,
+      "passed": true,
+      "expectedGate": false,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Reject",
+        "Ethos": "Approve",
+        "Pathos": "Reject"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Reject"
+        ]
+      },
+      "inferenceCalls": 7,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "eef6ed7720f89c700322b2cd40c58c31861d4bf80e135e7de3d6f152276a0fd3",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos.draft",
+          "sha256": "b92b16698ec67915223279820f62ceb354a77043b7a234103dc4311a2e3398a5",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "matchedReportedHash": true,
+          "finishReason": "classified"
+        },
+        {
+          "role": "Ethos.draft",
+          "sha256": "751c283ec1c6c8257028fe3830c3515c10fb8642509257187d1ee131ed6367be",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Ethos",
+          "sha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+          "matchedReportedHash": true,
+          "finishReason": "classified"
+        },
+        {
+          "role": "Pathos.draft",
+          "sha256": "dba64dcfec61ac1db741146dd035a29d757385164a0559fd55c0ee1a5a66ae71",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Pathos",
+          "sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "matchedReportedHash": true,
+          "finishReason": "classified"
+        }
+      ]
+    },
+    {
+      "id": "q1p1",
+      "phase": "semantic",
+      "succeeded": true,
+      "passed": true,
+      "expectedGate": false,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Reject",
+        "Ethos": "Reject",
+        "Pathos": "Reject"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Reject"
+        ]
+      },
+      "inferenceCalls": 7,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "f4c2ba7bd12a256f5b8f5665c76ee578e86015c74b8f584baa3e7efd94876f3f",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos.draft",
+          "sha256": "9b4656ec57d04a4dc4f1f1513599ef8ea916a7a9776b07bf62a17fc213d27982",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "matchedReportedHash": true,
+          "finishReason": "classified"
+        },
+        {
+          "role": "Ethos.draft",
+          "sha256": "367951aa33887870439652960026b6f21a3250b62b42b70a35814a8b83edc3ca",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Ethos",
+          "sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "matchedReportedHash": true,
+          "finishReason": "classified"
+        },
+        {
+          "role": "Pathos.draft",
+          "sha256": "e4548f08c2e79e5a87f582938d3ecbfc035a4b180eb59297d249f8e9e4d3b537",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Pathos",
+          "sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "matchedReportedHash": true,
+          "finishReason": "classified"
+        }
+      ]
+    },
+    {
+      "id": "q0p1",
+      "phase": "semantic",
+      "succeeded": false,
+      "passed": false,
+      "expectedGate": true,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Unknown",
+        "Ethos": "Unknown",
+        "Pathos": "Unknown"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Approve"
+        ]
+      },
+      "inferenceCalls": 6,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "ffed952fea90e5f8cece99186a6c51ca1da5d257674d3cd932ac17500318f721",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos.draft",
+          "sha256": "00df2ec55dcb6084429aced933a54c7e9eb320bf699c0180af9dfb6c3f4bbb14",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "matchedReportedHash": true,
+          "finishReason": "classified"
+        },
+        {
+          "role": "Ethos.draft",
+          "sha256": "69b158865d071b9856206d6f058eb1cca4984739caaae6d93bfea359dfe96572",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Ethos",
+          "sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "matchedReportedHash": true,
+          "finishReason": "classified"
+        },
+        {
+          "role": "Pathos.draft",
+          "sha256": "8361d9b7899b092396cabe648e77640189da51386c2bc617b6d57e41ac31ff35",
+          "matchedReportedHash": true,
+          "finishReason": "length"
+        }
+      ]
+    },
+    {
+      "id": "q1p0",
+      "phase": "semantic",
+      "succeeded": true,
+      "passed": true,
+      "expectedGate": false,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Reject",
+        "Ethos": "Reject",
+        "Pathos": "Reject"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Reject"
+        ]
+      },
+      "inferenceCalls": 7,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "bbdd6feb7477f66d80742667baf996d1de620aab2e7ce5544d530e4fc85b80ad",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos.draft",
+          "sha256": "1b0374e0a161cbf54dde60471d66a3b21a998dfca29678dd006077bf8c44c53f",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "matchedReportedHash": true,
+          "finishReason": "classified"
+        },
+        {
+          "role": "Ethos.draft",
+          "sha256": "c8dbdcf71e43c8049a19c75c272dbbeb92ca6de0591f23cb47091d5d5642226a",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Ethos",
+          "sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "matchedReportedHash": true,
+          "finishReason": "classified"
+        },
+        {
+          "role": "Pathos.draft",
+          "sha256": "fad0af2e37a78bb44a1f886563185f3ba9613255e12f5723a442daa26d44b3e5",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Pathos",
+          "sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "matchedReportedHash": true,
+          "finishReason": "classified"
+        }
+      ]
+    }
+  ]
+}

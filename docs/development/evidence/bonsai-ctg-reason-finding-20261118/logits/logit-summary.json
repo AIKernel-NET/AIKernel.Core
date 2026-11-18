@@ -1,0 +1,192 @@
+{
+  "diagnosticOnly": true,
+  "cells": 3,
+  "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "preregistrationSha256": "22b3cdb16f5c77fb020b2b184ee6930d0a14e485cb6124147cc30dd8489d8635",
+  "resultSha256": "6fc91a2b0f68d9a314507782d42fc9edf89a5921c036d8f86a01368ee56e4e3a",
+  "rows": [
+    {
+      "id": "ordered-holdout-status-invented-Logos",
+      "promptSha256": "a361c191bf5812f46a16a779040901464c16f172419e9627bd4b94680657a013",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "publicPick": "A",
+      "historyTokens": 1412,
+      "vocabulary": 151669,
+      "publicMatchesBoth": true,
+      "first": {
+        "selected": "A",
+        "margin": 1.5929136276245117,
+        "logits": {
+          "A": 15.935406684875488,
+          "B": 14.26921272277832,
+          "C": 14.342493057250977
+        },
+        "singleLogits": {
+          "A": 15.935406684875488,
+          "B": 14.26921272277832,
+          "C": 14.342493057250977
+        },
+        "topTieCount": 1,
+        "allTies": [],
+        "fullVsSingleBitwise": true,
+        "fullVocabularyRanks": {
+          "A": 1,
+          "B": 5,
+          "C": 4
+        },
+        "historyTokens": 1412,
+        "logitsSha256": "1f98d956ea33b75b072cb0b689f8d9e724c34070cada5a66dc53be3428dda2d0"
+      },
+      "prefix": {
+        "selected": "C",
+        "margin": 0.007965087890625,
+        "logits": {
+          "A": 17.066314697265625,
+          "B": 16.00590705871582,
+          "C": 17.07427978515625
+        },
+        "singleLogits": {
+          "A": 17.066314697265625,
+          "B": 16.00590705871582,
+          "C": 17.07427978515625
+        },
+        "topTieCount": 1,
+        "allTies": [],
+        "fullVsSingleBitwise": true,
+        "fullVocabularyRanks": {
+          "A": 3,
+          "B": 4,
+          "C": 2
+        },
+        "historyTokens": 1416,
+        "logitsSha256": "dc666e9df7ded4f37df86239868c6afebf69286a9c06a4504a98550dbc0796f0"
+      },
+      "prefixChangesWinner": true
+    },
+    {
+      "id": "ordered-holdout-status-exact-Logos",
+      "promptSha256": "fea36ebb950294d5c784d6cffd1b88806d084d25d13107ee5931099c0a4040f4",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "publicPick": "A",
+      "historyTokens": 1419,
+      "vocabulary": 151669,
+      "publicMatchesBoth": true,
+      "first": {
+        "selected": "A",
+        "margin": 2.271341323852539,
+        "logits": {
+          "A": 16.099470138549805,
+          "B": 13.710996627807617,
+          "C": 13.828128814697266
+        },
+        "singleLogits": {
+          "A": 16.099470138549805,
+          "B": 13.710996627807617,
+          "C": 13.828128814697266
+        },
+        "topTieCount": 1,
+        "allTies": [],
+        "fullVsSingleBitwise": true,
+        "fullVocabularyRanks": {
+          "A": 1,
+          "B": 7,
+          "C": 6
+        },
+        "historyTokens": 1419,
+        "logitsSha256": "98b9e9ce61065bb44b8dcfe8fc8242dbf38e2d8095960a75de36b14a9f85c4c0"
+      },
+      "prefix": {
+        "selected": "A",
+        "margin": 0.43531036376953125,
+        "logits": {
+          "A": 17.32564926147461,
+          "B": 15.293859481811523,
+          "C": 16.890338897705078
+        },
+        "singleLogits": {
+          "A": 17.32564926147461,
+          "B": 15.293859481811523,
+          "C": 16.890338897705078
+        },
+        "topTieCount": 1,
+        "allTies": [],
+        "fullVsSingleBitwise": true,
+        "fullVocabularyRanks": {
+          "A": 2,
+          "B": 4,
+          "C": 3
+        },
+        "historyTokens": 1423,
+        "logitsSha256": "551bafe0e2e6dc5ff36ff089fccac0e6a8dea2d7be7f0ab14acc8d59d26dccda"
+      },
+      "prefixChangesWinner": false
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Logos",
+      "promptSha256": "3fa76bd2c07d2eb23bb3794561dc6d8f03586c9c773e8686cf5efc89ab3dfbe7",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "publicPick": "A",
+      "historyTokens": 1439,
+      "vocabulary": 151669,
+      "publicMatchesBoth": true,
+      "first": {
+        "selected": "A",
+        "margin": 2.3189239501953125,
+        "logits": {
+          "A": 14.967450141906738,
+          "B": 12.648526191711426,
+          "C": 12.387497901916504
+        },
+        "singleLogits": {
+          "A": 14.967450141906738,
+          "B": 12.648526191711426,
+          "C": 12.387497901916504
+        },
+        "topTieCount": 1,
+        "allTies": [],
+        "fullVsSingleBitwise": true,
+        "fullVocabularyRanks": {
+          "A": 1,
+          "B": 7,
+          "C": 10
+        },
+        "historyTokens": 1439,
+        "logitsSha256": "e506b7023167d6a7548171572607a3a530f37a9d319c26737f0a070dfe2a8dea"
+      },
+      "prefix": {
+        "selected": "A",
+        "margin": 0.4698905944824219,
+        "logits": {
+          "A": 17.402891159057617,
+          "B": 15.911359786987305,
+          "C": 16.933000564575195
+        },
+        "singleLogits": {
+          "A": 17.402891159057617,
+          "B": 15.911359786987305,
+          "C": 16.933000564575195
+        },
+        "topTieCount": 1,
+        "allTies": [],
+        "fullVsSingleBitwise": true,
+        "fullVocabularyRanks": {
+          "A": 2,
+          "B": 4,
+          "C": 3
+        },
+        "historyTokens": 1443,
+        "logitsSha256": "4d294b95ed53039633800bb5413f712e368f3ec4ac8c8bda9a52a8b38bfe28b1"
+      },
+      "prefixChangesWinner": false
+    }
+  ]
+}

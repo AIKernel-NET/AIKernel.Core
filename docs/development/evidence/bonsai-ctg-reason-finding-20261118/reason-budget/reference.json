@@ -1,0 +1,31 @@
+{
+  "originalId": "ordered-holdout-dimension-exact",
+  "council": "Pathos",
+  "expectedFinding": "supported",
+  "requiredVote": [
+    "Approve"
+  ],
+  "baselineGate": false,
+  "baselineEvaluationError": "ctg.bonsai.invalid_draft",
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "originalCasesSha256": "a8d8429529e0b79fc1ab0599904043801a6b0db2e5318697f337690164f2d433",
+  "originalRecordedResultsSha256": "65a29f386432c97763549442fcc13b2fb09f91bf38c7e06bee8a0e698aaa7e2b",
+  "originalRecordedResponsesSha256": "8a7b31cd0743217e4e09b7e4fa3023ae8136c327d7572dae964254d025a25110",
+  "baselineDraft": {
+    "Text": "The original candidate's statement \"部品Rの幅は12 mmと回答する\" is directly supported by the evidence, which confirms that the measurement is 12 mm. The evidence establishes that the measurement is correct, and the candidate's statement aligns with that measurement. Therefore, the original fact is decisive and establishes that the candidate's action is in line with the evidence. \n\n**Original fact:** \"部品Rの幅は12 mmと回答する.\"  \n**Evidence:** \"提供された完全な寸法表には部品Rの幅が12 mmと記録されている。単位もmmと明記されている。\"  \n**Council criteria:** \"Tone Appropriateness\" and \"Context Awareness\" are evaluated.  \n**Conclusion:** The candidate's statement is aligned with the evidence, and the evidence establishes that the measurement is 12 mm. The candidate's action is deemed appropriate under",
+    "InputTokens": 1571,
+    "OutputTokens": 192,
+    "FinishReason": "length",
+    "ElapsedMilliseconds": 57932,
+    "CpuBackend": "avx512",
+    "ActivationPrecision": "fp32",
+    "Profile": null,
+    "GeneratedTokenSha256": null,
+    "PrefillMilliseconds": 36473.757411,
+    "DecodeMilliseconds": 21458.715089000005,
+    "PrefillForwardTokens": 378,
+    "DecodeForwardTokens": 191,
+    "PrefillThreads": 4,
+    "DecodeThreads": 4
+  }
+}

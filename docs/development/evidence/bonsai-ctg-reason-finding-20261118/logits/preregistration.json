@@ -1,0 +1,28 @@
+{
+  "diagnosticOnly": true,
+  "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "kernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+  "harnessSha256": "e9898c4fca0faef326bc499df05ee98c0b6756397bfec7d4a0840039b37229e0",
+  "sourceSha256": "98e060245617ecc439bd2c68aa0cd4686cbac3c514d62b8cfd73f74f9ccf2dd4",
+  "casesSha256": "86865386f358739ef496254049409b5b0469bd52bda8438951536af3038aa0a1",
+  "parentPrimarySha256": "ce3c173f10eb7897ab0ef4ec8b44e656dc47465abff394b05ee30c64153db58c",
+  "cells": [
+    [
+      "ordered-holdout-status-invented-Logos",
+      "a361c191bf5812f46a16a779040901464c16f172419e9627bd4b94680657a013"
+    ],
+    [
+      "ordered-holdout-status-exact-Logos",
+      "fea36ebb950294d5c784d6cffd1b88806d084d25d13107ee5931099c0a4040f4"
+    ],
+    [
+      "ordered-holdout-dimension-wrong-Logos",
+      "3fa76bd2c07d2eb23bb3794561dc6d8f03586c9c773e8686cf5efc89ab3dfbe7"
+    ]
+  ],
+  "criteria": "Check every full vocabulary score is finite. For each one-token label, compare its score from the single full projection with production's separate one-row projections of the same hidden state. Report bits, top-two margin, and exact top ties. Compare both winners to a fresh public ClassifyAsync on exactly the same prompt. Record current prefill/decode instruction sets and threads.",
+  "firstStepPlanSha256": "afcda39e181c23c5c3e6e346cb1add770b0b9a6000b3fdae44f416f1a79a4283",
+  "prefixPlan": "Keep the regular first-step measurement and classifier comparison. Before selecting a next label, append only the tokenized assistant string 'My answer is:' followed by LF after the original full chat history. Use identical labels mapping, system, user, and full/sliced projections. The second step records within-prompt rank shifts; it is not the public ClassifyAsync or a vote. No interpretation based on expected labels enters model input.",
+  "prefixLiteral": "My answer is:\n",
+  "prefixBuilderSha256": "607a8550aef4f67c65fb4143ea9e73805ffcfcc2cd3d11ae62e66cae3b174b4f"
+}

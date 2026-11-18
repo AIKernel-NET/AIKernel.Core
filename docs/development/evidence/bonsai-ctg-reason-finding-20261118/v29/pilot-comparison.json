@@ -1,0 +1,56 @@
+{
+  "phase": "pilot",
+  "v19Compared": [],
+  "before": {
+    "count": 1,
+    "fullPass": 1,
+    "gatePass": 1,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "after": {
+    "count": 1,
+    "fullPass": 0,
+    "gatePass": 1,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "existingBefore": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "existingAfter": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "hostBlocks": [],
+  "legacyPromptWitnessMatched": [
+    "ordered-holdout-status-invented"
+  ],
+  "regressions": [
+    [
+      "ordered-holdout-status-invented",
+      "Logos",
+      "Reject",
+      "Approve"
+    ],
+    [
+      "ordered-holdout-status-invented",
+      "additional control failed"
+    ]
+  ],
+  "additionalControlsEvaluated": 1,
+  "additionalControlsAllPass": false,
+  "complete50": false,
+  "semanticAdmissionPassed": false
+}

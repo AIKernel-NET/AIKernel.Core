@@ -1,0 +1,382 @@
+{
+  "diagnosticOnly": true,
+  "planned": 3,
+  "modelHash": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "rows": [
+    {
+      "id": "ordered-holdout-status-invented-Logos",
+      "promptSha256": "a361c191bf5812f46a16a779040901464c16f172419e9627bd4b94680657a013",
+      "afterPrefix": {
+        "literal": "My answer is:\n",
+        "tokenIds": [
+          5050,
+          4226,
+          374,
+          510
+        ],
+        "historyTokens": 1416,
+        "decode": "avx512",
+        "prefixPick": "C",
+        "singlePick": "C",
+        "margin": 0.007965087890625,
+        "tieCount": 1,
+        "singleTieCount": 1,
+        "singleMargin": 0.007965087890625,
+        "logitsSha256": "dc666e9df7ded4f37df86239868c6afebf69286a9c06a4504a98550dbc0796f0",
+        "fullVocabArgmax": 334,
+        "fullVocabMax": 18.921225,
+        "fullNonfinite": 0,
+        "singleNonfinite": 0,
+        "allLabelScoresBitwiseIdentical": true,
+        "byLabel": [
+          {
+            "label": "A",
+            "tokenId": 32,
+            "full": 17.066315,
+            "single": 17.066315,
+            "fullBits": 1099466704,
+            "singleBits": 1099466704,
+            "fullVocabularyRank": 3
+          },
+          {
+            "label": "B",
+            "tokenId": 33,
+            "full": 16.005907,
+            "single": 16.005907,
+            "fullBits": 1098910745,
+            "singleBits": 1098910745,
+            "fullVocabularyRank": 4
+          },
+          {
+            "label": "C",
+            "tokenId": 34,
+            "full": 17.07428,
+            "single": 17.07428,
+            "fullBits": 1099470880,
+            "singleBits": 1099470880,
+            "fullVocabularyRank": 2
+          }
+        ]
+      },
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1412,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 92205,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 92204.594014,
+        "DecodeMilliseconds": 0.4102859999984503,
+        "PrefillForwardTokens": 1412,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      },
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1412,
+      "vocabulary": 151669,
+      "fullNonfinite": 0,
+      "singleNonfinite": 0,
+      "fullVocabArgmax": 32,
+      "fullVocabMax": 15.935407,
+      "logitsSha256": "1f98d956ea33b75b072cb0b689f8d9e724c34070cada5a66dc53be3428dda2d0",
+      "labels": [
+        {
+          "label": "A",
+          "tokenId": 32,
+          "full": 15.935407,
+          "single": 15.935407,
+          "fullVocabularyRank": 1,
+          "fullBits": 1098839917,
+          "singleBits": 1098839917
+        },
+        {
+          "label": "B",
+          "tokenId": 33,
+          "full": 14.269213,
+          "single": 14.269213,
+          "fullVocabularyRank": 5,
+          "fullBits": 1097092786,
+          "singleBits": 1097092786
+        },
+        {
+          "label": "C",
+          "tokenId": 34,
+          "full": 14.342493,
+          "single": 14.342493,
+          "fullVocabularyRank": 4,
+          "fullBits": 1097169626,
+          "singleBits": 1097169626
+        }
+      ],
+      "fullPick": "A",
+      "singlePick": "A",
+      "publicPick": "A",
+      "fullTieCount": 1,
+      "singleTieCount": 1,
+      "fullMargin": 1.5929136276245117,
+      "singleMargin": 1.5929136276245117,
+      "publicMatchesFull": true,
+      "publicMatchesSingle": true,
+      "allLabelScoresBitwiseIdentical": true
+    },
+    {
+      "id": "ordered-holdout-status-exact-Logos",
+      "promptSha256": "fea36ebb950294d5c784d6cffd1b88806d084d25d13107ee5931099c0a4040f4",
+      "afterPrefix": {
+        "literal": "My answer is:\n",
+        "tokenIds": [
+          5050,
+          4226,
+          374,
+          510
+        ],
+        "historyTokens": 1423,
+        "decode": "avx512",
+        "prefixPick": "A",
+        "singlePick": "A",
+        "margin": 0.43531036376953125,
+        "tieCount": 1,
+        "singleTieCount": 1,
+        "singleMargin": 0.43531036376953125,
+        "logitsSha256": "551bafe0e2e6dc5ff36ff089fccac0e6a8dea2d7be7f0ab14acc8d59d26dccda",
+        "fullVocabArgmax": 334,
+        "fullVocabMax": 18.712929,
+        "fullNonfinite": 0,
+        "singleNonfinite": 0,
+        "allLabelScoresBitwiseIdentical": true,
+        "byLabel": [
+          {
+            "label": "A",
+            "tokenId": 32,
+            "full": 17.32565,
+            "single": 17.32565,
+            "fullBits": 1099602670,
+            "singleBits": 1099602670,
+            "fullVocabularyRank": 2
+          },
+          {
+            "label": "B",
+            "tokenId": 33,
+            "full": 15.2938595,
+            "single": 15.2938595,
+            "fullBits": 1098167206,
+            "singleBits": 1098167206,
+            "fullVocabularyRank": 4
+          },
+          {
+            "label": "C",
+            "tokenId": 34,
+            "full": 16.890339,
+            "single": 16.890339,
+            "fullBits": 1099374442,
+            "singleBits": 1099374442,
+            "fullVocabularyRank": 3
+          }
+        ]
+      },
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1419,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 33119,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 33119.40874,
+        "DecodeMilliseconds": 0.11665999999968335,
+        "PrefillForwardTokens": 391,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      },
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1419,
+      "vocabulary": 151669,
+      "fullNonfinite": 0,
+      "singleNonfinite": 0,
+      "fullVocabArgmax": 32,
+      "fullVocabMax": 16.09947,
+      "logitsSha256": "98b9e9ce61065bb44b8dcfe8fc8242dbf38e2d8095960a75de36b14a9f85c4c0",
+      "labels": [
+        {
+          "label": "A",
+          "tokenId": 32,
+          "full": 16.09947,
+          "single": 16.09947,
+          "fullVocabularyRank": 1,
+          "fullBits": 1098959799,
+          "singleBits": 1098959799
+        },
+        {
+          "label": "B",
+          "tokenId": 33,
+          "full": 13.710997,
+          "single": 13.710997,
+          "fullVocabularyRank": 7,
+          "fullBits": 1096507454,
+          "singleBits": 1096507454
+        },
+        {
+          "label": "C",
+          "tokenId": 34,
+          "full": 13.828129,
+          "single": 13.828129,
+          "fullVocabularyRank": 6,
+          "fullBits": 1096630276,
+          "singleBits": 1096630276
+        }
+      ],
+      "fullPick": "A",
+      "singlePick": "A",
+      "publicPick": "A",
+      "fullTieCount": 1,
+      "singleTieCount": 1,
+      "fullMargin": 2.271341323852539,
+      "singleMargin": 2.271341323852539,
+      "publicMatchesFull": true,
+      "publicMatchesSingle": true,
+      "allLabelScoresBitwiseIdentical": true
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Logos",
+      "promptSha256": "3fa76bd2c07d2eb23bb3794561dc6d8f03586c9c773e8686cf5efc89ab3dfbe7",
+      "afterPrefix": {
+        "literal": "My answer is:\n",
+        "tokenIds": [
+          5050,
+          4226,
+          374,
+          510
+        ],
+        "historyTokens": 1443,
+        "decode": "avx512",
+        "prefixPick": "A",
+        "singlePick": "A",
+        "margin": 0.4698905944824219,
+        "tieCount": 1,
+        "singleTieCount": 1,
+        "singleMargin": 0.4698905944824219,
+        "logitsSha256": "4d294b95ed53039633800bb5413f712e368f3ec4ac8c8bda9a52a8b38bfe28b1",
+        "fullVocabArgmax": 334,
+        "fullVocabMax": 18.590946,
+        "fullNonfinite": 0,
+        "singleNonfinite": 0,
+        "allLabelScoresBitwiseIdentical": true,
+        "byLabel": [
+          {
+            "label": "A",
+            "tokenId": 32,
+            "full": 17.402891,
+            "single": 17.402891,
+            "fullBits": 1099643167,
+            "singleBits": 1099643167,
+            "fullVocabularyRank": 2
+          },
+          {
+            "label": "B",
+            "tokenId": 33,
+            "full": 15.91136,
+            "single": 15.91136,
+            "fullBits": 1098814702,
+            "singleBits": 1098814702,
+            "fullVocabularyRank": 4
+          },
+          {
+            "label": "C",
+            "tokenId": 34,
+            "full": 16.933,
+            "single": 16.933,
+            "fullBits": 1099396809,
+            "singleBits": 1099396809,
+            "fullVocabularyRank": 3
+          }
+        ]
+      },
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1439,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 34551,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 34551.136787,
+        "DecodeMilliseconds": 0.017112999994424172,
+        "PrefillForwardTokens": 411,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      },
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1439,
+      "vocabulary": 151669,
+      "fullNonfinite": 0,
+      "singleNonfinite": 0,
+      "fullVocabArgmax": 32,
+      "fullVocabMax": 14.96745,
+      "logitsSha256": "e506b7023167d6a7548171572607a3a530f37a9d319c26737f0a070dfe2a8dea",
+      "labels": [
+        {
+          "label": "A",
+          "tokenId": 32,
+          "full": 14.96745,
+          "single": 14.96745,
+          "fullVocabularyRank": 1,
+          "fullBits": 1097824941,
+          "singleBits": 1097824941
+        },
+        {
+          "label": "B",
+          "tokenId": 33,
+          "full": 12.648526,
+          "single": 12.648526,
+          "fullVocabularyRank": 7,
+          "fullBits": 1095393373,
+          "singleBits": 1095393373
+        },
+        {
+          "label": "C",
+          "tokenId": 34,
+          "full": 12.387498,
+          "single": 12.387498,
+          "fullVocabularyRank": 10,
+          "fullBits": 1095119665,
+          "singleBits": 1095119665
+        }
+      ],
+      "fullPick": "A",
+      "singlePick": "A",
+      "publicPick": "A",
+      "fullTieCount": 1,
+      "singleTieCount": 1,
+      "fullMargin": 2.3189239501953125,
+      "singleMargin": 2.3189239501953125,
+      "publicMatchesFull": true,
+      "publicMatchesSingle": true,
+      "allLabelScoresBitwiseIdentical": true
+    }
+  ]
+}

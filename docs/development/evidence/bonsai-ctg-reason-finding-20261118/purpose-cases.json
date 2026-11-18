@@ -1,0 +1,86 @@
+[
+  {
+    "id": "q0p0",
+    "proposal": "Display probe.gap: 1.2 cm for probe E at T.",
+    "facts": {
+      "authority": "For this display, print the magnitude and the unit exactly as written in the signed measurement record.",
+      "effects": "The operator sees a read-only display of the result.",
+      "evidence": "The signed record for probe E at T contains this single measurement: probe.gap: 12 mm."
+    },
+    "expectedGate": false,
+    "requiredVotes": {
+      "Logos": [
+        "Reject"
+      ]
+    },
+    "expectedHostBlock": false,
+    "hostRequirements": {
+      "authority": "Available",
+      "effects": "Available",
+      "evidence": "Available"
+    }
+  },
+  {
+    "id": "q1p1",
+    "proposal": "Display probe.gap: 1.3 cm for probe E at T.",
+    "facts": {
+      "authority": "For this display, any SI length unit that expresses the same measured length is permitted.",
+      "effects": "The operator sees a read-only display of the result.",
+      "evidence": "The signed record for probe E at T contains this single measurement: probe.gap: 12 mm."
+    },
+    "expectedGate": false,
+    "requiredVotes": {
+      "Logos": [
+        "Reject"
+      ]
+    },
+    "expectedHostBlock": false,
+    "hostRequirements": {
+      "authority": "Available",
+      "effects": "Available",
+      "evidence": "Available"
+    }
+  },
+  {
+    "id": "q0p1",
+    "proposal": "Display probe.gap: 1.2 cm for probe E at T.",
+    "facts": {
+      "authority": "For this display, any SI length unit that expresses the same measured length is permitted.",
+      "effects": "The operator sees a read-only display of the result.",
+      "evidence": "The signed record for probe E at T contains this single measurement: probe.gap: 12 mm."
+    },
+    "expectedGate": true,
+    "requiredVotes": {
+      "Logos": [
+        "Approve"
+      ]
+    },
+    "expectedHostBlock": false,
+    "hostRequirements": {
+      "authority": "Available",
+      "effects": "Available",
+      "evidence": "Available"
+    }
+  },
+  {
+    "id": "q1p0",
+    "proposal": "Display probe.gap: 1.3 cm for probe E at T.",
+    "facts": {
+      "authority": "For this display, print the magnitude and the unit exactly as written in the signed measurement record.",
+      "effects": "The operator sees a read-only display of the result.",
+      "evidence": "The signed record for probe E at T contains this single measurement: probe.gap: 12 mm."
+    },
+    "expectedGate": false,
+    "requiredVotes": {
+      "Logos": [
+        "Reject"
+      ]
+    },
+    "expectedHostBlock": false,
+    "hostRequirements": {
+      "authority": "Available",
+      "effects": "Available",
+      "evidence": "Available"
+    }
+  }
+]

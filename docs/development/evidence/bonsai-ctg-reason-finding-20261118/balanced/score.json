@@ -1,0 +1,539 @@
+{
+  "diagnosticOnly": true,
+  "preregistrationSha256": "329c6800778fac23574e86c19239e5f0fce3c622beedcf25549808034a324f53",
+  "resultsSha256": "67c7b9607ac69b516d58e7fd19a5693c9cf1dc73b015d2ce1ca9bfd7b205d24c",
+  "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "cells": 6,
+  "measuredForwardCalls": 20,
+  "correct": 2,
+  "allAggregateSelectionsValid": true,
+  "wronglySupportedDefects": 2,
+  "correctPreviouslySupported": 2,
+  "advance": false,
+  "rows": [
+    {
+      "pair": 0,
+      "caseId": "ordered-holdout-status-invented",
+      "role": "Logos",
+      "expected": "proposal_defect",
+      "selected": "supported",
+      "correct": false,
+      "finite": true,
+      "gap": 0.04709180196126303,
+      "meanCenteredLogitsByFinding": {
+        "supported": 0.12816609276665622,
+        "proposal_defect": 0.08107429080539319,
+        "evaluation_unavailable": -0.20924038357204822
+      },
+      "previousArgmaxMatches": [
+        true,
+        true
+      ],
+      "rows": [
+        {
+          "rotation": 0,
+          "id": "run-01",
+          "values": [
+            15.983262062072754,
+            14.490636825561523,
+            14.410810470581055
+          ],
+          "canon": [
+            0,
+            1,
+            2
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "da15afc4e1bd5dffd7efa52f9ec0ad4525d21b1d22c1350c4017a05a1231f47a",
+          "priorSymbol": "A"
+        },
+        {
+          "rotation": 1,
+          "id": "run-02",
+          "values": [
+            15.194175720214844,
+            14.47506046295166,
+            14.412511825561523
+          ],
+          "canon": [
+            2,
+            0,
+            1
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "f83d2e5a91a7c1d1cf11c8c50bb2efd93a1a59362c2127b5c3ab3562031ee2f2",
+          "priorSymbol": "A"
+        },
+        {
+          "rotation": 2,
+          "id": "run-03",
+          "values": [
+            15.802556991577148,
+            14.229775428771973,
+            14.38865852355957
+          ],
+          "canon": [
+            1,
+            2,
+            0
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "632d23b06e0a14c02a01f12fec6c8b7e8d57869c2435f08184615952ad971964",
+          "priorSymbol": null
+        }
+      ]
+    },
+    {
+      "pair": 1,
+      "caseId": "ordered-holdout-dimension-wrong",
+      "role": "Logos",
+      "expected": "proposal_defect",
+      "selected": "supported",
+      "correct": false,
+      "finite": true,
+      "gap": 0.4328737258911133,
+      "meanCenteredLogitsByFinding": {
+        "supported": 0.34520318773057745,
+        "proposal_defect": -0.08767053816053583,
+        "evaluation_unavailable": -0.257532649570041
+      },
+      "previousArgmaxMatches": [
+        true,
+        true
+      ],
+      "rows": [
+        {
+          "rotation": 0,
+          "id": "run-04",
+          "values": [
+            15.94603157043457,
+            13.967195510864258,
+            13.56668472290039
+          ],
+          "canon": [
+            0,
+            1,
+            2
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "e6e64081a252bbdda87293fa753e4ea1f88f9c161963a1ff07330f7211501849",
+          "priorSymbol": "A"
+        },
+        {
+          "rotation": 1,
+          "id": "run-05",
+          "values": [
+            15.178140640258789,
+            14.43118667602539,
+            13.377367973327637
+          ],
+          "canon": [
+            2,
+            0,
+            1
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "a2c320345b3a60fb2ed3251c989fa3fd90173e9143c91a0c0f329ba0e805e4c0",
+          "priorSymbol": "A"
+        },
+        {
+          "rotation": 2,
+          "id": "run-06",
+          "values": [
+            15.89024543762207,
+            13.98039722442627,
+            14.156211853027344
+          ],
+          "canon": [
+            1,
+            2,
+            0
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "6de54167f23a6155f648f1c4c667618f81d02a492b6441be91e681a040d05546",
+          "priorSymbol": null
+        }
+      ]
+    },
+    {
+      "pair": 2,
+      "caseId": "ordered-holdout-status-invented",
+      "role": "Ethos",
+      "expected": "proposal_defect",
+      "selected": "safety_neutral",
+      "correct": false,
+      "finite": true,
+      "gap": 0.5954089164733887,
+      "meanCenteredLogitsByFinding": {
+        "supported": -0.11191362142562866,
+        "proposal_defect": -0.21220701932907104,
+        "evaluation_unavailable": -0.1593746542930603,
+        "safety_neutral": 0.48349529504776
+      },
+      "previousArgmaxMatches": [
+        true,
+        true
+      ],
+      "rows": [
+        {
+          "rotation": 0,
+          "id": "run-07",
+          "values": [
+            15.608688354492188,
+            13.042977333068848,
+            14.392589569091797,
+            15.571931838989258
+          ],
+          "canon": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "f0765f3b03d458c52037f28de3bf10189eb1dac061d3dcbe169fbe5cb4416235",
+          "priorSymbol": "A"
+        },
+        {
+          "rotation": 1,
+          "id": "run-08",
+          "values": [
+            15.129865646362305,
+            12.76753044128418,
+            13.849662780761719,
+            14.833036422729492
+          ],
+          "canon": [
+            3,
+            0,
+            1,
+            2
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "0b78282287538ccdca96f7b2d36ad1e91f0a2bec4d44cce8baa90d80ae36dd64",
+          "priorSymbol": "A"
+        },
+        {
+          "rotation": 2,
+          "id": "run-09",
+          "values": [
+            14.79801082611084,
+            14.57563591003418,
+            14.622369766235352,
+            15.120981216430664
+          ],
+          "canon": [
+            2,
+            3,
+            0,
+            1
+          ],
+          "maxima": [
+            "D"
+          ],
+          "promptSha256": "11c40123cfa2827cf0f82be795072eb2abdc7f441c708792d1f1ac8a8d480c32",
+          "priorSymbol": null
+        },
+        {
+          "rotation": 3,
+          "id": "run-10",
+          "values": [
+            15.551124572753906,
+            13.75243854522705,
+            15.070121765136719,
+            14.967330932617188
+          ],
+          "canon": [
+            1,
+            2,
+            3,
+            0
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "d75855b1b63a2d6fa93c16a6cb939323a5062b61e0082cc2cdfd6a128b7d6021",
+          "priorSymbol": null
+        }
+      ]
+    },
+    {
+      "pair": 3,
+      "caseId": "ordered-holdout-dimension-wrong",
+      "role": "Ethos",
+      "expected": "proposal_defect",
+      "selected": "safety_neutral",
+      "correct": false,
+      "finite": true,
+      "gap": 0.2252504825592041,
+      "meanCenteredLogitsByFinding": {
+        "supported": 0.44349414110183716,
+        "proposal_defect": -0.6676363348960876,
+        "evaluation_unavailable": -0.44460242986679077,
+        "safety_neutral": 0.6687446236610413
+      },
+      "previousArgmaxMatches": [
+        true,
+        true
+      ],
+      "rows": [
+        {
+          "rotation": 0,
+          "id": "run-11",
+          "values": [
+            15.170795440673828,
+            12.276464462280273,
+            13.018146514892578,
+            15.14952278137207
+          ],
+          "canon": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "72d7952ade8f6aeabdf0e72e6390278859118129fb9e5e8c2f13a416320ce60a",
+          "priorSymbol": "A"
+        },
+        {
+          "rotation": 1,
+          "id": "run-12",
+          "values": [
+            14.520960807800293,
+            12.92335319519043,
+            12.305431365966797,
+            13.890317916870117
+          ],
+          "canon": [
+            3,
+            0,
+            1,
+            2
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "3faa3057aaa5ff18f322b7e7282910f7b2c9d939e45539b20416aae8f80cd062",
+          "priorSymbol": "A"
+        },
+        {
+          "rotation": 2,
+          "id": "run-13",
+          "values": [
+            14.366922378540039,
+            14.198131561279297,
+            14.500913619995117,
+            13.604059219360352
+          ],
+          "canon": [
+            2,
+            3,
+            0,
+            1
+          ],
+          "maxima": [
+            "C"
+          ],
+          "promptSha256": "9076a48be43638e529f68c20eadf61e98249d032ee74d02251206433c20e6c76",
+          "priorSymbol": null
+        },
+        {
+          "rotation": 3,
+          "id": "run-14",
+          "values": [
+            14.845425605773926,
+            12.6481294631958,
+            14.508289337158203,
+            14.880840301513672
+          ],
+          "canon": [
+            1,
+            2,
+            3,
+            0
+          ],
+          "maxima": [
+            "D"
+          ],
+          "promptSha256": "4cb3075de334ec9de209da20c79e6cdd949e77f78a8bf7993394d8e35aa1860f",
+          "priorSymbol": null
+        }
+      ]
+    },
+    {
+      "pair": 4,
+      "caseId": "ordered-holdout-status-exact",
+      "role": "Logos",
+      "expected": "supported",
+      "selected": "supported",
+      "correct": true,
+      "finite": true,
+      "gap": 0.6021277109781902,
+      "meanCenteredLogitsByFinding": {
+        "supported": 0.42789830101860876,
+        "proposal_defect": -0.17422940995958136,
+        "evaluation_unavailable": -0.25366889105902796
+      },
+      "previousArgmaxMatches": [
+        true,
+        true
+      ],
+      "rows": [
+        {
+          "rotation": 0,
+          "id": "run-15",
+          "values": [
+            16.134984970092773,
+            14.002817153930664,
+            14.477113723754883
+          ],
+          "canon": [
+            0,
+            1,
+            2
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "7717126e71ccd5dd0ff48d9ef59887b314a8e87880ef91e9b3566dc60eaf74c2",
+          "priorSymbol": "A"
+        },
+        {
+          "rotation": 1,
+          "id": "run-16",
+          "values": [
+            15.405415534973145,
+            14.883016586303711,
+            14.32699203491211
+          ],
+          "canon": [
+            2,
+            0,
+            1
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "46b2163bedb78943e581552f7da825a959c9d77d85bc05a59201af9e1d4ca57d",
+          "priorSymbol": "A"
+        },
+        {
+          "rotation": 2,
+          "id": "run-17",
+          "values": [
+            15.747575759887695,
+            13.956537246704102,
+            14.865766525268555
+          ],
+          "canon": [
+            1,
+            2,
+            0
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "909054a9b81afd8e544eaf41ad215f2a4d3b0c407a967ab1c5f61904468ad0be",
+          "priorSymbol": null
+        }
+      ]
+    },
+    {
+      "pair": 5,
+      "caseId": "ordered-holdout-dimension-exact",
+      "role": "Logos",
+      "expected": "supported",
+      "selected": "supported",
+      "correct": true,
+      "finite": true,
+      "gap": 1.7886180877685547,
+      "meanCenteredLogitsByFinding": {
+        "supported": 1.2450451321072051,
+        "proposal_defect": -0.5435729556613497,
+        "evaluation_unavailable": -0.7014721764458548
+      },
+      "previousArgmaxMatches": [
+        true,
+        true
+      ],
+      "rows": [
+        {
+          "rotation": 0,
+          "id": "run-18",
+          "values": [
+            16.102825164794922,
+            12.815147399902344,
+            12.623558044433594
+          ],
+          "canon": [
+            0,
+            1,
+            2
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "d713cd2ec60fbbbb473b18b347f2a532a41574a679a2f859a6e1192eb3003526",
+          "priorSymbol": "A"
+        },
+        {
+          "rotation": 1,
+          "id": "run-19",
+          "values": [
+            15.143916130065918,
+            15.57541561126709,
+            12.792706489562988
+          ],
+          "canon": [
+            2,
+            0,
+            1
+          ],
+          "maxima": [
+            "B"
+          ],
+          "promptSha256": "012e6ddb14645bcff32cbc043b6c57a49744793efd7a0b258eeb040673c5bfe8",
+          "priorSymbol": "B"
+        },
+        {
+          "rotation": 2,
+          "id": "run-20",
+          "values": [
+            15.817848205566406,
+            13.184530258178711,
+            15.11331558227539
+          ],
+          "canon": [
+            1,
+            2,
+            0
+          ],
+          "maxima": [
+            "A"
+          ],
+          "promptSha256": "bccd960466252ecf8543735916a4d207701dacf8e73ab488b1dc56b573e3bf12",
+          "priorSymbol": null
+        }
+      ]
+    }
+  ]
+}

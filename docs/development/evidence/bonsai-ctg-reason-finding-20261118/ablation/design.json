@@ -1,0 +1,418 @@
+[
+  {
+    "id": "c01",
+    "arm": "no-reason-primary",
+    "pair": 0,
+    "caseId": "ordered-holdout-status-invented",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-status-invented-Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "a361c191bf5812f46a16a779040901464c16f172419e9627bd4b94680657a013",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c07",
+    "arm": "no-reason-cycle",
+    "pair": 0,
+    "caseId": "ordered-holdout-status-invented",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-status-invented-Logos",
+    "mapping": {
+      "A": "evaluation_unavailable",
+      "B": "supported",
+      "C": "proposal_defect"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "33ec50c976410c389dbf1ff062707fec691336f4fce763df679a41d1d2c20341",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c13",
+    "arm": "reason-primary",
+    "pair": 0,
+    "caseId": "ordered-holdout-status-invented",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-status-invented-Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "da15afc4e1bd5dffd7efa52f9ec0ad4525d21b1d22c1350c4017a05a1231f47a",
+    "priorReasonSha256": "ea3a908b1abacabe4186ef20f78e924aec74c58f88ded78a1b0bafc42867b338"
+  },
+  {
+    "id": "c19",
+    "arm": "reason-cycle",
+    "pair": 0,
+    "caseId": "ordered-holdout-status-invented",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-status-invented-Logos",
+    "mapping": {
+      "A": "evaluation_unavailable",
+      "B": "supported",
+      "C": "proposal_defect"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "f83d2e5a91a7c1d1cf11c8c50bb2efd93a1a59362c2127b5c3ab3562031ee2f2",
+    "priorReasonSha256": "ea3a908b1abacabe4186ef20f78e924aec74c58f88ded78a1b0bafc42867b338"
+  },
+  {
+    "id": "c02",
+    "arm": "no-reason-primary",
+    "pair": 1,
+    "caseId": "ordered-holdout-dimension-wrong",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-dimension-wrong-Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "3fa76bd2c07d2eb23bb3794561dc6d8f03586c9c773e8686cf5efc89ab3dfbe7",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c08",
+    "arm": "no-reason-cycle",
+    "pair": 1,
+    "caseId": "ordered-holdout-dimension-wrong",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-dimension-wrong-Logos",
+    "mapping": {
+      "A": "evaluation_unavailable",
+      "B": "supported",
+      "C": "proposal_defect"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "f2e871b1b618f5a6693159cb4519d8e4fe29800a4dc2ba26f4232b27acc632bd",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c14",
+    "arm": "reason-primary",
+    "pair": 1,
+    "caseId": "ordered-holdout-dimension-wrong",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-dimension-wrong-Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "e6e64081a252bbdda87293fa753e4ea1f88f9c161963a1ff07330f7211501849",
+    "priorReasonSha256": "bb0cab57debec464b68c371e04525c416599b1c42d9f409a9371d9789628bffe"
+  },
+  {
+    "id": "c20",
+    "arm": "reason-cycle",
+    "pair": 1,
+    "caseId": "ordered-holdout-dimension-wrong",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-dimension-wrong-Logos",
+    "mapping": {
+      "A": "evaluation_unavailable",
+      "B": "supported",
+      "C": "proposal_defect"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "a2c320345b3a60fb2ed3251c989fa3fd90173e9143c91a0c0f329ba0e805e4c0",
+    "priorReasonSha256": "bb0cab57debec464b68c371e04525c416599b1c42d9f409a9371d9789628bffe"
+  },
+  {
+    "id": "c03",
+    "arm": "no-reason-primary",
+    "pair": 2,
+    "caseId": "ordered-holdout-status-invented",
+    "role": "Ethos",
+    "sourceId": "ordered-holdout-status-invented-Ethos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable",
+      "D": "safety_neutral"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "a82bde420d989f8cd5de3a2ca391e5c37ebcab3b42cf9c4e3ea8c8c83eb3b910",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c09",
+    "arm": "no-reason-cycle",
+    "pair": 2,
+    "caseId": "ordered-holdout-status-invented",
+    "role": "Ethos",
+    "sourceId": "ordered-holdout-status-invented-Ethos",
+    "mapping": {
+      "A": "safety_neutral",
+      "B": "supported",
+      "C": "proposal_defect",
+      "D": "evaluation_unavailable"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "52a97be65f580341c61b6b260a9eabf1637d139579332ca59f72fd68bd15c554",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c15",
+    "arm": "reason-primary",
+    "pair": 2,
+    "caseId": "ordered-holdout-status-invented",
+    "role": "Ethos",
+    "sourceId": "ordered-holdout-status-invented-Ethos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable",
+      "D": "safety_neutral"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "f0765f3b03d458c52037f28de3bf10189eb1dac061d3dcbe169fbe5cb4416235",
+    "priorReasonSha256": "369ecefd5b23ac9deafd00c4c728044fcfd7065a19b9af21e478a9b808eb1083"
+  },
+  {
+    "id": "c21",
+    "arm": "reason-cycle",
+    "pair": 2,
+    "caseId": "ordered-holdout-status-invented",
+    "role": "Ethos",
+    "sourceId": "ordered-holdout-status-invented-Ethos",
+    "mapping": {
+      "A": "safety_neutral",
+      "B": "supported",
+      "C": "proposal_defect",
+      "D": "evaluation_unavailable"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "0b78282287538ccdca96f7b2d36ad1e91f0a2bec4d44cce8baa90d80ae36dd64",
+    "priorReasonSha256": "369ecefd5b23ac9deafd00c4c728044fcfd7065a19b9af21e478a9b808eb1083"
+  },
+  {
+    "id": "c04",
+    "arm": "no-reason-primary",
+    "pair": 3,
+    "caseId": "ordered-holdout-dimension-wrong",
+    "role": "Ethos",
+    "sourceId": "ordered-holdout-dimension-wrong-Ethos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable",
+      "D": "safety_neutral"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "18dff490623ea76c17580e5e37eec51913ab4d889010b7fdc73ce3cdcb377e87",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c10",
+    "arm": "no-reason-cycle",
+    "pair": 3,
+    "caseId": "ordered-holdout-dimension-wrong",
+    "role": "Ethos",
+    "sourceId": "ordered-holdout-dimension-wrong-Ethos",
+    "mapping": {
+      "A": "safety_neutral",
+      "B": "supported",
+      "C": "proposal_defect",
+      "D": "evaluation_unavailable"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "931786427952f97221ee210f75c1e903c112ff6e63f0d90ba4287fbf3ec57155",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c16",
+    "arm": "reason-primary",
+    "pair": 3,
+    "caseId": "ordered-holdout-dimension-wrong",
+    "role": "Ethos",
+    "sourceId": "ordered-holdout-dimension-wrong-Ethos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable",
+      "D": "safety_neutral"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "72d7952ade8f6aeabdf0e72e6390278859118129fb9e5e8c2f13a416320ce60a",
+    "priorReasonSha256": "2f6a2d578a374ae92b2d777b583dc86427691a78782d2614ec713a7989a5d1d9"
+  },
+  {
+    "id": "c22",
+    "arm": "reason-cycle",
+    "pair": 3,
+    "caseId": "ordered-holdout-dimension-wrong",
+    "role": "Ethos",
+    "sourceId": "ordered-holdout-dimension-wrong-Ethos",
+    "mapping": {
+      "A": "safety_neutral",
+      "B": "supported",
+      "C": "proposal_defect",
+      "D": "evaluation_unavailable"
+    },
+    "expected": "proposal_defect",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "3faa3057aaa5ff18f322b7e7282910f7b2c9d939e45539b20416aae8f80cd062",
+    "priorReasonSha256": "2f6a2d578a374ae92b2d777b583dc86427691a78782d2614ec713a7989a5d1d9"
+  },
+  {
+    "id": "c05",
+    "arm": "no-reason-primary",
+    "pair": 4,
+    "caseId": "ordered-holdout-status-exact",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-status-exact-Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "expected": "supported",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "fea36ebb950294d5c784d6cffd1b88806d084d25d13107ee5931099c0a4040f4",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c11",
+    "arm": "no-reason-cycle",
+    "pair": 4,
+    "caseId": "ordered-holdout-status-exact",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-status-exact-Logos",
+    "mapping": {
+      "A": "evaluation_unavailable",
+      "B": "supported",
+      "C": "proposal_defect"
+    },
+    "expected": "supported",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "6a3c369711b542eaf5e06b2731a5a9708d867db38c185d5be16c2e84a63b99ec",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c17",
+    "arm": "reason-primary",
+    "pair": 4,
+    "caseId": "ordered-holdout-status-exact",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-status-exact-Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "expected": "supported",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "7717126e71ccd5dd0ff48d9ef59887b314a8e87880ef91e9b3566dc60eaf74c2",
+    "priorReasonSha256": "7c83a04b319ae3a09f7ac6e26ab6c19ed242979cc73cfb53795e6d0d4880787d"
+  },
+  {
+    "id": "c23",
+    "arm": "reason-cycle",
+    "pair": 4,
+    "caseId": "ordered-holdout-status-exact",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-status-exact-Logos",
+    "mapping": {
+      "A": "evaluation_unavailable",
+      "B": "supported",
+      "C": "proposal_defect"
+    },
+    "expected": "supported",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "46b2163bedb78943e581552f7da825a959c9d77d85bc05a59201af9e1d4ca57d",
+    "priorReasonSha256": "7c83a04b319ae3a09f7ac6e26ab6c19ed242979cc73cfb53795e6d0d4880787d"
+  },
+  {
+    "id": "c06",
+    "arm": "no-reason-primary",
+    "pair": 5,
+    "caseId": "ordered-holdout-dimension-exact",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-dimension-exact-Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "expected": "supported",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "75061b3b83bf9d8e42df5e8e7233f07bb4d2943f087d5a6e68ab57821e039716",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c12",
+    "arm": "no-reason-cycle",
+    "pair": 5,
+    "caseId": "ordered-holdout-dimension-exact",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-dimension-exact-Logos",
+    "mapping": {
+      "A": "evaluation_unavailable",
+      "B": "supported",
+      "C": "proposal_defect"
+    },
+    "expected": "supported",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "8e14a18afe5c39466469f7cefc89f2eaa5de05c7d9600222e8a041f07e81e46e",
+    "priorReasonSha256": null
+  },
+  {
+    "id": "c18",
+    "arm": "reason-primary",
+    "pair": 5,
+    "caseId": "ordered-holdout-dimension-exact",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-dimension-exact-Logos",
+    "mapping": {
+      "A": "supported",
+      "B": "proposal_defect",
+      "C": "evaluation_unavailable"
+    },
+    "expected": "supported",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "d713cd2ec60fbbbb473b18b347f2a532a41574a679a2f859a6e1192eb3003526",
+    "priorReasonSha256": "d361a1f481cefc14d9ad85bbacdf191e17388040d1d1d06737e50d2e9e371701"
+  },
+  {
+    "id": "c24",
+    "arm": "reason-cycle",
+    "pair": 5,
+    "caseId": "ordered-holdout-dimension-exact",
+    "role": "Logos",
+    "sourceId": "ordered-holdout-dimension-exact-Logos",
+    "mapping": {
+      "A": "evaluation_unavailable",
+      "B": "supported",
+      "C": "proposal_defect"
+    },
+    "expected": "supported",
+    "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+    "promptSha256": "012e6ddb14645bcff32cbc043b6c57a49744793efd7a0b258eeb040673c5bfe8",
+    "priorReasonSha256": "d361a1f481cefc14d9ad85bbacdf191e17388040d1d1d06737e50d2e9e371701"
+  }
+]

@@ -1,0 +1,364 @@
+{
+  "replayOnly": true,
+  "newModelCalls": 0,
+  "formalVotes": 0,
+  "v28KernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+  "v29KernelSha256": "25e8a79ffc56fae14fb38a6572319926055a4b567cbdfd0bb141af9d0fd84cb0",
+  "casesSha256": "bf08fc0b1a19eb9c0b511af0829a28eb7d0c2508dfcb1665faa4bcd3e40a8836",
+  "rawSha256": "a510b8bc81f86e3865dd45bbf3165412600ba2ff769b1aeabe8a62b408510b77",
+  "resultsSha256": "c4613bc2c0a5df0630cb308b8f816f26143c1885f463928671aac388d4e4a4a9",
+  "verifierSha256": "a5daf626a5d87decfb86d7ac022f7acc21cfb25a267191bfb058061c6deeee24",
+  "fullyReproduced": 3,
+  "partial": [
+    "q0p1"
+  ],
+  "matchedStages": 27,
+  "matchedConstrainedSelections": 11,
+  "cases": [
+    {
+      "id": "q0p0",
+      "fullyReproduced": true,
+      "matchedStages": 7,
+      "archivedConstrainedSelections": {
+        "Logos": "proposal_defect",
+        "Ethos": "supported",
+        "Pathos": "proposal_defect"
+      },
+      "missingRole": null,
+      "missing256TokenResponsePromptSha256": null,
+      "verifiedGate": false,
+      "verifiedFinalVotes": {
+        "Logos": "Reject",
+        "Ethos": "Approve",
+        "Pathos": "Reject"
+      },
+      "stages": [
+        {
+          "stage": "reading",
+          "role": "none",
+          "archivedFinish": "stop",
+          "outputTokens": 40,
+          "promptSha256": "1cd1f5f154a1bd9b4a9f851dab9c5138d836c63222324771d1f6530bea4655cf",
+          "responseSha256": "eef6ed7720f89c700322b2cd40c58c31861d4bf80e135e7de3d6f152276a0fd3",
+          "v29Role": "reading",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "draft",
+          "role": "Logos",
+          "archivedFinish": "stop",
+          "outputTokens": 158,
+          "promptSha256": "ac7155b915819ade89ffc297c924af7a7588ba5351c2b4ae197a3dbdd89a6b2c",
+          "responseSha256": "b92b16698ec67915223279820f62ceb354a77043b7a234103dc4311a2e3398a5",
+          "v29Role": "draft",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "final",
+          "role": "Logos",
+          "archivedFinish": "classified",
+          "outputTokens": 1,
+          "promptSha256": "638c4f909ca47fe25aebb884461ea6676c2915e9a1a64cf25aeafe9bda6b4781",
+          "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "v29Role": "final",
+          "attachedOwnReasonSha256": "b92b16698ec67915223279820f62ceb354a77043b7a234103dc4311a2e3398a5"
+        },
+        {
+          "stage": "draft",
+          "role": "Ethos",
+          "archivedFinish": "stop",
+          "outputTokens": 101,
+          "promptSha256": "be0d7958081e4f8d69e52e9ac83928b574e787def227a8b5db4b5949496a1993",
+          "responseSha256": "751c283ec1c6c8257028fe3830c3515c10fb8642509257187d1ee131ed6367be",
+          "v29Role": "draft",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "final",
+          "role": "Ethos",
+          "archivedFinish": "classified",
+          "outputTokens": 1,
+          "promptSha256": "3b0f12be5555dd739f186fa539a53c74e9fc9ee27db543a4463f50cba15176ea",
+          "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+          "v29Role": "final",
+          "attachedOwnReasonSha256": "751c283ec1c6c8257028fe3830c3515c10fb8642509257187d1ee131ed6367be"
+        },
+        {
+          "stage": "draft",
+          "role": "Pathos",
+          "archivedFinish": "stop",
+          "outputTokens": 155,
+          "promptSha256": "95491e85dec75184c8cb77da7ed8034cedaf201732adc67610d37ac1f93e8407",
+          "responseSha256": "dba64dcfec61ac1db741146dd035a29d757385164a0559fd55c0ee1a5a66ae71",
+          "v29Role": "draft",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "final",
+          "role": "Pathos",
+          "archivedFinish": "classified",
+          "outputTokens": 1,
+          "promptSha256": "d51c94953140307345eb021e299444a81ad7b1b36363ae820f8f51c8b779cb8a",
+          "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "v29Role": "final",
+          "attachedOwnReasonSha256": "dba64dcfec61ac1db741146dd035a29d757385164a0559fd55c0ee1a5a66ae71"
+        }
+      ]
+    },
+    {
+      "id": "q1p1",
+      "fullyReproduced": true,
+      "matchedStages": 7,
+      "archivedConstrainedSelections": {
+        "Logos": "proposal_defect",
+        "Ethos": "proposal_defect",
+        "Pathos": "proposal_defect"
+      },
+      "missingRole": null,
+      "missing256TokenResponsePromptSha256": null,
+      "verifiedGate": false,
+      "verifiedFinalVotes": {
+        "Logos": "Reject",
+        "Ethos": "Reject",
+        "Pathos": "Reject"
+      },
+      "stages": [
+        {
+          "stage": "reading",
+          "role": "none",
+          "archivedFinish": "stop",
+          "outputTokens": 37,
+          "promptSha256": "b76cd81c657a620826f7b0214625db5114792712c0eea09ac433a74f0c5dbd3c",
+          "responseSha256": "f4c2ba7bd12a256f5b8f5665c76ee578e86015c74b8f584baa3e7efd94876f3f",
+          "v29Role": "reading",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "draft",
+          "role": "Logos",
+          "archivedFinish": "stop",
+          "outputTokens": 94,
+          "promptSha256": "5bc89f35a7621970581969da48dae43a3e0f3def739ea2cda8297147b15a825e",
+          "responseSha256": "9b4656ec57d04a4dc4f1f1513599ef8ea916a7a9776b07bf62a17fc213d27982",
+          "v29Role": "draft",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "final",
+          "role": "Logos",
+          "archivedFinish": "classified",
+          "outputTokens": 1,
+          "promptSha256": "d0b6c6cd0efd06d7a31beb63827cf3a076e5e72d1d4d23988c2151e6a21058b2",
+          "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "v29Role": "final",
+          "attachedOwnReasonSha256": "9b4656ec57d04a4dc4f1f1513599ef8ea916a7a9776b07bf62a17fc213d27982"
+        },
+        {
+          "stage": "draft",
+          "role": "Ethos",
+          "archivedFinish": "stop",
+          "outputTokens": 79,
+          "promptSha256": "cdc0ddfca453121ebd451db7ad164bb41f6df99fbb3e7861967262195e6a29a8",
+          "responseSha256": "367951aa33887870439652960026b6f21a3250b62b42b70a35814a8b83edc3ca",
+          "v29Role": "draft",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "final",
+          "role": "Ethos",
+          "archivedFinish": "classified",
+          "outputTokens": 1,
+          "promptSha256": "34ab47937e5e0a6302308194820905c92b4e3c995a13fe8307bd6af958be4dec",
+          "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "v29Role": "final",
+          "attachedOwnReasonSha256": "367951aa33887870439652960026b6f21a3250b62b42b70a35814a8b83edc3ca"
+        },
+        {
+          "stage": "draft",
+          "role": "Pathos",
+          "archivedFinish": "stop",
+          "outputTokens": 97,
+          "promptSha256": "f1bfd493a51a5e0ebeb90ca134d08ee1a92bd0a2a65c41ad34d815d0fac68203",
+          "responseSha256": "e4548f08c2e79e5a87f582938d3ecbfc035a4b180eb59297d249f8e9e4d3b537",
+          "v29Role": "draft",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "final",
+          "role": "Pathos",
+          "archivedFinish": "classified",
+          "outputTokens": 1,
+          "promptSha256": "31e7c9fbd7bf200f865409334de2057789b5997085b6e4e7a8d9d313a721d15f",
+          "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "v29Role": "final",
+          "attachedOwnReasonSha256": "e4548f08c2e79e5a87f582938d3ecbfc035a4b180eb59297d249f8e9e4d3b537"
+        }
+      ]
+    },
+    {
+      "id": "q0p1",
+      "fullyReproduced": false,
+      "matchedStages": 6,
+      "archivedConstrainedSelections": {
+        "Logos": "proposal_defect",
+        "Ethos": "proposal_defect"
+      },
+      "missingRole": "Pathos",
+      "missing256TokenResponsePromptSha256": "333e77bd11be0a1b27c6cfb6818bc3d2d692c350b4ea95aa6737c8e615c30481",
+      "verifiedGate": null,
+      "verifiedFinalVotes": null,
+      "stages": [
+        {
+          "stage": "reading",
+          "role": "none",
+          "archivedFinish": "stop",
+          "outputTokens": 37,
+          "promptSha256": "513806b3cc1519827e4e8dc9f13657a1845aa56b3222cd1cb8081b127d59d756",
+          "responseSha256": "ffed952fea90e5f8cece99186a6c51ca1da5d257674d3cd932ac17500318f721",
+          "v29Role": "reading",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "draft",
+          "role": "Logos",
+          "archivedFinish": "stop",
+          "outputTokens": 160,
+          "promptSha256": "29ed30fbd8df2dfa75b8a0e1a0b42f0e86a977401646792627da015665cc987b",
+          "responseSha256": "00df2ec55dcb6084429aced933a54c7e9eb320bf699c0180af9dfb6c3f4bbb14",
+          "v29Role": "draft",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "final",
+          "role": "Logos",
+          "archivedFinish": "classified",
+          "outputTokens": 1,
+          "promptSha256": "25b11a31f5f8c1c671f92bf96f244737c9f32abd2820360b675eafd9fd8c62ca",
+          "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "v29Role": "final",
+          "attachedOwnReasonSha256": "00df2ec55dcb6084429aced933a54c7e9eb320bf699c0180af9dfb6c3f4bbb14"
+        },
+        {
+          "stage": "draft",
+          "role": "Ethos",
+          "archivedFinish": "stop",
+          "outputTokens": 79,
+          "promptSha256": "9ae6013e45e027b342af1d6dcea16f43ce36c25862248a67d4332236e63fea70",
+          "responseSha256": "69b158865d071b9856206d6f058eb1cca4984739caaae6d93bfea359dfe96572",
+          "v29Role": "draft",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "final",
+          "role": "Ethos",
+          "archivedFinish": "classified",
+          "outputTokens": 1,
+          "promptSha256": "9204919dad915ee1287ff29eedb58bf3fe2a06317152c9604ca3057d7429178b",
+          "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "v29Role": "final",
+          "attachedOwnReasonSha256": "69b158865d071b9856206d6f058eb1cca4984739caaae6d93bfea359dfe96572"
+        },
+        {
+          "stage": "draft",
+          "role": "Pathos",
+          "archivedFinish": "length",
+          "outputTokens": 192,
+          "promptSha256": "333e77bd11be0a1b27c6cfb6818bc3d2d692c350b4ea95aa6737c8e615c30481",
+          "responseSha256": "8361d9b7899b092396cabe648e77640189da51386c2bc617b6d57e41ac31ff35",
+          "v29Role": "discarded-incomplete-initial",
+          "attachedOwnReasonSha256": null
+        }
+      ]
+    },
+    {
+      "id": "q1p0",
+      "fullyReproduced": true,
+      "matchedStages": 7,
+      "archivedConstrainedSelections": {
+        "Logos": "proposal_defect",
+        "Ethos": "proposal_defect",
+        "Pathos": "proposal_defect"
+      },
+      "missingRole": null,
+      "missing256TokenResponsePromptSha256": null,
+      "verifiedGate": false,
+      "verifiedFinalVotes": {
+        "Logos": "Reject",
+        "Ethos": "Reject",
+        "Pathos": "Reject"
+      },
+      "stages": [
+        {
+          "stage": "reading",
+          "role": "none",
+          "archivedFinish": "stop",
+          "outputTokens": 40,
+          "promptSha256": "b9389a1a85e1baf8d9a2bf33467a4519487a7176d373c451c49c4cfec5b4f7b0",
+          "responseSha256": "bbdd6feb7477f66d80742667baf996d1de620aab2e7ce5544d530e4fc85b80ad",
+          "v29Role": "reading",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "draft",
+          "role": "Logos",
+          "archivedFinish": "stop",
+          "outputTokens": 162,
+          "promptSha256": "26de0bb65d2f0c56804115b6cd5940a2923b477a4731e31e59a777ef068e7282",
+          "responseSha256": "1b0374e0a161cbf54dde60471d66a3b21a998dfca29678dd006077bf8c44c53f",
+          "v29Role": "draft",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "final",
+          "role": "Logos",
+          "archivedFinish": "classified",
+          "outputTokens": 1,
+          "promptSha256": "afc77d24ab96c927e9174670beac78e048f3b984c4a279ed2bbab6bfa07b8daa",
+          "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "v29Role": "final",
+          "attachedOwnReasonSha256": "1b0374e0a161cbf54dde60471d66a3b21a998dfca29678dd006077bf8c44c53f"
+        },
+        {
+          "stage": "draft",
+          "role": "Ethos",
+          "archivedFinish": "stop",
+          "outputTokens": 141,
+          "promptSha256": "13f5d74aa8b9082a7e1a2ae46d2ce5bea1173825f0b019df276757b7ddb2527e",
+          "responseSha256": "c8dbdcf71e43c8049a19c75c272dbbeb92ca6de0591f23cb47091d5d5642226a",
+          "v29Role": "draft",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "final",
+          "role": "Ethos",
+          "archivedFinish": "classified",
+          "outputTokens": 1,
+          "promptSha256": "812442a9e41ec5c217b191c52667ba8f8d9889d74a806326fb6029f92cd931ca",
+          "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "v29Role": "final",
+          "attachedOwnReasonSha256": "c8dbdcf71e43c8049a19c75c272dbbeb92ca6de0591f23cb47091d5d5642226a"
+        },
+        {
+          "stage": "draft",
+          "role": "Pathos",
+          "archivedFinish": "stop",
+          "outputTokens": 165,
+          "promptSha256": "1319cd44656f79017c53bf0fecec1d7ed899664ed52b5488527938020c6dcb8f",
+          "responseSha256": "fad0af2e37a78bb44a1f886563185f3ba9613255e12f5723a442daa26d44b3e5",
+          "v29Role": "draft",
+          "attachedOwnReasonSha256": null
+        },
+        {
+          "stage": "final",
+          "role": "Pathos",
+          "archivedFinish": "classified",
+          "outputTokens": 1,
+          "promptSha256": "487723d78cad493a82ebcf0cc06aa75538af207f1c96872fa0b21998daf01eb4",
+          "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+          "v29Role": "final",
+          "attachedOwnReasonSha256": "fad0af2e37a78bb44a1f886563185f3ba9613255e12f5723a442daa26d44b3e5"
+        }
+      ]
+    }
+  ]
+}

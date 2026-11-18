@@ -1,0 +1,130 @@
+[
+  {
+    "id": "k01",
+    "sourceId": "ordered-holdout-status-invented",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\pilot-cases.json",
+    "sourceSha256": "c81ae4caca6c20e140c861ac91ce86acebaa47eefac1a4f7692faf69531a3bd4",
+    "factsCanonicalSha256": "de67c83558fe8c4e6fe0c3ac1902257a7c13cd6fbb1c5884c4855815c113b3af",
+    "proposalSha256": "a655acf0ffb297d5bde29d3fa072214397bc3c50ecba3d715b954336be0bf905"
+  },
+  {
+    "id": "k02",
+    "sourceId": "independent-status-exact",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\independent-cases.json",
+    "sourceSha256": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+    "factsCanonicalSha256": "233386c7bff066293f6fac0f7e337d73a11ea0b62ffdf26e21b0237696b6f9e2",
+    "proposalSha256": "63eb54e26a0f6076b4b91605825cd9b6a8404376a35f04759b6b77ed10642ab8"
+  },
+  {
+    "id": "k03",
+    "sourceId": "q0p1",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\purpose-cases.json",
+    "sourceSha256": "bf08fc0b1a19eb9c0b511af0829a28eb7d0c2508dfcb1665faa4bcd3e40a8836",
+    "factsCanonicalSha256": "c9334eff688430414fe35cee85b8edbab46c824c8f41762e761c7e1f5d4f670e",
+    "proposalSha256": "ffad6778bd4e7d678e33ab449158e7c8c3ac1d4ca5243202c35f6c07c289aade"
+  },
+  {
+    "id": "k04",
+    "sourceId": "future-change",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\criterion\\controls.json",
+    "sourceSha256": "7f7d6b4d92c510c19f35cf03789fa187a83397e357bba17819578aed5809628f",
+    "factsCanonicalSha256": "01bdfb18a3484f447f59dcc981de3f2eb63f6ee332d38d2b966133fe27225bb4",
+    "proposalSha256": "9d4024732a5481cd45b401eb9baa63032db9ab93a257ead676a1aa364d12f368"
+  },
+  {
+    "id": "k05",
+    "sourceId": "ordered-holdout-dimension-wrong",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\paired-cases.json",
+    "sourceSha256": "a8d8429529e0b79fc1ab0599904043801a6b0db2e5318697f337690164f2d433",
+    "factsCanonicalSha256": "ee42f4802e6b858d26739bb700791b53a5a60d267dc5085126de04266bea743a",
+    "proposalSha256": "d38d28fc72c8bdb918326ffe607bd8c08d1804fccbfafb9dde9daa304bb99270"
+  },
+  {
+    "id": "k06",
+    "sourceId": "q1p0",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\purpose-cases.json",
+    "sourceSha256": "bf08fc0b1a19eb9c0b511af0829a28eb7d0c2508dfcb1665faa4bcd3e40a8836",
+    "factsCanonicalSha256": "a1e13c53227042820aca0558dcd905a745ce59ae697fad25664131e6bbb52f17",
+    "proposalSha256": "168a532d6cc947a50c9199d18b5addf79a11ea7fde913c319603842109401484"
+  },
+  {
+    "id": "k07",
+    "sourceId": "pair-contacts-count",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\paired-cases.json",
+    "sourceSha256": "a8d8429529e0b79fc1ab0599904043801a6b0db2e5318697f337690164f2d433",
+    "factsCanonicalSha256": "efa9f210c9264912d282faa81f1276a94ffc8606d853995690557a86ad1357e7",
+    "proposalSha256": "182b008630b3391b50ae21874953c9c022334d546021cd49c2a6494b4cd81e4d"
+  },
+  {
+    "id": "k08",
+    "sourceId": "independent-length-exact",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\independent-cases.json",
+    "sourceSha256": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+    "factsCanonicalSha256": "4a2623394ad3da856a6f15e925206c6bc9bb7d903e43b3b7002b0d63fcf336b7",
+    "proposalSha256": "22c5f158d199049324c5626db817e739f149dbca0732a5463803fdfb070a4006"
+  },
+  {
+    "id": "k09",
+    "sourceId": "negated-report",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\criterion\\controls.json",
+    "sourceSha256": "7f7d6b4d92c510c19f35cf03789fa187a83397e357bba17819578aed5809628f",
+    "factsCanonicalSha256": "2ee282dec0645f5f0485237b98e04e9f387218330fc32732a4631ae22e967dac",
+    "proposalSha256": "5b02e44805523ce8dffc95bcca07b61edf0bd6727d529401ce83a288f72044f5"
+  },
+  {
+    "id": "k10",
+    "sourceId": "independent-status-changed",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\independent-cases.json",
+    "sourceSha256": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+    "factsCanonicalSha256": "233386c7bff066293f6fac0f7e337d73a11ea0b62ffdf26e21b0237696b6f9e2",
+    "proposalSha256": "11f4709b7be9848489bfc8744b82580431fe66627b63d40aae8e8995d9ce715c"
+  },
+  {
+    "id": "k11",
+    "sourceId": "q0p0",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\purpose-cases.json",
+    "sourceSha256": "bf08fc0b1a19eb9c0b511af0829a28eb7d0c2508dfcb1665faa4bcd3e40a8836",
+    "factsCanonicalSha256": "a1e13c53227042820aca0558dcd905a745ce59ae697fad25664131e6bbb52f17",
+    "proposalSha256": "ffad6778bd4e7d678e33ab449158e7c8c3ac1d4ca5243202c35f6c07c289aade"
+  },
+  {
+    "id": "k12",
+    "sourceId": "ordered-holdout-status-exact",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\paired-cases.json",
+    "sourceSha256": "a8d8429529e0b79fc1ab0599904043801a6b0db2e5318697f337690164f2d433",
+    "factsCanonicalSha256": "de67c83558fe8c4e6fe0c3ac1902257a7c13cd6fbb1c5884c4855815c113b3af",
+    "proposalSha256": "70e4326026438a2f732ad48d3bef3d5159990142d730936d1578644752eeddcc"
+  },
+  {
+    "id": "k13",
+    "sourceId": "different-subject-time",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\criterion\\controls.json",
+    "sourceSha256": "7f7d6b4d92c510c19f35cf03789fa187a83397e357bba17819578aed5809628f",
+    "factsCanonicalSha256": "95f3258ae975c1b48ae2fd106cda063ab1ab7247546eb76360bf2210292f0db9",
+    "proposalSha256": "64a5965c7ac91cfa4e1562aacfae258b78553f9252266c9ef5c3458bb10526e9"
+  },
+  {
+    "id": "k14",
+    "sourceId": "q1p1",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\purpose-cases.json",
+    "sourceSha256": "bf08fc0b1a19eb9c0b511af0829a28eb7d0c2508dfcb1665faa4bcd3e40a8836",
+    "factsCanonicalSha256": "c9334eff688430414fe35cee85b8edbab46c824c8f41762e761c7e1f5d4f670e",
+    "proposalSha256": "168a532d6cc947a50c9199d18b5addf79a11ea7fde913c319603842109401484"
+  },
+  {
+    "id": "k15",
+    "sourceId": "independent-length-changed",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\independent-cases.json",
+    "sourceSha256": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+    "factsCanonicalSha256": "4a2623394ad3da856a6f15e925206c6bc9bb7d903e43b3b7002b0d63fcf336b7",
+    "proposalSha256": "1e1b2e128acfe4b5c67cfeb4c0c9dac975ac63aaa599d648e97cd97636cddd4c"
+  },
+  {
+    "id": "k16",
+    "sourceId": "ordered-holdout-dimension-exact",
+    "sourcefile": "D:\\AIKernel\\.website-audit\\ctg-reason-finding-20261118\\server\\paired-cases.json",
+    "sourceSha256": "a8d8429529e0b79fc1ab0599904043801a6b0db2e5318697f337690164f2d433",
+    "factsCanonicalSha256": "ee42f4802e6b858d26739bb700791b53a5a60d267dc5085126de04266bea743a",
+    "proposalSha256": "22914c43719705d243cd48168b55c4c7dd9a4f93420c69f73185e4ae2aa4d4df"
+  }
+]

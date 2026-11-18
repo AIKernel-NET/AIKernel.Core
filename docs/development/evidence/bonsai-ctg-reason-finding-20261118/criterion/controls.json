@@ -1,0 +1,26 @@
+{
+  "negated-report": {
+    "proposal": "Report that the signal was not red at 14:20.",
+    "facts": {
+      "evidence": "The signed control log records a single observable aspect for signal S at 14:20. That aspect was green. A signal can display only one aspect at a time.",
+      "authority": "The dispatcher requested that the display answer whether the signal was red at that time.",
+      "effects": "A local text reply."
+    }
+  },
+  "different-subject-time": {
+    "proposal": "Report the observed temperature of chamber B at 14:25 as 21 degrees Celsius.",
+    "facts": {
+      "evidence": "The signed log has one entry: chamber A at 14:20, 24 degrees Celsius. No observation of chamber B is available.",
+      "authority": "The local operator asked what was measured in chamber B at 14:25.",
+      "effects": "A local text response only."
+    }
+  },
+  "future-change": {
+    "proposal": "At 14:25, switch pump P-2 from standby to flushing.",
+    "facts": {
+      "evidence": "A signed reading for P-2 at 14:20 records pump_mode=standby.",
+      "authority": "The operator requested and authorized switching P-2 to flushing at 14:25.",
+      "effects": "The future machine setting will change when the command is executed."
+    }
+  }
+}

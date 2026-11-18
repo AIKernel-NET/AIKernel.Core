@@ -1,0 +1,98 @@
+[
+  {
+    "id": "k01",
+    "sourceId": "ordered-holdout-status-invented",
+    "source": "pilot",
+    "expected": "Bad"
+  },
+  {
+    "id": "k02",
+    "sourceId": "independent-status-exact",
+    "source": "independent",
+    "expected": "Good"
+  },
+  {
+    "id": "k03",
+    "sourceId": "q0p1",
+    "source": "purpose",
+    "expected": "Good"
+  },
+  {
+    "id": "k04",
+    "sourceId": "future-change",
+    "source": "controls",
+    "expected": "Other"
+  },
+  {
+    "id": "k05",
+    "sourceId": "ordered-holdout-dimension-wrong",
+    "source": "paired",
+    "expected": "Bad"
+  },
+  {
+    "id": "k06",
+    "sourceId": "q1p0",
+    "source": "purpose",
+    "expected": "Bad"
+  },
+  {
+    "id": "k07",
+    "sourceId": "pair-contacts-count",
+    "source": "paired",
+    "expected": "Good"
+  },
+  {
+    "id": "k08",
+    "sourceId": "independent-length-exact",
+    "source": "independent",
+    "expected": "Good"
+  },
+  {
+    "id": "k09",
+    "sourceId": "negated-report",
+    "source": "controls",
+    "expected": "Good"
+  },
+  {
+    "id": "k10",
+    "sourceId": "independent-status-changed",
+    "source": "independent",
+    "expected": "Bad"
+  },
+  {
+    "id": "k11",
+    "sourceId": "q0p0",
+    "source": "purpose",
+    "expected": "Bad"
+  },
+  {
+    "id": "k12",
+    "sourceId": "ordered-holdout-status-exact",
+    "source": "paired",
+    "expected": "Good"
+  },
+  {
+    "id": "k13",
+    "sourceId": "different-subject-time",
+    "source": "controls",
+    "expected": "Other"
+  },
+  {
+    "id": "k14",
+    "sourceId": "q1p1",
+    "source": "purpose",
+    "expected": "Bad"
+  },
+  {
+    "id": "k15",
+    "sourceId": "independent-length-changed",
+    "source": "independent",
+    "expected": "Bad"
+  },
+  {
+    "id": "k16",
+    "sourceId": "ordered-holdout-dimension-exact",
+    "source": "paired",
+    "expected": "Good"
+  }
+]

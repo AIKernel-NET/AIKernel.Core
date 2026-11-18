@@ -1,0 +1,38 @@
+{
+  "diagnosticOnly": true,
+  "aspNetHarnessSha256": "973bc807406cc346d5c3ec473151b5bd9eaed4898f1aae6fccb34937d6f47932",
+  "inputSha256": "680b48d1a8128b54d58fbe8facdaa6425c665179cf687de20a3455f602d99f7a",
+  "outputSha256": "fef7f492843f44b5f65b7cac76adf84d952db2c6f0e4fe6e2b8afcfc2dc6ffde",
+  "checks": [
+    {
+      "id": "ordered-holdout-status-invented-Logos",
+      "winningFinding": "supported",
+      "exactFP64MeanEquality": true
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Logos",
+      "winningFinding": "supported",
+      "exactFP64MeanEquality": true
+    },
+    {
+      "id": "ordered-holdout-status-invented-Ethos",
+      "winningFinding": "safety_neutral",
+      "exactFP64MeanEquality": true
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Ethos",
+      "winningFinding": "safety_neutral",
+      "exactFP64MeanEquality": true
+    },
+    {
+      "id": "ordered-holdout-status-exact-Logos",
+      "winningFinding": "supported",
+      "exactFP64MeanEquality": true
+    },
+    {
+      "id": "ordered-holdout-dimension-exact-Logos",
+      "winningFinding": "supported",
+      "exactFP64MeanEquality": true
+    }
+  ]
+}

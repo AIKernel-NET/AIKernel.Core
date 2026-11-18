@@ -1,0 +1,76 @@
+[
+  {
+    "pair": 0,
+    "caseId": "ordered-holdout-status-invented",
+    "role": "Logos",
+    "expected": "proposal_defect",
+    "findings": [
+      "supported",
+      "proposal_defect",
+      "evaluation_unavailable"
+    ],
+    "sourceReasonSha256": "ea3a908b1abacabe4186ef20f78e924aec74c58f88ded78a1b0bafc42867b338"
+  },
+  {
+    "pair": 1,
+    "caseId": "ordered-holdout-dimension-wrong",
+    "role": "Logos",
+    "expected": "proposal_defect",
+    "findings": [
+      "supported",
+      "proposal_defect",
+      "evaluation_unavailable"
+    ],
+    "sourceReasonSha256": "bb0cab57debec464b68c371e04525c416599b1c42d9f409a9371d9789628bffe"
+  },
+  {
+    "pair": 2,
+    "caseId": "ordered-holdout-status-invented",
+    "role": "Ethos",
+    "expected": "proposal_defect",
+    "findings": [
+      "supported",
+      "proposal_defect",
+      "evaluation_unavailable",
+      "safety_neutral"
+    ],
+    "sourceReasonSha256": "369ecefd5b23ac9deafd00c4c728044fcfd7065a19b9af21e478a9b808eb1083"
+  },
+  {
+    "pair": 3,
+    "caseId": "ordered-holdout-dimension-wrong",
+    "role": "Ethos",
+    "expected": "proposal_defect",
+    "findings": [
+      "supported",
+      "proposal_defect",
+      "evaluation_unavailable",
+      "safety_neutral"
+    ],
+    "sourceReasonSha256": "2f6a2d578a374ae92b2d777b583dc86427691a78782d2614ec713a7989a5d1d9"
+  },
+  {
+    "pair": 4,
+    "caseId": "ordered-holdout-status-exact",
+    "role": "Logos",
+    "expected": "supported",
+    "findings": [
+      "supported",
+      "proposal_defect",
+      "evaluation_unavailable"
+    ],
+    "sourceReasonSha256": "7c83a04b319ae3a09f7ac6e26ab6c19ed242979cc73cfb53795e6d0d4880787d"
+  },
+  {
+    "pair": 5,
+    "caseId": "ordered-holdout-dimension-exact",
+    "role": "Logos",
+    "expected": "supported",
+    "findings": [
+      "supported",
+      "proposal_defect",
+      "evaluation_unavailable"
+    ],
+    "sourceReasonSha256": "d361a1f481cefc14d9ad85bbacdf191e17388040d1d1d06737e50d2e9e371701"
+  }
+]

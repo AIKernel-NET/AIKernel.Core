@@ -1,0 +1,29 @@
+{
+  "diagnosticOnly": true,
+  "formalVotes": 0,
+  "resultSha256": "79a88176297e0fa045187b412fc9fd7a141e5e71bdda2b84bd7517f50a6cd448",
+  "preregistrationSha256": "802f2fc17ea0ae95f8bad47681d2cb0b57789e81dadd8de907010086ea127ce5",
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+  "calls": 2,
+  "elapsedSeconds": 207.4834183,
+  "attempts": [
+    {
+      "variant": "original-256",
+      "finish": "stop",
+      "outputTokens": 196,
+      "characters": 770,
+      "prefixMatches": true,
+      "validReason": true,
+      "validChoice": true,
+      "selected": "supported",
+      "wordCount": 99,
+      "expectedSelected": true,
+      "failure": null,
+      "reasonPromptSha256": "8380df52e1610965b71f011a7b7c31ccb6eb4c1d8c26f04449f5ddbda88f3860",
+      "reasonResponseSha256": "fcd7aae4f047ae55fe0775977987037d254b88e37f63f5e3f7d158bcad7b870c",
+      "choicePromptSha256": "5f4ba52a589b4b9433d8be3779e7f1e9a6e0073c23048e361624566f280320bc",
+      "choiceResponseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e"
+    }
+  ]
+}

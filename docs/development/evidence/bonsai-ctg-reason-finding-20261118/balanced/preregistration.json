@@ -1,0 +1,31 @@
+{
+  "diagnosticOnly": true,
+  "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "parent": {
+    "choice/primary-cases.json": "ce3c173f10eb7897ab0ef4ec8b44e656dc47465abff394b05ee30c64153db58c",
+    "choice/primary-result.json": "9540a8daaf4dd50fd7f1b0b505a002ffd7be290e730b7a7b9c64672d823bc5d0",
+    "choice/primary-mapping.json": "c8ca724e9fb526510d612f2a0c592b86fd2a21a76e7d0164b5d5b7fae42d33c3",
+    "choice/expectations.json": "28560249e635068f0a69dd2398048e3374ce7a5b7441143ea41160df15231a21",
+    "v25/observed-votes.json": "6eefc9fa4d691b3aec18112c55649a31f559ae93fe8776570fd61c535bcfd876",
+    "v26/observed-votes.json": "2d8df1b8f9341f53222dd7a7bd52baf975f4b990380c56dc56b6d4674720de5d"
+  },
+  "ablationPreregistrationSha256": "df34c65d987d2a0fae748f7040e5cc655ec9e6356e33f9a682d3098d31ff91a7",
+  "files": {
+    "Balanced.cs": "306cb928d9144248b5eca2fd7cddf5617f7f7f91856a431caabdc037d22194d6",
+    "Balanced.csproj": "a59edcbfa58e48883747040b3dcfe23cfe9155eb74dfc4bc79fafa3199666a28",
+    "build.py": "0745f4e0bfe6f63c2432ac29ecc8917626b09da08ed8eace09144e84fd35b74b",
+    "score.py": "182a7e832fa94fe1cb0744c6a1ae1de2472707da2c5a83cc3639f20835ecb10d",
+    "balanced-cases.json": "e802fb5c859a35f4ea76d56d36253627bd1e2f790996a14712617a42427d2e85",
+    "design.json": "2c13b46a6706d842fe97e99291352fc9797b56e3eab38506d8ef0f71c746cea6",
+    "key.json": "a56c098be8e985f78c36541cace4bd7bc76a2957dba39ad82698fd6c8e3dcd1b",
+    "app/AIKernel.Core.Tests.dll": "ef4343ddea0c9dd4aac2f2211388e909c0d4ecd9c9ed6fd268c7c1a19eadcfb2",
+    "app/AIKernel.Kernel.dll": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492"
+  },
+  "cells": 6,
+  "forwardCalls": 20,
+  "evaluator": "Bonsai 1.7B, fp32 auto, cold/reused clean request workspace, sorted CPU options and ROM equal across rotations; no manufacturing of missing votes.",
+  "intervention": "Use prior nonbinding reason, original text and calculations, role and canonical instruction block. Only permute symbol-to-finding mapping. For every cell (3 or 4 options) offset k in 0..N-1 maps symbol i to finding ((i-k) mod N). Each finding appears at each ordinal slot exactly once.",
+  "scoring": "Each forward computes raw FP32 logits over only the one-token choices at the unchanged first answer position. Subtract the mean over symbol scores in each rotation using FP64. Map centered logits back to semantic findings. Arithmetic mean over the N rotations per finding. Select unique greatest value. Nonfinite or exact aggregate tie invalidates the cell. Archive per-rotation ties separately. No threshold, abstention rule, recovery from reasoning text, winner-takes-all voting, or case-dependent routing.",
+  "admission": "All 6 expected findings including each of 4 defect cells and both protected supported cells must match with valid output; compare 12 duplicated prompt hashes' raw argmax to prior classified selections. Stop development of this candidate on failure; even all pass is only diagnostic and requires full council admission.",
+  "blinding": "Runtime inputs omit expectation, prior votes, ground truth, and per-cell indices. Role and ROM available to validate the exact source. Scoring and C# comparison operate after actual inference."
+}

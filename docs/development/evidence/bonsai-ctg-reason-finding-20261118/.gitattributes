@@ -1,0 +1,4 @@
+* -text whitespace=cr-at-eol
+# Keep the exact preregistered source bytes, including trailing empty lines.
+*.cs whitespace=cr-at-eol,-blank-at-eof
+*.py whitespace=cr-at-eol,-blank-at-eof

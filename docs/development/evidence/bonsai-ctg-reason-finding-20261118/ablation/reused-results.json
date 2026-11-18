@@ -1,0 +1,44 @@
+[
+  {
+    "pair": 0,
+    "sourceId": "ordered-holdout-status-invented-Logos",
+    "promptSha256": "a361c191bf5812f46a16a779040901464c16f172419e9627bd4b94680657a013",
+    "symbol": "A",
+    "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+  },
+  {
+    "pair": 1,
+    "sourceId": "ordered-holdout-dimension-wrong-Logos",
+    "promptSha256": "3fa76bd2c07d2eb23bb3794561dc6d8f03586c9c773e8686cf5efc89ab3dfbe7",
+    "symbol": "A",
+    "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+  },
+  {
+    "pair": 2,
+    "sourceId": "ordered-holdout-status-invented-Ethos",
+    "promptSha256": "a82bde420d989f8cd5de3a2ca391e5c37ebcab3b42cf9c4e3ea8c8c83eb3b910",
+    "symbol": "A",
+    "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+  },
+  {
+    "pair": 3,
+    "sourceId": "ordered-holdout-dimension-wrong-Ethos",
+    "promptSha256": "18dff490623ea76c17580e5e37eec51913ab4d889010b7fdc73ce3cdcb377e87",
+    "symbol": "A",
+    "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+  },
+  {
+    "pair": 4,
+    "sourceId": "ordered-holdout-status-exact-Logos",
+    "promptSha256": "fea36ebb950294d5c784d6cffd1b88806d084d25d13107ee5931099c0a4040f4",
+    "symbol": "A",
+    "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+  },
+  {
+    "pair": 5,
+    "sourceId": "ordered-holdout-dimension-exact-Logos",
+    "promptSha256": "75061b3b83bf9d8e42df5e8e7233f07bb4d2943f087d5a6e68ab57821e039716",
+    "symbol": "A",
+    "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+  }
+]

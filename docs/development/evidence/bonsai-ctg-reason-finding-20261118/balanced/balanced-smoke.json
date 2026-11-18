@@ -1,0 +1,18 @@
+{
+  "diagnosticOnly": true,
+  "passed": [
+    "recovers underlying finding with fixed symbol bias n=3",
+    "invariant to evaluation order n=3",
+    "exact tie remains undecided n=3",
+    "recovers underlying finding with fixed symbol bias n=4",
+    "invariant to evaluation order n=4",
+    "exact tie remains undecided n=4",
+    "rejects a duplicate shift",
+    "rejects a noncyclic shift",
+    "rejects incomplete rotations",
+    "rejects nonfinite input",
+    "rejects invalid finding",
+    "rejects duplicate case id"
+  ],
+  "harnessSha256": "973bc807406cc346d5c3ec473151b5bd9eaed4898f1aae6fccb34937d6f47932"
+}

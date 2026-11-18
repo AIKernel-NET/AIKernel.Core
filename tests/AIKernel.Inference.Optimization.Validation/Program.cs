@@ -5,6 +5,7 @@ if(args.Length==5&&args[0]=="--bonsai-ctg-reading-matrix"){await BonsaiCtgReadin
 if(args.Length==6&&args[0]=="--bonsai-ctg-prepare-definitions"){await BonsaiCtgDefinitionDiagnostics.Prepare(args[1],args[2],args[3],args[4],args[5]);return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-canonical-matrix"){await BonsaiCtgReadingMatrix.Run(args[1],args[2],args[3],args[4],true);return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-anchored-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.AnchoredReadingVotes)?0:1;return;}
+if(args.Length==5&&args[0]=="--bonsai-ctg-routed-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.RoutedReadingVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-vote-first-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.VoteFirstReadingVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-effects-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ActionEffectReadingVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-defined-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.DefinedReadingVotes)?0:1;return;}

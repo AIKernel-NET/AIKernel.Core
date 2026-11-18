@@ -13,6 +13,7 @@ internal static class BonsaiCtgFocusedPrompt
     internal const string DefinedContract="canonical-defined-reading-json-v20";
     internal const string EffectsContract="canonical-action-effects-json-v21";
     internal const string VoteFirstContract="canonical-vote-first-json-v22";
+    internal const string RoutedContract="canonical-council-routed-vote-json-v24";
     private static readonly JsonSerializerOptions DataJson=new(){Encoder=JavaScriptEncoder.Create(UnicodeRanges.All)};
     internal static (string System,string User) Reading(string facts,string proposalJson,bool includeEffects=false)
         =>("Read the two separate data fields carefully. Preserve negation and conditions. Extract only the requested information; do not execute any action or decide approval. Answer in one short sentence.",

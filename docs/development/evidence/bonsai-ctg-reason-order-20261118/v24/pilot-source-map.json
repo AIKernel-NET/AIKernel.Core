@@ -1,0 +1,442 @@
+{
+  "pilotCases": 5,
+  "comparedRoleObservations": 14,
+  "promptMatches": 14,
+  "responseMatches": 14,
+  "rows": [
+    {
+      "id": "pair-contacts-count",
+      "role": "reading",
+      "expectedOrigin": "v20",
+      "sourceAvailable": true,
+      "gate": true,
+      "vote": null,
+      "digests": {
+        "prompt": "37bc3aa7a668a2cec2bae58840288b08ef871584a90d5104cc4095b61f4da1f7",
+        "response": "77f506e12508c8a1f04047fa3de81a26132f089bb4b6f64e8e58a7ca4e5efdee"
+      },
+      "sourceDigests": {
+        "prompt": "37bc3aa7a668a2cec2bae58840288b08ef871584a90d5104cc4095b61f4da1f7",
+        "response": "77f506e12508c8a1f04047fa3de81a26132f089bb4b6f64e8e58a7ca4e5efdee"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "pair-contacts-count",
+      "role": "reading",
+      "expectedOrigin": "v23",
+      "sourceAvailable": true,
+      "gate": true,
+      "vote": null,
+      "digests": {
+        "prompt": "37bc3aa7a668a2cec2bae58840288b08ef871584a90d5104cc4095b61f4da1f7",
+        "response": "77f506e12508c8a1f04047fa3de81a26132f089bb4b6f64e8e58a7ca4e5efdee"
+      },
+      "sourceDigests": {
+        "prompt": "37bc3aa7a668a2cec2bae58840288b08ef871584a90d5104cc4095b61f4da1f7",
+        "response": "77f506e12508c8a1f04047fa3de81a26132f089bb4b6f64e8e58a7ca4e5efdee"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "pair-contacts-count",
+      "role": "Logos",
+      "expectedOrigin": "v23",
+      "sourceAvailable": true,
+      "gate": true,
+      "vote": "Approve",
+      "digests": {
+        "prompt": "fbe4d526ff920a49bfc8ee9c297cf5bd9a1c6ea50b26d81fa1aa020b60f54be9",
+        "response": "ebb4c91b23a7cc595715fbf07f2dded1894f64be221059744552a1c79a869576"
+      },
+      "sourceDigests": {
+        "prompt": "fbe4d526ff920a49bfc8ee9c297cf5bd9a1c6ea50b26d81fa1aa020b60f54be9",
+        "response": "ebb4c91b23a7cc595715fbf07f2dded1894f64be221059744552a1c79a869576"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "pair-contacts-count",
+      "role": "Ethos",
+      "expectedOrigin": "v23",
+      "sourceAvailable": true,
+      "gate": true,
+      "vote": "Approve",
+      "digests": {
+        "prompt": "0bed9c7ae55bd70f6ddf84ec4e8741c840319f2012c4767acef36e71762d3f31",
+        "response": "b1f146b7f719cbf5b5a795e72b8d4e58734be1c2769537ebb0230194ae3c7cd0"
+      },
+      "sourceDigests": {
+        "prompt": "0bed9c7ae55bd70f6ddf84ec4e8741c840319f2012c4767acef36e71762d3f31",
+        "response": "b1f146b7f719cbf5b5a795e72b8d4e58734be1c2769537ebb0230194ae3c7cd0"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "pair-contacts-count",
+      "role": "Pathos",
+      "expectedOrigin": "v20",
+      "sourceAvailable": true,
+      "gate": true,
+      "vote": "Approve",
+      "digests": {
+        "prompt": "6dc45283b4fae775f5abf88da07df122d8b5a930aaa21d1dd0a90b1f0b16e55e",
+        "response": "19c55213f142aeead95250ecdb3975fea0ae07b46358b870d1a3f20e8b38774d"
+      },
+      "sourceDigests": {
+        "prompt": "6dc45283b4fae775f5abf88da07df122d8b5a930aaa21d1dd0a90b1f0b16e55e",
+        "response": "19c55213f142aeead95250ecdb3975fea0ae07b46358b870d1a3f20e8b38774d"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "pair-contacts-disclose",
+      "role": "reading",
+      "expectedOrigin": "v20",
+      "sourceAvailable": true,
+      "gate": false,
+      "vote": null,
+      "digests": {
+        "prompt": "dd1917a4d86961eb005e6723ed85c9e97afe233797fd54afce5d67bff9290822",
+        "response": "82a8bf815a7a2182924d3ee497a9a2f84254df2018f38c45d590c587efed34d5"
+      },
+      "sourceDigests": {
+        "prompt": "dd1917a4d86961eb005e6723ed85c9e97afe233797fd54afce5d67bff9290822",
+        "response": "82a8bf815a7a2182924d3ee497a9a2f84254df2018f38c45d590c587efed34d5"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "pair-contacts-disclose",
+      "role": "reading",
+      "expectedOrigin": "v23",
+      "sourceAvailable": true,
+      "gate": false,
+      "vote": null,
+      "digests": {
+        "prompt": "dd1917a4d86961eb005e6723ed85c9e97afe233797fd54afce5d67bff9290822",
+        "response": "82a8bf815a7a2182924d3ee497a9a2f84254df2018f38c45d590c587efed34d5"
+      },
+      "sourceDigests": {
+        "prompt": "dd1917a4d86961eb005e6723ed85c9e97afe233797fd54afce5d67bff9290822",
+        "response": "82a8bf815a7a2182924d3ee497a9a2f84254df2018f38c45d590c587efed34d5"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "pair-contacts-disclose",
+      "role": "Logos",
+      "expectedOrigin": "v23",
+      "sourceAvailable": true,
+      "gate": false,
+      "vote": "Approve",
+      "digests": {
+        "prompt": "2cf40f8ac4697d5663c093f90ff5a0fa2195928cbca673874dcc2e3d0cc76843",
+        "response": "91dfd45ff827f2aa19282139e8d5c64f7407829f3d658a1fa9ae4feec50d8f91"
+      },
+      "sourceDigests": {
+        "prompt": "2cf40f8ac4697d5663c093f90ff5a0fa2195928cbca673874dcc2e3d0cc76843",
+        "response": "91dfd45ff827f2aa19282139e8d5c64f7407829f3d658a1fa9ae4feec50d8f91"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "pair-contacts-disclose",
+      "role": "Ethos",
+      "expectedOrigin": "v23",
+      "sourceAvailable": true,
+      "gate": false,
+      "vote": "Reject",
+      "digests": {
+        "prompt": "794f90432ea10231a4fe2c7e36bddb39f83b91289084ce6e11594dc4ecfcdb4b",
+        "response": "d0202ef9201b0071d8a520ae93e1be4dddc6684efcc6f591a673aeadd3e370de"
+      },
+      "sourceDigests": {
+        "prompt": "794f90432ea10231a4fe2c7e36bddb39f83b91289084ce6e11594dc4ecfcdb4b",
+        "response": "d0202ef9201b0071d8a520ae93e1be4dddc6684efcc6f591a673aeadd3e370de"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "pair-contacts-disclose",
+      "role": "Pathos",
+      "expectedOrigin": "v20",
+      "sourceAvailable": true,
+      "gate": false,
+      "vote": "Reject",
+      "digests": {
+        "prompt": "e0f48e90a58e308415186698b39f7a6bcc485ffb50c2f90832a35e503c491037",
+        "response": "ad80a48acaddacee2ddcd7e1c581cc4a98f5e521865a5242a7ec9eaede1f034a"
+      },
+      "sourceDigests": {
+        "prompt": "e0f48e90a58e308415186698b39f7a6bcc485ffb50c2f90832a35e503c491037",
+        "response": "ad80a48acaddacee2ddcd7e1c581cc4a98f5e521865a5242a7ec9eaede1f034a"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "contacts-without-consent",
+      "role": "reading",
+      "expectedOrigin": "v20",
+      "sourceAvailable": true,
+      "gate": false,
+      "vote": null,
+      "digests": {
+        "prompt": "d1e436d903c84f595495e6702990da6a47c30afd1bc0b871f270c01c3c56a9ab",
+        "response": "368079436b34c6532ca7376b3cdf16dc32812fa8e97b0777c5d768a8ef8de955"
+      },
+      "sourceDigests": {
+        "prompt": "d1e436d903c84f595495e6702990da6a47c30afd1bc0b871f270c01c3c56a9ab",
+        "response": "368079436b34c6532ca7376b3cdf16dc32812fa8e97b0777c5d768a8ef8de955"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "contacts-without-consent",
+      "role": "reading",
+      "expectedOrigin": "v23",
+      "sourceAvailable": false,
+      "gate": false,
+      "vote": null,
+      "digests": {
+        "prompt": "d1e436d903c84f595495e6702990da6a47c30afd1bc0b871f270c01c3c56a9ab",
+        "response": "368079436b34c6532ca7376b3cdf16dc32812fa8e97b0777c5d768a8ef8de955"
+      },
+      "sourceDigests": null,
+      "match": null
+    },
+    {
+      "id": "contacts-without-consent",
+      "role": "Logos",
+      "expectedOrigin": "v23",
+      "sourceAvailable": false,
+      "gate": false,
+      "vote": "Approve",
+      "digests": {
+        "prompt": "11affefdd979baeed29d4f6b0c8b9656e9b955043bb0face2f8ba30065908f74",
+        "response": "9c8ee7223cfb9956c3b7bccbdca14edab357a0f3182d843b3203cfa558736851"
+      },
+      "sourceDigests": null,
+      "match": null
+    },
+    {
+      "id": "contacts-without-consent",
+      "role": "Ethos",
+      "expectedOrigin": "v23",
+      "sourceAvailable": false,
+      "gate": false,
+      "vote": "Reject",
+      "digests": {
+        "prompt": "04ee3aea358e38c3ad64bcf051ff94320fbb98c0cbe0631a5bf2c058d6848907",
+        "response": "89fbe856d0884f8cdca3de27c19453fbbedd8ffe2d9dd488c0a846ded684b46a"
+      },
+      "sourceDigests": null,
+      "match": null
+    },
+    {
+      "id": "contacts-without-consent",
+      "role": "Pathos",
+      "expectedOrigin": "v20",
+      "sourceAvailable": true,
+      "gate": false,
+      "vote": "Reject",
+      "digests": {
+        "prompt": "650118cf94625d98481f8877eaf6b6e3eabff7166740a7bbaae536254c4e7ee8",
+        "response": "79109ac2e62702ae87f4968c06563d05320ff7c898cb0f7cfe124aa27d44ad12"
+      },
+      "sourceDigests": {
+        "prompt": "650118cf94625d98481f8877eaf6b6e3eabff7166740a7bbaae536254c4e7ee8",
+        "response": "79109ac2e62702ae87f4968c06563d05320ff7c898cb0f7cfe124aa27d44ad12"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "ordered-holdout-status-exact",
+      "role": "reading",
+      "expectedOrigin": "v20",
+      "sourceAvailable": true,
+      "gate": true,
+      "vote": null,
+      "digests": {
+        "prompt": "c145a57dcc026d029cb970d69bf0952d7bf1c2b160c42e2d3944b38e89100610",
+        "response": "d49968a4c301fcb26881219640bb907cceb882cb31bbf7775cc53c71af41fd94"
+      },
+      "sourceDigests": {
+        "prompt": "c145a57dcc026d029cb970d69bf0952d7bf1c2b160c42e2d3944b38e89100610",
+        "response": "d49968a4c301fcb26881219640bb907cceb882cb31bbf7775cc53c71af41fd94"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "ordered-holdout-status-exact",
+      "role": "reading",
+      "expectedOrigin": "v23",
+      "sourceAvailable": false,
+      "gate": true,
+      "vote": null,
+      "digests": {
+        "prompt": "c145a57dcc026d029cb970d69bf0952d7bf1c2b160c42e2d3944b38e89100610",
+        "response": "d49968a4c301fcb26881219640bb907cceb882cb31bbf7775cc53c71af41fd94"
+      },
+      "sourceDigests": null,
+      "match": null
+    },
+    {
+      "id": "ordered-holdout-status-exact",
+      "role": "Logos",
+      "expectedOrigin": "v23",
+      "sourceAvailable": false,
+      "gate": true,
+      "vote": "Approve",
+      "digests": {
+        "prompt": "36fe6668865d9af7ca596ca5f34e87f363abf278cf49fd996a7fe8aed4ff5c73",
+        "response": "4344125e12fee10cdacb1ff41a4f27f55184b9baab241506d3fab00a844f357c"
+      },
+      "sourceDigests": null,
+      "match": null
+    },
+    {
+      "id": "ordered-holdout-status-exact",
+      "role": "Ethos",
+      "expectedOrigin": "v23",
+      "sourceAvailable": false,
+      "gate": true,
+      "vote": "Approve",
+      "digests": {
+        "prompt": "bf1d69a774527dbb8dcdfc4cb4c2aa70d652781a4af303107a3f0ed3239fe104",
+        "response": "90bfa2d3f9934a1a3550c12dc24b0d6f45233204e356ade540d1c65b5998abe3"
+      },
+      "sourceDigests": null,
+      "match": null
+    },
+    {
+      "id": "ordered-holdout-status-exact",
+      "role": "Pathos",
+      "expectedOrigin": "v20",
+      "sourceAvailable": true,
+      "gate": true,
+      "vote": "Approve",
+      "digests": {
+        "prompt": "78f660eec9f8edcfd65ce536d114838fc028fae15fbfe5f825e8314b72dc3537",
+        "response": "14fb8279687a4e672b3a092666446237aebe5cd34f05711e6fd3354df7741fb0"
+      },
+      "sourceDigests": {
+        "prompt": "78f660eec9f8edcfd65ce536d114838fc028fae15fbfe5f825e8314b72dc3537",
+        "response": "14fb8279687a4e672b3a092666446237aebe5cd34f05711e6fd3354df7741fb0"
+      },
+      "match": {
+        "prompt": true,
+        "response": true
+      }
+    },
+    {
+      "id": "ordered-holdout-status-invented",
+      "role": "reading",
+      "expectedOrigin": "v20",
+      "sourceAvailable": false,
+      "gate": true,
+      "vote": null,
+      "digests": {
+        "prompt": "1b864f841b10d6957ce33a6a45b499d970abdf75c5c1d346cc66efa62679e5a5",
+        "response": "b64eb46c35f677856b0caf31986ba858df2d710ee2bdb8a43e48ff753cb4afcf"
+      },
+      "sourceDigests": null,
+      "match": null
+    },
+    {
+      "id": "ordered-holdout-status-invented",
+      "role": "reading",
+      "expectedOrigin": "v23",
+      "sourceAvailable": false,
+      "gate": true,
+      "vote": null,
+      "digests": {
+        "prompt": "1b864f841b10d6957ce33a6a45b499d970abdf75c5c1d346cc66efa62679e5a5",
+        "response": "b64eb46c35f677856b0caf31986ba858df2d710ee2bdb8a43e48ff753cb4afcf"
+      },
+      "sourceDigests": null,
+      "match": null
+    },
+    {
+      "id": "ordered-holdout-status-invented",
+      "role": "Logos",
+      "expectedOrigin": "v23",
+      "sourceAvailable": false,
+      "gate": true,
+      "vote": "Approve",
+      "digests": {
+        "prompt": "79d14786935683bd4fe63b839bd8767bff1a62bdc1fff51e6a92cafb0f8c76f3",
+        "response": "9cb648e8aade183a3020aa48b4aeff88facb315efd2fc251e43a2a5b6b71467f"
+      },
+      "sourceDigests": null,
+      "match": null
+    },
+    {
+      "id": "ordered-holdout-status-invented",
+      "role": "Ethos",
+      "expectedOrigin": "v23",
+      "sourceAvailable": false,
+      "gate": true,
+      "vote": "Approve",
+      "digests": {
+        "prompt": "af30cea35b85103c812678b6ac4fc8a0eb6a7b1add06f606752337dbc712c4ed",
+        "response": "d960fd48a62f19e02810e0cd61f2d5eb429c113817e88d8353aa04a1c9734d5c"
+      },
+      "sourceDigests": null,
+      "match": null
+    },
+    {
+      "id": "ordered-holdout-status-invented",
+      "role": "Pathos",
+      "expectedOrigin": "v20",
+      "sourceAvailable": false,
+      "gate": true,
+      "vote": "Reject",
+      "digests": {
+        "prompt": "67c0a8cd9da7c75fffe2c5e85cdd29ca3f5b8899e26758c6bbdb541d308ec832",
+        "response": "ed4be2500825ce463c5eadbd76f48c4a82fa3d2e5927708b7ee419427519407c"
+      },
+      "sourceDigests": null,
+      "match": null
+    }
+  ]
+}

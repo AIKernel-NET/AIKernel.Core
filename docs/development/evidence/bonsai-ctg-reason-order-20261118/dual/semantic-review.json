@@ -1,0 +1,27 @@
+{
+  "diagnosticOnly": true,
+  "case": "ordered-holdout-status-invented",
+  "requiredVotes": {"Logos": "Reject", "Ethos": "Reject"},
+  "manualReviewByRawResponseSha256": {
+    "c918ab247841b63c463aff6e4b1eb57919330a9dba7b29ea4f4a52c4c222c995": {
+      "role": "Logos",
+      "rawVote": "Approve",
+      "evidenceExact": true,
+      "candidateExact": false,
+      "reason": "The echo preserves the proposed active value but changes its enclosing single quotes to double quotes. The reason cites the observation of idle and claims that it confirms the correctness of the proposal. It uses the candidate's assertion as proof despite the conflicting value."
+    },
+    "ab0b718cac35e37370ed9434f03e86b3a7d8be2de62a580dbbae2e3f4567ff2e": {
+      "role": "Ethos",
+      "rawVote": "Approve",
+      "evidenceExact": true,
+      "candidateExact": false,
+      "reason": "The echo preserves the proposed active value but changes its enclosing single quotes to double quotes. The reason treats the existence of one recorded status as evidence that the proposed value is not fabricated, then treats the proposal's assertion of correctness as proof."
+    }
+  },
+  "protocol": "Both evidence fields match the whole observation after JSON decoding. Neither candidate field exactly matches the supplied proposal after decoding. Both strict submissions would fail; the two raw Approve labels are not host approvals.",
+  "caseSpecificConclusion": "Having the differing observed and proposed values in the model's output did not make either reason distinguish their truth. Comparing source membership alone did not establish support for the proposed value.",
+  "passedPreregistration": false,
+  "unrun": ["exact-Logos", "exact-Ethos", "count-Logos", "count-Ethos", "disclose-Logos", "disclose-Ethos"],
+  "integration": "Stopped after the planned first pair. No product mode. This configuration leaves v24 Pathos untouched, which independently rejected the correct dimension in the supplemental v24 evaluation.",
+  "limitations": "Two raw generations for a known fabricated-status proposal. The six remaining cells were not run and have no vote or score."
+}

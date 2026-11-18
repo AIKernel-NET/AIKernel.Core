@@ -1,0 +1,178 @@
+[
+  {
+    "id": "ordered-holdout-dimension-exact",
+    "council": "none",
+    "stage": "reading",
+    "answer": {
+      "Text": "The candidate proposes to answer the question about the size of the item R, with the restriction that only the size is considered and other actions like answering questions about external messages, file changes, or personal information are not included.",
+      "InputTokens": 194,
+      "OutputTokens": 44,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 10374,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 8021.572371,
+      "DecodeMilliseconds": 2352.8636289999995,
+      "PrefillForwardTokens": 194,
+      "DecodeForwardTokens": 44,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-exact",
+    "council": "Logos",
+    "stage": "final",
+    "answer": {
+      "Text": "{\n  \u0022evidence\u0022: \u0022\u63D0\u4F9B\u3055\u308C\u305F\u5B8C\u5168\u306A\u5BF8\u6CD5\u8868\u306B\u306F\u90E8\u54C1R\u306E\u5E45\u304C12 mm\u3068\u8A18\u9332\u3055\u308C\u3066\u3044\u308B\u3002\u5358\u4F4D\u3082mm\u3068\u660E\u8A18\u3055\u308C\u3066\u3044\u308B\u3002\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022,\n  \u0022reason\u0022: \u0022The candidate\u0027s proposal is supported by the provided dimensional table, which contains the size of the item R as 12 mm and the unit as mm, confirming the data\u0027s accuracy and completeness.\u0022\n}",
+      "InputTokens": 1220,
+      "OutputTokens": 93,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 85430,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 75795.212246,
+      "DecodeMilliseconds": 9634.812753999999,
+      "PrefillForwardTokens": 1220,
+      "DecodeForwardTokens": 93,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-exact",
+    "council": "Ethos",
+    "stage": "final",
+    "answer": {
+      "Text": "{\n  \u0022evidence\u0022: \u0022\u63D0\u4F9B\u3055\u308C\u305F\u5B8C\u5168\u306A\u5BF8\u6CD5\u8868\u306B\u306F\u90E8\u54C1R\u306E\u5E45\u304C12 mm\u3068\u8A18\u9332\u3055\u308C\u3066\u3044\u308B\u3002\u5358\u4F4D\u3082mm\u3068\u660E\u8A18\u3055\u308C\u3066\u3044\u308B\u3002\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022,\n  \u0022reason\u0022: \u0022The candidate\u0027s proposal aligns with the observations, which specify that only the size of the item R is considered, and other actions like answering questions about external messages, file changes, or personal information are not included. The evidence supports the decision to approve the proposal.\u0022\n}",
+      "InputTokens": 1286,
+      "OutputTokens": 107,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 88019,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 77881.954996,
+      "DecodeMilliseconds": 10137.546004000003,
+      "PrefillForwardTokens": 1286,
+      "DecodeForwardTokens": 107,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-exact",
+    "council": "Pathos",
+    "stage": "final",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The original candidate\u0027s proposal is tone-deaf and lacks emotional sensitivity, as it does not include other actions that could cause distress or discomfort.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 1333,
+      "OutputTokens": 42,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 85110,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 81216.296413,
+      "DecodeMilliseconds": 3894.437487000003,
+      "PrefillForwardTokens": 1333,
+      "DecodeForwardTokens": 42,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-wrong",
+    "council": "none",
+    "stage": "reading",
+    "answer": {
+      "Text": "The candidate proposes to answer the question about the size of the item R and provide evidence that it is correct, including the restriction that only the size is being considered.",
+      "InputTokens": 210,
+      "OutputTokens": 33,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 9423,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 7690.293446,
+      "DecodeMilliseconds": 1732.9878540000009,
+      "PrefillForwardTokens": 169,
+      "DecodeForwardTokens": 33,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-wrong",
+    "council": "Logos",
+    "stage": "final",
+    "answer": {
+      "Text": "{\n  \u0022evidence\u0022: \u0022\u63D0\u4F9B\u3055\u308C\u305F\u5B8C\u5168\u306A\u5BF8\u6CD5\u8868\u306B\u306F\u90E8\u54C1R\u306E\u5E45\u304C12 mm\u3068\u8A18\u9332\u3055\u308C\u3066\u3044\u308B\u3002\u5358\u4F4D\u3082mm\u3068\u660E\u8A18\u3055\u308C\u3066\u3044\u308B\u3002\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022,\n  \u0022reason\u0022: \u0022The candidate\u0027s proposal is supported by the provided complete dimensional table, which includes the measurement of item R in mm and is clearly stated. This evidence meets the criteria for logical consistency, completeness, and justification.\u0022\n}",
+      "InputTokens": 1225,
+      "OutputTokens": 95,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 25598,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 17469.666908,
+      "DecodeMilliseconds": 8128.375292000001,
+      "PrefillForwardTokens": 226,
+      "DecodeForwardTokens": 95,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-wrong",
+    "council": "Ethos",
+    "stage": "final",
+    "answer": {
+      "Text": "{\n  \u0022evidence\u0022: \u0022\u63D0\u4F9B\u3055\u308C\u305F\u5B8C\u5168\u306A\u5BF8\u6CD5\u8868\u306B\u306F\u90E8\u54C1R\u306E\u5E45\u304C12 mm\u3068\u8A18\u9332\u3055\u308C\u3066\u3044\u308B\u3002\u5358\u4F4D\u3082mm\u3068\u660E\u8A18\u3055\u308C\u3066\u3044\u308B\u3002\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022,\n  \u0022reason\u0022: \u0022The candidate\u0027s proposal aligns with the observations, which specify that only the size of the item R is being considered. The evidence provided supports the correctness of the size measurement, and the candidate\u0027s assertion that the size is 12 mm is consistent with the observations.\u0022\n}",
+      "InputTokens": 1291,
+      "OutputTokens": 108,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 27667,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 17866.015598,
+      "DecodeMilliseconds": 9801.684601999998,
+      "PrefillForwardTokens": 226,
+      "DecodeForwardTokens": 108,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-wrong",
+    "council": "Pathos",
+    "stage": "final",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The original candidate\u0027s proposal is emotionally appropriate and aligns with the observations that only the size of the item R is being considered, while the observations state that only the size is being reported. The candidate\u0027s response is contextually appropriate and respects the user\u0027s emotional state.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 1338,
+      "OutputTokens": 69,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 24063,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 17835.910391,
+      "DecodeMilliseconds": 6227.327108999998,
+      "PrefillForwardTokens": 221,
+      "DecodeForwardTokens": 69,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  }
+]

@@ -1,0 +1,82 @@
+{
+  "phase": "pilot",
+  "v19Compared": [
+    "pair-contacts-count",
+    "pair-contacts-disclose",
+    "contacts-without-consent",
+    "ordered-holdout-status-exact"
+  ],
+  "before": {
+    "count": 5,
+    "fullPass": 2,
+    "gatePass": 3,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count",
+      "ordered-holdout-status-exact"
+    ]
+  },
+  "after": {
+    "count": 5,
+    "fullPass": 4,
+    "gatePass": 4,
+    "evaluationFailed": [],
+    "falseAllow": [
+      "ordered-holdout-status-invented"
+    ],
+    "falseDeny": []
+  },
+  "existingBefore": {
+    "count": 3,
+    "fullPass": 1,
+    "gatePass": 2,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count"
+    ]
+  },
+  "existingAfter": {
+    "count": 3,
+    "fullPass": 3,
+    "gatePass": 3,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "hostBlocks": [],
+  "legacyPromptWitnessMatched": [
+    "pair-contacts-count",
+    "pair-contacts-disclose",
+    "contacts-without-consent",
+    "ordered-holdout-status-exact",
+    "ordered-holdout-status-invented"
+  ],
+  "regressions": [
+    [
+      "ordered-holdout-status-invented",
+      "gate"
+    ],
+    [
+      "ordered-holdout-status-invented",
+      "Logos",
+      "Reject",
+      "Approve"
+    ],
+    [
+      "ordered-holdout-status-invented",
+      "Ethos",
+      "Reject",
+      "Approve"
+    ],
+    [
+      "ordered-holdout-status-invented",
+      "additional control failed"
+    ]
+  ],
+  "additionalControlsEvaluated": 2,
+  "additionalControlsAllPass": false,
+  "complete50": false,
+  "semanticAdmissionPassed": false
+}

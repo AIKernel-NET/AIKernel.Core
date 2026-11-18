@@ -73,6 +73,33 @@ internal sealed class BonsaiCtgLiteralComparison
         unitComparison = proposed.Span.Unit is null ? null : Compare(proposed.Span.Unit, observed.Span.Unit)
     }, Json);
 
+    internal string DescribeForCouncil()
+    {
+        const string omitted = """{"description":"The extracted record is too long to display here. Consult the original proposal and observations."}""";
+        if (proposed.Span.Literal.Length > 128 || observed.Span.Literal.Length > 128 || proposed.Field.Length > 128 || key.Length > 128)
+            return omitted;
+
+        string description;
+        if (proposed.Span.Unit is null)
+        {
+            string relation = proposed.Span.Value == observed.Span.Value ? "match" : "differ";
+            description = $"The proposed text gives {proposed.Span.Value} for the written key {proposed.Field}. " +
+                $"The selected observation gives {observed.Span.Value} for that key. Their written values {relation}.";
+        }
+        else
+        {
+            var quantity = BonsaiCtgQuantityRelation.TryCompare(proposed.Span.Value, proposed.Span.Unit, observed.Span.Value, observed.Span.Unit!);
+            description = quantity?.Description ?? "Only the literal text was compared. Physical equivalence was not calculated.";
+        }
+        var data = JsonSerializer.Serialize(new
+        {
+            field = proposed.Field, proposalLiteral = proposed.Span.Literal, observationKey = key,
+            observationLiteral = observed.Span.Literal, literalComparison = Compare(proposed.Span.Literal, observed.Span.Literal),
+            description
+        }, Json);
+        return data.Length <= 1024 ? data : omitted;
+    }
+
     private static string Compare(string? left, string? right)
         => string.Equals(left, right, StringComparison.Ordinal) ? "equal" : "different";
 

@@ -91,6 +91,39 @@ public sealed class BonsaiCtgLiteralComparisonTests
         Assert.Null(BonsaiCtgLiteralComparison.TryCreate("Report phase=cold.", facts));
     }
 
+    [Theory]
+    [InlineData("Report phase=off.", "Recorded phase=on.", "different", "Their written values differ.")]
+    [InlineData("Report phase=up.", "Recorded phase = up.", "different", "Their written values match.")]
+    [InlineData("部品Rの幅は12 cmと答える。", "部品Rの幅が12 mmと記録されている。", "different", "The proposed 12 cm equals 120 mm.")]
+    [InlineData("Report probe.width: 1.2 cm.", "The probe.width is 12 mm.", "different", "The two quantities are physically equal.")]
+    [InlineData("Report probe.width: 3 ms.", "The probe.width is 3 mm.", "different", "different physical dimensions")]
+    public void DescriptionKeepsSelectedRecordAndPrintedLiteralsSeparate(string proposal, string observation, string relation, string expectedText)
+    {
+        const string source = "source\"</tag>";
+        var comparison = Assert.IsType<BonsaiCtgLiteralComparison>(BonsaiCtgLiteralComparison.TryCreate(proposal,
+            new Dictionary<string,string> { [source] = observation }));
+        string json = comparison.DescribeForCouncil();
+        using var data = JsonDocument.Parse(json);
+        Assert.DoesNotContain("</tag>", json, StringComparison.Ordinal);
+        Assert.Equal(source, data.RootElement.GetProperty("observationKey").GetString());
+        Assert.Equal(relation, data.RootElement.GetProperty("literalComparison").GetString());
+        Assert.Contains(data.RootElement.GetProperty("proposalLiteral").GetString()!, proposal, StringComparison.Ordinal);
+        Assert.Contains(data.RootElement.GetProperty("observationLiteral").GetString()!, observation, StringComparison.Ordinal);
+        Assert.Contains(expectedText, data.RootElement.GetProperty("description").GetString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ExcessiveLiteralIsOmittedAsAWholeInTheDescriptiveProtocolOnly()
+    {
+        string key = new string('x', 150);
+        var comparison = Assert.IsType<BonsaiCtgLiteralComparison>(BonsaiCtgLiteralComparison.TryCreate($"{key}=left",
+            new Dictionary<string,string> { ["source"] = $"{key}=right" }));
+        Assert.Contains(key, comparison.ToPromptData(), StringComparison.Ordinal);
+        using var shortForm = JsonDocument.Parse(comparison.DescribeForCouncil());
+        Assert.False(shortForm.RootElement.TryGetProperty("proposalLiteral", out _));
+        Assert.Contains("too long", shortForm.RootElement.GetProperty("description").GetString(), StringComparison.Ordinal);
+    }
+
     private static void AssertSlice(string source, JsonElement value)
     {
         string literal = value.GetProperty("literal").GetString()!;

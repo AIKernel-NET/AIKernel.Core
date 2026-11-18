@@ -9,6 +9,16 @@ if(args.Length==5&&args[0]=="--bonsai-ctg-routed-suite"){Environment.ExitCode=aw
 if(args.Length==5&&args[0]=="--bonsai-ctg-comparison-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ComparedReadingVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-record-findings-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.RecordFindingVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-reasoned-findings-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ReasonedFindingVotes)?0:1;return;}
+if (args.Length == 3 && args[0] == "--bonsai-ctg-balance-logits")
+{
+    try { BonsaiCtgBalancedChoice.Run(args[1], args[2]); }
+    catch (Exception ex) when (ex is InvalidDataException or System.Text.Json.JsonException)
+    {
+        Console.Error.WriteLine(ex.Message);
+        Environment.ExitCode = 2;
+    }
+    return;
+}
 if(args.Length==5&&args[0]=="--bonsai-ctg-vote-first-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.VoteFirstReadingVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-effects-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ActionEffectReadingVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-defined-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.DefinedReadingVotes)?0:1;return;}

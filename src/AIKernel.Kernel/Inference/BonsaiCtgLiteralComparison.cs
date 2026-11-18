@@ -21,6 +21,8 @@ internal sealed class BonsaiCtgLiteralComparison
     // cannot identify the same measurement in two independent sentences.
     private static readonly Regex JapaneseField = new(
         @"(?<field>[\p{IsCJKUnifiedIdeographs}\p{IsKatakana}A-Za-z0-9ー_]+の[\p{IsCJKUnifiedIdeographs}\p{IsKatakana}A-Za-z0-9ー_]+(?:さ|み)?)(?:は|が|を)[ \t]*\z", Options);
+    private static readonly Regex JapaneseFieldPath = new(
+        @"(?<field>(?:[\p{IsCJKUnifiedIdeographs}\p{IsKatakana}A-Za-z0-9ー_]+の)+[\p{IsCJKUnifiedIdeographs}\p{IsKatakana}A-Za-z0-9ー_]+(?:さ|み)?)(?:は|が|を)[ \t]*\z", Options);
     private static readonly Regex QualifiedField = new(
         @"(?<field>[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+)(?:[ \t]*[:=]|[ \t]+is)[ \t]*\z", Options);
     // Recognize explicit qualifications conservatively. This is a deliberately small
@@ -47,15 +49,15 @@ internal sealed class BonsaiCtgLiteralComparison
     private BonsaiCtgLiteralComparison(FieldValue proposed, string key, FieldValue observed)
         => (this.proposed, this.key, this.observed) = (proposed, key, observed);
 
-    internal static BonsaiCtgLiteralComparison? TryCreate(string candidate, IReadOnlyDictionary<string, string> observations)
+    internal static BonsaiCtgLiteralComparison? TryCreate(string candidate, IReadOnlyDictionary<string, string> observations, bool includeFieldPaths = false)
     {
         if (observations.Count > 64 || !SafeText(candidate, 8192) ||
-            !TryRead(candidate, out var proposed) || proposed is null) return null;
+            !TryRead(candidate, includeFieldPaths, out var proposed) || proposed is null) return null;
 
         BonsaiCtgLiteralComparison? found = null;
         foreach (var (key, text) in observations)
         {
-            if (!SafeText(key, 256) || !SafeText(text, 8192) || !TryRead(text, out var observed)) return null;
+            if (!SafeText(key, 256) || !SafeText(text, 8192) || !TryRead(text, includeFieldPaths, out var observed)) return null;
             if (observed is null || observed.Field != proposed.Field ||
                 (observed.Span.Unit is null) != (proposed.Span.Unit is null)) continue;
             if (found is not null) return null;
@@ -103,6 +105,33 @@ internal sealed class BonsaiCtgLiteralComparison
     private static string Compare(string? left, string? right)
         => string.Equals(left, right, StringComparison.Ordinal) ? "equal" : "different";
 
+    // These edits describe the two literals only. Whether an edit is appropriate depends
+    // on the request, subject, time and the individual council's governance rules.
+    internal string DescribeEdits() => JsonSerializer.Serialize(new
+    {
+        source = new { observationKey = key, field = observed.Field, recorded = observed.Span.Literal },
+        proposal = new { field = proposed.Field, wouldReport = proposed.Span.Literal },
+        valueEdit = Edit(observed.Span.Value, proposed.Span.Value),
+        unitEdit = observed.Span.Unit is null ? null : Edit(observed.Span.Unit, proposed.Span.Unit!),
+        quantity = observed.Span.Unit is null ? null :
+            BonsaiCtgQuantityRelation.TryCompare(proposed.Span.Value, proposed.Span.Unit!, observed.Span.Value, observed.Span.Unit)?.Description
+    }, Json);
+
+    private static string Edit(string source, string proposedText) => source == proposedText
+        ? $"Copied unchanged: {source}."
+        : $"Replaced the recorded {source} with {proposedText} in the proposed output.";
+
+    internal bool HasMaterialValueDifference => proposed.Span.Unit is null
+        ? proposed.Span.Value != observed.Span.Value
+        : BonsaiCtgQuantityRelation.TryCompare(proposed.Span.Value, proposed.Span.Unit,
+            observed.Span.Value, observed.Span.Unit!)?.Relation is "different" or "incompatible_dimensions";
+
+    // Preserving both strings is a necessary condition for this reading aid, not a
+    // semantic verdict. A translation which drops the part identifier is dispensable.
+    internal bool ReadingRetainsClaimedField(string reading) =>
+        reading.Contains(proposed.Field, StringComparison.Ordinal) &&
+        reading.Contains(proposed.Span.Literal, StringComparison.Ordinal);
+
     private static bool SafeText(string text, int maxLength)
     {
         if (string.IsNullOrWhiteSpace(text) || text.Length > maxLength ||
@@ -119,7 +148,7 @@ internal sealed class BonsaiCtgLiteralComparison
 
     // false denotes an ambiguous or unsupported expression. true with no value means
     // this record contains no supported literal. Never select the most convenient of several.
-    private static bool TryRead(string text, out FieldValue? result)
+    private static bool TryRead(string text, bool includeFieldPaths, out FieldValue? result)
     {
         result = null;
         Match assignment = Assignment.Match(text);
@@ -131,7 +160,7 @@ internal sealed class BonsaiCtgLiteralComparison
         {
             if (!EndsAtDelimiter(text, quantity.Index + quantity.Length)) return false;
             string prefix = text[..quantity.Index];
-            Match field = JapaneseField.Match(prefix);
+            Match field = (includeFieldPaths ? JapaneseFieldPath : JapaneseField).Match(prefix);
             bool japanese = field.Success;
             if (!japanese) field = QualifiedField.Match(prefix);
             if (!field.Success || !StartsAtDelimiter(text, field.Index, japanese)) return false;

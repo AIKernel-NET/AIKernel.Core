@@ -92,7 +92,13 @@ internal enum BonsaiCtgResponseMode
     /// <summary>Validation-only model classification using the same council's independently generated explanation.</summary>
     ReasonedFindingVotes,
     /// <summary>Validation only. Allows one bounded replacement for a token-limited council explanation.</summary>
-    CompletedReasonedFindingVotes
+    CompletedReasonedFindingVotes,
+    /// <summary>Validation only. Assess the directed edit between two source-bound literals.</summary>
+    SourceBoundRecordVotes,
+    /// <summary>Validation only. Recheck a supported report with a demonstrably different field value.</summary>
+    ChallengedRecordVotes,
+    /// <summary>Validation only. Keep the original proposal when an action summary drops the identified field.</summary>
+    FieldBoundReadingVotes
 }
 
 /// <summary>Experimental Bonsai 1.7B council observations; canonical voting fidelity is not established.
@@ -138,7 +144,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         if(info.Architecture!="qwen3" || info.StoredParameters is <1_500_000_000 or >2_000_000_000)throw new NotSupportedException("This evaluator requires the pinned Bonsai 1.7B family.");
         model=new(modelPath,cpuThreads,2048,"auto");model.ConfigureTrustedPrefixCache(ReadingContract(responseMode) is null?3:4,maximumPrefixCacheBytes);
         select=model.ClassifyAsync;
-        if (responseMode == BonsaiCtgResponseMode.CompletedReasonedFindingVotes)
+        if (responseMode is BonsaiCtgResponseMode.CompletedReasonedFindingVotes or BonsaiCtgResponseMode.ChallengedRecordVotes or BonsaiCtgResponseMode.FieldBoundReadingVotes)
             retryReason = (system, user, token) => model.GenerateAsync(system, user, 256, token);
         classify=(system,user,token)=>model.GenerateAsync(system,user,responseMode is BonsaiCtgResponseMode.CitedDirectVotes or BonsaiCtgResponseMode.CitedFindings or BonsaiCtgResponseMode.CanonicalFindings?256:192,token);
     }
@@ -164,6 +170,9 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         BonsaiCtgResponseMode.ComparedReadingVotes => BonsaiCtgFocusedPrompt.ComparisonContract,
         BonsaiCtgResponseMode.RecordFindingVotes => BonsaiCtgRecordFindingPrompt.Contract,
         BonsaiCtgResponseMode.CompletedReasonedFindingVotes => "canonical-completed-reasoned-finding-v29",
+        BonsaiCtgResponseMode.SourceBoundRecordVotes => "canonical-source-bound-record-v30",
+        BonsaiCtgResponseMode.ChallengedRecordVotes => "canonical-challenged-record-v31",
+        BonsaiCtgResponseMode.FieldBoundReadingVotes => "canonical-field-bound-reading-v32",
         BonsaiCtgResponseMode.ReasonedFindingVotes => BonsaiCtgReasonedFindingPrompt.Contract,
         _ => null
     };
@@ -261,9 +270,14 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             try
             {
                 string? actionReading=null;
-                bool reasoned = responseMode is BonsaiCtgResponseMode.ReasonedFindingVotes or BonsaiCtgResponseMode.CompletedReasonedFindingVotes;
-                bool compareLiterals = reasoned || responseMode is BonsaiCtgResponseMode.ComparedReadingVotes or BonsaiCtgResponseMode.RecordFindingVotes;
-                var witness = compareLiterals ? BonsaiCtgLiteralComparison.TryCreate(proposal!, inputFacts) : null;
+                bool challenge = responseMode is BonsaiCtgResponseMode.ChallengedRecordVotes or BonsaiCtgResponseMode.FieldBoundReadingVotes;
+                bool reasoned = challenge || responseMode is BonsaiCtgResponseMode.ReasonedFindingVotes or BonsaiCtgResponseMode.CompletedReasonedFindingVotes;
+                bool sourceBound = responseMode == BonsaiCtgResponseMode.SourceBoundRecordVotes;
+                bool compareLiterals = sourceBound || reasoned || responseMode is BonsaiCtgResponseMode.ComparedReadingVotes or BonsaiCtgResponseMode.RecordFindingVotes;
+                var witness = compareLiterals ? BonsaiCtgLiteralComparison.TryCreate(proposal!, inputFacts, includeFieldPaths: sourceBound || challenge) : null;
+                string? edits = sourceBound ? witness?.DescribeEdits() : null;
+                if (edits is { Length: > 1024 }) edits = null;
+                if (edits is not null) metadata["record.edits.sha256"] = Hash(edits);
                 string? comparison = witness?.ToPromptData();
                 if (comparison is not null) metadata["comparison.sha256"] = Hash(comparison);
                 string? recordComparison = responseMode == BonsaiCtgResponseMode.RecordFindingVotes && witness is not null
@@ -271,13 +285,13 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     : null;
                 if (recordComparison is not null) metadata["binding.policy"] = BonsaiCtgFindingPolicy.Contract;
                 string? reasonedComparison = reasoned ? witness?.DescribeForCouncil() : null;
-                if (reasonedComparison is not null)
+                if (reasonedComparison is not null || edits is not null)
                 {
                     metadata["binding.policy"] = BonsaiCtgFindingPolicy.Contract;
-                    metadata["draft.binding"] = "false";
+                    if (reasonedComparison is not null) metadata["draft.binding"] = "false";
                     if (select is null) return Failure("ctg.bonsai.selection_unavailable", metadata);
                 }
-                if(focused)
+                if(focused && edits is null)
                 {
                     var readingPrompt=BonsaiCtgFocusedPrompt.Reading(facts,proposalJson!,effects);
                     var readingAnswer=await classify(readingPrompt.System,readingPrompt.User,timeout.Token).ConfigureAwait(false);
@@ -289,6 +303,13 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     metadata["reading.binding"]="false";
                     try{actionReading=BonsaiCtgFocusedPrompt.ValidateReading(readingAnswer);}
                     catch(InvalidDataException){return Failure("ctg.bonsai.invalid_reading",metadata);}
+                    if (responseMode == BonsaiCtgResponseMode.FieldBoundReadingVotes && witness is not null)
+                    {
+                        bool retains = witness.ReadingRetainsClaimedField(actionReading);
+                        if (!retains) actionReading = null;
+                        metadata["reading.used_source"] = retains ? "generated_reading" : "original_proposal";
+                        metadata["reading.used.sha256"] = Hash(actionReading ?? proposal!);
+                    }
                 }
                 foreach(var council in Councils)
                 {
@@ -322,7 +343,8 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     bool routed = responseMode == BonsaiCtgResponseMode.RoutedReadingVotes || compareLiterals;
                     bool anchored = responseMode == BonsaiCtgResponseMode.AnchoredReadingVotes ||
                         (routed && council is CouncilKind.Logos or CouncilKind.Ethos);
-                    var rule=rules[council];var prompt=reasonedComparison is not null?BonsaiCtgReasonedFindingPrompt.Build(rule,council,facts,proposalJson!,actionReading!,reasonedComparison):
+                    var rule=rules[council];var prompt=edits is not null?BonsaiCtgReasonedFindingPrompt.BuildFromRecord(rule,council,facts,proposalJson!,edits):
+                        reasonedComparison is not null?BonsaiCtgReasonedFindingPrompt.Build(rule,council,facts,proposalJson!,actionReading,reasonedComparison):
                         recordComparison is not null?BonsaiCtgRecordFindingPrompt.Build(rule,council,facts,proposalJson!,actionReading!,recordComparison):
                         anchored?BonsaiCtgAnchoredVotePrompt.Build(rule,council,facts,proposalJson!,actionReading!,comparison):
                         focused?BonsaiCtgFocusedPrompt.Build(rule,council,facts,proposalJson!,actionReading!,defined,voteFirst,literalComparison:comparison):
@@ -343,10 +365,12 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     if (reasonedComparison is not null) user = BonsaiCtgReasonedFindingPrompt.ForReason(user);
                     metadata[council+".prompt.sha256"]=Hash(system+"\n"+user);metadata[council+".rom.sha256"]=rule.Reference.ContentHash!;
                     metadata[council+".excerpt.sha256"]=Hash(prompt.Excerpt);
-                    var answer=await classify(system,user,timeout.Token).ConfigureAwait(false);
+                    var answer=edits is not null
+                        ? await select!(system,user,BonsaiCtgReasonedFindingPrompt.Choices(council),timeout.Token).ConfigureAwait(false)
+                        : await classify(system,user,timeout.Token).ConfigureAwait(false);
                     if(reviewed || reasonedComparison is not null)
                     {
-                        if (responseMode == BonsaiCtgResponseMode.CompletedReasonedFindingVotes && reasonedComparison is not null &&
+                        if ((challenge || responseMode == BonsaiCtgResponseMode.CompletedReasonedFindingVotes) && reasonedComparison is not null &&
                             answer.FinishReason == "length" && retryReason is not null)
                         {
                             // Keep the incomplete attempt for replay only. It never enters the replacement or selection prompt.
@@ -373,6 +397,40 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                             ? await select!(system,user,BonsaiCtgReasonedFindingPrompt.Choices(council),timeout.Token).ConfigureAwait(false)
                             : await classify(system,user,timeout.Token).ConfigureAwait(false);
                     }
+                    string? challengedFinding = null;
+                    if (challenge && council == CouncilKind.Logos && witness?.HasMaterialValueDifference == true &&
+                        BonsaiCtgReasonedFindingPrompt.Finding(council, answer) == "supported")
+                    {
+                        var difference = witness.DescribeEdits();
+                        if (difference.Length <= 1024)
+                        {
+                            metadata["Logos.before_challenge.prompt.sha256"] = metadata["Logos.prompt.sha256"];
+                            metadata["Logos.before_challenge.response.sha256"] = Hash(answer.Text);
+                            metadata["Logos.before_challenge.excerpt.sha256"] = metadata["Logos.excerpt.sha256"];
+                            var check = BonsaiCtgReportChallenge.Build(rule, facts, proposalJson!, difference);
+                            var review = await select!(check.System, check.User, BonsaiCtgReportChallenge.Choices, timeout.Token).ConfigureAwait(false);
+                            metadata["Logos.challenge.prompt.sha256"] = Hash(check.System + "\n" + check.User);
+                            metadata["Logos.challenge.response.sha256"] = Hash(review.Text);
+                            metadata["Logos.challenge.edits.sha256"] = Hash(difference);
+                            metadata["Logos.challenge.excerpt.sha256"] = Hash(check.Excerpt);
+                            if (review.FinishReason != "classified" || review.OutputTokens != 1 ||
+                                !BonsaiCtgReportChallenge.Choices.Contains(review.Text))
+                                return Failure("ctg.bonsai.invalid_assessment", metadata);
+                            if (review.Text == "Error")
+                            {
+                                CriterionObservation?.Invoke(council, "before_challenge", answer);
+                                challengedFinding = "proposal_defect";
+                                metadata["Logos.prompt.sha256"] = metadata["Logos.challenge.prompt.sha256"];
+                                metadata["Logos.excerpt.sha256"] = metadata["Logos.challenge.excerpt.sha256"];
+                                prompt = check;
+                                answer = review;
+                            }
+                            else
+                            {
+                                CriterionObservation?.Invoke(council, "challenge_deferred", review);
+                            }
+                        }
+                    }
                     Observation?.Invoke(council,answer);
                     metadata[council+".response.sha256"]=Hash(answer.Text);
                     metadata[council+".backend"]=answer.CpuBackend;
@@ -385,13 +443,14 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     CouncilVoteValue value;var voteMetadata=new Dictionary<string,string>{["prompt.sha256"]=metadata[council+".prompt.sha256"]};
                     try
                     {
-                        if (reasonedComparison is not null)
+                        if (reasonedComparison is not null || edits is not null)
                         {
-                            string finding = BonsaiCtgReasonedFindingPrompt.Finding(council, answer);
+                            string finding = challengedFinding ?? BonsaiCtgReasonedFindingPrompt.Finding(council, answer);
                             value = BonsaiCtgFindingPolicy.Resolve(council, finding);
                             voteMetadata["finding"] = metadata[council+".finding"] = finding;
                             voteMetadata["binding.policy"] = BonsaiCtgFindingPolicy.Contract;
-                            voteMetadata["draft.response.sha256"] = metadata[council+".draft.response.sha256"];
+                            if (edits is not null) voteMetadata["record.edits.sha256"] = metadata["record.edits.sha256"];
+                            else voteMetadata["draft.response.sha256"] = metadata[council+".draft.response.sha256"];
                         }
                         else if(findings||citedFinding||recordComparison is not null)
                         {

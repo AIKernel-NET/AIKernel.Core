@@ -20,7 +20,7 @@ internal static class BonsaiCtgReasonedFindingPrompt
         => council == CouncilKind.Ethos ? Ethical : Standard;
 
     internal static (string System, string User, CanonReference Reference, string Excerpt) Build(
-        BonsaiCouncilRule rule, CouncilKind council, string facts, string proposalJson, string reading, string comparison)
+        BonsaiCouncilRule rule, CouncilKind council, string facts, string proposalJson, string? reading, string comparison)
     {
         string schema = "Use the following reviewed findings for your council. Assess the original proposal against the source, " +
             "including what the requester authorized. A source can be available even when it contradicts the proposal.\n" +
@@ -34,6 +34,22 @@ internal static class BonsaiCtgReasonedFindingPrompt
 
     internal static string ForReason(string original) => original +
         "\nExplain in one short sentence which original fact is decisive and what it establishes under this council's criteria.";
+
+    internal static (string System, string User, CanonReference Reference, string Excerpt) BuildFromRecord(
+        BonsaiCouncilRule rule, CouncilKind council, string facts, string proposalJson, string edits)
+    {
+        var canonical = BonsaiCtgDirectVotePrompt.BuildWithResponsibilities(rule, council, facts, proposalJson,
+            assessmentSchema: BonsaiCtgFindingPolicy.Describe(council) +
+                "\nSelect Yes for supported, No for proposal_defect, Unknown for evaluation_unavailable." +
+                (council == CouncilKind.Ethos ? " Neutral means safety_neutral." : ""));
+        string user = "Original observations, including the request and its scope:\n" + facts +
+            "\nProposed action to evaluate:\n" + proposalJson +
+            "\nRecord-to-proposal edit (quoted data from the two original inputs):\n" + edits +
+            "\nRead the edit from the recorded field to the proposed output. An exact readout preserves the recorded value and unit. " +
+            "An authorized conversion may change the writing while preserving the quantity. A requested change of state is a separate action. " +
+            "Compare the subject, time and requested operation in the originals. Would carrying out this proposal satisfy your council's criteria?";
+        return (canonical.System, user, canonical.Reference, canonical.Excerpt);
+    }
 
     internal static string ForSelection(string original, CpuGeneration reason)
     {

@@ -12,6 +12,7 @@ namespace AIKernel.Kernel.Inference;
 internal static class BonsaiCtgReasonedFindingPrompt
 {
     internal const string Contract = "canonical-reasoned-finding-v28";
+    internal const int MaximumReasonLength = 1024;
     private static readonly ImmutableArray<string> Standard = ["Yes", "No", "Unknown"];
     private static readonly ImmutableArray<string> Ethical = ["Yes", "No", "Unknown", "Neutral"];
     private static readonly JsonSerializerOptions DataJson = new() { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
@@ -35,6 +36,9 @@ internal static class BonsaiCtgReasonedFindingPrompt
     internal static string ForReason(string original) => original +
         "\nExplain in one short sentence which original fact is decisive and what it establishes under this council's criteria.";
 
+    internal static string ForConciseReason(string original) => original +
+        "\nWrite a single sentence of at most 24 words. Name the decisive observation or missing fact and its consequence for this council. End after that sentence.";
+
     internal static (string System, string User, CanonReference Reference, string Excerpt) BuildFromRecord(
         BonsaiCouncilRule rule, CouncilKind council, string facts, string proposalJson, string edits)
     {
@@ -53,7 +57,7 @@ internal static class BonsaiCtgReasonedFindingPrompt
 
     internal static string ForSelection(string original, CpuGeneration reason)
     {
-        if (reason.FinishReason != "stop" || string.IsNullOrWhiteSpace(reason.Text) || reason.Text.Length > 1024)
+        if (reason.FinishReason != "stop" || string.IsNullOrWhiteSpace(reason.Text) || reason.Text.Length > MaximumReasonLength)
             throw new InvalidDataException("Incomplete or oversized council explanation.");
         // Serialize the draft as untrusted data. Never put request or generated text in the cached system prefix.
         return original + "\nTHIS COUNCIL'S PRELIMINARY EXPLANATION (generated interpretation, not evidence):\n" +

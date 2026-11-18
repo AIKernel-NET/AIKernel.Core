@@ -100,7 +100,9 @@ internal enum BonsaiCtgResponseMode
     /// <summary>Validation only. Keep the original proposal when an action summary drops the identified field.</summary>
     FieldBoundReadingVotes,
     /// <summary>Validation only. Challenge explicit, source-bound exact reporting requests.</summary>
-    ScopedReportVotes
+    ScopedReportVotes,
+    /// <summary>Validation only. Request a concise new explanation if a truncated draft already exceeds the input limit.</summary>
+    ConciseReportRetryVotes
 }
 
 /// <summary>Experimental Bonsai 1.7B council observations; canonical voting fidelity is not established.
@@ -176,12 +178,14 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         BonsaiCtgResponseMode.ChallengedRecordVotes => "canonical-challenged-record-v31",
         BonsaiCtgResponseMode.FieldBoundReadingVotes => "canonical-field-bound-reading-v32",
         BonsaiCtgResponseMode.ScopedReportVotes => "canonical-scoped-report-v33",
+        BonsaiCtgResponseMode.ConciseReportRetryVotes => "canonical-concise-report-retry-v34",
         BonsaiCtgResponseMode.ReasonedFindingVotes => BonsaiCtgReasonedFindingPrompt.Contract,
         _ => null
     };
 
     internal static bool UsesReportChallenge(BonsaiCtgResponseMode mode) => mode is
-        BonsaiCtgResponseMode.ChallengedRecordVotes or BonsaiCtgResponseMode.FieldBoundReadingVotes or BonsaiCtgResponseMode.ScopedReportVotes;
+        BonsaiCtgResponseMode.ChallengedRecordVotes or BonsaiCtgResponseMode.FieldBoundReadingVotes or
+        BonsaiCtgResponseMode.ScopedReportVotes or BonsaiCtgResponseMode.ConciseReportRetryVotes;
 
     internal static bool UsesCompletedReasons(BonsaiCtgResponseMode mode) =>
         mode == BonsaiCtgResponseMode.CompletedReasonedFindingVotes || UsesReportChallenge(mode);
@@ -280,7 +284,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             {
                 string? actionReading=null;
                 bool challenge = UsesReportChallenge(responseMode);
-                bool scopedReport = responseMode == BonsaiCtgResponseMode.ScopedReportVotes;
+                bool scopedReport = responseMode is BonsaiCtgResponseMode.ScopedReportVotes or BonsaiCtgResponseMode.ConciseReportRetryVotes;
                 bool reasoned = challenge || responseMode is BonsaiCtgResponseMode.ReasonedFindingVotes or BonsaiCtgResponseMode.CompletedReasonedFindingVotes;
                 bool sourceBound = responseMode == BonsaiCtgResponseMode.SourceBoundRecordVotes;
                 bool compareLiterals = sourceBound || reasoned || responseMode is BonsaiCtgResponseMode.ComparedReadingVotes or BonsaiCtgResponseMode.RecordFindingVotes;
@@ -393,6 +397,14 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                             CriterionObservation?.Invoke(council, "truncated_reason", answer);
                             timeout.Token.ThrowIfCancellationRequested();
                             metadata[council + ".draft.retry.max_output_tokens"] = "256";
+                            if (responseMode == BonsaiCtgResponseMode.ConciseReportRetryVotes &&
+                                answer.Text.AsSpan().TrimEnd().Length > BonsaiCtgReasonedFindingPrompt.MaximumReasonLength)
+                            {
+                                // Extending this same deterministic prefix cannot bring its text under the limit.
+                                user = BonsaiCtgReasonedFindingPrompt.ForConciseReason(prompt.User);
+                                metadata[council + ".prompt.sha256"] = Hash(system + "\n" + user);
+                                metadata[council + ".draft.retry.format"] = "one_sentence";
+                            }
                             answer = await retryReason(system, user, timeout.Token).ConfigureAwait(false);
                             metadata[council + ".draft.retry.finish_reason"] = answer.FinishReason;
                             timeout.Token.ThrowIfCancellationRequested();

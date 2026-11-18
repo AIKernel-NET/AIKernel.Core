@@ -1,5 +1,6 @@
 using AIKernel.Kernel.Inference;
 using System.Text.Json;
+if(args.Length==5&&args[0]=="--bonsai-ctg-concise-report-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ConciseReportRetryVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-scoped-report-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ScopedReportVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-scoped-report-probe"){await BonsaiCtgReportChallengeProbe.Run(args[1],args[2],args[3],args[4],requireBoundReport:true);return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-field-bound-reading-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.FieldBoundReadingVotes)?0:1;return;}

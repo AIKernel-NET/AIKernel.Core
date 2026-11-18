@@ -7,6 +7,47 @@ namespace AIKernel.Core.Tests.Inference;
 
 public sealed partial class BonsaiCtgTests
 {
+    [Theory]
+    [InlineData(1024, false, true)]
+    [InlineData(1025, true, true)]
+    [InlineData(1025, true, false)]
+    public async Task RetryChangesThePromptOnlyForAnAlreadyOversizedPrefix(int length, bool shortForm, bool validReplacement)
+    {
+        string fragment = new string('X', length);
+        string? firstPrompt = null;
+        int generations = 0, retries = 0, selections = 0;
+        using var evaluator = new BonsaiCtgCouncilEvaluator((system, user, _) =>
+        {
+            if (++generations == 2)
+            {
+                firstPrompt = user;
+                return Task.FromResult(ReadingAnswer(fragment + "  ", "length"));
+            }
+            return Task.FromResult(ReadingAnswer("A recorded state is available."));
+        }, Rules(), responseMode: BonsaiCtgResponseMode.ConciseReportRetryVotes, select: (system, user, _, _) =>
+        {
+            selections++;
+            Assert.DoesNotContain(fragment, user);
+            Assert.DoesNotContain("at most 24 words", user);
+            return Task.FromResult(SelectedFinding("No"));
+        }, retryReason: (_, user, _) =>
+        {
+            retries++;
+            Assert.Equal(shortForm, user.Contains("at most 24 words", StringComparison.Ordinal));
+            Assert.Equal(!shortForm, firstPrompt == user);
+            Assert.DoesNotContain(fragment, user);
+            return Task.FromResult(ReadingAnswer(validReplacement ? "The observed state contradicts the report." : fragment));
+        });
+        var result = await EvaluateRetryStatus(evaluator, BonsaiCtgEvidenceAvailability.Available, TestContext.Current.CancellationToken);
+        Assert.Equal(1, retries);
+        Assert.Equal(validReplacement, result.Evaluation.Succeeded);
+        Assert.Equal(validReplacement ? 3 : 0, selections);
+        var metadata = result.Evaluation.Metadata;
+        Assert.Equal(shortForm, metadata.ContainsKey("Logos.draft.retry.format"));
+        Assert.Equal(!shortForm, metadata["Logos.draft.initial.prompt.sha256"] == metadata["Logos.draft.prompt.sha256"]);
+        if (!validReplacement) AssertUnknownReasonedDecision(result);
+    }
+
     private static Task<BonsaiCtgDecision> EvaluateRetryStatus(BonsaiCtgCouncilEvaluator evaluator,
         BonsaiCtgEvidenceAvailability availability, CancellationToken token)
     {

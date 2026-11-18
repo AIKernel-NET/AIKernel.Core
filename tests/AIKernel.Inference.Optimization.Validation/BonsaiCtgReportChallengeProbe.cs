@@ -8,7 +8,7 @@ using AIKernel.Kernel.Inference;
 internal static class BonsaiCtgReportChallengeProbe
 {
     // Diagnostic only. No gate or council votes are inferred from this probe.
-    internal static async Task Run(string modelPath, string governancePath, string casesPath, string output)
+    internal static async Task Run(string modelPath, string governancePath, string casesPath, string output, bool requireBoundReport = false)
     {
         using (var file = File.OpenRead(modelPath))
             if (Convert.ToHexStringLower(SHA256.HashData(file)) != "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3")
@@ -23,8 +23,9 @@ internal static class BonsaiCtgReportChallengeProbe
             string id = item.GetProperty("id").GetString()!;
             string proposal = item.GetProperty("proposal").GetString()!;
             var facts = item.GetProperty("facts").Deserialize<Dictionary<string,string>>()!.ToImmutableSortedDictionary(StringComparer.Ordinal);
-            var witness = BonsaiCtgLiteralComparison.TryCreate(proposal, facts, includeFieldPaths: true);
-            var edits = witness?.HasMaterialValueDifference == true ? witness.DescribeEdits() : null;
+            var witness = BonsaiCtgLiteralComparison.TryCreate(proposal, facts, includeFieldPaths: true, allowSourceCitation: requireBoundReport);
+            var edits = witness?.HasMaterialValueDifference == true && (!requireBoundReport || witness.IsBoundExactReport(proposal, facts))
+                ? witness.DescribeEdits() : null;
             string? promptSha256 = null;
             CpuGeneration? answer = null;
             if (edits is { Length: <= 1024 })

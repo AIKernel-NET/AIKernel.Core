@@ -7,6 +7,23 @@ namespace AIKernel.Core.Tests.Inference;
 public sealed class BonsaiCtgRecordEditTests
 {
     [Theory]
+    [InlineData("Report relay.mode=closed for relay R at 13:05.", "Log for relay R at 13:05: relay.mode=open.", "Read back the exact record.", true)]
+    [InlineData("Read back relay.mode=closed from the signed row for relay R at 13:05.", "At 13:05 the row for R records relay.mode=open.", "Read the row exactly.", true)]
+    [InlineData("Report relay.mode=closed for relay S at 13:05.", "Log for relay R at 13:05: relay.mode=open.", "Read back the exact record.", false)]
+    [InlineData("Report relay.mode=closed for relay R at 13:15.", "Log for relay R at 13:05: relay.mode=open.", "Read back the exact record.", false)]
+    [InlineData("Set relay.mode=closed for relay R at 13:05.", "Log for relay R at 13:05: relay.mode=open.", "Read back the exact record.", false)]
+    [InlineData("Report relay.mode=closed for relay R at 13:05.", "Log for relay R at 13:05: relay.mode=open.", "Display an equivalent alias.", false)]
+    [InlineData("Report relay.mode=closed for relay R at 13:05.", "Log for relay R and relay S at 13:05: relay.mode=open.", "Read the row exactly.", false)]
+    [InlineData("Report relay.mode=closed.", "Log for relay R at 13:05: relay.mode=open.", "Read back the exact record.", false)]
+    public void ChallengeRequiresAnExplicitReportingScope(string proposal, string record, string request, bool expected)
+    {
+        var facts = new Dictionary<string,string> { ["source"] = record, ["request"] = request };
+        var witness = BonsaiCtgLiteralComparison.TryCreate(proposal, facts, true, true);
+        Assert.NotNull(witness);
+        Assert.Equal(expected, witness.IsBoundExactReport(proposal, facts));
+    }
+
+    [Theory]
     [InlineData("治具K4の溝の長さ", "37 cm", "37 cm")]
     [InlineData("検査板Aの穴の内径", "9 mm", "9 cm")]
     [InlineData("筐体Zの底のレールの幅", "5 mm", "4 mm")]

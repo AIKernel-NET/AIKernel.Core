@@ -33,6 +33,9 @@ internal sealed class BonsaiCtgLiteralComparison
     private static readonly Regex Continuation = new(
         @"^\s*(?:[/\\|*×÷·⋅^±+−–—<>≤≥=²³¹⁰-⁹⁻⁺⁄0-9-]|(?:per|squared|cubed|times|through|to|x)\b)",
         Options | RegexOptions.IgnoreCase);
+    private static readonly Regex FromRecord = new(
+        @"\bfrom\s+(?:(?:the|a|an)\s+)?(?:(?:signed|original|public|dated|inspection)\s+)*(?:row|log|table|record|sheet)\b",
+        Options | RegexOptions.IgnoreCase);
     private static readonly JsonSerializerOptions Json = new()
     {
         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
@@ -49,15 +52,16 @@ internal sealed class BonsaiCtgLiteralComparison
     private BonsaiCtgLiteralComparison(FieldValue proposed, string key, FieldValue observed)
         => (this.proposed, this.key, this.observed) = (proposed, key, observed);
 
-    internal static BonsaiCtgLiteralComparison? TryCreate(string candidate, IReadOnlyDictionary<string, string> observations, bool includeFieldPaths = false)
+    internal static BonsaiCtgLiteralComparison? TryCreate(string candidate, IReadOnlyDictionary<string, string> observations,
+        bool includeFieldPaths = false, bool allowSourceCitation = false)
     {
         if (observations.Count > 64 || !SafeText(candidate, 8192) ||
-            !TryRead(candidate, includeFieldPaths, out var proposed) || proposed is null) return null;
+            !TryRead(candidate, includeFieldPaths, allowSourceCitation, out var proposed) || proposed is null) return null;
 
         BonsaiCtgLiteralComparison? found = null;
         foreach (var (key, text) in observations)
         {
-            if (!SafeText(key, 256) || !SafeText(text, 8192) || !TryRead(text, includeFieldPaths, out var observed)) return null;
+            if (!SafeText(key, 256) || !SafeText(text, 8192) || !TryRead(text, includeFieldPaths, allowSourceCitation, out var observed)) return null;
             if (observed is null || observed.Field != proposed.Field ||
                 (observed.Span.Unit is null) != (proposed.Span.Unit is null)) continue;
             if (found is not null) return null;
@@ -132,6 +136,9 @@ internal sealed class BonsaiCtgLiteralComparison
         reading.Contains(proposed.Field, StringComparison.Ordinal) &&
         reading.Contains(proposed.Span.Literal, StringComparison.Ordinal);
 
+    internal bool IsBoundExactReport(string proposal, IReadOnlyDictionary<string,string> observations) =>
+        BonsaiCtgReportScope.IsBound(proposal, observations, key, proposed.Field, proposed.Span.Unit is not null);
+
     private static bool SafeText(string text, int maxLength)
     {
         if (string.IsNullOrWhiteSpace(text) || text.Length > maxLength ||
@@ -148,13 +155,16 @@ internal sealed class BonsaiCtgLiteralComparison
 
     // false denotes an ambiguous or unsupported expression. true with no value means
     // this record contains no supported literal. Never select the most convenient of several.
-    private static bool TryRead(string text, bool includeFieldPaths, out FieldValue? result)
+    private static bool TryRead(string text, bool includeFieldPaths, bool allowSourceCitation, out FieldValue? result)
     {
         result = null;
         Match assignment = Assignment.Match(text);
         Match quantity = Quantity.Match(text);
         if (!assignment.Success && !quantity.Success) return true;
-        if (QualifiedScope.IsMatch(text) || assignment.NextMatch().Success || quantity.NextMatch().Success) return false;
+        // Only the ambiguity check may ignore a source preposition. Offsets and evidence
+        // always refer to the unmodified original, including the word "from".
+        string scope = allowSourceCitation && assignment.Success && !quantity.Success ? FromRecord.Replace(text, " ") : text;
+        if (QualifiedScope.IsMatch(scope) || assignment.NextMatch().Success || quantity.NextMatch().Success) return false;
 
         if (quantity.Success)
         {

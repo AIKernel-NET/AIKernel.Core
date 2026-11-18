@@ -31,7 +31,7 @@ internal static class BonsaiCtgEvidenceScopeSuite
         };
         evaluator.CriterionObservation=(role,name,answer)=>
         {
-            if ((mode is BonsaiCtgResponseMode.CompletedReasonedFindingVotes or BonsaiCtgResponseMode.ChallengedRecordVotes or BonsaiCtgResponseMode.FieldBoundReadingVotes) && name == "truncated_reason")
+            if (BonsaiCtgCouncilEvaluator.UsesCompletedReasons(mode) && name == "truncated_reason")
                 validTruncations &= answer.FinishReason == "length" && truncatedRoles.Add(role);
             calls++;observations.Add(new{id=current,council=role.ToString(),stage="criterion",criterion=name,answer});
             File.WriteAllText(output+".responses.json",JsonSerializer.Serialize(observations,new JsonSerializerOptions{WriteIndented=true}));
@@ -60,10 +60,10 @@ internal static class BonsaiCtgEvidenceScopeSuite
             bool hostPass=blocked&&!expected&&calls==0&&legacyCalls==0&&!witness.Succeeded&&!result.Evaluation.Succeeded&&
                 witness.ErrorCode=="ctg.bonsai.required_evidence_unavailable"&&result.Evaluation.ErrorCode==witness.ErrorCode&&!result.Gate.Accepted&&
                 result.Evaluation.Decision.Votes.All(v=>v.VoteValue==CouncilVoteValue.Unknown);
-            bool reasoned = (mode is BonsaiCtgResponseMode.ReasonedFindingVotes or BonsaiCtgResponseMode.CompletedReasonedFindingVotes or BonsaiCtgResponseMode.ChallengedRecordVotes or BonsaiCtgResponseMode.FieldBoundReadingVotes) && result.Evaluation.Metadata.ContainsKey("comparison.sha256");
+            bool reasoned = (mode == BonsaiCtgResponseMode.ReasonedFindingVotes || BonsaiCtgCouncilEvaluator.UsesCompletedReasons(mode)) && result.Evaluation.Metadata.ContainsKey("comparison.sha256");
             int expectedCalls = reasoned ? 7 : hasReading ? 4 : mode == BonsaiCtgResponseMode.PerCriterionFindings ? 16 : mode == BonsaiCtgResponseMode.ReviewedPacketVotes ? 6 : 3;
             if (mode == BonsaiCtgResponseMode.SourceBoundRecordVotes && result.Evaluation.Metadata.ContainsKey("record.edits.sha256")) expectedCalls = 3;
-            bool challenged = mode is BonsaiCtgResponseMode.ChallengedRecordVotes or BonsaiCtgResponseMode.FieldBoundReadingVotes;
+            bool challenged = BonsaiCtgCouncilEvaluator.UsesReportChallenge(mode);
             if (challenged && result.Evaluation.Metadata.ContainsKey("Logos.challenge.response.sha256")) expectedCalls++;
             if (reasoned && (mode == BonsaiCtgResponseMode.CompletedReasonedFindingVotes || challenged))
             {

@@ -20,7 +20,8 @@ internal static class BonsaiCtgRecordReplay
             "v30" => BonsaiCtgResponseMode.SourceBoundRecordVotes,
             "v31" => BonsaiCtgResponseMode.ChallengedRecordVotes,
             "v32" => BonsaiCtgResponseMode.FieldBoundReadingVotes,
-            _ => throw new ArgumentException("Expected v30, v31 or v32.")
+            "v33" => BonsaiCtgResponseMode.ScopedReportVotes,
+            _ => throw new ArgumentException("Expected v30, v31, v32 or v33.")
         };
         var cases = Read(Path.Combine(directory,"cases.json")).EnumerateArray().ToDictionary(x => x.GetProperty("id").GetString()!);
         var responses = Read(Path.Combine(directory,"result.json.responses.json")).EnumerateArray().ToLookup(x => x.GetProperty("id").GetString()!);

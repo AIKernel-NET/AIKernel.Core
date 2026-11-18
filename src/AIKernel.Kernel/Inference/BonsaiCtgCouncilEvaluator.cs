@@ -84,7 +84,9 @@ internal enum BonsaiCtgResponseMode
     /// <summary>Validation-only exact observation followed by vote and reason.</summary>
     AnchoredReadingVotes,
     /// <summary>Validation-only fixed council protocols with independent Pathos reasoning about impact.</summary>
-    RoutedReadingVotes
+    RoutedReadingVotes,
+    /// <summary>Validation-only literal comparison of the proposed report against observation text.</summary>
+    ComparedReadingVotes
 }
 
 /// <summary>Experimental Bonsai 1.7B council observations; canonical voting fidelity is not established.
@@ -146,6 +148,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         BonsaiCtgResponseMode.VoteFirstReadingVotes => BonsaiCtgFocusedPrompt.VoteFirstContract,
         BonsaiCtgResponseMode.AnchoredReadingVotes => BonsaiCtgAnchoredVotePrompt.Contract,
         BonsaiCtgResponseMode.RoutedReadingVotes => BonsaiCtgFocusedPrompt.RoutedContract,
+        BonsaiCtgResponseMode.ComparedReadingVotes => BonsaiCtgFocusedPrompt.ComparisonContract,
         _ => null
     };
 
@@ -242,6 +245,10 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             try
             {
                 string? actionReading=null;
+                string? comparison = responseMode == BonsaiCtgResponseMode.ComparedReadingVotes
+                    ? BonsaiCtgLiteralComparison.TryCreate(proposal!, inputFacts)?.ToPromptData()
+                    : null;
+                if (comparison is not null) metadata["comparison.sha256"] = Hash(comparison);
                 if(focused)
                 {
                     var readingPrompt=BonsaiCtgFocusedPrompt.Reading(facts,proposalJson!,effects);
@@ -284,10 +291,11 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                             Metadata=new Dictionary<string,string>{{"label",combined.ToString()},{"binding.policy",BonsaiCtgCriteriaPrompt.Binding},{"prompt.sha256",metadata[council+".prompt.sha256"]}}});
                         continue;
                     }
+                    bool routed = responseMode is BonsaiCtgResponseMode.RoutedReadingVotes or BonsaiCtgResponseMode.ComparedReadingVotes;
                     bool anchored = responseMode == BonsaiCtgResponseMode.AnchoredReadingVotes ||
-                        (responseMode == BonsaiCtgResponseMode.RoutedReadingVotes && council is CouncilKind.Logos or CouncilKind.Ethos);
-                    var rule=rules[council];var prompt=anchored?BonsaiCtgAnchoredVotePrompt.Build(rule,council,facts,proposalJson!,actionReading!):
-                        focused?BonsaiCtgFocusedPrompt.Build(rule,council,facts,proposalJson!,actionReading!,defined,voteFirst):
+                        (routed && council is CouncilKind.Logos or CouncilKind.Ethos);
+                    var rule=rules[council];var prompt=anchored?BonsaiCtgAnchoredVotePrompt.Build(rule,council,facts,proposalJson!,actionReading!,comparison):
+                        focused?BonsaiCtgFocusedPrompt.Build(rule,council,facts,proposalJson!,actionReading!,defined,voteFirst,literalComparison:comparison):
                         provenance?BonsaiCtgProvenancePrompt.Build(rule,council,facts,proposalJson!):
                         councilScoped?BonsaiCtgDirectVotePrompt.BuildWithCouncilScopes(rule,council,facts,proposalJson!):
                         reviewed?BonsaiCtgReviewPrompt.Build(rule,council,facts,proposalJson!):

@@ -15,9 +15,9 @@ internal static class BonsaiCtgAnchoredVotePrompt
         "For reason, explain the decisive criterion in one short sentence. No Markdown or other text.";
 
     internal static (string System, string User, CanonReference Reference, string Excerpt) Build(
-        BonsaiCouncilRule rule, CouncilKind council, string facts, string proposalJson, string reading)
+        BonsaiCouncilRule rule, CouncilKind council, string facts, string proposalJson, string reading, string? literalComparison = null)
         => BonsaiCtgFocusedPrompt.Build(rule, council, facts, proposalJson, reading, includeResponsibilities: true,
-            assessmentSchema: Schema, assessmentSuffix: "Return only the evidence, vote, reason JSON assessment in that order.");
+            assessmentSchema: Schema, assessmentSuffix: "Return only the evidence, vote, reason JSON assessment in that order.", literalComparison: literalComparison);
 
     internal static CouncilVoteValue Parse(CpuGeneration answer, IReadOnlyDictionary<string, string> facts, CouncilKind council)
     {

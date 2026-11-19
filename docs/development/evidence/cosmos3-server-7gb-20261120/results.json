@@ -1,0 +1,1255 @@
+{
+  "server": {
+    "cpuModel": "AMD EPYC 9555 64-Core Processor",
+    "kernel": "6.8.0-149-bet01-generic",
+    "runtime": "10.0.15",
+    "filesystem": "xfs",
+    "modelHostAddressSpaceLimitBytes": 7000000000,
+    "weightCacheBytes": 3221225472,
+    "kvCacheBytes": 128000000,
+    "cpuThreads": 4,
+    "storage": {
+      "majorMinor": "9:0",
+      "backing": {
+        "device": "md0",
+        "rotational": "0",
+        "slaves": [
+          {
+            "device": "nvme7n1p1",
+            "rotational": "0",
+            "slaves": []
+          },
+          {
+            "device": "nvme14n1p1",
+            "rotational": "0",
+            "slaves": []
+          },
+          {
+            "device": "nvme4n1p1",
+            "rotational": "0",
+            "slaves": []
+          },
+          {
+            "device": "nvme8n1p1",
+            "rotational": "0",
+            "slaves": []
+          },
+          {
+            "device": "nvme15n1p1",
+            "rotational": "0",
+            "slaves": []
+          },
+          {
+            "device": "nvme1n1p1",
+            "rotational": "0",
+            "slaves": []
+          },
+          {
+            "device": "nvme12n1p1",
+            "rotational": "0",
+            "slaves": []
+          },
+          {
+            "device": "nvme2n1p1",
+            "rotational": "0",
+            "slaves": []
+          }
+        ]
+      }
+    }
+  },
+  "modelParameters": {
+    "context": 512,
+    "maxNewTokens": 32,
+    "thinking": false,
+    "system": "You are helpful.",
+    "history": []
+  },
+  "complete": {
+    "finished": "2026-11-19T18:31:58Z",
+    "kernel": "6.8.0-149-bet01-generic",
+    "limit": 7000000000,
+    "workers": 4
+  },
+  "source": {
+    "core": "4996454dd283f1c6a9a019968d9a55a4cfb26268",
+    "monolith": "5be4185ba365f54d21a04628d2d88b3868aa23c7",
+    "website": "dfee4ba29f47eee93b1d5b3288a6017287cd9541",
+    "referenceSha256": "1a448bf3a3d4a2b3eb8f101464880b3aafd80b1f61e5814bf6b7ecbc4c89dc54",
+    "developmentTimingSha256": "f11152d40339563583b2cd386ec344d8f228f00153d02227bc2f54fd775b70af",
+    "hostDllSha256": "86f74da38412243d360cfb95317a6981da27d70f25dab9d2c004d755a99b7464",
+    "relayDllSha256": "e4cebd0e27a4fa4cfad97f8d9cc01d2080c2eb7803098a911451b24d7b2eed86"
+  },
+  "development": [
+    {
+      "model": "edge",
+      "mode": "text",
+      "expected": "4",
+      "result": {
+        "reply": "4",
+        "finish": "stop"
+      },
+      "seconds": 76.9,
+      "matched": true
+    },
+    {
+      "model": "edge",
+      "mode": "image",
+      "expected": "The image is entirely red.",
+      "result": {
+        "reply": "The image is entirely red.",
+        "finish": "stop"
+      },
+      "seconds": 133.6,
+      "matched": true
+    },
+    {
+      "model": "edge",
+      "mode": "video",
+      "expected": "red, orange, yellow, green, blue, indigo, purple",
+      "result": {
+        "reply": "red, orange, yellow, green, blue, indigo, purple",
+        "finish": "stop"
+      },
+      "seconds": 531.0,
+      "matched": true
+    },
+    {
+      "model": "nano",
+      "mode": "text",
+      "expected": "4",
+      "result": {
+        "reply": "4",
+        "finish": "stop"
+      },
+      "seconds": 417.4,
+      "matched": true
+    },
+    {
+      "model": "nano",
+      "mode": "image",
+      "expected": "Red",
+      "result": {
+        "reply": "Red",
+        "finish": "stop"
+      },
+      "seconds": 233.5,
+      "matched": true
+    },
+    {
+      "model": "nano",
+      "mode": "video",
+      "expected": "Red, orange, green, blue.",
+      "result": {
+        "reply": "Red, orange, green, blue.",
+        "finish": "stop"
+      },
+      "seconds": 703.4,
+      "matched": true
+    }
+  ],
+  "edgeWarmup": {
+    "addressSpaceLimitBytes": 7000000000,
+    "aiKernel": {
+      "after": {
+        "BudgetAdjustments": 2,
+        "KvCacheCapacityBytes": 0,
+        "KvResidentBytes": 0,
+        "KvSwapReads": 0,
+        "LiveWorkspaceBytes": 0,
+        "MaximumResidentBytes": 7000000000,
+        "ObservedResidentBytes": 3498409984,
+        "PeakObservedResidentBytes": 3498409984,
+        "PeakWorkspaceBytes": 24241664,
+        "WeightBackingReads": 1722,
+        "WeightCacheCapacityBytes": 3221225472,
+        "WeightResidentBytes": 3221225472
+      },
+      "before": {
+        "BudgetAdjustments": 1,
+        "KvCacheCapacityBytes": 0,
+        "KvResidentBytes": 0,
+        "KvSwapReads": 0,
+        "LiveWorkspaceBytes": 0,
+        "MaximumResidentBytes": 7000000000,
+        "ObservedResidentBytes": 451301376,
+        "PeakObservedResidentBytes": 451301376,
+        "PeakWorkspaceBytes": 0,
+        "WeightBackingReads": 57,
+        "WeightCacheCapacityBytes": 3221225472,
+        "WeightResidentBytes": 239075328
+      },
+      "kvSwapReads": 0,
+      "weightBackingReads": 1665
+    },
+    "baselineRssBytes": 144662528,
+    "check": {
+      "answer": true,
+      "finish": true,
+      "inputCount": true,
+      "tokens": true
+    },
+    "cpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "devSeconds": 76.9,
+    "inputTokens": 32,
+    "ioDelta": {
+      "rchar": 11670937966,
+      "read_bytes": 469172224,
+      "wchar": 2421,
+      "write_bytes": 16384
+    },
+    "linuxHighWaterBytes": 3499249664,
+    "manifestSha256": "8f696d470adeb78ffcc949f804c7c9ac8d7dd5bd9ac350a4a162037120a6c882",
+    "mode": "text",
+    "model": "edge",
+    "peakRssBytes": 3499249664,
+    "reference": "4",
+    "reply": {
+      "finish": "stop",
+      "reply": "4"
+    },
+    "requestSha256": "9d3f27970f376e20303ceedfc7bf88690070bbab9aa8303fe5ca73901fcea800",
+    "samples": {
+      "combined": 3581603840,
+      "count": 44,
+      "rss": 3498409984,
+      "vsize": 5917396992
+    },
+    "seconds": 8.713866523001343,
+    "startUTC": "2026-11-19T18:26:12Z",
+    "tokenIds": [
+      1052,
+      11
+    ],
+    "warmup": true
+  },
+  "cases": [
+    {
+      "addressSpaceLimitBytes": 7000000000,
+      "aiKernel": {
+        "after": {
+          "BudgetAdjustments": 3,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 3501514752,
+          "PeakObservedResidentBytes": 3501514752,
+          "PeakWorkspaceBytes": 24241664,
+          "WeightBackingReads": 3387,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 3221225472
+        },
+        "before": {
+          "BudgetAdjustments": 2,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 3498409984,
+          "PeakObservedResidentBytes": 3498409984,
+          "PeakWorkspaceBytes": 24241664,
+          "WeightBackingReads": 1722,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 3221225472
+        },
+        "kvSwapReads": 0,
+        "weightBackingReads": 1665
+      },
+      "baselineRssBytes": 3499249664,
+      "check": {
+        "answer": true,
+        "finish": true,
+        "inputCount": true,
+        "tokens": true
+      },
+      "cpus": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "devSeconds": 76.9,
+      "inputTokens": 32,
+      "ioDelta": {
+        "rchar": 6765029955,
+        "read_bytes": 0,
+        "wchar": 2374,
+        "write_bytes": 12288
+      },
+      "linuxHighWaterBytes": 3501756416,
+      "manifestSha256": "8f696d470adeb78ffcc949f804c7c9ac8d7dd5bd9ac350a4a162037120a6c882",
+      "mode": "text",
+      "model": "edge",
+      "peakRssBytes": 3501756416,
+      "reference": "4",
+      "reply": {
+        "finish": "stop",
+        "reply": "4"
+      },
+      "requestSha256": "9d3f27970f376e20303ceedfc7bf88690070bbab9aa8303fe5ca73901fcea800",
+      "samples": {
+        "combined": 3585400832,
+        "count": 19,
+        "rss": 3501514752,
+        "vsize": 5918175232
+      },
+      "seconds": 3.6755145179922692,
+      "startUTC": "2026-11-19T18:26:21Z",
+      "tokenIds": [
+        1052,
+        11
+      ],
+      "warmup": false
+    },
+    {
+      "addressSpaceLimitBytes": 7000000000,
+      "aiKernel": {
+        "after": {
+          "BudgetAdjustments": 4,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 3497435136,
+          "PeakObservedResidentBytes": 3503439872,
+          "PeakWorkspaceBytes": 26720032,
+          "WeightBackingReads": 9784,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 3221225472
+        },
+        "before": {
+          "BudgetAdjustments": 3,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 3501514752,
+          "PeakObservedResidentBytes": 3501514752,
+          "PeakWorkspaceBytes": 24241664,
+          "WeightBackingReads": 3387,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 3221225472
+        },
+        "kvSwapReads": 0,
+        "weightBackingReads": 6397
+      },
+      "baselineRssBytes": 3501764608,
+      "check": {
+        "answer": true,
+        "finish": true,
+        "inputCount": true,
+        "tokens": true
+      },
+      "cpus": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "devSeconds": 133.6,
+      "inputTokens": 38,
+      "ioDelta": {
+        "rchar": 24554572428,
+        "read_bytes": 0,
+        "wchar": 2401,
+        "write_bytes": 12288
+      },
+      "linuxHighWaterBytes": 3497644032,
+      "manifestSha256": "8f696d470adeb78ffcc949f804c7c9ac8d7dd5bd9ac350a4a162037120a6c882",
+      "mode": "image",
+      "model": "edge",
+      "peakRssBytes": 3503390720,
+      "reference": "The image is entirely red.",
+      "reply": {
+        "finish": "stop",
+        "reply": "The image is entirely red."
+      },
+      "requestSha256": "2fef65bada9f99b032276392d7452a11e580776de9b2548dafe3d1b3df0a7bcb",
+      "samples": {
+        "combined": 3587919872,
+        "count": 35,
+        "rss": 3503390720,
+        "vsize": 5918167040
+      },
+      "seconds": 6.991359584993916,
+      "startUTC": "2026-11-19T18:26:24Z",
+      "tokenIds": [
+        1784,
+        3937,
+        1395,
+        17262,
+        4804,
+        1046,
+        11
+      ],
+      "warmup": false
+    },
+    {
+      "addressSpaceLimitBytes": 7000000000,
+      "aiKernel": {
+        "after": {
+          "BudgetAdjustments": 5,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 3531321344,
+          "PeakObservedResidentBytes": 3531333632,
+          "PeakWorkspaceBytes": 31821280,
+          "WeightBackingReads": 22539,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 3221225472
+        },
+        "before": {
+          "BudgetAdjustments": 4,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 3497435136,
+          "PeakObservedResidentBytes": 3503439872,
+          "PeakWorkspaceBytes": 26720032,
+          "WeightBackingReads": 9784,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 3221225472
+        },
+        "kvSwapReads": 0,
+        "weightBackingReads": 12755
+      },
+      "baselineRssBytes": 3497644032,
+      "check": {
+        "answer": true,
+        "finish": true,
+        "inputCount": true,
+        "tokens": true
+      },
+      "cpus": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "devSeconds": 531.0,
+      "inputTokens": 146,
+      "ioDelta": {
+        "rchar": 51541154061,
+        "read_bytes": 0,
+        "wchar": 2465,
+        "write_bytes": 12288
+      },
+      "linuxHighWaterBytes": 3519160320,
+      "manifestSha256": "8f696d470adeb78ffcc949f804c7c9ac8d7dd5bd9ac350a4a162037120a6c882",
+      "mode": "video",
+      "model": "edge",
+      "peakRssBytes": 3531333632,
+      "reference": "red, orange, yellow, green, blue, indigo, purple",
+      "reply": {
+        "finish": "stop",
+        "reply": "red, orange, yellow, green, blue, indigo, purple"
+      },
+      "requestSha256": "106a8f04eba0c4ca4457499b9be93dd98b871ca7adf00ec2dc0c5bf69b655dd1",
+      "samples": {
+        "combined": 3617337344,
+        "count": 131,
+        "rss": 3531333632,
+        "vsize": 5918167040
+      },
+      "seconds": 26.119551259005675,
+      "startUTC": "2026-11-19T18:26:31Z",
+      "tokenIds": [
+        2338,
+        1044,
+        32300,
+        1044,
+        19502,
+        1044,
+        11223,
+        1044,
+        10991,
+        1044,
+        2495,
+        7378,
+        1044,
+        47568,
+        11
+      ],
+      "warmup": false
+    },
+    {
+      "addressSpaceLimitBytes": 7000000000,
+      "aiKernel": {
+        "after": {
+          "BudgetAdjustments": 2,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 3539464192,
+          "PeakObservedResidentBytes": 3539480576,
+          "PeakWorkspaceBytes": 24357824,
+          "WeightBackingReads": 97860,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 3221225472
+        },
+        "before": {
+          "BudgetAdjustments": 1,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 905277440,
+          "PeakObservedResidentBytes": 905277440,
+          "PeakWorkspaceBytes": 0,
+          "WeightBackingReads": 145,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 608174080
+        },
+        "kvSwapReads": 0,
+        "weightBackingReads": 97715
+      },
+      "baselineRssBytes": 3503140864,
+      "check": {
+        "answer": true,
+        "finish": true,
+        "inputCount": true,
+        "tokens": true
+      },
+      "cpus": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "devSeconds": 417.4,
+      "inputTokens": 28,
+      "ioDelta": {
+        "rchar": 423066141133,
+        "read_bytes": 1162334208,
+        "wchar": 2457,
+        "write_bytes": 20480
+      },
+      "linuxHighWaterBytes": 3528069120,
+      "manifestSha256": "df2194ec2a53c3771a35e3d4e7e8b8abcf7fa1f690cd6c92fa374fe5a061bb58",
+      "mode": "text",
+      "model": "nano",
+      "peakRssBytes": 3539480576,
+      "reference": "4",
+      "reply": {
+        "finish": "stop",
+        "reply": "4"
+      },
+      "requestSha256": "b58168f504aa39f383edca419083391268004be68e496a94df0529f8ec9ecba1",
+      "samples": {
+        "combined": 3627380736,
+        "count": 303,
+        "rss": 3539480576,
+        "vsize": 6112149504
+      },
+      "seconds": 60.55703565001022,
+      "startUTC": "2026-11-19T18:26:58Z",
+      "tokenIds": [
+        19,
+        151645
+      ],
+      "warmup": false
+    },
+    {
+      "addressSpaceLimitBytes": 7000000000,
+      "aiKernel": {
+        "after": {
+          "BudgetAdjustments": 3,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 3550404608,
+          "PeakObservedResidentBytes": 3550404608,
+          "PeakWorkspaceBytes": 36065248,
+          "WeightBackingReads": 216226,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 3221225472
+        },
+        "before": {
+          "BudgetAdjustments": 2,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 3539464192,
+          "PeakObservedResidentBytes": 3539480576,
+          "PeakWorkspaceBytes": 24357824,
+          "WeightBackingReads": 97860,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 3221225472
+        },
+        "kvSwapReads": 0,
+        "weightBackingReads": 118366
+      },
+      "baselineRssBytes": 3528069120,
+      "check": {
+        "answer": true,
+        "finish": true,
+        "inputCount": true,
+        "tokens": true
+      },
+      "cpus": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "devSeconds": 233.5,
+      "inputTokens": 34,
+      "ioDelta": {
+        "rchar": 490032281711,
+        "read_bytes": 708644864,
+        "wchar": 2478,
+        "write_bytes": 16384
+      },
+      "linuxHighWaterBytes": 3536719872,
+      "manifestSha256": "df2194ec2a53c3771a35e3d4e7e8b8abcf7fa1f690cd6c92fa374fe5a061bb58",
+      "mode": "image",
+      "model": "nano",
+      "peakRssBytes": 3550404608,
+      "reference": "Red",
+      "reply": {
+        "finish": "stop",
+        "reply": "Red"
+      },
+      "requestSha256": "b892a432f9b26e2235c24ec6d4dbcbccd4599f3a2d8afd9c51d75dde9414257b",
+      "samples": {
+        "combined": 3637792768,
+        "count": 322,
+        "rss": 3550404608,
+        "vsize": 6131515392
+      },
+      "seconds": 64.35931942099705,
+      "startUTC": "2026-11-19T18:27:58Z",
+      "tokenIds": [
+        6033,
+        151645
+      ],
+      "warmup": false
+    },
+    {
+      "addressSpaceLimitBytes": 7000000000,
+      "aiKernel": {
+        "after": {
+          "BudgetAdjustments": 4,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 3559993344,
+          "PeakObservedResidentBytes": 3563991040,
+          "PeakWorkspaceBytes": 39338800,
+          "WeightBackingReads": 537360,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 3221225472
+        },
+        "before": {
+          "BudgetAdjustments": 3,
+          "KvCacheCapacityBytes": 0,
+          "KvResidentBytes": 0,
+          "KvSwapReads": 0,
+          "LiveWorkspaceBytes": 0,
+          "MaximumResidentBytes": 7000000000,
+          "ObservedResidentBytes": 3550404608,
+          "PeakObservedResidentBytes": 3550404608,
+          "PeakWorkspaceBytes": 36065248,
+          "WeightBackingReads": 216226,
+          "WeightCacheCapacityBytes": 3221225472,
+          "WeightResidentBytes": 3221225472
+        },
+        "kvSwapReads": 0,
+        "weightBackingReads": 321134
+      },
+      "baselineRssBytes": 3532189696,
+      "check": {
+        "answer": true,
+        "finish": true,
+        "inputCount": true,
+        "tokens": true
+      },
+      "cpus": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "devSeconds": 703.4,
+      "inputTokens": 87,
+      "ioDelta": {
+        "rchar": 1332531921452,
+        "read_bytes": 0,
+        "wchar": 2580,
+        "write_bytes": 12288
+      },
+      "linuxHighWaterBytes": 3547901952,
+      "manifestSha256": "df2194ec2a53c3771a35e3d4e7e8b8abcf7fa1f690cd6c92fa374fe5a061bb58",
+      "mode": "video",
+      "model": "nano",
+      "peakRssBytes": 3563966464,
+      "reference": "Red, orange, green, blue.",
+      "reply": {
+        "finish": "stop",
+        "reply": "Red, orange, green, blue."
+      },
+      "requestSha256": "fda6ed19b7d3ecaf439472c81ac30f22054ebe5d508dd4a9bc5dfc28dfc9338e",
+      "samples": {
+        "combined": 3654639616,
+        "count": 879,
+        "rss": 3563966464,
+        "vsize": 6145257472
+      },
+      "seconds": 175.96926857499056,
+      "startUTC": "2026-11-19T18:29:02Z",
+      "tokenIds": [
+        6033,
+        11,
+        18575,
+        11,
+        6176,
+        11,
+        6303,
+        13,
+        151645
+      ],
+      "warmup": false
+    }
+  ],
+  "pressureTest": {
+    "kvCacheBytes": 8388608,
+    "hostDllSha256": "2d367d89db8bc304dbd1aaa8fb477fb523d708a673078653be274dcc62622596",
+    "complete": {
+      "finished": "2026-11-19T18:26:10Z",
+      "kernel": "6.8.0-149-bet01-generic",
+      "limit": 7000000000,
+      "workers": 4
+    },
+    "cases": [
+      {
+        "addressSpaceLimitBytes": 7000000000,
+        "aiKernel": {
+          "after": {
+            "BudgetAdjustments": 3,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 3584,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 3496579072,
+            "PeakObservedResidentBytes": 3496579072,
+            "PeakWorkspaceBytes": 24241664,
+            "WeightBackingReads": 3387,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 3221225472
+          },
+          "before": {
+            "BudgetAdjustments": 2,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 1792,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 3493191680,
+            "PeakObservedResidentBytes": 3493191680,
+            "PeakWorkspaceBytes": 24241664,
+            "WeightBackingReads": 1722,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 3221225472
+          },
+          "kvSwapReads": 1792,
+          "weightBackingReads": 1665
+        },
+        "baselineRssBytes": 3494154240,
+        "check": {
+          "answer": true,
+          "finish": true,
+          "inputCount": true,
+          "tokens": true
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "devSeconds": 76.9,
+        "inputTokens": 32,
+        "ioDelta": {
+          "rchar": 7242567032,
+          "read_bytes": 0,
+          "wchar": 958765399,
+          "write_bytes": 966131712
+        },
+        "linuxHighWaterBytes": 3496824832,
+        "manifestSha256": "8f696d470adeb78ffcc949f804c7c9ac8d7dd5bd9ac350a4a162037120a6c882",
+        "mode": "text",
+        "model": "edge",
+        "peakRssBytes": 3496824832,
+        "reference": "4",
+        "reply": {
+          "finish": "stop",
+          "reply": "4"
+        },
+        "requestSha256": "9d3f27970f376e20303ceedfc7bf88690070bbab9aa8303fe5ca73901fcea800",
+        "samples": {
+          "combined": 3598172160,
+          "count": 27,
+          "rss": 3496579072,
+          "vsize": 5935955968
+        },
+        "seconds": 5.249698567989981,
+        "startUTC": "2026-11-19T18:20:17Z",
+        "tokenIds": [
+          1052,
+          11
+        ],
+        "warmup": false
+      },
+      {
+        "addressSpaceLimitBytes": 7000000000,
+        "aiKernel": {
+          "after": {
+            "BudgetAdjustments": 4,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 5992,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 3491041280,
+            "PeakObservedResidentBytes": 3497488384,
+            "PeakWorkspaceBytes": 26720032,
+            "WeightBackingReads": 9784,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 3221225472
+          },
+          "before": {
+            "BudgetAdjustments": 3,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 3584,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 3496579072,
+            "PeakObservedResidentBytes": 3496579072,
+            "PeakWorkspaceBytes": 24241664,
+            "WeightBackingReads": 3387,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 3221225472
+          },
+          "kvSwapReads": 2408,
+          "weightBackingReads": 6397
+        },
+        "baselineRssBytes": 3496824832,
+        "check": {
+          "answer": true,
+          "finish": true,
+          "inputCount": true,
+          "tokens": true
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "devSeconds": 133.6,
+        "inputTokens": 38,
+        "ioDelta": {
+          "rchar": 25196559400,
+          "read_bytes": 0,
+          "wchar": 1281761315,
+          "write_bytes": 1291730944
+        },
+        "linuxHighWaterBytes": 3491053568,
+        "manifestSha256": "8f696d470adeb78ffcc949f804c7c9ac8d7dd5bd9ac350a4a162037120a6c882",
+        "mode": "image",
+        "model": "edge",
+        "peakRssBytes": 3497488384,
+        "reference": "The image is entirely red.",
+        "reply": {
+          "finish": "stop",
+          "reply": "The image is entirely red."
+        },
+        "requestSha256": "2fef65bada9f99b032276392d7452a11e580776de9b2548dafe3d1b3df0a7bcb",
+        "samples": {
+          "combined": 3599556608,
+          "count": 47,
+          "rss": 3497488384,
+          "vsize": 5935951872
+        },
+        "seconds": 9.416315996000776,
+        "startUTC": "2026-11-19T18:20:22Z",
+        "tokenIds": [
+          1784,
+          3937,
+          1395,
+          17262,
+          4804,
+          1046,
+          11
+        ],
+        "warmup": false
+      },
+      {
+        "addressSpaceLimitBytes": 7000000000,
+        "aiKernel": {
+          "after": {
+            "BudgetAdjustments": 5,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 21952,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 3495997440,
+            "PeakObservedResidentBytes": 3500265472,
+            "PeakWorkspaceBytes": 31821280,
+            "WeightBackingReads": 22539,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 3221225472
+          },
+          "before": {
+            "BudgetAdjustments": 4,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 5992,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 3491041280,
+            "PeakObservedResidentBytes": 3497488384,
+            "PeakWorkspaceBytes": 26720032,
+            "WeightBackingReads": 9784,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 3221225472
+          },
+          "kvSwapReads": 15960,
+          "weightBackingReads": 12755
+        },
+        "baselineRssBytes": 3491053568,
+        "check": {
+          "answer": true,
+          "finish": true,
+          "inputCount": true,
+          "tokens": true
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "devSeconds": 531.0,
+        "inputTokens": 146,
+        "ioDelta": {
+          "rchar": 55787434014,
+          "read_bytes": 0,
+          "wchar": 8475761060,
+          "write_bytes": 8585953280
+        },
+        "linuxHighWaterBytes": 3495997440,
+        "manifestSha256": "8f696d470adeb78ffcc949f804c7c9ac8d7dd5bd9ac350a4a162037120a6c882",
+        "mode": "video",
+        "model": "edge",
+        "peakRssBytes": 3500265472,
+        "reference": "red, orange, yellow, green, blue, indigo, purple",
+        "reply": {
+          "finish": "stop",
+          "reply": "red, orange, yellow, green, blue, indigo, purple"
+        },
+        "requestSha256": "106a8f04eba0c4ca4457499b9be93dd98b871ca7adf00ec2dc0c5bf69b655dd1",
+        "samples": {
+          "combined": 3603652608,
+          "count": 179,
+          "rss": 3500265472,
+          "vsize": 5934698496
+        },
+        "seconds": 35.788309080991894,
+        "startUTC": "2026-11-19T18:20:32Z",
+        "tokenIds": [
+          2338,
+          1044,
+          32300,
+          1044,
+          19502,
+          1044,
+          11223,
+          1044,
+          10991,
+          1044,
+          2495,
+          7378,
+          1044,
+          47568,
+          11
+        ],
+        "warmup": false
+      },
+      {
+        "addressSpaceLimitBytes": 7000000000,
+        "aiKernel": {
+          "after": {
+            "BudgetAdjustments": 2,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 2016,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 3527708672,
+            "PeakObservedResidentBytes": 3534491648,
+            "PeakWorkspaceBytes": 24357824,
+            "WeightBackingReads": 97860,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 3221225472
+          },
+          "before": {
+            "BudgetAdjustments": 1,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 0,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 912510976,
+            "PeakObservedResidentBytes": 912510976,
+            "PeakWorkspaceBytes": 0,
+            "WeightBackingReads": 145,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 608174080
+          },
+          "kvSwapReads": 2016,
+          "weightBackingReads": 97715
+        },
+        "baselineRssBytes": 3495997440,
+        "check": {
+          "answer": true,
+          "finish": true,
+          "inputCount": true,
+          "tokens": true
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "devSeconds": 417.4,
+        "inputTokens": 28,
+        "ioDelta": {
+          "rchar": 423601481648,
+          "read_bytes": 11245408256,
+          "wchar": 1088802744,
+          "write_bytes": 1097068544
+        },
+        "linuxHighWaterBytes": 3527966720,
+        "manifestSha256": "df2194ec2a53c3771a35e3d4e7e8b8abcf7fa1f690cd6c92fa374fe5a061bb58",
+        "mode": "text",
+        "model": "nano",
+        "peakRssBytes": 3533123584,
+        "reference": "4",
+        "reply": {
+          "finish": "stop",
+          "reply": "4"
+        },
+        "requestSha256": "b58168f504aa39f383edca419083391268004be68e496a94df0529f8ec9ecba1",
+        "samples": {
+          "combined": 3637035008,
+          "count": 319,
+          "rss": 3533123584,
+          "vsize": 6116286464
+        },
+        "seconds": 63.870914346014615,
+        "startUTC": "2026-11-19T18:21:07Z",
+        "tokenIds": [
+          19,
+          151645
+        ],
+        "warmup": false
+      },
+      {
+        "addressSpaceLimitBytes": 7000000000,
+        "aiKernel": {
+          "after": {
+            "BudgetAdjustments": 3,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 4464,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 3542175744,
+            "PeakObservedResidentBytes": 3542228992,
+            "PeakWorkspaceBytes": 36065248,
+            "WeightBackingReads": 216226,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 3221225472
+          },
+          "before": {
+            "BudgetAdjustments": 2,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 2016,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 3527708672,
+            "PeakObservedResidentBytes": 3534491648,
+            "PeakWorkspaceBytes": 24357824,
+            "WeightBackingReads": 97860,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 3221225472
+          },
+          "kvSwapReads": 2448,
+          "weightBackingReads": 118366
+        },
+        "baselineRssBytes": 3527966720,
+        "check": {
+          "answer": true,
+          "finish": true,
+          "inputCount": true,
+          "tokens": true
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "devSeconds": 233.5,
+        "inputTokens": 34,
+        "ioDelta": {
+          "rchar": 490682980533,
+          "read_bytes": 4198400,
+          "wchar": 1315319392,
+          "write_bytes": 1325367296
+        },
+        "linuxHighWaterBytes": 3532111872,
+        "manifestSha256": "df2194ec2a53c3771a35e3d4e7e8b8abcf7fa1f690cd6c92fa374fe5a061bb58",
+        "mode": "image",
+        "model": "nano",
+        "peakRssBytes": 3542228992,
+        "reference": "Red",
+        "reply": {
+          "finish": "stop",
+          "reply": "Red"
+        },
+        "requestSha256": "b892a432f9b26e2235c24ec6d4dbcbccd4599f3a2d8afd9c51d75dde9414257b",
+        "samples": {
+          "combined": 3647569920,
+          "count": 309,
+          "rss": 3542228992,
+          "vsize": 6121795584
+        },
+        "seconds": 61.855926542019006,
+        "startUTC": "2026-11-19T18:22:11Z",
+        "tokenIds": [
+          6033,
+          151645
+        ],
+        "warmup": false
+      },
+      {
+        "addressSpaceLimitBytes": 7000000000,
+        "aiKernel": {
+          "after": {
+            "BudgetAdjustments": 4,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 13392,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 3533451264,
+            "PeakObservedResidentBytes": 3542228992,
+            "PeakWorkspaceBytes": 39338800,
+            "WeightBackingReads": 537360,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 3221225472
+          },
+          "before": {
+            "BudgetAdjustments": 3,
+            "KvCacheCapacityBytes": 0,
+            "KvResidentBytes": 0,
+            "KvSwapReads": 4464,
+            "LiveWorkspaceBytes": 0,
+            "MaximumResidentBytes": 7000000000,
+            "ObservedResidentBytes": 3542175744,
+            "PeakObservedResidentBytes": 3542228992,
+            "PeakWorkspaceBytes": 36065248,
+            "WeightBackingReads": 216226,
+            "WeightCacheCapacityBytes": 3221225472,
+            "WeightResidentBytes": 3221225472
+          },
+          "kvSwapReads": 8928,
+          "weightBackingReads": 321134
+        },
+        "baselineRssBytes": 3528421376,
+        "check": {
+          "answer": true,
+          "finish": true,
+          "inputCount": true,
+          "tokens": true
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "devSeconds": 703.4,
+        "inputTokens": 87,
+        "ioDelta": {
+          "rchar": 1334903130810,
+          "read_bytes": 16764928,
+          "wchar": 4769697784,
+          "write_bytes": 4822138880
+        },
+        "linuxHighWaterBytes": 3533471744,
+        "manifestSha256": "df2194ec2a53c3771a35e3d4e7e8b8abcf7fa1f690cd6c92fa374fe5a061bb58",
+        "mode": "video",
+        "model": "nano",
+        "peakRssBytes": 3534843904,
+        "reference": "Red, orange, green, blue.",
+        "reply": {
+          "finish": "stop",
+          "reply": "Red, orange, green, blue."
+        },
+        "requestSha256": "fda6ed19b7d3ecaf439472c81ac30f22054ebe5d508dd4a9bc5dfc28dfc9338e",
+        "samples": {
+          "combined": 3642101760,
+          "count": 884,
+          "rss": 3534843904,
+          "vsize": 6107893760
+        },
+        "seconds": 177.17856538499473,
+        "startUTC": "2026-11-19T18:23:13Z",
+        "tokenIds": [
+          6033,
+          11,
+          18575,
+          11,
+          6176,
+          11,
+          6303,
+          13,
+          151645
+        ],
+        "warmup": false
+      }
+    ]
+  }
+}

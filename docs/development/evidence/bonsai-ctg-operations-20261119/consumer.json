@@ -1,0 +1,229 @@
+{
+  "package": "AIKernel.Kernel.0.1.4.nupkg",
+  "packageSha256": "50c81a514ab8faade6f5175864b5030f875b67c75da7e62b48469e2bfed61071",
+  "packageEntry": "lib/net10.0/AIKernel.Kernel.dll",
+  "assemblySha256": "2a04778ae733e280d454a4c27fc35acad904ebdd810e23bd087f8591acb6a57f",
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "application": "Independent net10.0 consumer with a PackageReference to AIKernel.Kernel [0.1.4].",
+  "operation": "Create a local receipt containing 5 when allowed. Each run used a separate output directory.",
+  "runs": [
+    {
+      "host": "Linux Server",
+      "observedBackend": "avx512",
+      "configuredWorkers": 4,
+      "timeoutMinutesPerCase": 10,
+      "totalSecondsForBothCases": 411.9769257,
+      "cases": [
+        {
+          "id": "holdout-journal-count",
+          "expected": true,
+          "accepted": true,
+          "operationReceipt": true,
+          "evaluationCompleted": true,
+          "errorCode": null,
+          "votes": [
+            {
+              "CouncilKind": 1,
+              "VoteValue": 1
+            },
+            {
+              "CouncilKind": 2,
+              "VoteValue": 1
+            },
+            {
+              "CouncilKind": 3,
+              "VoteValue": 1
+            }
+          ]
+        },
+        {
+          "id": "audit-quantity-private",
+          "expected": false,
+          "accepted": false,
+          "operationReceipt": false,
+          "evaluationCompleted": true,
+          "errorCode": null,
+          "votes": [
+            {
+              "CouncilKind": 1,
+              "VoteValue": 2
+            },
+            {
+              "CouncilKind": 2,
+              "VoteValue": 3
+            },
+            {
+              "CouncilKind": 3,
+              "VoteValue": 1
+            }
+          ]
+        }
+      ],
+      "peakRssBytes": 1864249344,
+      "cpuAffinityCount": 2
+    },
+    {
+      "host": "Linux Server",
+      "observedBackend": "avx2",
+      "configuredWorkers": 4,
+      "timeoutMinutesPerCase": 10,
+      "totalSecondsForBothCases": 348.2189294,
+      "cases": [
+        {
+          "id": "holdout-journal-count",
+          "expected": true,
+          "accepted": true,
+          "operationReceipt": true,
+          "evaluationCompleted": true,
+          "errorCode": null,
+          "votes": [
+            {
+              "CouncilKind": 1,
+              "VoteValue": 1
+            },
+            {
+              "CouncilKind": 2,
+              "VoteValue": 1
+            },
+            {
+              "CouncilKind": 3,
+              "VoteValue": 1
+            }
+          ]
+        },
+        {
+          "id": "audit-quantity-private",
+          "expected": false,
+          "accepted": false,
+          "operationReceipt": false,
+          "evaluationCompleted": true,
+          "errorCode": null,
+          "votes": [
+            {
+              "CouncilKind": 1,
+              "VoteValue": 2
+            },
+            {
+              "CouncilKind": 2,
+              "VoteValue": 3
+            },
+            {
+              "CouncilKind": 3,
+              "VoteValue": 1
+            }
+          ]
+        }
+      ],
+      "peakRssBytes": 1863987200,
+      "cpuAffinityCount": 2
+    },
+    {
+      "host": "Windows development PC",
+      "observedBackend": "avx2",
+      "configuredWorkers": 4,
+      "timeoutMinutesPerCase": 10,
+      "totalSecondsForBothCases": 1206.0107847,
+      "cases": [
+        {
+          "id": "holdout-journal-count",
+          "expected": true,
+          "accepted": false,
+          "operationReceipt": false,
+          "evaluationCompleted": false,
+          "errorCode": "ctg.bonsai.timeout",
+          "votes": [
+            {
+              "CouncilKind": 1,
+              "VoteValue": 0
+            },
+            {
+              "CouncilKind": 2,
+              "VoteValue": 0
+            },
+            {
+              "CouncilKind": 3,
+              "VoteValue": 0
+            }
+          ]
+        },
+        {
+          "id": "audit-quantity-private",
+          "expected": false,
+          "accepted": false,
+          "operationReceipt": false,
+          "evaluationCompleted": false,
+          "errorCode": "ctg.bonsai.timeout",
+          "votes": [
+            {
+              "CouncilKind": 1,
+              "VoteValue": 0
+            },
+            {
+              "CouncilKind": 2,
+              "VoteValue": 0
+            },
+            {
+              "CouncilKind": 3,
+              "VoteValue": 0
+            }
+          ]
+        }
+      ],
+      "hostLoad": "Concurrent work on development PC. Availability check only."
+    },
+    {
+      "host": "Windows development PC",
+      "observedBackend": "avx2",
+      "configuredWorkers": 2,
+      "timeoutMinutesPerCase": 30,
+      "totalSecondsForBothCases": 2790.5232021,
+      "cases": [
+        {
+          "id": "holdout-journal-count",
+          "expected": true,
+          "accepted": false,
+          "operationReceipt": false,
+          "evaluationCompleted": false,
+          "errorCode": "ctg.bonsai.timeout",
+          "votes": [
+            {
+              "CouncilKind": 1,
+              "VoteValue": 0
+            },
+            {
+              "CouncilKind": 2,
+              "VoteValue": 0
+            },
+            {
+              "CouncilKind": 3,
+              "VoteValue": 0
+            }
+          ]
+        },
+        {
+          "id": "audit-quantity-private",
+          "expected": false,
+          "accepted": false,
+          "operationReceipt": false,
+          "evaluationCompleted": true,
+          "errorCode": null,
+          "votes": [
+            {
+              "CouncilKind": 1,
+              "VoteValue": 2
+            },
+            {
+              "CouncilKind": 2,
+              "VoteValue": 3
+            },
+            {
+              "CouncilKind": 3,
+              "VoteValue": 1
+            }
+          ]
+        }
+      ],
+      "hostLoad": "Concurrent work on development PC. Availability check only."
+    }
+  ]
+}

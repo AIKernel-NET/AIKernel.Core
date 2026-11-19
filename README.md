@@ -141,6 +141,12 @@ non-replacing for existing `IDecisionGate` and `ITrajectoryGate` services.
 Read the [CTG Governance Integration Guide](docs/development/ctg-governance-integration.md)
 for implementation boundaries.
 
+Hosts can evaluate a proposed operation against observed facts with the pinned
+Bonsai 1.7B model and execute it after council approval. [Bonsai CTG host integration (Japanese)](docs/development/bonsai-ctg-operations-jp.md)
+
+For local, single-turn text generation with GPT-OSS-20B, see the CPU example and
+reference token sequences. [GPT-OSS-20B inference (Japanese)](docs/development/model-expansion-gemma4-gptoss-jp.md)
+
 Distribution note: the 0.1.3 update publishes NuGet packages and synchronized Python wrappers. for this update line.
 
 ---

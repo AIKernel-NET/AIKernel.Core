@@ -58,10 +58,10 @@ QAT版にもQ6_Kが含まれるため、ファイル名のQ4_0だけで対応形
 検証結果、モデルrevision、取得部分のSHA-256、再現手順は
 [検証記録](evidence/model-expansion-20261115/README.md) に保存しています。
 
-## 次に実装する範囲
+## 0.1.4 配布候補で利用できる推論経路
 
-Gemma 4 E2BではCPU SIMD・CUDA行列演算とServerの7GB RSS枠を検証しました。
-次の対象はGPU forward全体の常駐化、バッチPrefill、別のCPU命令セット向け最適化です。
+Gemma 4 E2BではCPU SIMD、CUDAでのforward全体の常駐化、Serverの7GB RSS枠を検証しました。[GPU常駐化の実測](gemma4-resident-20261116-jp.md) · [Q6_K復号の改修と回帰検証](gemma4-q6-20261116-jp.md)
+
 GPT-OSS のCPU経路は o200k BPE、Harmony、上位4 expert のルーティングと集約、attention sink、bias付き線形層、交互の局所／全域アテンションを実装しています。以下は開発機での利用例です。12,109,566,624 バイトのチェックポイントを読み取り専用でマップします。Serverの7 GBでの実行は別途検証が必要です。
 
 ```csharp
@@ -70,7 +70,7 @@ var reply = await model.GenerateAsync("", "What is 2+2? Answer with one digit.",
 Console.WriteLine(reply.Text);
 ```
 
-同じGGUFを使った独立実装との照合では、検証ツールの `--gpt-oss-reference <GGUF> <reference.json> <result.json>` を使います。プロンプトの全トークン、生成トークンのSHA-256、回答本文、終了条件を検査します。[参照入力とトークン列](evidence/gpt-oss-20b-20261119/reference.json)
+同じGGUFを使った独立実装との照合では、検証ツールの `--gpt-oss-reference <GGUF> <reference.json> <result.json>` を使います。算術と首都名の2例で、プロンプトの全トークン、生成トークンのSHA-256、回答本文、終了条件が一致しました。[参照入力とトークン列](evidence/gpt-oss-20b-20261119/reference.json) · [生成結果](evidence/gpt-oss-20b-20261119/result.json)
 
 ## 添付レビューから採用する方針
 

@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <CudaNativeArtifactsRoot Condition="'$(CudaNativeArtifactsRoot)' == '' and '$(AIKernelCudaNativeRoot)' != ''">$(AIKernelCudaNativeRoot)</CudaNativeArtifactsRoot>
+    <CudaNativeArtifactsRoot Condition="'$(CudaNativeArtifactsRoot)' == ''">$(MSBuildThisFileDirectory)../artifacts/cuda-native</CudaNativeArtifactsRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(CudaNativeArtifactsRoot)/win-x64/aikernel_cuda_driver.dll"
+          Pack="true" PackagePath="runtimes/win-x64/native/" Visible="false" />
+    <None Include="$(CudaNativeArtifactsRoot)/linux-x64/libaikernel_cuda_driver.so"
+          Pack="true" PackagePath="runtimes/linux-x64/native/" Visible="false" />
+    <None Include="$(MSBuildThisFileDirectory)../native/cuda/LICENSE"
+          Pack="true" PackagePath="licenses/cuda-driver/" Visible="false" />
+  </ItemGroup>
+  <Target Name="RequireCudaNativePackageAssets" BeforeTargets="GenerateNuspec">
+    <Error Condition="!Exists('$(CudaNativeArtifactsRoot)/win-x64/aikernel_cuda_driver.dll')"
+           Text="CUDA_NATIVE_ASSET_MISSING: build and stage win-x64/aikernel_cuda_driver.dll under CudaNativeArtifactsRoot before packing AIKernel.Kernel." />
+    <Error Condition="!Exists('$(CudaNativeArtifactsRoot)/linux-x64/libaikernel_cuda_driver.so')"
+           Text="CUDA_NATIVE_ASSET_MISSING: build and stage linux-x64/libaikernel_cuda_driver.so under CudaNativeArtifactsRoot before packing AIKernel.Kernel." />
+  </Target>
+</Project>

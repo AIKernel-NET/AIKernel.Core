@@ -1,0 +1,111 @@
+name: native-cuda-nuget
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build native ABI without CUDA Toolkit or LibTorch
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then
+            cmake -S native/cuda -B artifacts/native-build -A x64
+          else
+            cmake -S native/cuda -B artifacts/native-build -DCMAKE_BUILD_TYPE=Release
+          fi
+          cmake --build artifacts/native-build --config Release
+          cmake --install artifacts/native-build --config Release --prefix artifacts/native-stage
+          python native/cuda/tests/host_abi_smoke.py artifacts/native-stage/aikernel_cuda_driver/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cuda-native-${{ matrix.rid }}
+          path: artifacts/native-stage/aikernel_cuda_driver/*
+          if-no-files-found: error
+
+  pack:
+    needs: native
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: cuda-native-win-x64
+          path: artifacts/cuda-native/win-x64
+      - uses: actions/download-artifact@v4
+        with:
+          name: cuda-native-linux-x64
+          path: artifacts/cuda-native/linux-x64
+      - name: Build and test managed projects
+        run: |
+          dotnet restore AIKernel.Core.slnx
+          dotnet build AIKernel.Core.slnx -c Release --no-restore
+          dotnet test AIKernel.Core.slnx -c Release --no-build --no-restore
+      - name: Pack complete family and verify native assets
+        shell: bash
+        run: |
+          python native/cuda/tests/check_pack_guards.py
+          for project in AIKernel.Common AIKernel.Core AIKernel.Hosting AIKernel.Kernel; do
+            dotnet pack "src/$project/$project.csproj" -c Release --no-build --no-restore -o artifacts/packages
+          done
+          python native/cuda/tests/verify_nupkg.py artifacts/packages/AIKernel.Kernel.*.nupkg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cuda-kernel-nuget
+          path: artifacts/packages/*.nupkg
+          if-no-files-found: error
+
+  consumer:
+    needs: pack
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/download-artifact@v4
+        with:
+          name: cuda-kernel-nuget
+          path: artifacts/packages
+      - name: Consume only NuGet packages and run host primitives
+        shell: bash
+        run: |
+          dotnet restore tests/packaging/CudaDriverConsumer --configfile tests/packaging/CudaDriverConsumer/NuGet.config -p:RestorePackagesPath="$PWD/artifacts/consumer-cache"
+          dotnet build tests/packaging/CudaDriverConsumer -c Release --no-restore -p:UseAppHost=false
+          dotnet tests/packaging/CudaDriverConsumer/bin/Release/net10.0/CudaDriverConsumer.dll
+          dotnet publish tests/packaging/CudaDriverConsumer -c Release -r '${{ matrix.rid }}' --self-contained false --configfile tests/packaging/CudaDriverConsumer/NuGet.config -p:RestorePackagesPath="$PWD/artifacts/consumer-cache" -o artifacts/consumer
+          dotnet artifacts/consumer/CudaDriverConsumer.dll

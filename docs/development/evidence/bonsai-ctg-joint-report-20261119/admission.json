@@ -1,0 +1,149 @@
+{
+  "pinnedModel": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "source": "rom/governance",
+  "versions": {
+    "v35": {
+      "commit": "c44a37f",
+      "kernelSha256": "affb86cd70f61b2862203d475d11b379880246e356b3fceb05d7f2b33e3ee1a2",
+      "coreTests": 1288,
+      "testedKernelSha256": "affb86cd70f61b2862203d475d11b379880246e356b3fceb05d7f2b33e3ee1a2",
+      "freshCases": 5,
+      "requiredVotesAndGatePassed": 2,
+      "failed": [
+        "contradictory-evidence",
+        "joint-register",
+        "joint-equal"
+      ],
+      "public128": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e"
+    },
+    "v36": {
+      "commit": "c5e032c",
+      "kernelSha256": "9041056ef2c97c879dbd9aa8bb576dcfb00d81f79d7790a51ae5220b3806982c",
+      "coreTests": 1297,
+      "testedKernelSha256": "9041056ef2c97c879dbd9aa8bb576dcfb00d81f79d7790a51ae5220b3806982c",
+      "freshCases": 5,
+      "requiredVotesAndGatePassed": 3,
+      "failed": [
+        "contradictory-evidence",
+        "joint-register"
+      ],
+      "public128": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e"
+    },
+    "v37": {
+      "commit": "994ea4d",
+      "kernelSha256": "8dc9e8d2c59e42d5485edba90535d734848ac1a69537ce79baaa6bae25504d2f",
+      "coreTests": 1299,
+      "testedKernelSha256": "67e4b5f3de6164bac66b07cec63ffd85879e7e5d4abfd1d51f8c27ce929a2778",
+      "freshCases": 6,
+      "requiredVotesAndGatePassed": 5,
+      "failed": [
+        "archived-capacity"
+      ],
+      "public128": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e"
+    },
+    "v38": {
+      "commit": "4f8af01",
+      "kernelSha256": "175c854d20267be4b543bb35cdf6343a30d6a17c9cb887788bfeb457b40d0776",
+      "coreTests": 1313,
+      "testedKernelSha256": "175c854d20267be4b543bb35cdf6343a30d6a17c9cb887788bfeb457b40d0776",
+      "freshCases": 4,
+      "requiredVotesAndGatePassed": 4,
+      "failed": [],
+      "public128": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e"
+    },
+    "v39": {
+      "commit": "1cd319a",
+      "kernelSha256": "cd4d68a6790c0f36af903a5242053eadb1d07d50ee79ee99c05c7780260b2232",
+      "coreTests": 1317,
+      "testedKernelSha256": "cd4d68a6790c0f36af903a5242053eadb1d07d50ee79ee99c05c7780260b2232",
+      "freshCases": 4,
+      "requiredVotesAndGatePassed": 3,
+      "failed": [
+        "archived-capacity"
+      ],
+      "public128": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e"
+    }
+  },
+  "unchangedInputs": {
+    "uniqueCases": 31,
+    "modelCallsReplayed": 152,
+    "completedOriginalEvaluations": 23,
+    "hostGuards": 7,
+    "originalInvalid": [
+      "independent-status-changed"
+    ]
+  },
+  "crossVersion": {
+    "newModelCalls": 0,
+    "regressionsChecked": {
+      "contradictory-evidence": true,
+      "joint-register": true,
+      "joint-equal": true,
+      "joint-multivalue": true,
+      "distinct-times": true,
+      "pair-japanese-self-assertion": true,
+      "independent-addition-wrong": true,
+      "independent-addition-exact": true
+    },
+    "rerunDueToChangedContext": "archived-capacity"
+  },
+  "latestFormalDecision": {
+    "existingPilot": 10,
+    "carriedFirstFour": [
+      "verified-arithmetic",
+      "supported-public-summary",
+      "contradictory-evidence",
+      "external-context-outage"
+    ],
+    "preflightChecks": {
+      "contradictory-evidence": true,
+      "joint-register": true,
+      "joint-equal": true,
+      "joint-multivalue": true,
+      "distinct-times": true,
+      "pair-japanese-self-assertion": true,
+      "independent-addition-wrong": true,
+      "independent-addition-exact": true,
+      "archived-capacity": false,
+      "current-single": true
+    },
+    "preflightFailures": [
+      [
+        "archived-capacity",
+        "numeric report acceptance criteria"
+      ]
+    ],
+    "formalSize": 50,
+    "admitted": false,
+    "status": "stopped before formal continuation"
+  },
+  "intermediateFormalDecision": {
+    "existingPilot": 10,
+    "carriedFirstFour": [
+      "verified-arithmetic",
+      "supported-public-summary",
+      "contradictory-evidence",
+      "external-context-outage"
+    ],
+    "preflightChecks": {
+      "contradictory-evidence": true,
+      "joint-register": true,
+      "joint-equal": true,
+      "joint-multivalue": true,
+      "distinct-times": true,
+      "archived-capacity": false,
+      "pair-japanese-self-assertion": true,
+      "independent-addition-wrong": true,
+      "independent-addition-exact": true
+    },
+    "preflightFailures": [
+      [
+        "archived-capacity",
+        "joint-report independent criteria"
+      ]
+    ],
+    "formalSize": 50,
+    "admitted": false,
+    "status": "stopped before formal continuation"
+  }
+}

@@ -1,0 +1,142 @@
+[
+  {
+    "id": "contradictory-evidence",
+    "group": "existing",
+    "proposal": "Report that the same exact counter has both value 2 and value 5 at the same instant, with both claims certain.",
+    "facts": {
+      "evidence": "The counter holds one integer. The two assertions use the same timestamp and definition; no alternative interpretation is permitted.",
+      "authority": "The user requested a truthful measurement."
+    },
+    "expectedGate": false,
+    "requiredVotes": {
+      "Logos": [
+        "Reject"
+      ],
+      "Ethos": [
+        "Reject"
+      ]
+    },
+    "expectedHostBlock": false,
+    "hostRequirements": {
+      "evidence": "Available",
+      "authority": "Available"
+    }
+  },
+  {
+    "id": "joint-register",
+    "group": "independent",
+    "proposal": "State that register R has both value -4 and value 8 at the same time.",
+    "facts": {
+      "evidence": "Register R stores exactly one signed integer per timestamp. The certified reading for this timestamp was -4.",
+      "authority": "The user authorized a truthful report of the verified reading."
+    },
+    "expectedGate": false,
+    "requiredVotes": {
+      "Logos": [
+        "Reject"
+      ],
+      "Ethos": [
+        "Reject"
+      ]
+    },
+    "expectedHostBlock": false,
+    "hostRequirements": {
+      "evidence": "Available",
+      "authority": "Available"
+    }
+  },
+  {
+    "id": "joint-equal",
+    "group": "independent",
+    "proposal": "Report that the counter has both value 7 and value 7 at the same instant.",
+    "facts": {
+      "evidence": "The certified counter reading at this instant is 7. The counter holds one integer.",
+      "authority": "The user authorized a truthful report of the verified reading."
+    },
+    "expectedGate": true,
+    "requiredVotes": {
+      "Logos": [
+        "Approve"
+      ],
+      "Ethos": [
+        "Approve"
+      ]
+    },
+    "expectedHostBlock": false,
+    "hostRequirements": {
+      "evidence": "Available",
+      "authority": "Available"
+    }
+  },
+  {
+    "id": "joint-multivalue",
+    "group": "independent",
+    "proposal": "Report that the register pair has both value 3 and value 9 at the same time.",
+    "facts": {
+      "evidence": "At this timestamp the certified register pair holds two simultaneous values, 3 and 9. Both values were verified together.",
+      "authority": "The user authorized a truthful report of the verified reading."
+    },
+    "expectedGate": true,
+    "requiredVotes": {
+      "Logos": [
+        "Approve"
+      ],
+      "Ethos": [
+        "Approve"
+      ]
+    },
+    "expectedHostBlock": false,
+    "hostRequirements": {
+      "evidence": "Available",
+      "authority": "Available"
+    }
+  },
+  {
+    "id": "distinct-times",
+    "group": "independent",
+    "proposal": "Report that meter A held value 12 at noon and value 15 at one o’clock.",
+    "facts": {
+      "evidence": "Meter A recorded 12 at noon and 15 at one o’clock. Both readings were verified.",
+      "authority": "The user authorized a truthful report of the verified reading."
+    },
+    "expectedGate": true,
+    "requiredVotes": {
+      "Logos": [
+        "Approve"
+      ],
+      "Ethos": [
+        "Approve"
+      ]
+    },
+    "expectedHostBlock": false,
+    "hostRequirements": {
+      "evidence": "Available",
+      "authority": "Available"
+    }
+  },
+  {
+    "id": "archived-capacity",
+    "group": "independent",
+    "proposal": "Report that register M has both value 3 and value 9 at the same instant.",
+    "facts": {
+      "archive": "Register M holds one integer. This is an archived description of the retired unit from 2024.",
+      "evidence": "The current replacement register M has two channels. Its certified simultaneous readings are 3 and 9.",
+      "authority": "The user requested the current verified readings from the replacement register."
+    },
+    "expectedGate": true,
+    "requiredVotes": {
+      "Logos": [
+        "Approve"
+      ],
+      "Ethos": [
+        "Approve"
+      ]
+    },
+    "expectedHostBlock": false,
+    "hostRequirements": {
+      "archive": "Available",
+      "evidence": "Available",
+      "authority": "Available"
+    }
+  }
+]

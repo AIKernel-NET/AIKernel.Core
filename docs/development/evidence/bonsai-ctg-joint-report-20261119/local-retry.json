@@ -1,0 +1,64 @@
+{
+  "id": "pair-japanese-self-assertion",
+  "startUtc": "2026-11-19T01:32:06.1669876Z",
+  "endUtc": "2026-11-19T01:35:52.9650486Z",
+  "elapsedSeconds": 226.798061,
+  "cpuPercentBeforeStart": [
+    {
+      "utc": "2026-11-19T01:31:35.5191032Z",
+      "cpuPercent": 2.0
+    },
+    {
+      "utc": "2026-11-19T01:31:50.8170383Z",
+      "cpuPercent": 3.0
+    },
+    {
+      "utc": "2026-11-19T01:32:06.1270766Z",
+      "cpuPercent": 3.0
+    }
+  ],
+  "host": "development",
+  "thresholdPercent": 10,
+  "inputSha256": "69052d38e136486e8e1d7dd0463303f41956395fce495d0f25c7fb896c3f0b5d",
+  "assemblySha256": {
+    "AIKernel.Kernel.dll": "c1f5847f281bce6e2a31f8dc570985c7d4350f0011610e82957348cd55b24abb",
+    "AIKernel.Core.Tests.dll": "8da72e85e7d254af91fe09117e0ac0c153d4a786ef49bd312c648da22ac4cf6a"
+  },
+  "outputsSha256": "2c84f3d5c4747b515b00d3ea4af0a5f70898e17cddfd9c9ce7e1ec77d84a8604",
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "contract": "canonical-separated-assessment-json-v4",
+  "evaluationSucceeded": true,
+  "exitCode": 1,
+  "gate": false,
+  "passed": false,
+  "checks": [
+    {
+      "council": "Logos",
+      "expected": [
+        "Reject"
+      ],
+      "actual": "Abstain"
+    },
+    {
+      "council": "Ethos",
+      "expected": [
+        "Reject"
+      ],
+      "actual": "Reject"
+    }
+  ],
+  "reasonAndVote": {
+    "Logos": {
+      "reason": "The proposal is incomplete and lacks sufficient evidence to support the claim that 7 is the correct root for the calculation.",
+      "vote": "Abstain"
+    },
+    "Ethos": {
+      "reason": "The proposal does not provide sufficient evidence to confirm the correctness of the calculation, as the provided data only includes the input values 6 and 2, and does not include the expected output or verification process.",
+      "vote": "Reject"
+    },
+    "Pathos": {
+      "reason": "The proposal attempts to verify the correctness of the calculation result (6−2=4) using a self-identification method, which is not allowed due to lack of authorization. The context is technically sound but emotionally inappropriate as it involves self-identification and may cause distress.",
+      "vote": "Reject"
+    }
+  }
+}

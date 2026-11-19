@@ -112,6 +112,44 @@ public sealed class GgufExpansionTests
         Assert.Throws<NotSupportedException>(()=>new VulkanQuantizedMatrix(file,0,1024*1024));
     }
 
+    [Theory]
+    [InlineData(0,128)]
+    [InlineData(8,34)]
+    [InlineData(39,17)]
+    public void PagedExpertsKeepRowAndBiasOffsetsAfterEviction(int type,int stride)
+    {
+        const int rows=3,experts=2;
+        byte[] encoded=new byte[rows*experts*stride];
+        for(int r=0;r<rows*experts;r++)
+        {
+            var row=encoded.AsSpan(r*stride,stride);
+            if(type==0)System.Runtime.InteropServices.MemoryMarshal.Cast<byte,float>(row).Fill(r+1);
+            else if(type==8){row[1]=0x3c;row[2..].Fill((byte)(r+1));}
+            else{row[0]=127;row[1..].Fill((byte)((r+1)*17));}
+        }
+        using var fixture=new Fixture("gpt-oss",new Spec("experts",[32,rows,experts],type,0,encoded));
+        using var mapped=new GgufWeights(fixture.Path);
+        using var directory=new GgufWeights(fixture.Path,mapTensorData:false);
+        var slices=Enumerable.Range(0,experts).Select(e=>directory.Tensors["experts"].MatrixSlice(e)).ToArray();
+        // Two rows per page, one resident page. Every slice crosses a page boundary.
+        var options=new GgufMemoryOptions { WeightCacheBytes=2*stride, SwapDirectory=Path.GetTempPath() };
+        using var pages=new GgufPagedWeights(fixture.Path,slices,options,2*stride,directory.BackingHandle);
+        float[] input=Enumerable.Range(1,32).Select(i=>i*.25f).ToArray();
+        float[] bias=Enumerable.Range(0,rows*experts).Select(i=>i+.5f).ToArray();
+        var parallel=new ParallelOptions { MaxDegreeOfParallelism=2 };
+        foreach(int e in new[]{1,0,1})
+        {
+            float[] expected=new float[rows],actual=new float[rows];
+            GptOssMatrix.Multiply(mapped,slices[e],input,expected,bias,e*rows,parallel);
+            GptOssMatrix.Multiply(directory,slices[e],input,actual,bias,e*rows,parallel,pages);
+            Assert.Equal(expected,actual);
+        }
+        Assert.Equal(1,pages.Statistics.RamBlocks);
+        Assert.Equal(6,pages.Statistics.BackingReads);
+        Assert.Equal(4,pages.DistinctPagesRead);
+        Assert.Equal(9L*stride,pages.BackingBytesRead);
+    }
+
     [Fact]
     public void ExpertSlicesRetainTheirAxesAndSelectTheCorrectEncodedMatrix()
     {

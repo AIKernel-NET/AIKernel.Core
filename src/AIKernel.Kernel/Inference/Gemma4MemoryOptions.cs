@@ -1,7 +1,7 @@
 namespace AIKernel.Kernel.Inference;
 
 /// <summary>CPU weight paging through AIKernel virtual memory. Budgets are decimal bytes.</summary>
-public sealed record Gemma4MemoryOptions
+public record GgufMemoryOptions
 {
     /// <summary>Process RSS ceiling checked at admission and page boundaries. Not an OS cgroup limit.</summary>
     public long MaximumResidentBytes{get;init;}=7_000_000_000;
@@ -12,3 +12,6 @@ public sealed record Gemma4MemoryOptions
     /// <summary>Private directory for virtual-memory storage. Immutable weights need no duplicate swap copy.</summary>
     public required string SwapDirectory{get;init;}
 }
+
+/// <summary>Resident-memory limits for Gemma 4 CPU inference.</summary>
+public sealed record Gemma4MemoryOptions : GgufMemoryOptions;

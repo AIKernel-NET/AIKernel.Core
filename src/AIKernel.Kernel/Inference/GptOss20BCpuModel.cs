@@ -12,6 +12,12 @@ public sealed class GptOss20BCpuModel : IDisposable
     private const int KvWidth = Head * KvHeads, AttentionWidth = Head * Heads;
     private const int Vocab = 201088;
     private readonly GgufWeights file;
+    private readonly GgufPagedWeights? pages;
+    /// <summary>Page residency and page-ins for a model opened with an explicit RAM budget.</summary>
+    public AIKernel.Kernel.Memory.VirtualMemoryStatistics? MemoryStatistics => pages?.Statistics;
+    internal long BackingBytesRead => pages?.BackingBytesRead ?? 0;
+    internal long DistinctPagesRead => pages?.DistinctPagesRead ?? 0;
+    internal long WeightCacheCapacityBytes => pages?.CacheCapacityBytes ?? 0;
     private readonly GgufByteBpe bpe;
     private readonly GgufWeights.Tensor embedding, output;
     private readonly float[] outputNorm, frequencies = new float[Head/2];
@@ -33,13 +39,17 @@ public sealed class GptOss20BCpuModel : IDisposable
 
     /// <summary>Maps one checkpoint and validates its architecture, tensor shapes and Harmony controls before use.</summary>
     public GptOss20BCpuModel(string modelPath, int cpuThreads = 4, int contextTokens = 512)
+        : this(modelPath,cpuThreads,contextTokens,null) { }
+
+    /// <summary>Uses row-aligned virtual-memory pages from the GGUF when a memory budget is supplied.</summary>
+    public GptOss20BCpuModel(string modelPath, int cpuThreads, int contextTokens, GgufMemoryOptions? memory)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(cpuThreads,1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(cpuThreads,64);
         if (contextTokens is < 8 or > 2048) throw new ArgumentOutOfRangeException(nameof(contextTokens));
         threads = cpuThreads;
         context = contextTokens;
-        file = new(modelPath);
+        file = new(modelPath,mapTensorData: memory is null);
         try
         {
             if (file.Metadata.GetValueOrDefault("general.architecture") is not "gpt-oss" ||
@@ -74,6 +84,8 @@ public sealed class GptOss20BCpuModel : IDisposable
             start=bpe.SpecialToken("<|start|>"); end=bpe.SpecialToken("<|end|>"); message=bpe.SpecialToken("<|message|>");
             channel=bpe.SpecialToken("<|channel|>"); stop=bpe.SpecialToken("<|return|>");
             if (stop != file.Int("tokenizer.ggml.eos_token_id")) throw new InvalidDataException("Invalid Harmony terminator.");
+            if (memory is not null)
+                pages = new(modelPath,MatrixTensors(),memory,pageSize:1<<20,backingHandle:file.BackingHandle);
         }
         catch { file.Dispose(); throw; }
     }
@@ -84,8 +96,20 @@ public sealed class GptOss20BCpuModel : IDisposable
         if (tensor.Type != type) throw new InvalidDataException("Unexpected storage format: "+name);
         return tensor;
     }
-    private float[] Vector(string name, int columns) => file.Vector(Weight(name,1,columns,0));
-    private unsafe Layer LoadLayer(int index)
+    private float[] Vector(string name, int columns) => file.ReadFloat32(Weight(name,1,columns,0));
+    private IEnumerable<GgufWeights.Tensor> MatrixTensors()
+    {
+        yield return embedding;
+        yield return output;
+        foreach (var layer in layers)
+        {
+            foreach (var projection in new[]{layer.Q,layer.K,layer.V,layer.O,layer.Router})
+                yield return projection.Weight;
+            foreach (var bank in new[]{layer.Gate,layer.Up,layer.Down})
+                for (int expert=0;expert<Experts;expert++) yield return bank.Weight.MatrixSlice(expert);
+        }
+    }
+    private Layer LoadLayer(int index)
     {
         string prefix = $"blk.{index}.";
         Linear Projection(string key, int rows, int columns, int type = 8) =>
@@ -96,7 +120,7 @@ public sealed class GptOss20BCpuModel : IDisposable
                 tensor.Rows != Width || tensor.Columns != Width || tensor.Depth != Experts)
                 throw new InvalidDataException("Invalid expert bank: "+key);
             var bias = Weight(prefix+key+".bias",Experts,Width,0);
-            return new(tensor,new ReadOnlySpan<float>(file.Pointer(bias),Experts*Width).ToArray());
+            return new(tensor,file.ReadFloat32(bias));
         }
         return new(Vector(prefix+"attn_norm.weight",Width),Projection("attn_q",AttentionWidth,Width),
             Projection("attn_k",KvWidth,Width),Projection("attn_v",KvWidth,Width),Projection("attn_output",Width,AttentionWidth),
@@ -120,7 +144,9 @@ public sealed class GptOss20BCpuModel : IDisposable
     }
 
     /// <summary>Generates a single final-channel answer. Requests on this model are serialized.</summary>
-    public async Task<CpuGeneration> GenerateAsync(string system, string user, int maxNewTokens = 128, CancellationToken cancellationToken = default)
+    public Task<CpuGeneration> GenerateAsync(string system, string user, int maxNewTokens = 128, CancellationToken cancellationToken = default)
+        => GenerateAsync(system,user,maxNewTokens,cancellationToken,null);
+    internal async Task<CpuGeneration> GenerateAsync(string system,string user,int maxNewTokens,CancellationToken cancellationToken,Action<int>? observeToken)
     {
         ArgumentNullException.ThrowIfNull(system);
         ArgumentException.ThrowIfNullOrWhiteSpace(user);
@@ -132,11 +158,12 @@ public sealed class GptOss20BCpuModel : IDisposable
             ObjectDisposedException.ThrowIf(disposed,this);
             var prompt = EncodeChat(system,user);
             if (prompt.Count > context-maxNewTokens) throw new ArgumentException("Prompt and generation exceed the context.");
-            return await Task.Run(() => Run(prompt,maxNewTokens,cancellationToken),cancellationToken).ConfigureAwait(false);
+            pages?.CheckBudget();
+            return await Task.Run(() => Run(prompt,maxNewTokens,cancellationToken,observeToken),cancellationToken).ConfigureAwait(false);
         }
         finally { gate.Release(); }
     }
-    private CpuGeneration Run(List<int> prompt, int maximum, CancellationToken cancellation)
+    private CpuGeneration Run(List<int> prompt, int maximum, CancellationToken cancellation, Action<int>? observeToken)
     {
         var watch=Stopwatch.StartNew();
         var options=new ParallelOptions { MaxDegreeOfParallelism=threads, CancellationToken=cancellation };
@@ -149,19 +176,20 @@ public sealed class GptOss20BCpuModel : IDisposable
         while (ids.Count < maximum)
         {
             Normalize(state.X,outputNorm,state.Norm);
-            GptOssMatrix.Multiply(file,output,state.Norm,state.Logits,null,0,options);
+            GptOssMatrix.Multiply(file,output,state.Norm,state.Logits,null,0,options,pages);
             int best=0;
             for (int i=0;i<state.Logits.Length;i++)
             {
                 if (!float.IsFinite(state.Logits[i])) throw new InvalidDataException("Non-finite GPT-OSS output.");
                 if (state.Logits[i]>state.Logits[best]) best=i;
             }
+            observeToken?.Invoke(best);
             if (best == stop) { finish="stop"; break; }
             if (best >= 199998) throw new InvalidDataException("Unexpected Harmony control in final answer.");
             ids.Add(best);
             if (ids.Count < maximum) Forward(best,position++,state,options);
         }
-        return new(bpe.Decode(ids),prompt.Count,ids.Count,finish,watch.ElapsedMilliseconds,"gpt-oss-mxfp4-cpu")
+        return new(bpe.Decode(ids),prompt.Count,ids.Count,finish,watch.ElapsedMilliseconds,pages is null?"gpt-oss-mxfp4-cpu":"gpt-oss-mxfp4-cpu-paged")
         { GeneratedTokenSha256=Convert.ToHexStringLower(SHA256.HashData(MemoryMarshal.AsBytes(CollectionsMarshal.AsSpan(ids)))),
           PrefillMilliseconds=prefill,DecodeMilliseconds=watch.ElapsedMilliseconds-prefill,PrefillForwardTokens=prompt.Count,
           DecodeForwardTokens=position-prompt.Count,PrefillThreads=threads,DecodeThreads=threads };
@@ -180,7 +208,8 @@ public sealed class GptOss20BCpuModel : IDisposable
     private unsafe void Forward(int token, int pos, State s, ParallelOptions options)
     {
         options.CancellationToken.ThrowIfCancellationRequested();
-        embedding.Encoding.Decode(new ReadOnlySpan<byte>(file.Pointer(embedding)+(long)token*embedding.RowBytes,embedding.RowBytes),s.X);
+        if (pages is not null) pages.ReadRow(embedding,token,s.X);
+        else embedding.Encoding.Decode(new ReadOnlySpan<byte>(file.Pointer(embedding)+(long)token*embedding.RowBytes,embedding.RowBytes),s.X);
         float amplitude=1+0.1f*MathF.Log(32);
         for (int i=0;i<s.Cos.Length;i++)
         {
@@ -188,7 +217,7 @@ public sealed class GptOss20BCpuModel : IDisposable
             s.Cos[i]=cos*amplitude; s.Sin[i]=sin*amplitude;
         }
         void Project(Linear linear,float[] x,float[] dest,int expert=-1) =>
-            GptOssMatrix.Multiply(file,expert<0?linear.Weight:linear.Weight.MatrixSlice(expert),x,dest,linear.Bias,expert<0?0:expert*Width,options);
+            GptOssMatrix.Multiply(file,expert<0?linear.Weight:linear.Weight.MatrixSlice(expert),x,dest,linear.Bias,expert<0?0:expert*Width,options,pages);
         Span<int> order=stackalloc int[Experts];
         for (int layer=0;layer<Layers;layer++)
         {
@@ -263,7 +292,7 @@ public sealed class GptOss20BCpuModel : IDisposable
     public void Dispose()
     {
         gate.Wait();
-        try { if (!disposed) { disposed=true; file.Dispose(); } }
+        try { if (!disposed) { disposed=true; try { pages?.Dispose(); } finally { file.Dispose(); } } }
         finally { gate.Release(); }
     }
 }

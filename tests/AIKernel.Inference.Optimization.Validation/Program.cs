@@ -1,5 +1,11 @@
 using AIKernel.Kernel.Inference;
 using System.Text.Json;
+if ((args.Length == 6 || args.Length == 7 && args[6]=="--cold-file-cache") && args[0] == "--gpt-oss-paged-reference")
+{
+    Environment.ExitCode = await GptOssReference.Run(args[1],args[2],args[3],
+        new GgufMemoryOptions { SwapDirectory=args[4] },int.Parse(args[5],System.Globalization.CultureInfo.InvariantCulture),args.Length==7) ? 0 : 1;
+    return;
+}
 if (args.Length == 4 && args[0] == "--gpt-oss-reference")
 {
     Environment.ExitCode = await GptOssReference.Run(args[1],args[2],args[3]) ? 0 : 1;

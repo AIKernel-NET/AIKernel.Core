@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace AIKernel.Kernel.Inference;
 
-// Sparse expert selection leaves weights in their original read-only file mapping.
+// Mapped and paged weights share the same per-row arithmetic.
 internal static unsafe class GptOssMatrix
 {
     private static readonly float[] Fp4 = [0,.5f,1,1.5f,2,3,4,6,0,-.5f,-1,-1.5f,-2,-3,-4,-6];
@@ -11,7 +11,7 @@ internal static unsafe class GptOssMatrix
     private static readonly float[] Halves = Enumerable.Range(0,65536).Select(i => (float)BitConverter.UInt16BitsToHalf((ushort)i)).ToArray();
 
     internal static void Multiply(GgufWeights file, GgufWeights.Tensor matrix, float[] x, float[] output,
-        float[]? bias, int biasOffset, ParallelOptions options)
+        float[]? bias, int biasOffset, ParallelOptions options, GgufPagedWeights? pages = null)
     {
         if(matrix.Rank>2 || matrix.Type is not (0 or 8 or 39))
             throw new NotSupportedException("Expected an F32, Q8_0 or MXFP4 matrix slice.");
@@ -19,12 +19,18 @@ internal static unsafe class GptOssMatrix
             bias is not null && biasOffset>bias.Length-matrix.Rows)
             throw new ArgumentException("GPT-OSS matrix dimensions mismatch.");
         int columns = matrix.Columns, stride = matrix.RowBytes;
-        nint start = (nint)file.Pointer(matrix);
-        int jobs = Math.Min(options.MaxDegreeOfParallelism, matrix.Rows);
-        Parallel.For(0, jobs, options, job =>
+        if (pages is null) Rows((nint)file.Pointer(matrix),0,matrix.Rows);
+        else pages.VisitRows(matrix,options.CancellationToken,Rows);
+
+        void Rows(nint start, int first, int count)
+        {
+            int jobs = Math.Min(options.MaxDegreeOfParallelism,count);
+            Parallel.For(0,jobs,options,job => Compute(start,first,count,job,jobs));
+        }
+        void Compute(nint start, int first, int count, int job, int jobs)
         {
             Span<float> decoded = stackalloc float[32];
-            for (int row = job * matrix.Rows / jobs; row < (job + 1) * matrix.Rows / jobs; row++)
+            for (int row = job * count / jobs; row < (job + 1) * count / jobs; row++)
             {
                 if ((row & 63) == 0) options.CancellationToken.ThrowIfCancellationRequested();
                 byte* w = (byte*)start + (long)row * stride;
@@ -55,9 +61,9 @@ internal static unsafe class GptOssMatrix
                     }
                     sum += scale * Dot(decoded, x.AsSpan(col,32));
                 }
-                output[row] = bias is null ? sum : sum + bias[biasOffset + row];
+                output[first+row] = bias is null ? sum : sum + bias[biasOffset + first+row];
             }
-        });
+        }
     }
 
     internal static float Dot(ReadOnlySpan<float> a, ReadOnlySpan<float> b)

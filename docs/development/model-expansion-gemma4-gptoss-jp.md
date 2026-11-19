@@ -62,15 +62,44 @@ QAT版にもQ6_Kが含まれるため、ファイル名のQ4_0だけで対応形
 
 Gemma 4 E2BではCPU SIMD、CUDAでのforward全体の常駐化、Serverの7GB RSS枠を検証しました。[GPU常駐化の実測](gemma4-resident-20261116-jp.md) · [Q6_K復号の改修と回帰検証](gemma4-q6-20261116-jp.md)
 
-GPT-OSS のCPU経路は o200k BPE、Harmony、上位4 expert のルーティングと集約、attention sink、bias付き線形層、交互の局所／全域アテンションを実装しています。以下は開発機での利用例です。12,109,566,624 バイトのチェックポイントを読み取り専用でマップします。Serverの7 GBでの実行は別途検証が必要です。
+GPT-OSS のCPU経路は o200k BPE、Harmony、上位4 expert のルーティングと集約、attention sink、bias付き線形層、交互の局所／全域アテンションを実装しています。実メモリに上限がある場合は `GgufMemoryOptions` を指定します。12,109,566,624 バイトのGGUFをSSDに置き、AIKernelの仮想メモリが必要な重みを行単位でページにまとめて読み込みます。RAMから外した重みは同じファイルから復元します。
 
 ```csharp
-using var model = new GptOss20BCpuModel("gpt-oss-20b-MXFP4.gguf", cpuThreads: 4, contextTokens: 128);
+var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+var privateSwapDirectory = Directory.CreateDirectory(Path.Combine(home, ".aikernel", "model-swap")).FullName;
+using var model = new GptOss20BCpuModel("gpt-oss-20b-MXFP4.gguf", cpuThreads: 4, contextTokens: 128,
+    memory: new GgufMemoryOptions {
+        MaximumResidentBytes = 7_000_000_000,
+        WeightCacheBytes = 5_000_000_000,
+        SwapDirectory = privateSwapDirectory
+    });
 var reply = await model.GenerateAsync("", "What is 2+2? Answer with one digit.", maxNewTokens: 8);
 Console.WriteLine(reply.Text);
 ```
 
 同じGGUFを使った独立実装との照合では、検証ツールの `--gpt-oss-reference <GGUF> <reference.json> <result.json>` を使います。算術と首都名の2例で、プロンプトの全トークン、生成トークンのSHA-256、回答本文、終了条件が一致しました。[参照入力とトークン列](evidence/gpt-oss-20b-20261119/reference.json) · [生成結果](evidence/gpt-oss-20b-20261119/result.json)
+
+### GPT-OSS-20BのServer実測
+
+2026年11月19日、AMD EPYC 9555の4コアで、プロセスの仮想アドレス空間にも7,000,000,000バイトのハード上限を設定しました。モデルのSHA-256は前回と同一です。2例とも入力トークンと終了トークンを含む生成列がllama.cpp b12532と一致しました。
+
+| 入力と回答 | 生成トークンID（末尾はEOS） | ファイルキャッシュ解放時の応答 | 最大RSS | キャッシュ保持時の応答 | 最大RSS |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 2 + 2 → `4` | `19, 200002` | 22.19秒 | 2.892 GB | 24.16秒 | 2.691 GB |
+| フランスの首都 → `Paris.` | `72782, 13, 200002` | 26.76秒 | 2.892 GB | 26.85秒 | 2.890 GB |
+
+各条件・各例は新規プロセスで1回ずつ実行しました。応答時間はモデル構築後の `GenerateAsync` 全体で、プロンプト処理からEOSまでを含みます。モデル構築は別に1.86～2.07秒かかりました。最大RSSはLinuxの `wait4(ru_maxrss)`、単位は十進GBです。
+
+最初の試験はRSS 3.88 GBでメモリ不足終了しました。ランタイムが予約する仮想領域も踏まえてキャッシュを縮めるよう改修したところ、5 GBに設定した重みキャッシュの実効上限は2.38～2.61 GBになりました。ファイルキャッシュ解放時には、生成中にストレージから9.41 GBと9.37 GBを読み、AIKernelが以前に退避したページをそれぞれ12,196回と16,739回読み直しました。変更されない重みはSSD上の元のGGUFから復元するため、専用スワップファイルへの複製は不要です。[メモリ・I/O・トークン列の実測記録](evidence/gpt-oss-20b-20261119/server-paging.json)
+
+同じ条件で検証する場合は、Linuxで検証プロジェクト `tests/AIKernel.Inference.Optimization.Validation` をビルドし、次の形で実行します。ケース番号は算術が `0`、首都が `1` です。`--cold-file-cache` を付けるとハッシュ検証後に対象GGUFのファイルキャッシュ解放をOSに要求します。省略するとハッシュ検証後のキャッシュを保持します。
+
+```sh
+DOTNET_PROCESSOR_COUNT=4 DOTNET_GCHeapHardLimit=0x18000000 DOTNET_GCRegionRange=0x30000000 \
+  prlimit --as=7000000000:7000000000 -- taskset -c 0-3 \
+  dotnet AIKernel.Core.Tests.dll --gpt-oss-paged-reference \
+  "$GGUF" "$REFERENCE_JSON" result.json "$PRIVATE_SWAP_DIR" 0 --cold-file-cache
+```
 
 ## 添付レビューから採用する方針
 
@@ -204,7 +233,6 @@ Qwenのトークンハッシュや誤差閾値を流用しません。
 SSD/mmapはアドレス空間を広げる手段であり、RSS上限や速度の保証にはなりません。
 expert/embeddingのアクセスで生じるページフォールト、初回/定常応答時間も記録します。
 
-E2Bは最初の検証候補で、7GB枠内の動作保証は未実施です。
-GPT-OSS-20Bの完全常駐を同枠へ約束せず、十分なメモリの開発機から検証します。
+Gemma 4 E2BとGPT-OSS-20Bの両方で、Serverの7 GB枠内でテキストを生成しています。[Gemmaの測定条件](gemma4-optimization-20261115-jp.md) · [GPT-OSSのトークン列・応答時間・RSS](evidence/gpt-oss-20b-20261119/server-paging.json)
 対応状況は「読み取り」「tokenizer/template」「数値一致」「生成」
 「資源枠」「高速化」を別々に記録し、読み取りだけでモデル対応済みとは表示しません。

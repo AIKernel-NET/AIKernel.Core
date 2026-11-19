@@ -1,0 +1,182 @@
+{
+  "date": "2026-11-19",
+  "host": "Server",
+  "cpu": "AMD EPYC 9555 64-Core Processor",
+  "workers": 4,
+  "affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "precision": "fp32",
+  "reference": "llama.cpp b12532",
+  "checkpoint": "gpt-oss-20b-MXFP4.gguf",
+  "checkpointBytes": 12109566624,
+  "checkpointSha256": "27cd6c432c7672cb812a92f611cf3ba7bbc35928262bb1e1253ff4ee6ae35901",
+  "engineAssemblySha256": "e4b3f9b91f19874c266f4028be15137af3a8be6e9cb53fba071cb715b49ef80b",
+  "validatorAssemblySha256": "5f8c6d77db6671df9a759d00f23f6591d16a839b236f4e88521589831d4e67c0",
+  "hardAddressSpaceBytes": 7000000000,
+  "processRssBudgetBytes": 7000000000,
+  "nominalWeightCacheBytes": 5000000000,
+  "runtimeReserveBytes": 1000000000,
+  "weightPageBytes": 1048576,
+  "gcHeapLimitBytes": 402653184,
+  "contextTokens": 128,
+  "maxNewTokens": 8,
+  "method": "One fresh process and model per sample. Checksum and model construction precede the timed GenerateAsync. Cold requests POSIX_FADV_DONTNEED on the checkpoint after SHA-256 verification. Warm keeps the file cache after verification. Both start with an empty AIKernel cache.",
+  "memoryMethod": "Linux wait4 ru_maxrss is the child lifetime high-water mark. Logical GGUF reads include page-cache hits. Linux storage reads use /proc/self/io read_bytes within generation.",
+  "initialTrial": {
+    "kernelPeakRssBytes": 3883954176,
+    "exitCode": -6,
+    "message": "Out of memory.",
+    "addressSpaceAwareCache": false
+  },
+  "samples": [
+    {
+      "cacheCondition": "cold",
+      "sampleIndex": 0,
+      "prompt": "What is 2+2? Answer with one digit.",
+      "inputTokens": 21,
+      "inputTokensMatched": true,
+      "actualTokensIncludingEos": [
+        19,
+        200002
+      ],
+      "referenceTokensIncludingEos": [
+        19,
+        200002
+      ],
+      "text": "4",
+      "finish": "stop",
+      "responseMilliseconds": 22189.5102,
+      "prefillMilliseconds": 20812,
+      "decodeMilliseconds": 1375,
+      "modelInitializationMilliseconds": 2074.0535,
+      "processWallSecondsIncludingHash": 34.69045475797611,
+      "kernelPeakRssBytes": 2892001280,
+      "runtimePeakRssBytes": 2892001280,
+      "sampledPeakRssBytes": 2904772608,
+      "sampledPeakAddressSpaceBytes": 5996978176,
+      "effectiveWeightCacheBytes": 2605711360,
+      "weightPageIns": 20930,
+      "distinctPages": 8734,
+      "previouslyEvictedPageIns": 12196,
+      "ggufBytesReadByPager": 18786871800,
+      "linuxStorageReadBytesDuringGeneration": 9406193664,
+      "swapFileReads": 0,
+      "checkpointMapped": false
+    },
+    {
+      "cacheCondition": "cold",
+      "sampleIndex": 1,
+      "prompt": "What is the capital of France? Answer with the city name.",
+      "inputTokens": 22,
+      "inputTokensMatched": true,
+      "actualTokensIncludingEos": [
+        72782,
+        13,
+        200002
+      ],
+      "referenceTokensIncludingEos": [
+        72782,
+        13,
+        200002
+      ],
+      "text": "Paris.",
+      "finish": "stop",
+      "responseMilliseconds": 26756.8555,
+      "prefillMilliseconds": 23965,
+      "decodeMilliseconds": 2789,
+      "modelInitializationMilliseconds": 2042.0103,
+      "processWallSecondsIncludingHash": 37.72409282901208,
+      "kernelPeakRssBytes": 2891988992,
+      "runtimePeakRssBytes": 2891988992,
+      "sampledPeakRssBytes": 2904674304,
+      "sampledPeakAddressSpaceBytes": 5996982272,
+      "effectiveWeightCacheBytes": 2605711360,
+      "weightPageIns": 25550,
+      "distinctPages": 8811,
+      "previouslyEvictedPageIns": 16739,
+      "ggufBytesReadByPager": 23028813000,
+      "linuxStorageReadBytesDuringGeneration": 9370955776,
+      "swapFileReads": 0,
+      "checkpointMapped": false
+    },
+    {
+      "cacheCondition": "warm",
+      "sampleIndex": 0,
+      "prompt": "What is 2+2? Answer with one digit.",
+      "inputTokens": 21,
+      "inputTokensMatched": true,
+      "actualTokensIncludingEos": [
+        19,
+        200002
+      ],
+      "referenceTokensIncludingEos": [
+        19,
+        200002
+      ],
+      "text": "4",
+      "finish": "stop",
+      "responseMilliseconds": 24155.7764,
+      "prefillMilliseconds": 22606,
+      "decodeMilliseconds": 1547,
+      "modelInitializationMilliseconds": 1916.0202,
+      "processWallSecondsIncludingHash": 35.91793774298276,
+      "kernelPeakRssBytes": 2690674688,
+      "runtimePeakRssBytes": 2690674688,
+      "sampledPeakRssBytes": 2684026880,
+      "sampledPeakAddressSpaceBytes": 5997211648,
+      "effectiveWeightCacheBytes": 2381316096,
+      "weightPageIns": 20930,
+      "distinctPages": 8734,
+      "previouslyEvictedPageIns": 12196,
+      "ggufBytesReadByPager": 18786871800,
+      "linuxStorageReadBytesDuringGeneration": 20037632,
+      "swapFileReads": 0,
+      "checkpointMapped": false
+    },
+    {
+      "cacheCondition": "warm",
+      "sampleIndex": 1,
+      "prompt": "What is the capital of France? Answer with the city name.",
+      "inputTokens": 22,
+      "inputTokensMatched": true,
+      "actualTokensIncludingEos": [
+        72782,
+        13,
+        200002
+      ],
+      "referenceTokensIncludingEos": [
+        72782,
+        13,
+        200002
+      ],
+      "text": "Paris.",
+      "finish": "stop",
+      "responseMilliseconds": 26847.5715,
+      "prefillMilliseconds": 23449,
+      "decodeMilliseconds": 3396,
+      "modelInitializationMilliseconds": 1859.8793,
+      "processWallSecondsIncludingHash": 37.1007907850144,
+      "kernelPeakRssBytes": 2889900032,
+      "runtimePeakRssBytes": 2889900032,
+      "sampledPeakRssBytes": 2904358912,
+      "sampledPeakAddressSpaceBytes": 5996974080,
+      "effectiveWeightCacheBytes": 2532311040,
+      "weightPageIns": 25550,
+      "distinctPages": 8811,
+      "previouslyEvictedPageIns": 16739,
+      "ggufBytesReadByPager": 23028813000,
+      "linuxStorageReadBytesDuringGeneration": 0,
+      "swapFileReads": 0,
+      "checkpointMapped": false
+    }
+  ],
+  "regressions": {
+    "Core.Tests": 1676,
+    "IntegrationTests": 6,
+    "Monolith.Tests": 23
+  }
+}

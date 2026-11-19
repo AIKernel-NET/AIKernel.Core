@@ -42,7 +42,7 @@ internal static class BonsaiCtgReportChallenge
         return (system, user, rule.Reference with { Section = "3. Evaluation Criteria" }, excerpt);
     }
 
-    private static string Criteria(BonsaiCouncilRule rule)
+    internal static string Criteria(BonsaiCouncilRule rule)
     {
         BonsaiCtgFindingPolicy.RequireSupported(rule, CouncilKind.Logos);
         string[] lines = rule.Text.Split('\n').Select(l => l.TrimEnd('\r')).Where(l =>

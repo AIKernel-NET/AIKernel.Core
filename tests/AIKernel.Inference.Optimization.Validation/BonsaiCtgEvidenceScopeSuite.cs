@@ -65,6 +65,7 @@ internal static class BonsaiCtgEvidenceScopeSuite
             if (mode == BonsaiCtgResponseMode.SourceBoundRecordVotes && result.Evaluation.Metadata.ContainsKey("record.edits.sha256")) expectedCalls = 3;
             bool challenged = BonsaiCtgCouncilEvaluator.UsesReportChallenge(mode);
             if (challenged && result.Evaluation.Metadata.ContainsKey("Logos.challenge.response.sha256")) expectedCalls++;
+            if (challenged && result.Evaluation.Metadata.ContainsKey("Ethos.challenge.response.sha256")) expectedCalls++;
             if (reasoned && (mode == BonsaiCtgResponseMode.CompletedReasonedFindingVotes || challenged))
             {
                 expectedCalls += truncatedRoles.Count;

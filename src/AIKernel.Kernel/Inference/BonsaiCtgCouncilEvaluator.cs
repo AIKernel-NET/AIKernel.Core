@@ -180,7 +180,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         BonsaiCtgResponseMode.FieldBoundReadingVotes => "canonical-field-bound-reading-v32",
         BonsaiCtgResponseMode.ScopedReportVotes => "canonical-scoped-report-v33",
         BonsaiCtgResponseMode.ConciseReportRetryVotes => "canonical-concise-report-retry-v34",
-        BonsaiCtgResponseMode.JointReportVotes => "canonical-joint-report-v37",
+        BonsaiCtgResponseMode.JointReportVotes => "canonical-numeric-report-v38",
         BonsaiCtgResponseMode.ReasonedFindingVotes => BonsaiCtgReasonedFindingPrompt.Contract,
         _ => null
     };
@@ -191,6 +191,13 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
 
     internal static bool UsesCompletedReasons(BonsaiCtgResponseMode mode) =>
         mode == BonsaiCtgResponseMode.CompletedReasonedFindingVotes || UsesReportChallenge(mode);
+
+    private static bool IsSupportedAnchoredVote(CpuGeneration answer, IReadOnlyDictionary<string,string> facts, CouncilKind council)
+    {
+        try { return BonsaiCtgAnchoredVotePrompt.Parse(answer, facts, council) == CouncilVoteValue.Approve; }
+        // Keep the original response and let the regular validator record the precise failure.
+        catch (InvalidDataException) { return false; }
+    }
 
     private static ImmutableDictionary<CouncilKind,BonsaiCouncilRule> ValidateRules(IReadOnlyDictionary<CouncilKind,BonsaiCouncilRule> rules,BonsaiCtgResponseMode mode)
     {
@@ -301,6 +308,9 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                 string? jointReport = witness is null && responseMode == BonsaiCtgResponseMode.JointReportVotes
                     ? BonsaiCtgJointReport.Extract(proposal!, inputFacts, out exceedsCapacity) : null;
                 if (jointReport is not null) metadata["joint.claims.sha256"] = Hash(jointReport);
+                string? equation = witness is null && jointReport is null && responseMode == BonsaiCtgResponseMode.JointReportVotes
+                    ? BonsaiCtgEquationReport.TryComparison(proposal!, inputFacts) : null;
+                if (equation is not null) metadata["equation.comparison.sha256"] = Hash(equation);
                 if (comparison is not null) metadata["comparison.sha256"] = Hash(comparison);
                 string? recordComparison = responseMode == BonsaiCtgResponseMode.RecordFindingVotes && witness is not null
                     ? BonsaiCtgRecordFindingPrompt.FormatComparison(witness, inputFacts.Keys)
@@ -430,24 +440,27 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                             : await classify(system,user,timeout.Token).ConfigureAwait(false);
                     }
                     string? challengedFinding = null;
-                    if (challenge && council == CouncilKind.Logos && (exceedsCapacity ||
+                    bool reviewEquation = equation is not null && anchored && IsSupportedAnchoredVote(answer, inputFacts, council);
+                    if (reviewEquation || challenge && council == CouncilKind.Logos && (exceedsCapacity ||
                         witness?.HasMaterialValueDifference == true && (!scopedReport || witness.IsBoundExactReport(proposal!, inputFacts))) &&
                         answer is { Text: "Yes", FinishReason: "classified", OutputTokens: 1 })
                     {
-                        var difference = exceedsCapacity ? jointReport! : witness!.DescribeEdits();
+                        var difference = reviewEquation ? equation! : exceedsCapacity ? jointReport! : witness!.DescribeEdits();
                         if (difference.Length <= 1024)
                         {
-                            metadata["Logos.before_challenge.prompt.sha256"] = metadata["Logos.prompt.sha256"];
-                            metadata["Logos.before_challenge.response.sha256"] = Hash(answer.Text);
-                            metadata["Logos.before_challenge.excerpt.sha256"] = metadata["Logos.excerpt.sha256"];
-                            var check = exceedsCapacity
+                            if (select is null) return Failure("ctg.bonsai.selection_unavailable", metadata);
+                            metadata[council+".before_challenge.prompt.sha256"] = metadata[council+".prompt.sha256"];
+                            metadata[council+".before_challenge.response.sha256"] = Hash(answer.Text);
+                            metadata[council+".before_challenge.excerpt.sha256"] = metadata[council+".excerpt.sha256"];
+                            var check = reviewEquation ? BonsaiCtgEquationReport.Build(rule, council, facts, proposalJson!, difference) : exceedsCapacity
                                 ? BonsaiCtgReportChallenge.BuildForCapacity(rule, facts, proposalJson!, difference)
                                 : BonsaiCtgReportChallenge.Build(rule, facts, proposalJson!, difference);
                             var review = await select!(check.System, check.User, BonsaiCtgReportChallenge.Choices, timeout.Token).ConfigureAwait(false);
-                            metadata["Logos.challenge.prompt.sha256"] = Hash(check.System + "\n" + check.User);
-                            metadata["Logos.challenge.response.sha256"] = Hash(review.Text);
-                            metadata[exceedsCapacity ? "Logos.challenge.capacity.sha256" : "Logos.challenge.edits.sha256"] = Hash(difference);
-                            metadata["Logos.challenge.excerpt.sha256"] = Hash(check.Excerpt);
+                            metadata[council+".challenge.prompt.sha256"] = Hash(check.System + "\n" + check.User);
+                            metadata[council+".challenge.response.sha256"] = Hash(review.Text);
+                            string comparisonKind = reviewEquation ? "equation" : exceedsCapacity ? "capacity" : "edits";
+                            metadata[council+".challenge."+comparisonKind+".sha256"] = Hash(difference);
+                            metadata[council+".challenge.excerpt.sha256"] = Hash(check.Excerpt);
                             if (review.FinishReason != "classified" || review.OutputTokens != 1 ||
                                 !BonsaiCtgReportChallenge.Choices.Contains(review.Text))
                                 return Failure("ctg.bonsai.invalid_assessment", metadata);
@@ -455,8 +468,8 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                             {
                                 CriterionObservation?.Invoke(council, "before_challenge", answer);
                                 challengedFinding = "proposal_defect";
-                                metadata["Logos.prompt.sha256"] = metadata["Logos.challenge.prompt.sha256"];
-                                metadata["Logos.excerpt.sha256"] = metadata["Logos.challenge.excerpt.sha256"];
+                                metadata[council+".prompt.sha256"] = metadata[council+".challenge.prompt.sha256"];
+                                metadata[council+".excerpt.sha256"] = metadata[council+".challenge.excerpt.sha256"];
                                 prompt = check;
                                 answer = review;
                             }
@@ -478,13 +491,14 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     CouncilVoteValue value;var voteMetadata=new Dictionary<string,string>{["prompt.sha256"]=metadata[council+".prompt.sha256"]};
                     try
                     {
-                        if (reasonedComparison is not null || edits is not null || jointFinding)
+                        if (reasonedComparison is not null || edits is not null || jointFinding || challengedFinding is not null)
                         {
                             string finding = challengedFinding ?? BonsaiCtgReasonedFindingPrompt.Finding(council, answer);
                             value = BonsaiCtgFindingPolicy.Resolve(council, finding);
                             voteMetadata["finding"] = metadata[council+".finding"] = finding;
                             voteMetadata["binding.policy"] = BonsaiCtgFindingPolicy.Contract;
-                            if (jointFinding) voteMetadata["joint.claims.sha256"] = metadata["joint.claims.sha256"];
+                            if (reviewEquation) voteMetadata["equation.comparison.sha256"] = metadata["equation.comparison.sha256"];
+                            else if (jointFinding) voteMetadata["joint.claims.sha256"] = metadata["joint.claims.sha256"];
                             else if (edits is not null) voteMetadata["record.edits.sha256"] = metadata["record.edits.sha256"];
                             else voteMetadata["draft.response.sha256"] = metadata[council+".draft.response.sha256"];
                         }

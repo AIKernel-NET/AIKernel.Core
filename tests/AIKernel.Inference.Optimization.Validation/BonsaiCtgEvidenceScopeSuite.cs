@@ -69,6 +69,7 @@ internal static class BonsaiCtgEvidenceScopeSuite
             var selectedMode=mode==BonsaiCtgResponseMode.RoutedEvidenceVotes ? BonsaiCtgEvidenceRouting.Select(proposal,request.InputFacts) : mode;
             bool reasoned = (selectedMode == BonsaiCtgResponseMode.ReasonedFindingVotes || BonsaiCtgCouncilEvaluator.UsesCompletedReasons(selectedMode)) && result.Evaluation.Metadata.ContainsKey("comparison.sha256");
             int expectedCalls = reasoned ? 7 : BonsaiCtgCouncilEvaluator.ReadingContract(selectedMode) is not null ? 4 : mode == BonsaiCtgResponseMode.PerCriterionFindings ? 16 : mode == BonsaiCtgResponseMode.ReviewedPacketVotes ? 6 : 3;
+            if (result.Evaluation.Metadata.TryGetValue("reading.purpose", out var purpose) && purpose == "back-translation") expectedCalls++;
             if (mode == BonsaiCtgResponseMode.SourceBoundRecordVotes && result.Evaluation.Metadata.ContainsKey("record.edits.sha256")) expectedCalls = 3;
             bool challenged = BonsaiCtgCouncilEvaluator.UsesReportChallenge(selectedMode);
             if (result.Evaluation.Metadata.ContainsKey("Logos.challenge.response.sha256")) expectedCalls++;

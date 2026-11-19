@@ -50,7 +50,7 @@ internal static class BonsaiCtgRecordReplay
                 "v37-as-v39" => "canonical-joint-report-v37",
                 _ => BonsaiCtgCouncilEvaluator.ReadingContract(sourceMode)
             };
-            bool routedSource=modeName=="routed" && meta["prompt.contract"] is "canonical-evidence-scope-json-v10"
+            bool routedSource=modeName=="routed" && meta["prompt.contract"] is "canonical-evidence-scope-json-v10" or "canonical-source-reply-v50" or BonsaiCtgReplyEvidence.Contract
                 or "canonical-routed-evidence-v44" or "canonical-numeric-report-v41" or "canonical-numeric-report-v39" or "canonical-numeric-report-v38"
                 or "canonical-joint-report-v37" or "canonical-concise-report-retry-v34" or "canonical-scoped-report-v33";
             if ((!routedSource && meta["prompt.contract"] != sourceContract) ||

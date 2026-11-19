@@ -5,6 +5,9 @@ using System.Text;
 using System.Text.Json;
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
+using AIKernel.Abstractions.Providers;
+using AIKernel.Core.Context;
+using AIKernel.Core.Time;
 using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.KernelContext;
@@ -16,6 +19,31 @@ public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOr
 {
     private readonly IKernelReplayer _replayer =
         replayer ?? throw new ArgumentNullException(nameof(replayer));
+    private readonly ModelExecutionPipeline? _pipeline;
+
+    /// <summary>
+    /// EN: Binds the pipeline to a host-selected model and the Core execution services.
+    /// JA: ホストが選択したモデルと Core の実行サービスをパイプラインに接続します。
+    /// </summary>
+    public PipelineOrchestrator(
+        IKernelReplayer replayer,
+        IModelProvider provider,
+        string modelId,
+        IKernelExecutor executor,
+        IOutputPolisher polisher,
+        IPolisherValidator validator,
+        IKernelClock clock)
+        : this(replayer)
+    {
+        ArgumentNullException.ThrowIfNull(provider);
+        ArgumentException.ThrowIfNullOrWhiteSpace(modelId);
+        ArgumentNullException.ThrowIfNull(executor);
+        ArgumentNullException.ThrowIfNull(polisher);
+        ArgumentNullException.ThrowIfNull(validator);
+        ArgumentNullException.ThrowIfNull(clock);
+
+        _pipeline = new ModelExecutionPipeline(provider, modelId, executor, polisher, validator, clock);
+    }
 
     /// <summary>[EN] Documents this public package API member. [JA] InitializeAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.InitializeAsync']/summary" />
@@ -39,9 +67,27 @@ public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOr
     /// <summary>[EN] Documents this public package API member. [JA] ExecuteAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.ExecuteAsync']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.PipelineOrchestrator.ExecuteAsync']/summary" />
-    public Task<ExecutionResult> ExecuteAsync(
+    public async Task<ExecutionResult> ExecuteAsync(
         IContextCollection context,
         SignatureVerificationResult signatureVerificationResult,
+        CancellationToken cancellationToken)
+        => (await ExecuteCoreAsync(context, signatureVerificationResult, captureReplay: false, cancellationToken)
+            .ConfigureAwait(false)).Result;
+
+    /// <summary>
+    /// EN: Executes the bound pipeline and captures a hash-chained replay dump on success.
+    /// JA: 接続済みのパイプラインを実行し、成功時にハッシュチェーン付きのリプレイダンプを返します。
+    /// </summary>
+    public Task<(ExecutionResult Result, ReplayDump? Dump)> ExecuteWithReplayAsync(
+        IContextCollection context,
+        SignatureVerificationResult signatureVerificationResult,
+        CancellationToken cancellationToken = default)
+        => ExecuteCoreAsync(context, signatureVerificationResult, captureReplay: true, cancellationToken);
+
+    private async Task<(ExecutionResult Result, ReplayDump? Dump)> ExecuteCoreAsync(
+        IContextCollection context,
+        SignatureVerificationResult signatureVerificationResult,
+        bool captureReplay,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -50,14 +96,17 @@ public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOr
 
         if (!signatureVerificationResult.IsValid)
         {
-            return Task.FromResult(CreateFailure(
-                "Signature verification failed.",
-                context));
+            return (CreateFailure("Signature verification failed.", ComputeContextHash(context)), null);
         }
 
-        return Task.FromResult(CreateFailure(
-            "Pipeline execution requires a bound execution backend.",
-            context));
+        if (_pipeline is null)
+        {
+            return (CreateFailure("Pipeline execution requires a bound execution backend.", ComputeContextHash(context)), null);
+        }
+
+        var snapshot = new ContextCollectionSnapshot(context.GetAll());
+        return await _pipeline.ExecuteAsync(snapshot, ComputeContextHash(snapshot), captureReplay, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>[EN] Documents this public package API member. [JA] ReplayFromDumpAsync を取得します。</summary>
@@ -77,17 +126,15 @@ public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOr
             cancellationToken).ConfigureAwait(false);
     }
 
-    private static ExecutionResult CreateFailure(
-        string message,
-        IContextCollection context)
+    internal static ExecutionResult CreateFailure(string message, string contextHash, long elapsed = 0)
     {
         return new ExecutionResult
         {
-            Logic = new RawLogic(ComputeContextHash(context)),
+            Logic = new RawLogic(contextHash),
             FinalOutput = string.Empty,
             IsSuccessful = false,
             ErrorMessage = message,
-            ElapsedMilliseconds = 0
+            ElapsedMilliseconds = elapsed
         };
     }
 
@@ -143,7 +190,7 @@ public sealed class PipelineOrchestrator(IKernelReplayer replayer) : IPipelineOr
         };
     }
 
-    private static string ComputeHash(string value)
+    internal static string ComputeHash(string value)
     {
         var bytes = Encoding.UTF8.GetBytes(value);
         var hash = SHA256.HashData(bytes);

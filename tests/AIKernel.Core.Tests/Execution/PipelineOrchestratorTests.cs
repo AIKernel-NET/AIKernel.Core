@@ -124,29 +124,27 @@ public sealed class PipelineOrchestratorTests
 
     private static ReplayDump CreateReplayDump()
     {
+        const string dumpId = "dump-1";
+        var createdAt = DateTime.UnixEpoch;
+        var structure = new RawLogic("logic");
+        const string generation = "generated";
+        var original = new ExecutionResult
+        {
+            Logic = new RawLogic("original logic"),
+            FinalOutput = "final",
+            IsSuccessful = true,
+            ErrorMessage = string.Empty,
+            ElapsedMilliseconds = 12
+        };
+
         return new ReplayDump
         {
-            DumpId = "dump-1",
-            CreatedAt = DateTime.UnixEpoch,
-            StructureOutput = new RawLogic("logic"),
-            GenerationOutput = "final",
-            OriginalResult = new ExecutionResult
-            {
-                Logic = new RawLogic("logic"),
-                FinalOutput = "final",
-                IsSuccessful = true,
-                ErrorMessage = string.Empty,
-                ElapsedMilliseconds = 12
-            },
-            HashChain = new HashChain
-            {
-                HashAlgorithm = "sha256",
-                StructureHash = "s",
-                GenerationHash = "g",
-                GenerationParentHash = "s",
-                PolishHash = "p",
-                PolishParentHash = "g"
-            }
+            DumpId = dumpId,
+            CreatedAt = createdAt,
+            StructureOutput = structure,
+            GenerationOutput = generation,
+            OriginalResult = original,
+            HashChain = ReplayDumpIntegrity.CreateHashChain(dumpId, createdAt, structure, generation, original)
         };
     }
 }

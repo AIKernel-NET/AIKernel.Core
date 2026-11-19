@@ -13,15 +13,7 @@ public sealed class KernelReplayer : IKernelReplayer
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.CanReplay']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.CanReplay']/summary" />
     public bool CanReplay(ReplayDump replayDump)
-    {
-        return replayDump is
-        {
-            OriginalResult: not null,
-            HashChain: not null
-        }
-        && !string.IsNullOrWhiteSpace(replayDump.DumpId)
-        && !string.IsNullOrWhiteSpace(replayDump.HashChain.HashAlgorithm);
-    }
+        => ReplayDumpIntegrity.IsValid(replayDump);
 
     /// <summary>[EN] Documents this public package API member. [JA] ReplayAsync を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Execution.KernelReplayer.ReplayAsync']/summary" />
@@ -37,15 +29,14 @@ public sealed class KernelReplayer : IKernelReplayer
         if (!CanReplay(replayDump))
         {
             return ValueTask.FromResult(CreateFailure(
-                "Replay dump is incomplete or fails closed.",
-                replayDump?.StructureOutput));
+                "Replay dump is incomplete or fails closed."));
         }
 
         var original = replayDump.OriginalResult;
 
         return ValueTask.FromResult(new ExecutionResult
         {
-            Logic = replayDump.StructureOutput ?? original.Logic,
+            Logic = replayDump.StructureOutput,
             FinalOutput = original.FinalOutput,
             IsSuccessful = original.IsSuccessful,
             ErrorMessage = original.ErrorMessage,
@@ -53,13 +44,11 @@ public sealed class KernelReplayer : IKernelReplayer
         });
     }
 
-    private static ExecutionResult CreateFailure(
-        string message,
-        RawLogic? logic)
+    private static ExecutionResult CreateFailure(string message)
     {
         return new ExecutionResult
         {
-            Logic = logic ?? new RawLogic(string.Empty),
+            Logic = new RawLogic(string.Empty),
             FinalOutput = string.Empty,
             IsSuccessful = false,
             ErrorMessage = message,

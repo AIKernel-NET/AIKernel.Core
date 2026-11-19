@@ -7,10 +7,12 @@ using AIKernel.Abstractions.Providers;
 using AIKernel.Abstractions.Routing;
 using AIKernel.Core.Context;
 using AIKernel.Core.Execution;
+using AIKernel.Dtos.Context;
 using AIKernel.Dtos.Core;
 using AIKernel.Dtos.Execution;
 using AIKernel.Dtos.Kernel;
 using AIKernel.Dtos.Routing;
+using AIKernel.Enums;
 using AIKernel.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -210,6 +212,160 @@ public sealed class ModelProviderHostingExtensionsTests
             exception.Message);
     }
 
+    [Fact]
+    public async Task WithExecutionPipeline_ExecutesTheSelectedModelAndIsolatesPhaseInputs()
+    {
+        const string plan = """{"steps":["Summarize the verified source."]}""";
+        const string answer = "Summary of the verified source.";
+        var prompts = new List<string>();
+        var examples = new List<string> { "original example" };
+        var chosen = new ExternalCapabilityProvider("selected", messages =>
+        {
+            prompts.Add(string.Join("\n", messages.Select(message => message.Content)));
+            examples[0] = "changed during execution";
+            return prompts.Count == 1 ? plan : answer;
+        });
+        var other = new ExternalCapabilityProvider("other", _ => throw new InvalidOperationException());
+        var polisher = new RecordingPolisher();
+        var services = new ServiceCollection();
+        services.AddSingleton<IOutputPolisher>(polisher);
+        services.AddAIKernelCore()
+            .WithModelProvider(_ => other, CreateCapability("other", "default"))
+            .WithModelProvider(_ => chosen, CreateCapability("selected", "default"))
+            .WithExecutionPipeline("selected", "default");
+
+        using var host = services.BuildServiceProvider();
+        var orchestrator = host.GetRequiredService<PipelineOrchestrator>();
+        Assert.Same(orchestrator, host.GetRequiredService<IPipelineOrchestrator>());
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var (result, dump) = await orchestrator.ExecuteWithReplayAsync(
+            CreatePipelineContext(examples), SignatureResult(isValid: true), cancellationToken);
+
+        Assert.True(result.IsSuccessful, result.ErrorMessage);
+        Assert.Equal(plan, result.Logic.SerializedRepresentation);
+        Assert.Equal(answer, result.FinalOutput);
+        Assert.Collection(prompts,
+            structure =>
+            {
+                Assert.Contains("task input", structure, StringComparison.Ordinal);
+                Assert.Contains("source input", structure, StringComparison.Ordinal);
+                Assert.DoesNotContain("expression input", structure, StringComparison.Ordinal);
+                Assert.DoesNotContain("internal policy data", structure, StringComparison.Ordinal);
+            },
+            generation =>
+            {
+                Assert.Contains(plan, generation, StringComparison.Ordinal);
+                Assert.DoesNotContain("source input", generation, StringComparison.Ordinal);
+                Assert.DoesNotContain("internal policy data", generation, StringComparison.Ordinal);
+            });
+        Assert.Equal(answer, polisher.Input);
+        var expression = Assert.Single(polisher.ExpressionFragments);
+        Assert.Equal("expression input", expression.Content);
+        Assert.Equal("original example", Assert.Single(expression.Examples));
+
+        Assert.NotNull(dump);
+        Assert.Equal(answer, dump.GenerationOutput);
+        var modification = new ModificationContext
+        {
+            Reason = "Verify recorded result",
+            TargetPhase = "replay",
+            ModificationData = string.Empty,
+            ModifiedBy = "test"
+        };
+        var replayed = await orchestrator.ReplayFromDumpAsync(dump, modification, cancellationToken);
+        Assert.True(replayed.IsSuccessful);
+        Assert.Equal(result.FinalOutput, replayed.FinalOutput);
+
+        var tampered = await orchestrator.ReplayFromDumpAsync(
+            dump with { GenerationOutput = "tampered" }, modification, cancellationToken);
+        Assert.False(tampered.IsSuccessful);
+        Assert.Empty(tampered.FinalOutput);
+    }
+
+    [Theory]
+    [InlineData(false, "default", "unused", 0)]
+    [InlineData(true, "unregistered", "unused", 0)]
+    [InlineData(true, "default", "not a structure", 1)]
+    [InlineData(true, "default", "{\"steps\":[]}", 1)]
+    public async Task WithExecutionPipeline_StopsBeforeLaterPhasesOnRejectedInput(
+        bool signatureValid, string model, string structure, int expectedProviderCalls)
+    {
+        var calls = 0;
+        var provider = new ExternalCapabilityProvider("selected", _ =>
+        {
+            calls++;
+            return structure;
+        });
+        var polisher = new RecordingPolisher();
+        var services = new ServiceCollection();
+        services.AddSingleton<IOutputPolisher>(polisher);
+        services.AddAIKernelCore()
+            .WithModelProvider(_ => provider, CreateCapability("selected", "default"))
+            .WithExecutionPipeline("selected", model);
+
+        using var host = services.BuildServiceProvider();
+        var result = await host.GetRequiredService<IPipelineOrchestrator>().ExecuteAsync(
+            CreatePipelineContext([]), SignatureResult(signatureValid), TestContext.Current.CancellationToken);
+
+        Assert.False(result.IsSuccessful);
+        Assert.Empty(result.FinalOutput);
+        Assert.Equal(expectedProviderCalls, calls);
+        Assert.Null(polisher.Input);
+    }
+
+    [Fact]
+    public async Task WithExecutionPipeline_RejectsPolishThatChangesTheGeneratedAnswer()
+    {
+        var output = new Queue<string>(["""{"steps":["Answer the question."]}""", "Original answer."]);
+        var provider = new ExternalCapabilityProvider("selected", _ => output.Dequeue());
+        var services = new ServiceCollection();
+        services.AddSingleton<IOutputPolisher>(new RecordingPolisher("Altered answer."));
+        services.AddAIKernelCore()
+            .WithModelProvider(_ => provider, CreateCapability("selected", "default"))
+            .WithExecutionPipeline("selected", "default");
+
+        using var host = services.BuildServiceProvider();
+        var result = await host.GetRequiredService<IPipelineOrchestrator>().ExecuteAsync(
+            CreatePipelineContext([]), SignatureResult(isValid: true), TestContext.Current.CancellationToken);
+
+        Assert.Empty(output);
+        Assert.False(result.IsSuccessful);
+        Assert.Empty(result.FinalOutput);
+        Assert.Equal("Polish altered the generated answer.", result.ErrorMessage);
+    }
+
+    private static ContextCollectionSnapshot CreatePipelineContext(IReadOnlyList<string> examples)
+        => new([
+            new ContextFragment { FragmentId = "task", Category = ContextCategory.Orchestration, Content = "task input" },
+            new ContextFragment { FragmentId = "source", Category = ContextCategory.Material, Content = "source input" },
+            new ContextFragment { FragmentId = "policy", Category = ContextCategory.Governance, Content = "internal policy data" },
+            new ExpressionFragment { FragmentId = "style", Content = "expression input", Examples = examples }
+        ]);
+
+    private static SignatureVerificationResult SignatureResult(bool isValid)
+        => new()
+        {
+            IsValid = isValid,
+            SignerId = "test-signer",
+            TrustScore = isValid ? 1 : 0,
+            Message = isValid ? "verified" : "invalid",
+            VerificationTimestamp = DateTime.UnixEpoch
+        };
+
+    private sealed class RecordingPolisher(string? replacement = null) : IOutputPolisher
+    {
+        public ModelCapacityVector RequiredCapacity { get; } = new();
+        public string? Input { get; private set; }
+        public IReadOnlyList<ExpressionFragment> ExpressionFragments { get; private set; } = [];
+
+        public Task<string> RenderAsync(RawLogic logic, ExpressionContext expressionContext, CancellationToken ct)
+        {
+            Input = logic.SerializedRepresentation;
+            ExpressionFragments = expressionContext.ExpressionBuffer.Fragments;
+            return Task.FromResult(replacement ?? Input);
+        }
+    }
+
     private static ModelPromptCapability CreateCapability(
         string providerId,
         string modelId)
@@ -258,10 +414,14 @@ public sealed class ModelProviderHostingExtensionsTests
         {
         }
 
+        private readonly Func<IReadOnlyList<IModelMessage>, string>? _generate;
+
         public ExternalCapabilityProvider(
-            string providerId)
+            string providerId,
+            Func<IReadOnlyList<IModelMessage>, string>? generate = null)
         {
             ProviderId = providerId;
+            _generate = generate;
         }
 
         public string ProviderId { get; }
@@ -303,7 +463,7 @@ public sealed class ModelProviderHostingExtensionsTests
             IReadOnlyList<IModelMessage> messages,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult("external output");
+            return Task.FromResult(_generate?.Invoke(messages) ?? "external output");
         }
 
         public Task StreamGenerateAsync(

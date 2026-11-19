@@ -83,6 +83,23 @@ public sealed partial class BonsaiCtgTests
     }
 
     [Theory]
+    [InlineData("Register M presently holds two verified readings.", false)]
+    [InlineData("The certified replacement register M has two channels.", false)]
+    [InlineData("Register M2 holds two readings.", true)]
+    [InlineData("Register m holds two readings.", true)]
+    public void AnotherRecordForTheSameIdentifierPreventsBindingAnOlderCapacity(string current, bool binds)
+    {
+        var facts = new Dictionary<string,string>
+            { ["previous"]="Register M holds one integer. Specification at installation.", ["current"]=current };
+        using var packet = JsonDocument.Parse(BonsaiCtgJointReport.Extract(
+            "Report that register M has both 3 and 9 at the same instant.", facts, out bool exceeds)!);
+        Assert.Equal(binds, exceeds);
+        var claims = binds ? packet.RootElement : packet.RootElement.GetProperty("claims");
+        Assert.Equal(binds ? JsonValueKind.Object : JsonValueKind.Null, claims.GetProperty("observedCapacityConstraint").ValueKind);
+        if (!binds) Assert.Equal(2, packet.RootElement.GetProperty("accountsForTheSameSubject").GetArrayLength());
+    }
+
+    [Theory]
     [InlineData(true, "ctg.bonsai.invalid_assessment", 1)]
     [InlineData(false, "ctg.bonsai.required_evidence_unavailable", 0)]
     public async Task JointReportNeedsValidHostEvidenceAndARealCouncilFinding(bool available, string error, int calls)

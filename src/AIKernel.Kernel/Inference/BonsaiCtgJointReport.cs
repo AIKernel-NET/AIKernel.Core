@@ -32,17 +32,29 @@ internal static class BonsaiCtgJointReport
         var constraints = facts.Select(f => (f.Key, Quote: ScalarRecord.Match(f.Value)))
             .Where(f => f.Quote.Success && SameSubject(f.Quote.Groups["subject"].Value, referent))
             .Take(2).ToArray();
-        var capacity = constraints.Length == 1 ? new
+        // A second account of the same subject may describe another time or device revision.
+        // Keep both originals in the council packet; the host cannot pick which one governs.
+        var otherAccounts = constraints.Length == 1 ? facts.Where(f => f.Key != constraints[0].Key &&
+            MentionsSubject(f.Value, referent)).Select(f => f.Key).Order(StringComparer.Ordinal).ToArray() : [];
+        bool uniqueSource = constraints.Length == 1 && otherAccounts.Length == 0;
+        var capacity = uniqueSource ? new
         {
             sourceKey = constraints[0].Key, exactQuote = constraints[0].Quote.Value.TrimEnd(),
             maximumSimultaneousValues = 1,
             comparisonIfApplicable = distinct > 1 ? "2 distinct values cannot fit in 1 slot." : "1 distinct value fits in 1 slot. Verify the value itself."
         } : null;
         exceedsCapacity = capacity is not null && distinct > 1;
-        return JsonSerializer.Serialize(new
+        var claims = new
         {
             subject, firstClaim = first, secondClaim = second, time = match.Groups["time"].Value,
             distinctValuesInProposal = distinct, observedCapacityConstraint = capacity
+        };
+        if (otherAccounts.Length == 0) return JsonSerializer.Serialize(claims);
+        return JsonSerializer.Serialize(new
+        {
+            claims,
+            accountsForTheSameSubject = otherAccounts.Prepend(constraints[0].Key),
+            scopeQuestion = "Which record describes the unit and time in the request? A specification for a retired unit does not establish the current unit's capacity."
         });
     }
 
@@ -53,6 +65,22 @@ internal static class BonsaiCtgJointReport
             (source.Length == proposal.Length && char.ToLowerInvariant(source[0]) == char.ToLowerInvariant(proposal[0]) &&
              source.AsSpan(1).SequenceEqual(proposal.AsSpan(1)));
     }
+
+    private static bool MentionsSubject(string record, string subject)
+    {
+        for (int from = 0; from < record.Length;)
+        {
+            int start = record.IndexOf(subject, from, StringComparison.OrdinalIgnoreCase);
+            if (start < 0) break;
+            int end = start + subject.Length;
+            if ((start == 0 || !IsNameCharacter(record[start-1])) && (end == record.Length || !IsNameCharacter(record[end])) &&
+                SameSubject(record[start..end], subject)) return true;
+            from = start + 1;
+        }
+        return false;
+    }
+
+    private static bool IsNameCharacter(char c) => char.IsLetterOrDigit(c) || c is '_' or '-';
 
     // Decimal strings need no fixed-width conversion. Retain the original spelling in the packet.
     private static string NormalizeInteger(string value)

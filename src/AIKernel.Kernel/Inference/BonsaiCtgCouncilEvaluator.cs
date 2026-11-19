@@ -180,7 +180,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         BonsaiCtgResponseMode.FieldBoundReadingVotes => "canonical-field-bound-reading-v32",
         BonsaiCtgResponseMode.ScopedReportVotes => "canonical-scoped-report-v33",
         BonsaiCtgResponseMode.ConciseReportRetryVotes => "canonical-concise-report-retry-v34",
-        BonsaiCtgResponseMode.JointReportVotes => "canonical-numeric-report-v38",
+        BonsaiCtgResponseMode.JointReportVotes => "canonical-numeric-report-v39",
         BonsaiCtgResponseMode.ReasonedFindingVotes => BonsaiCtgReasonedFindingPrompt.Contract,
         _ => null
     };

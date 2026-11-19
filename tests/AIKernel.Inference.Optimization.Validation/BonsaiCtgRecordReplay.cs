@@ -22,7 +22,7 @@ internal static class BonsaiCtgRecordReplay
             "v32" => BonsaiCtgResponseMode.FieldBoundReadingVotes,
             "v33" => BonsaiCtgResponseMode.ScopedReportVotes,
             "v34" or "v33-as-v34" => BonsaiCtgResponseMode.ConciseReportRetryVotes,
-            "v38" or "v37-as-v38" or "v34-as-v38" or "v33-as-v38" => BonsaiCtgResponseMode.JointReportVotes,
+            "v39" or "v38-as-v39" or "v37-as-v39" or "v34-as-v39" or "v33-as-v39" => BonsaiCtgResponseMode.JointReportVotes,
             _ => throw new ArgumentException("Unsupported record replay contract: " + modeName)
         };
         var cases = Read(Path.Combine(directory,"cases.json")).EnumerateArray().ToDictionary(x => x.GetProperty("id").GetString()!);
@@ -38,11 +38,16 @@ internal static class BonsaiCtgRecordReplay
             var meta = evaluation.GetProperty("Metadata").Deserialize<Dictionary<string,string>>()!;
             var sourceMode = modeName switch
             {
-                "v33-as-v34" or "v33-as-v38" => BonsaiCtgResponseMode.ScopedReportVotes,
-                "v34-as-v38" => BonsaiCtgResponseMode.ConciseReportRetryVotes,
+                "v33-as-v34" or "v33-as-v39" => BonsaiCtgResponseMode.ScopedReportVotes,
+                "v34-as-v39" => BonsaiCtgResponseMode.ConciseReportRetryVotes,
                 _ => mode
             };
-            string? sourceContract = modeName == "v37-as-v38" ? "canonical-joint-report-v37" : BonsaiCtgCouncilEvaluator.ReadingContract(sourceMode);
+            string? sourceContract = modeName switch
+            {
+                "v38-as-v39" => "canonical-numeric-report-v38",
+                "v37-as-v39" => "canonical-joint-report-v37",
+                _ => BonsaiCtgCouncilEvaluator.ReadingContract(sourceMode)
+            };
             if (meta["prompt.contract"] != sourceContract ||
                 meta["model.sha256"] != "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3")
                 throw new InvalidDataException("Unexpected source model or contract.");

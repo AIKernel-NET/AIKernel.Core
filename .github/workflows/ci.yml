@@ -32,6 +32,4 @@ jobs:
         run: dotnet build AIKernel.Core.slnx -c Release --no-restore
       - name: Test
         run: dotnet test AIKernel.Core.slnx -c Release --no-build --no-restore
-      - name: Pack
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: dotnet pack AIKernel.Core.slnx -c Release --no-build --no-restore
+      # The native-cuda-nuget workflow packs the complete family with both RID assets.

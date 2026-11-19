@@ -102,7 +102,8 @@ internal enum BonsaiCtgResponseMode
     /// <summary>Validation only. Challenge explicit, source-bound exact reporting requests.</summary>
     ScopedReportVotes,
     /// <summary>Validation only. Request a concise new explanation if a truncated draft already exceeds the input limit.</summary>
-    ConciseReportRetryVotes
+    ConciseReportRetryVotes,
+    JointReportVotes
 }
 
 /// <summary>Experimental Bonsai 1.7B council observations; canonical voting fidelity is not established.
@@ -179,13 +180,14 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         BonsaiCtgResponseMode.FieldBoundReadingVotes => "canonical-field-bound-reading-v32",
         BonsaiCtgResponseMode.ScopedReportVotes => "canonical-scoped-report-v33",
         BonsaiCtgResponseMode.ConciseReportRetryVotes => "canonical-concise-report-retry-v34",
+        BonsaiCtgResponseMode.JointReportVotes => "canonical-joint-report-v35",
         BonsaiCtgResponseMode.ReasonedFindingVotes => BonsaiCtgReasonedFindingPrompt.Contract,
         _ => null
     };
 
     internal static bool UsesReportChallenge(BonsaiCtgResponseMode mode) => mode is
         BonsaiCtgResponseMode.ChallengedRecordVotes or BonsaiCtgResponseMode.FieldBoundReadingVotes or
-        BonsaiCtgResponseMode.ScopedReportVotes or BonsaiCtgResponseMode.ConciseReportRetryVotes;
+        BonsaiCtgResponseMode.ScopedReportVotes or BonsaiCtgResponseMode.ConciseReportRetryVotes or BonsaiCtgResponseMode.JointReportVotes;
 
     internal static bool UsesCompletedReasons(BonsaiCtgResponseMode mode) =>
         mode == BonsaiCtgResponseMode.CompletedReasonedFindingVotes || UsesReportChallenge(mode);
@@ -284,7 +286,8 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
             {
                 string? actionReading=null;
                 bool challenge = UsesReportChallenge(responseMode);
-                bool scopedReport = responseMode is BonsaiCtgResponseMode.ScopedReportVotes or BonsaiCtgResponseMode.ConciseReportRetryVotes;
+                bool conciseRetry = responseMode is BonsaiCtgResponseMode.ConciseReportRetryVotes or BonsaiCtgResponseMode.JointReportVotes;
+                bool scopedReport = responseMode == BonsaiCtgResponseMode.ScopedReportVotes || conciseRetry;
                 bool reasoned = challenge || responseMode is BonsaiCtgResponseMode.ReasonedFindingVotes or BonsaiCtgResponseMode.CompletedReasonedFindingVotes;
                 bool sourceBound = responseMode == BonsaiCtgResponseMode.SourceBoundRecordVotes;
                 bool compareLiterals = sourceBound || reasoned || responseMode is BonsaiCtgResponseMode.ComparedReadingVotes or BonsaiCtgResponseMode.RecordFindingVotes;
@@ -294,6 +297,9 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                 if (edits is { Length: > 1024 }) edits = null;
                 if (edits is not null) metadata["record.edits.sha256"] = Hash(edits);
                 string? comparison = witness?.ToPromptData();
+                string? jointReport = witness is null && responseMode == BonsaiCtgResponseMode.JointReportVotes
+                    ? BonsaiCtgJointReport.Extract(proposal!) : null;
+                if (jointReport is not null) metadata["joint.claims.sha256"] = Hash(jointReport);
                 if (comparison is not null) metadata["comparison.sha256"] = Hash(comparison);
                 string? recordComparison = responseMode == BonsaiCtgResponseMode.RecordFindingVotes && witness is not null
                     ? BonsaiCtgRecordFindingPrompt.FormatComparison(witness, inputFacts.Keys)
@@ -361,7 +367,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     var rule=rules[council];var prompt=edits is not null?BonsaiCtgReasonedFindingPrompt.BuildFromRecord(rule,council,facts,proposalJson!,edits):
                         reasonedComparison is not null?BonsaiCtgReasonedFindingPrompt.Build(rule,council,facts,proposalJson!,actionReading,reasonedComparison):
                         recordComparison is not null?BonsaiCtgRecordFindingPrompt.Build(rule,council,facts,proposalJson!,actionReading!,recordComparison):
-                        anchored?BonsaiCtgAnchoredVotePrompt.Build(rule,council,facts,proposalJson!,actionReading!,comparison):
+                        anchored?BonsaiCtgAnchoredVotePrompt.Build(rule,council,facts,proposalJson!,actionReading!,comparison,jointReport):
                         focused?BonsaiCtgFocusedPrompt.Build(rule,council,facts,proposalJson!,actionReading!,defined,voteFirst,literalComparison:comparison):
                         provenance?BonsaiCtgProvenancePrompt.Build(rule,council,facts,proposalJson!):
                         councilScoped?BonsaiCtgDirectVotePrompt.BuildWithCouncilScopes(rule,council,facts,proposalJson!):
@@ -397,7 +403,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                             CriterionObservation?.Invoke(council, "truncated_reason", answer);
                             timeout.Token.ThrowIfCancellationRequested();
                             metadata[council + ".draft.retry.max_output_tokens"] = "256";
-                            if (responseMode == BonsaiCtgResponseMode.ConciseReportRetryVotes &&
+                            if (conciseRetry &&
                                 answer.Text.AsSpan().TrimEnd().Length > BonsaiCtgReasonedFindingPrompt.MaximumReasonLength)
                             {
                                 // Extending this same deterministic prefix cannot bring its text under the limit.

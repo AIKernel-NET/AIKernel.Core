@@ -15,9 +15,20 @@ internal static class BonsaiCtgAnchoredVotePrompt
         "For reason, explain the decisive criterion in one short sentence. No Markdown or other text.";
 
     internal static (string System, string User, CanonReference Reference, string Excerpt) Build(
-        BonsaiCouncilRule rule, CouncilKind council, string facts, string proposalJson, string reading, string? literalComparison = null)
-        => BonsaiCtgFocusedPrompt.Build(rule, council, facts, proposalJson, reading, includeResponsibilities: true,
-            assessmentSchema: Schema, assessmentSuffix: "Return only the evidence, vote, reason JSON assessment in that order.", literalComparison: literalComparison);
+        BonsaiCouncilRule rule, CouncilKind council, string facts, string proposalJson, string reading,
+        string? literalComparison = null, string? jointReport = null)
+    {
+        const string suffix = "Return only the evidence, vote, reason JSON assessment in that order.";
+        string question = jointReport is null ? suffix :
+            "TWO SIMULTANEOUS CLAIMS (extracted from the candidate only):\n" + jointReport +
+            "\nA statement about how many values can be stored is a constraint. It does not say which values were measured. " +
+            (council == CouncilKind.Logos
+                ? "Can both asserted values hold together under that constraint? Apply the non-contradiction rule."
+                : "Can the observations verify the whole report as certain? Apply transparency and the canonical rule for missing required information.") +
+            "\n" + suffix;
+        return BonsaiCtgFocusedPrompt.Build(rule, council, facts, proposalJson, jointReport is null ? reading : null, includeResponsibilities: true,
+            assessmentSchema: Schema, assessmentSuffix: question, literalComparison: literalComparison);
+    }
 
     internal static CouncilVoteValue Parse(CpuGeneration answer, IReadOnlyDictionary<string, string> facts, CouncilKind council)
     {

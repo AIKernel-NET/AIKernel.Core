@@ -1,0 +1,16 @@
+{
+  "method": "Gemma4CpuMatrix.DotQ6_256",
+  "fullOptimization": true,
+  "shiftImmediates": [
+    "vpsrlw   ymm12, ymm10, 2",
+    "vpsrlw   ymm8, ymm8, 4",
+    "vpsrlw   ymm9, ymm10, 4",
+    "vpsrlw   ymm8, ymm9, 4",
+    "vpsrlw   ymm9, ymm10, 6"
+  ],
+  "packedIntegerUnpack": true,
+  "helpersInlined": true,
+  "scalarHalfOrReferenceDecodeCalls": false,
+  "fma": false,
+  "note": "CA1857 flags helper parameters statically; literal call sites inline to immediate shifts in the inspected optimized JIT code."
+}

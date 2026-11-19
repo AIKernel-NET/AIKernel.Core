@@ -1,0 +1,106 @@
+from pathlib import Path
+import os, subprocess, json, time, resource
+
+out=Path(__file__).resolve().parent
+root=out.parent.parent
+os.umask(0o077)
+settings=json.loads((out/'run.json').read_text())
+if settings.get('waitFor'):
+ dependency=out.parent/settings['waitFor']
+ deadline=time.time()+7200
+ while not (dependency/'completion.json').exists():
+  if time.time()>deadline:raise RuntimeError('Preceding run has not completed')
+  time.sleep(5)
+ previous=json.loads((dependency/'completion.json').read_text())
+ if settings['waitFor']=='controls-baseline':
+  assert previous['stopReason'] is None and previous['exitCode'] in (0,1)
+  assert len(json.loads((dependency/'result.json').read_text()))==4
+ elif settings['waitFor'] in ('public-api','final-api'):
+  assert all(c['exitCode']==0 and c['stopReason'] is None for c in previous['checks'].values())
+ elif settings['waitFor']=='candidate-pilot2' and (dependency/'stop-record.json').exists():
+  stopped=json.loads((dependency/'stop-record.json').read_text())
+  assert previous['exitCode']==-15 and stopped['reason']=='new false approval violates frozen semantic admission criterion'
+ else:
+  assert previous['stopReason'] is None and previous['exitCode'] in (0,1),'Preceding run failed operationally'
+  previous_rows=json.loads((dependency/'result.json').read_text())
+  assert len(previous_rows)==({'candidate-pilot':6,'candidate-pilot2':8,'candidate-ordered':8}.get(settings['waitFor'],46)) and all(r['result']['Evaluation']['Succeeded'] for r in previous_rows)
+  if settings['waitFor']=='candidate-ordered':
+   assert not any(not r['expectedGate'] and r['result']['Gate']['Accepted'] and r['id']!='printer-profile-outage' for r in previous_rows),'Pilot introduced a false approval'
+   assert sum(r['expectedGate'] and not r['result']['Gate']['Accepted'] for r in previous_rows)<4,'Pilot did not reduce false denials'
+   assert all(c['exitCode']==0 and c['stopReason'] is None for c in previous['checks'].values())
+assert {4,5}.issubset(os.sched_getaffinity(0))
+os.sched_setaffinity(0,{4,5})
+os.nice(10)
+resource.setrlimit(resource.RLIMIT_AS,(8*1024**3,8*1024**3))
+env=os.environ.copy()
+env.update(DOTNET_PROCESSOR_COUNT='2',DOTNET_GCHeapHardLimit='0x80000000')
+runtime=Path(json.loads((root/'runtime.lock.json').read_text())['path'])/'dotnet'
+model=root/'models/bonsai1.7b/Bonsai-1.7B-Q1_0.gguf'
+assert settings['mode'] in ('--bonsai-ctg-separated-suite','--bonsai-ctg-grounded-suite','--bonsai-ctg-comparative-suite','--bonsai-ctg-ordered-suite','--bonsai-ctg-readable-suite','--bonsai-ctg-scope-suite','--bonsai-ctg-evidence-scope-suite')
+command=[str(runtime),str(out/'app/AIKernel.Core.Tests.dll'),settings['mode'],str(model),str(out/'governance'),str(out/'cases.json'),str(out/'result.json')]
+maximum_rss=0
+start=time.time()
+with (out/'output.log').open('wb') as log:
+ p=subprocess.Popen(command,env=env,stdout=log,stderr=subprocess.STDOUT,stdin=subprocess.DEVNULL)
+ (out/'pid.json').write_text(json.dumps({'pid':p.pid,'runnerPid':os.getpid(),'cpus':[4,5],'configuredWorkers':4}))
+ stop_reason=None
+ while p.poll() is None:
+  try:
+   resident=int((Path('/proc')/str(p.pid)/'statm').read_text().split()[1])*os.sysconf('SC_PAGE_SIZE')
+   maximum_rss=max(maximum_rss,resident)
+   if resident>7*1024**3:stop_reason='rss-limit'
+  except (OSError,ValueError,IndexError):pass
+  if settings.get('stopOnRegression') and (out/'result.json').exists():
+   try:
+    baseline=json.loads((out/'baseline-gates.json').read_text())
+    completed=json.loads((out/'result.json').read_text())
+    violations=[]
+    for row in completed:
+     if row.get('expectedHostBlock'):
+      if not row.get('pipelinePass') or row.get('inferenceCalls')!=0:violations.append([row['id'],'host guard failure'])
+      continue
+     before=baseline.get(row['id']);after=row['result']['Gate']['Accepted']
+     if not row['result']['Evaluation']['Succeeded']:violations.append([row['id'],'evaluation failed'])
+     if before:
+      if before['gate']==before['expected'] and after!=before['expected']:violations.append([row['id'],'gate regression'])
+      for c in row['checks']:
+       if c['council'] in before['passingVotes'] and c['actual'] not in before['passingVotes'][c['council']]:violations.append([row['id'],c['council']+' vote regression'])
+     elif not row['pass']:violations.append([row['id'],'previously unrun control failed'])
+    if violations:
+     stop_reason='semantic-regression'
+     (out/'stop-record.json').write_text(json.dumps({'reason':stop_reason,'violations':violations,'completed':len(completed)},indent=2))
+   except ValueError:pass
+  if time.time()-start>7200:stop_reason='suite-deadline'
+  if stop_reason:
+   p.terminate()
+   try:p.wait(timeout=15)
+   except subprocess.TimeoutExpired:p.kill();p.wait()
+   break
+  time.sleep(1)
+ result={'exitCode':p.wait(),'stopReason':stop_reason,'maximumRssBytes':maximum_rss,'seconds':time.time()-start,
+         'cpuAffinity':[4,5],'configuredWorkers':4,'performanceBenchmark':False}
+ if settings.get('postChecks') and stop_reason is None and result['exitCode'] in (0,1):
+  checks={}
+  commands={
+   'evidence-probe':[str(runtime),str(out/'app/AIKernel.Core.Tests.dll'),'--bonsai-ctg-evidence-probe',str(model),str(out/'governance'),str(out/'probe-cases.json'),str(out/'evidence-probe.json')],
+   'normal-128':[str(runtime),str(out/'app/AIKernel.Core.Tests.dll'),str(model),'cpu','avx512']}
+  for name,command in commands.items():
+   peak=0;reason=None;started=time.time()
+   with (out/(name+'.log')).open('wb') as check_log:
+    child=subprocess.Popen(command,env=env,stdout=check_log,stderr=subprocess.STDOUT,stdin=subprocess.DEVNULL)
+    while child.poll() is None:
+     try:
+      resident=int((Path('/proc')/str(child.pid)/'statm').read_text().split()[1])*os.sysconf('SC_PAGE_SIZE');peak=max(peak,resident)
+      if resident>7*1024**3:reason='rss-limit'
+     except (OSError,ValueError,IndexError):pass
+     if time.time()-started>1200:reason='check-deadline'
+     if reason:
+      child.terminate()
+      try:child.wait(timeout=15)
+      except subprocess.TimeoutExpired:child.kill();child.wait()
+      break
+     time.sleep(1)
+    checks[name]={'exitCode':child.wait(),'maximumRssBytes':peak,'stopReason':reason,'seconds':time.time()-started}
+   (out/'checks.json').write_text(json.dumps(checks,indent=2))
+  result['checks']=checks
+ (out/'completion.json').write_text(json.dumps(result,indent=2))

@@ -1,0 +1,27 @@
+from pathlib import Path
+import sys,subprocess,json
+sys.path.insert(0,r'D:/AIKernel/.wp-predelete-backup')
+from xserver_ssh import connection
+script=r'''from pathlib import Path
+import json,os,signal,time
+root=Path.home()/'.aikernel-inquiry-014/ctg-grounding-20261116'
+out=root/'candidate-full3'
+rows=json.loads((out/'result.json').read_text());baseline=json.loads((root/'baseline/result.json').read_text())
+case='japanese-arithmetic'
+old=next(r for r in baseline if r['id']==case);new=next(r for r in rows if r['id']==case)
+assert old['expectedGate'] is True and old['result']['Gate']['Accepted'] is True
+assert new['result']['Evaluation']['Succeeded'] is True and new['result']['Gate']['Accepted'] is False
+record=json.loads((out/'pid.json').read_text());pid=record['pid']
+cmd=(Path('/proc')/str(pid)/'cmdline').read_bytes().split(b'\0')
+assert str(out/'app/AIKernel.Core.Tests.dll').encode() in cmd and b'--bonsai-ctg-ordered-suite' in cmd
+decision={'reason':'regression of previously correct gate violates frozen admission criterion','caseId':case,
+ 'completedCases':len(rows),'pid':pid,'signal':'SIGTERM','timeUtcSeconds':time.time()}
+(out/'stop-record.json').write_text(json.dumps(decision,indent=2))
+os.kill(pid,signal.SIGTERM);print(json.dumps(decision))
+'''
+with connection() as ssh:
+ p=subprocess.run(ssh+['/usr/bin/python3.6 -'],input=script.encode(),capture_output=True,timeout=60,creationflags=subprocess.CREATE_NO_WINDOW)
+if p.returncode:raise RuntimeError(p.stderr.decode(errors='replace'))
+result=json.loads(p.stdout)
+(Path(__file__).parent/'ordered-early-stop.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result))

@@ -1,0 +1,98 @@
+{
+  "root": "/home/tkysoftware/.aikernel-inquiry-014",
+  "runtime": "/home/tkysoftware/.aikernel-inquiry-014/runtimes/10.0.15/dotnet",
+  "model": "/home/tkysoftware/.aikernel-inquiry-014/models/bonsai1.7b/Bonsai-1.7B-Q1_0.gguf",
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "cpus": [
+    {
+      "id": 0,
+      "socket": 0,
+      "core": 0
+    },
+    {
+      "id": 1,
+      "socket": 0,
+      "core": 1
+    },
+    {
+      "id": 2,
+      "socket": 0,
+      "core": 2
+    },
+    {
+      "id": 3,
+      "socket": 0,
+      "core": 3
+    },
+    {
+      "id": 4,
+      "socket": 0,
+      "core": 4
+    },
+    {
+      "id": 5,
+      "socket": 0,
+      "core": 5
+    },
+    {
+      "id": 6,
+      "socket": 0,
+      "core": 6
+    },
+    {
+      "id": 7,
+      "socket": 0,
+      "core": 7
+    },
+    {
+      "id": 8,
+      "socket": 0,
+      "core": 32
+    },
+    {
+      "id": 9,
+      "socket": 0,
+      "core": 33
+    },
+    {
+      "id": 10,
+      "socket": 0,
+      "core": 34
+    },
+    {
+      "id": 11,
+      "socket": 0,
+      "core": 35
+    },
+    {
+      "id": 12,
+      "socket": 0,
+      "core": 36
+    },
+    {
+      "id": 13,
+      "socket": 0,
+      "core": 37
+    },
+    {
+      "id": 14,
+      "socket": 0,
+      "core": 38
+    },
+    {
+      "id": 15,
+      "socket": 0,
+      "core": 39
+    }
+  ],
+  "host": [
+    "VmRSS:\t  193036 kB",
+    "Cpus_allowed_list:\t0-3"
+  ],
+  "load": [
+    63.58,
+    68.01,
+    65.66
+  ],
+  "privateTestDirectories": []
+}

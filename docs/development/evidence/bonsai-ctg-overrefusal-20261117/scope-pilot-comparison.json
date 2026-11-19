@@ -1,0 +1,31 @@
+{
+  "phase": "scope-pilot",
+  "pairedBefore": {
+    "n": 6,
+    "fullPass": 2,
+    "gatePass": 5,
+    "falseAllow": [],
+    "falseDeny": [
+      "holdout-japanese-replace"
+    ]
+  },
+  "pairedAfter": {
+    "n": 6,
+    "fullPass": 2,
+    "gatePass": 6,
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "previouslyUnrun": {
+    "n": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "regressions": [],
+  "improvements": [
+    "holdout-japanese-replace"
+  ],
+  "eligibleForAdoption": false
+}

@@ -1,0 +1,16 @@
+{
+  "sourceSha256": {
+    "tests/AIKernel.Inference.Optimization.Validation/Program.cs": "fb42c8d77a69b7ca660f85937d7d29fabacc3c9719ccb5f3124bf697ee8f7d84",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgReadingProbe.cs": "cb051b0b2a1c552014ba35e109cba2464962bd8d1240210de88c4878117f85ed"
+  },
+  "assemblySha256": {
+    "AIKernel.Abstractions.dll": "d321b8bf8bc28cfe39e360a1d847ef9daca0ff8114ae33c6a59336185335402b",
+    "AIKernel.Common.dll": "a0cd428aea280b4886c1beab50139917ac3c503cd587adb2c84c15f9f836ec52",
+    "AIKernel.Core.dll": "ed3faafac6ea7e8b450147b6f620817a6d1f723ee16bef4559f040aedd6173e9",
+    "AIKernel.Core.Tests.dll": "fbbe69f36d930e5a24f0dff595370d9aab9d41c573ce53fb833f8b738b450961",
+    "AIKernel.Dtos.dll": "a1021628aea83069fa38c80d71dbe42683c2f75925d7d033bb4bd4fc9cc5745b",
+    "AIKernel.Enums.dll": "746b2d42c474c2620beaf7768671c77c6a47bda12236b6650ff2cd42ba48fb3f",
+    "AIKernel.Kernel.dll": "cab5aefe2a171f441a80c227b9b6e9ed37bd8ca17c299c41661155eb950370db"
+  },
+  "kernelAssembliesMatchTestedBuild": true
+}

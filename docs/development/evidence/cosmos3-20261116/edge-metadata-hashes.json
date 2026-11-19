@@ -1,0 +1,8 @@
+{
+  "chat_template.jinja": "7120ee6666468d4e9b2dc11e133ac5c2fa765fa5907706bf0f906270aa5510c8",
+  "config.json": "ffb75b654e65d10e337ea07f20ac4eadc3775dd22c9a8194c87c3b68df5c8f5f",
+  "preprocessor_config.json": "111a151f82088f4e15cb4d488c5db0e9c481ae46ec8cf146d734ac62d13a57d6",
+  "tokenizer.json": "4dc692a99dca6d92a44e9529ffb53541eb79bb260eec7281bc51268c05d7311c",
+  "tokenizer_config.json": "85577f01be64ea03ee9aacc0536088e47b96971e4aff21e0aa604900b1410386",
+  "video_preprocessor_config.json": "9cada8c04cb57ea22ff44984b8307a63c626c608e84a130c1f2e7fe134efc6d4"
+}

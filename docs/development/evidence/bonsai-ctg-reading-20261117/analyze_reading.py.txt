@@ -1,0 +1,19 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent;read=lambda p:json.loads((root/p).read_text(encoding='utf-8'))
+run=read('server-reading-matrix/result.json');done=read('server-reading-matrix/completion.json')
+assert done['exitCode']==0 and done['stopReason'] is None and run['diagnosticOnly'] and len(run['rows'])==run['planned']==16
+cases=read('reading-matrix.json');answers={r['id']:r for r in run['rows']};sha=lambda s:hashlib.sha256(s.encode()).hexdigest()
+for c in cases:
+ r=answers[c['id']];assert r['promptSha256']==c['promptSha256']==sha(c['system']+'\n'+c['user'])
+ assert r['responseSha256']==sha(r['answer']['Text']) and r['answer']['FinishReason']=='stop'
+prior=json.loads((root.parent/'ctg-binding-20261117/server-reading-probe-fixed/result.json').read_text(encoding='utf-8'))['rows'][2]
+assert answers['count-original']['promptSha256']==prior['promptSha256'] and answers['count-original']['answer']['Text']==prior['answer']['Text']
+matched={'count-neutral-question','count-reversed-choice','count-candidate-last','disclose-original','disclose-no-observations','disclose-neutral-question','disclose-candidate-last','files-count','files-disclose'}
+summary={'diagnosticOnly':True,'baselinePromptAndResponseMatch':True,'observedAnswerFirstOptionBias':True,
+ 'interpretation':'The original two-choice question yields disclosure even without negation or observations. Open reading recovers the count-only action. This does not establish council voting fidelity.',
+ 'limitations':['Known diagnostic examples, not new adoption controls.','Question reversal is a diagnostic, not a production fix.','Two disclosure paraphrases import effects into restrictions; model readings remain untrusted.','The hypothetical-removal and evidence-only variants also change JSON whitespace; they are not isolated single-factor estimates.'],
+ 'rows':[dict(id=c['id'],notes=c['notes'],text=answers[c['id']]['answer']['Text'],actionCategoryMatches=c['id'] in matched,
+   sourceScopeMixed=c['id'] in {'disclose-neutral-question','disclose-candidate-last'},promptSha256=c['promptSha256'],responseSha256=answers[c['id']]['responseSha256']) for c in cases]}
+(root/'reading-analysis.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({'rows':len(cases),'baselineMatches':True,'openQuestionCountCorrect':True,'observationsAbsentStillWrong':True}))

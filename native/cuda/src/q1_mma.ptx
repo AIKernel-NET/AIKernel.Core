@@ -1,0 +1,63 @@
+// SM80+ integer Tensor Core path. Each warp handles 16 output rows.
+// B repeats the GEMV vector over 8 columns; only column zero is stored.
+// Fragment mapping: NVIDIA PTX ISA, Matrix Fragments for mma.m16n8k32.
+.version 7.0
+.target sm_80
+.address_size 64
+.visible .entry matvec_q1_q8_mma(
+ .param .u64 weights, .param .u64 input, .param .u64 scales, .param .u64 sums,
+ .param .u64 output, .param .u32 rows, .param .u32 columns)
+{
+ .reg .pred %p<8>;
+ .reg .b16 %h<2>;
+ .reg .b32 %r<40>;
+ .reg .b64 %d<24>;
+ .reg .f32 %f<10>;
+ ld.param.u64 %d0,[weights]; ld.param.u64 %d1,[input];
+ ld.param.u64 %d2,[scales]; ld.param.u64 %d3,[sums]; ld.param.u64 %d4,[output];
+ ld.param.u32 %r0,[rows]; ld.param.u32 %r1,[columns];
+ mov.u32 %r2,%laneid; shr.u32 %r3,%r2,2; and.b32 %r4,%r2,3;
+ mov.u32 %r5,%ctaid.x; mad.lo.u32 %r6,%r5,16,%r3; add.u32 %r7,%r6,8;
+ setp.lt.u32 %p0,%r6,%r0; setp.lt.u32 %p1,%r7,%r0;
+ shr.u32 %r8,%r1,7; mul.lo.u32 %r9,%r8,18;
+ mul.wide.u32 %d5,%r6,%r9; add.u64 %d5,%d0,%d5;
+ mul.wide.u32 %d6,%r7,%r9; add.u64 %d6,%d0,%d6;
+ shr.u32 %r10,%r4,1; and.b32 %r11,%r4,1; shl.b32 %r11,%r11,2;
+ cvt.u64.u32 %d7,%r10; add.u64 %d7,%d7,2;
+ mul.wide.u32 %d8,%r4,4; add.u64 %d8,%d1,%d8;
+ mov.u32 %r12,0; mov.f32 %f0,0f00000000; mov.f32 %f1,0f00000000;
+Mblock:
+ mov.u32 %r13,0;
+ mov.u32 %r20,0; mov.u32 %r21,0; mov.u32 %r22,0; mov.u32 %r23,0;
+ add.u64 %d9,%d5,%d7; add.u64 %d10,%d6,%d7; mov.u64 %d11,%d8;
+Mpart:
+ mov.u32 %r14,0; mov.u32 %r15,0; mov.u32 %r16,0; mov.u32 %r17,0;
+ @%p0 ld.global.u8 %r14,[%d9]; @%p0 ld.global.u8 %r16,[%d9+2];
+ @%p1 ld.global.u8 %r15,[%d10]; @%p1 ld.global.u8 %r17,[%d10+2];
+ shr.u32 %r14,%r14,%r11; and.b32 %r14,%r14,15; mul.lo.u32 %r14,%r14,0x00204081; and.b32 %r14,%r14,0x01010101;
+ shr.u32 %r15,%r15,%r11; and.b32 %r15,%r15,15; mul.lo.u32 %r15,%r15,0x00204081; and.b32 %r15,%r15,0x01010101;
+ shr.u32 %r16,%r16,%r11; and.b32 %r16,%r16,15; mul.lo.u32 %r16,%r16,0x00204081; and.b32 %r16,%r16,0x01010101;
+ shr.u32 %r17,%r17,%r11; and.b32 %r17,%r17,15; mul.lo.u32 %r17,%r17,0x00204081; and.b32 %r17,%r17,0x01010101;
+ ld.global.u32 %r18,[%d11]; ld.global.u32 %r19,[%d11+16];
+ mma.sync.aligned.m16n8k32.row.col.s32.u8.s8.s32 {%r20,%r21,%r22,%r23}, {%r14,%r15,%r16,%r17}, {%r18,%r19}, {%r20,%r21,%r22,%r23};
+ add.u64 %d9,%d9,4; add.u64 %d10,%d10,4; add.u64 %d11,%d11,32;
+ add.u32 %r13,%r13,1; setp.lt.u32 %p2,%r13,4; @%p2 bra Mpart;
+ ld.global.s32 %r24,[%d3];
+ shl.b32 %r20,%r20,1; sub.s32 %r20,%r20,%r24;
+ shl.b32 %r22,%r22,1; sub.s32 %r22,%r22,%r24;
+ mov.b16 %h0,0; mov.b16 %h1,0;
+ @%p0 ld.global.b16 %h0,[%d5]; @%p1 ld.global.b16 %h1,[%d6];
+ cvt.f32.f16 %f2,%h0; cvt.f32.f16 %f3,%h1; ld.global.f32 %f4,[%d2];
+ mul.f32 %f2,%f2,%f4; mul.f32 %f3,%f3,%f4;
+ cvt.rn.f32.s32 %f5,%r20; cvt.rn.f32.s32 %f6,%r22;
+ mul.f32 %f5,%f5,%f2; mul.f32 %f6,%f6,%f3;
+ add.f32 %f0,%f0,%f5; add.f32 %f1,%f1,%f6;
+ add.u64 %d5,%d5,18; add.u64 %d6,%d6,18; add.u64 %d8,%d8,128;
+ add.u64 %d2,%d2,4; add.u64 %d3,%d3,4;
+ add.u32 %r12,%r12,1; setp.lt.u32 %p3,%r12,%r8; @%p3 bra Mblock;
+ setp.eq.u32 %p4,%r4,0; and.pred %p5,%p4,%p0; and.pred %p6,%p4,%p1;
+ mul.wide.u32 %d12,%r6,4; add.u64 %d12,%d4,%d12;
+ mul.wide.u32 %d13,%r7,4; add.u64 %d13,%d4,%d13;
+ @%p5 st.global.f32 [%d12],%f0; @%p6 st.global.f32 [%d13],%f1;
+ ret;
+}

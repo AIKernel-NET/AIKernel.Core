@@ -1,0 +1,38 @@
+[
+  {
+    "case": "synthetic-edge-bf16",
+    "checks": 10,
+    "maximumError": 1.6763806e-07,
+    "allTokensExact": true
+  },
+  {
+    "case": "synthetic-edge-f16",
+    "checks": 10,
+    "maximumError": 2.3841858e-07,
+    "allTokensExact": true
+  },
+  {
+    "case": "synthetic-edge-f32",
+    "checks": 10,
+    "maximumError": 1.8905848e-07,
+    "allTokensExact": true
+  },
+  {
+    "case": "synthetic-nano-bf16",
+    "checks": 16,
+    "maximumError": 3.5762787e-07,
+    "allTokensExact": true
+  },
+  {
+    "case": "synthetic-nano-f16",
+    "checks": 16,
+    "maximumError": 4.5448542e-07,
+    "allTokensExact": true
+  },
+  {
+    "case": "synthetic-nano-f32",
+    "checks": 16,
+    "maximumError": 4.61936e-07,
+    "allTokensExact": true
+  }
+]

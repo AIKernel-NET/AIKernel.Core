@@ -1,0 +1,38 @@
+#version 450
+#extension GL_KHR_shader_subgroup_arithmetic : require
+layout(local_size_x=32) in;
+layout(set=0,binding=0,std430) readonly buffer Weights { uint w[]; };
+layout(set=0,binding=1,std430) readonly buffer Input { float x[]; };
+layout(set=0,binding=2,std430) writeonly buffer Output { float y[]; };
+layout(push_constant) uniform Shape { uint columns; uint rows; uint type; uint offsetBytes; uint groupWidth; } p;
+shared float partial[32];
+uint byteAt(uint address) { return (w[address>>2] >> ((address&3)*8)) & 255; }
+float signedValue(float value,uint bit) { return uintBitsToFloat(floatBitsToUint(value)^((1u-bit)<<31)); }
+void main() {
+ uint row=gl_WorkGroupID.x+gl_WorkGroupID.y*p.groupWidth;
+ if(row>=p.rows)return;
+ uint lane=gl_LocalInvocationID.x;
+ precise float sum=0;
+ if(p.type==42) {
+  uint bytes=(p.columns/128)*18,base=p.offsetBytes+row*bytes;
+  for(uint i=lane;i<bytes;i+=32)sum+=float(byteAt(base+i));
+ } else if(p.type==41) {
+  uint base=p.offsetBytes+row*(p.columns/128)*18;
+  for(uint b=0;b<p.columns/128;b++) {
+   uint block=base+b*18;
+   float scale=unpackHalf2x16(byteAt(block)|(byteAt(block+1)<<8)).x;
+   uint bits=byteAt(block+2+lane/2)>>((lane&1)*4);
+   uint col=b*128+lane*4;
+   precise float v=signedValue(x[col],bits&1)+signedValue(x[col+1],(bits>>1)&1);
+   v+=signedValue(x[col+2],(bits>>2)&1);v+=signedValue(x[col+3],(bits>>3)&1);
+   sum+=scale*v;
+  }
+ } else {
+  uint base=p.offsetBytes/4+row*p.columns;
+  for(uint col=lane;col<p.columns;col+=32)sum+=uintBitsToFloat(w[base+col])*x[col];
+ }
+ float reduced=subgroupAdd(sum);
+ if(subgroupElect())partial[gl_SubgroupID]=reduced;
+ barrier();
+ if(lane==0) { float total=0;for(uint g=0;g<gl_NumSubgroups;g++)total+=partial[g];y[row]=total; }
+}

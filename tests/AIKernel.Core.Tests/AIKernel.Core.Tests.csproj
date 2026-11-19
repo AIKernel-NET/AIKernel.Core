@@ -36,6 +36,12 @@ JA: AIKernel.Core ランタイムコンポーネントのユニットテスト�
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Inference\Fixtures\BonsaiCtgCanonicalRules.json" LogicalName="BonsaiCtgCanonicalRules.json" />
+    <EmbeddedResource Include="Inference\Fixtures\BonsaiCtgPromptContracts.json" LogicalName="BonsaiCtgPromptContracts.json" />
+    <EmbeddedResource Include="Inference\Fixtures\BonsaiCtgSeparatedPromptContracts.json" LogicalName="BonsaiCtgSeparatedPromptContracts.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\AIKernel.Common\AIKernel.Common.csproj" />
     <ProjectReference Include="..\..\src\AIKernel.Core\AIKernel.Core.csproj" />
     <ProjectReference Include="..\..\src\AIKernel.Hosting\AIKernel.Hosting.csproj" />

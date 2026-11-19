@@ -1,0 +1,58 @@
+from pathlib import Path
+import json
+root=Path(__file__).parent;repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+load=lambda name:json.loads((root/name).read_text(encoding='utf-8'))
+report=repo/'docs/development/bonsai-ctg-definitions-20261117-jp.md'
+s=report.read_text(encoding='utf-8');assert s.count('RESULTS_PENDING')==2
+guard=load('guard-regression.json');status=load('local-retry-status.json');samples=load('local-load-samples.json')
+assert status['state']=='deferred-high-load',status
+assert not load('server-final-state.json')['activeOwnedValidationProcesses']
+assert not load('local-monitor-state.json')['activeOwnedMonitors']
+assert not load('focus-pilot-comparison.json')['semanticAdmissionPassed']
+assert not load('effects-pilot-comparison.json')['semanticAdmissionPassed']
+for phase in ('host-guards','effects-host'):
+ data=load('server-'+phase+'/result.json')
+ assert len(data)==7 and all(r['pipelinePass'] and r['inferenceCalls']==0 for r in data)
+rss=guard['maximumObservedRssBytes'];low=min(r['cpuPercent'] for r in samples);high=max(r['cpuPercent'] for r in samples)
+regression=f'''- 最新のCoreテストは1,094件成功、失敗・スキップ0件。v20時点の1,088件の記録も保存した。
+- 各版でテストしたKernel DLLとServerへ配布したDLLのハッシュが一致した。
+- 最終ビルドの既定APIは旧v4基準と入力・プロンプト・応答・ROMのハッシュが一致した。取得失敗3状態は推論前拒否を維持した。
+- v20／v21のホスト取得失敗7例は、それぞれ推論0回・全票Unknown・ゲート拒否だった。意味評価の正解数には加算しない。
+- 固定128トークンの通常生成は `f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e` と一致した。
+- 最大観測RSSは{rss:,} bytes（{rss/1024**3:.2f} GiB）。1秒間隔の監視で7 GiB超過を観測せず、7 GB枠よりも十分小さかった。
+- 公開サービスはCPU 0〜3、私的検証はCPU 4・5・nice 10。設定4ワーカー、仮想アドレス8 GiB、GCヒープ2 GiBを維持した。速度比較ではない。
+- governance、投票対応表、決定ゲート、推論カーネルは変更していない。既定v2／v4は維持し、Serverの検証プロセスは終了済み。
+
+[最終回帰](evidence/bonsai-ctg-definitions-20261117/guard-regression.json)、
+[v20回帰](evidence/bonsai-ctg-definitions-20261117/v20-guard-regression.json)、
+[取得失敗7例](evidence/bonsai-ctg-definitions-20261117/effects-host-comparison.json)、
+[テスト集計](evidence/bonsai-ctg-definitions-20261117/unit-tests.json)、
+[Server終了確認](evidence/bonsai-ctg-definitions-20261117/server-final-state.json)。
+
+端末負荷を合計{len(samples)}回記録し、{low:g}〜{high:g}%だった。
+10%以下が15秒間隔で3回続く条件を満たさず、`pair-japanese-self-assertion` は未実行で保留した。
+利用者のアプリ・WSLは終了していない。
+
+最初の監視はWindowsのファイル更新でAccess Deniedとなり停止した。
+観測記録とエラーを保持し、ファイル置換の再試行へUnauthorizedAccessExceptionも含め、待機上限を延ばして再開した。
+再開後は10分の監視を終了し、監視プロセスが残っていないことも確認した。
+停止中を低負荷と推定したり、保留例を実行済みとして数えたりしない。
+
+[負荷記録](evidence/bonsai-ctg-definitions-20261117/local-load-samples.json)、
+[保留状態](evidence/bonsai-ctg-definitions-20261117/local-retry-status.json)、
+[監視終了確認](evidence/bonsai-ctg-definitions-20261117/local-monitor-state.json)。'''
+s=s.replace('RESULTS_PENDING',regression,1)
+repro='''[凍結した採用条件](evidence/bonsai-ctg-definitions-20261117/admission.json)、
+[v20の実行物・ソース](evidence/bonsai-ctg-definitions-20261117/defined-tested-build.json)、
+[最終v21の実行物・ソース](evidence/bonsai-ctg-definitions-20261117/effects-tested-build.json)、
+[全証拠SHA-256](evidence/bonsai-ctg-definitions-20261117/evidence-sha256.json)。
+
+fixture、診断の問い、原応答、実際に転送したrunner、入力・実行物・ROMのハッシュ、各版のソースを保存した。
+試験は `dotnet test tests/AIKernel.Core.Tests/AIKernel.Core.Tests.csproj -c Release`、
+実機用の配布物は `dotnet publish tests/AIKernel.Inference.Optimization.Validation/AIKernel.Inference.Optimization.Validation.csproj -c Release` で構築した。
+モデル本体・鍵・認証情報は含めない。ローカルコミットへ保存し、push・本番反映は行わない。
+
+結論は採用基準未達である。定義節の欠落を補う実装と切り分け手段は追加したが、
+件数回答の過剰拒否を安全に解消する候補は得られなかった。既存の正しい票を悪化させた候補は採用しない。'''
+s=s.replace('RESULTS_PENDING',repro,1);report.write_text(s,encoding='utf-8',newline='\n')
+print(json.dumps(dict(samples=len(samples),minimum=low,maximum=high,maximumRssBytes=rss)))

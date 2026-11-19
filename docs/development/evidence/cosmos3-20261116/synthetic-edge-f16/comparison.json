@@ -1,0 +1,122 @@
+[
+  {
+    "mode": "text",
+    "name": "logits",
+    "elements": 1280,
+    "maxAbsolute": 8.940697E-08,
+    "rms": 2.5304084208476947E-08,
+    "maximumIndex": 666,
+    "expectedAtMaximum": -0.20386243,
+    "actualAtMaximum": -0.20386234,
+    "gate": 1E-05,
+    "pass": true
+  },
+  {
+    "mode": "text",
+    "name": "generation",
+    "elements": 2560,
+    "maxAbsolute": 8.940697E-08,
+    "rms": 2.20434311434978E-08,
+    "maximumIndex": 1489,
+    "expectedAtMaximum": -0.22712922,
+    "actualAtMaximum": -0.22712931,
+    "gate": 1E-05,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "patches",
+    "elements": 18432,
+    "maxAbsolute": 0,
+    "rms": 0,
+    "maximumIndex": 0,
+    "expectedAtMaximum": -1,
+    "actualAtMaximum": -1,
+    "gate": 0,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "vision",
+    "elements": 192,
+    "maxAbsolute": 4.656613E-08,
+    "rms": 1.4136854234272706E-08,
+    "maximumIndex": 173,
+    "expectedAtMaximum": -0.00994854,
+    "actualAtMaximum": -0.009948493,
+    "gate": 1E-05,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "logits",
+    "elements": 3840,
+    "maxAbsolute": 2.3841858E-07,
+    "rms": 5.0019002253939406E-08,
+    "maximumIndex": 2898,
+    "expectedAtMaximum": -0.26436383,
+    "actualAtMaximum": -0.2643636,
+    "gate": 1E-05,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "generation",
+    "elements": 2560,
+    "maxAbsolute": 1.4901161E-07,
+    "rms": 2.7844563004785496E-08,
+    "maximumIndex": 153,
+    "expectedAtMaximum": 0.2922927,
+    "actualAtMaximum": 0.29229257,
+    "gate": 1E-05,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "patches",
+    "elements": 55296,
+    "maxAbsolute": 0,
+    "rms": 0,
+    "maximumIndex": 0,
+    "expectedAtMaximum": -1,
+    "actualAtMaximum": -1,
+    "gate": 0,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "vision",
+    "elements": 576,
+    "maxAbsolute": 4.656613E-08,
+    "rms": 1.2943862875532352E-08,
+    "maximumIndex": 173,
+    "expectedAtMaximum": -0.00994854,
+    "actualAtMaximum": -0.009948493,
+    "gate": 1E-05,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "logits",
+    "elements": 10240,
+    "maxAbsolute": 2.3841858E-07,
+    "rms": 4.7200647700382107E-08,
+    "maximumIndex": 2898,
+    "expectedAtMaximum": -0.26436383,
+    "actualAtMaximum": -0.2643636,
+    "gate": 1E-05,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "generation",
+    "elements": 2560,
+    "maxAbsolute": 8.940697E-08,
+    "rms": 2.3335754330505783E-08,
+    "maximumIndex": 99,
+    "expectedAtMaximum": 0.29213828,
+    "actualAtMaximum": 0.2921382,
+    "gate": 1E-05,
+    "pass": true
+  }
+]

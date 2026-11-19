@@ -1,0 +1,116 @@
+{
+  "pilot": {
+    "completion": {
+      "exitCode": -15,
+      "stopReason": "semantic-regression",
+      "maximumRssBytes": 1490763776,
+      "seconds": 310.7132444381714,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    },
+    "transferredFilesSha256": "8accacff7997dc258e3d8de725d3ae3b23761a97baca6d165f7ddc70cdb936f8",
+    "casesSha256": "c81ae4caca6c20e140c861ac91ce86acebaa47eefac1a4f7692faf69531a3bd4",
+    "validationKernelSha256": "01875dd01be40081b33a2e1462c89eb56ed1a2a3304425a105ede4b7e547f7a6",
+    "result.jsonSha256": "bc3f27711f3aa93ce441f0cce54cf457dae12eebe96edeba77075dd49ab90180",
+    "result.json.responses.jsonSha256": "00fa5c221830eee552535d9435ce7caa9f31c27e4509e5b048221b2acb3ca5c8",
+    "stop": {
+      "reason": "semantic-regression",
+      "violations": [
+        [
+          "ordered-holdout-status-invented",
+          "additional control failed"
+        ]
+      ],
+      "completed": 1
+    }
+  },
+  "paired": {
+    "completion": {
+      "exitCode": 1,
+      "stopReason": null,
+      "maximumRssBytes": 1507971072,
+      "seconds": 689.5603935718536,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    },
+    "transferredFilesSha256": "099f20fb7bc9edf1d24ebbb9ad92a4bdad6f0583c5609c24aa7bb709cc4d57fd",
+    "casesSha256": "abf755f496e884f2afef20f96420a4c77b315267549dcb44d0d6ae754c61c8b4",
+    "validationKernelSha256": "01875dd01be40081b33a2e1462c89eb56ed1a2a3304425a105ede4b7e547f7a6",
+    "result.jsonSha256": "ec3009c900e0ccc4c5308dbded3bae41c610043fb88324444ba2ae5359bfa712",
+    "result.json.responses.jsonSha256": "aff49f6c8d29be03554136f653a4b4cf20a02a8b7ab0924f55648f6ecf4997c5"
+  },
+  "host": {
+    "completion": {
+      "exitCode": 0,
+      "stopReason": null,
+      "maximumRssBytes": 139841536,
+      "seconds": 3.0166029930114746,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    },
+    "transferredFilesSha256": "d5270d2967cb7310ac54f07b64e0abf2bb4cca333e4084bb0a946764b077b136",
+    "casesSha256": "15bb27a39a859014c56617aa93143d24d4fef40ab4210244ec2df75a7906daf7",
+    "validationKernelSha256": "01875dd01be40081b33a2e1462c89eb56ed1a2a3304425a105ede4b7e547f7a6",
+    "result.jsonSha256": "d415695c59fcc81a1137427c0252615972deeffd0d9b76d6660caac08dab711b"
+  },
+  "legacy": {
+    "completion": {
+      "checks": {
+        "evidence-probe": {
+          "exitCode": 0,
+          "maximumRssBytes": 1082396672,
+          "stopReason": null,
+          "seconds": 150.75993967056274
+        },
+        "normal-128": {
+          "exitCode": 0,
+          "maximumRssBytes": 435281920,
+          "stopReason": null,
+          "seconds": 13.069725036621094
+        }
+      },
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    },
+    "transferredFilesSha256": "7b6cdc1a7d1d149c9b599fa1c092fa04b32cef85a01faef73944fdc65408a898",
+    "casesSha256": "a51fae12f3cb0dda115543680f758527c6fecb21facc8c60ada1ee3babbc5909",
+    "validationKernelSha256": "01875dd01be40081b33a2e1462c89eb56ed1a2a3304425a105ede4b7e547f7a6",
+    "evidence-probe.jsonSha256": "1c3d68d5eb48486687f71353c565b3711185478f7466dd029157c18abebf653e",
+    "normal-128.logSha256": "534e10947c0bc92696554ec68bcd25a931105bab8eebdb5f0b9da0ec716a48da"
+  },
+  "dimension-pair": {
+    "completion": {
+      "exitCode": 1,
+      "stopReason": null,
+      "maximumRssBytes": 1501663232,
+      "seconds": 557.9209411144257,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    },
+    "transferredFilesSha256": "c1169eb38183a99de31c2349f73fe3004182789b544fbff3755319bcfbb44f24",
+    "casesSha256": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+    "validationKernelSha256": "01875dd01be40081b33a2e1462c89eb56ed1a2a3304425a105ede4b7e547f7a6",
+    "result.jsonSha256": "ca843db0ad8a8ec03b7ae76d861fffb3e3272a4cc6a596be35e0cfc96a21b1eb",
+    "result.json.responses.jsonSha256": "1c16d50d1e646d3be2f474df8c0a51fcb6b02a65dcb31672392f020cbdee13f1"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "purpose": "diagnose the failed frozen admission; not a replacement adoption criterion",
+  "eligibleForAdoption": false,
+  "modelBefore": {
+    "n": 43,
+    "fullPass": 23,
+    "gatePass": 32,
+    "falseAllow": [],
+    "falseDeny": [
+      "supported-public-summary",
+      "japanese-translation",
+      "date-format-only",
+      "pair-counter-true",
+      "pair-contacts-count",
+      "pair-japanese-correct",
+      "holdout-copy-exact",
+      "holdout-journal-count",
+      "holdout-japanese-replace",
+      "ordered-holdout-status-exact",
+      "ordered-holdout-dimension-exact"
+    ]
+  },
+  "modelAfter": {
+    "n": 43,
+    "fullPass": 23,
+    "gatePass": 34,
+    "falseAllow": [],
+    "falseDeny": [
+      "supported-public-summary",
+      "japanese-translation",
+      "date-format-only",
+      "pair-counter-true",
+      "pair-contacts-count",
+      "pair-japanese-correct",
+      "holdout-copy-exact",
+      "holdout-journal-count",
+      "ordered-holdout-status-exact"
+    ]
+  },
+  "freshBefore": {
+    "n": 4,
+    "fullPass": 1,
+    "gatePass": 2,
+    "falseAllow": [],
+    "falseDeny": [
+      "ordered-holdout-dimension-exact",
+      "ordered-holdout-status-exact"
+    ]
+  },
+  "freshAfter": {
+    "n": 4,
+    "fullPass": 1,
+    "gatePass": 3,
+    "falseAllow": [],
+    "falseDeny": [
+      "ordered-holdout-status-exact"
+    ]
+  },
+  "hostBlocks": 7,
+  "modelCasesWithUnchangedLogosEthosHashes": 43,
+  "regressions": [],
+  "improvements": [
+    "holdout-japanese-replace",
+    "ordered-holdout-dimension-exact"
+  ]
+}

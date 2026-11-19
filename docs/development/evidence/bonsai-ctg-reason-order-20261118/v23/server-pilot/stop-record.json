@@ -1,0 +1,10 @@
+{
+  "reason": "semantic-regression",
+  "violations": [
+    [
+      "pair-contacts-disclose",
+      "Pathos vote regression"
+    ]
+  ],
+  "completed": 2
+}

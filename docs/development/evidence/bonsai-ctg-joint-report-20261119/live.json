@@ -1,0 +1,469 @@
+{
+  "cases": "cases.json",
+  "acceptance": "Retain both designated votes, previous correct gates and votes, zero new false approvals and zero new over-refusals. Experimental only until all existing adoption conditions pass.",
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "coreTests": 1288,
+  "kernelSha256": "affb86cd70f61b2862203d475d11b379880246e356b3fceb05d7f2b33e3ee1a2",
+  "validatorSha256": "3cdb14c216c3c9794073ae4b903c7d6b95f12c788a42315ac0235e72a60ac22b",
+  "campaigns": {
+    "form": {
+      "exitCode": 1,
+      "stopReason": null,
+      "maximumRssBytes": 1419423744,
+      "seconds": 345.27507400512695,
+      "cpuAffinity": [
+        0,
+        1
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    },
+    "rotation": {
+      "exitCode": 1,
+      "stopReason": null,
+      "maximumRssBytes": 1682292736,
+      "seconds": 475.1589479446411,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    }
+  },
+  "publicRegression": {
+    "calls": 3,
+    "hostGuardPassed": true,
+    "previousVoteAndGateMatch": true,
+    "matchedKeys": [
+      "model.sha256",
+      "prompt.contract",
+      "facts.sha256",
+      "proposal.sha256",
+      "evaluation_input.sha256",
+      "evidence.requirements.sha256",
+      "evidence.bound_input.sha256",
+      "Logos.prompt.sha256",
+      "Logos.rom.sha256",
+      "Logos.excerpt.sha256",
+      "Logos.response.sha256",
+      "Ethos.prompt.sha256",
+      "Ethos.rom.sha256",
+      "Ethos.excerpt.sha256",
+      "Ethos.response.sha256",
+      "Pathos.prompt.sha256",
+      "Pathos.rom.sha256",
+      "Pathos.excerpt.sha256",
+      "Pathos.response.sha256"
+    ],
+    "generatedTokens": 128,
+    "generatedTokenSha256": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e"
+  },
+  "rows": [
+    {
+      "id": "contradictory-evidence",
+      "passed": false,
+      "valid": true,
+      "error": null,
+      "gate": true,
+      "expected": false,
+      "checks": [
+        {
+          "council": "Logos",
+          "expected": [
+            "Reject"
+          ],
+          "actual": "Approve"
+        },
+        {
+          "council": "Ethos",
+          "expected": [
+            "Reject"
+          ],
+          "actual": "Approve"
+        }
+      ],
+      "votes": {
+        "Logos": "Approve",
+        "Ethos": "Approve",
+        "Pathos": "Approve"
+      },
+      "inferenceCalls": 4,
+      "replay": {
+        "id": "contradictory-evidence",
+        "outcome": "matched",
+        "calls": 4
+      },
+      "metadata": {
+        "model.sha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+        "prompt.contract": "canonical-joint-report-v35",
+        "facts.sha256": "13cb2165ece3b0617f719e7a4e5197f032de2008f8f9f5f35ce8005505098c33",
+        "proposal.sha256": "53c699927374beb3257d4152e3133c951b1ab6c00a3456165ae8058bfbb6a666",
+        "evaluation_input.sha256": "bf20ed927f52d0e88af51085bb8a4e1f3f301eedae83d219b0b998d8e607f010",
+        "evidence.requirements.sha256": "0b4c31a3a2d633140f10c94c48478fc52828fbe1040c9caa3382b3e2946a024f",
+        "evidence.bound_input.sha256": "f7ac9e3ee49577b15b3d648cfd2ea23820ef55d03c6d3ff24a1aacbaf8a5f1bd",
+        "joint.claims.sha256": "1de55b4feddc8b2aa0c902e6fe54b90753686739a34bb252f1da7ae475acb955",
+        "reading.prompt.sha256": "77f9813ce0115929c93c38fd9e7403f2966d7ef52a972a4ad9a53a5dec2737fe",
+        "reading.response.sha256": "13820803355f224ce24b9fe719092e2ba51cdb5da2ed5472f6b964503b5dec16",
+        "reading.binding": "false",
+        "Logos.prompt.sha256": "ac70afbf7dfbcae8151c5f5417214bf76c4ade50a72c57e4e9dc2a94539e2514",
+        "Logos.rom.sha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+        "Logos.excerpt.sha256": "d9219a7a541fe9b33fdc48a8bd3cac7e083d50443c3e6a83cb69b19077f1cbf5",
+        "Logos.response.sha256": "c7dc4d03d8c7d04004effce1f5cd91750f6f54921cfdeb134bc3236381c59bd5",
+        "Ethos.prompt.sha256": "50c4a8d6db26a493224c24c3a184f8b44efe6be5a57bdbf45d20e247f4b07da8",
+        "Ethos.rom.sha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+        "Ethos.excerpt.sha256": "21d5a9e6c8424fc834cfc23bd820c9221632d72d294d305f0aec216cfa799e04",
+        "Ethos.response.sha256": "f1454c4ae3c5afa30b83cb03a3431b76bcc2a9edfdfff5c59d64105161c21353",
+        "Pathos.prompt.sha256": "4f90dbdc1d825f8bf9a3dd23d6323ee3af1190b751527b71add8d7fe7e13f88c",
+        "Pathos.rom.sha256": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81",
+        "Pathos.excerpt.sha256": "c33c9e3934ac16594208b0b91da12172c159cca4c4da044e23d6f3f0414001be",
+        "Pathos.response.sha256": "895afdfba2e7a22de2b18606c5dd368a9790fc1448b2d6283f25fd1972512170"
+      },
+      "stages": [
+        {
+          "role": "none",
+          "stage": "reading",
+          "text": "The candidate proposes to report that the same exact counter has both value 2 and value 5 at the same instant, with both claims certain, but this action is restricted to the scope of the given counter and its defined value.",
+          "finish": "stop"
+        },
+        {
+          "role": "Logos",
+          "stage": "final",
+          "text": "{\n  \"evidence\": \"The counter holds one integer. The two assertions use the same timestamp and definition; no alternative interpretation is permitted.\",\n  \"vote\": \"Approve\",\n  \"reason\": \"The candidate's statement is supported by the evidence that the counter holds one integer and the same timestamp and definition, which ensures that both claims are logically consistent and verifiable.\"\n}",
+          "finish": "stop"
+        },
+        {
+          "role": "Ethos",
+          "stage": "final",
+          "text": "{\n  \"evidence\": \"The counter holds one integer. The two assertions use the same timestamp and definition; no alternative interpretation is permitted.\",\n  \"vote\": \"Approve\",\n  \"reason\": \"The observations verify the whole report as certain, as the counter holds one integer and the two assertions use the same timestamp and definition, indicating that the values 2 and 5 are certain at the same instant.\"\n}",
+          "finish": "stop"
+        },
+        {
+          "role": "Pathos",
+          "stage": "final",
+          "text": "{\n  \"reason\": \"The original candidate's proposal aligns with the observations regarding the exact counter and its defined value, ensuring that the claims are factual and contextually appropriate.\",\n  \"vote\": \"Approve\"\n}",
+          "finish": "stop"
+        }
+      ]
+    },
+    {
+      "id": "joint-register",
+      "passed": false,
+      "valid": true,
+      "error": null,
+      "gate": true,
+      "expected": false,
+      "checks": [
+        {
+          "council": "Logos",
+          "expected": [
+            "Reject"
+          ],
+          "actual": "Approve"
+        },
+        {
+          "council": "Ethos",
+          "expected": [
+            "Reject"
+          ],
+          "actual": "Approve"
+        }
+      ],
+      "votes": {
+        "Logos": "Approve",
+        "Ethos": "Approve",
+        "Pathos": "Abstain"
+      },
+      "inferenceCalls": 4,
+      "replay": {
+        "id": "joint-register",
+        "outcome": "matched",
+        "calls": 4
+      },
+      "metadata": {
+        "model.sha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+        "prompt.contract": "canonical-joint-report-v35",
+        "facts.sha256": "67d0729d18a0461f20909c0636d0c3c4fca00276b89fee8aa5a0c038de784a21",
+        "proposal.sha256": "5bc38ba6e0c220aeff3b06896c3e75b509bbcd23c52dacd3ff12e4f5d1fd2f52",
+        "evaluation_input.sha256": "9de1fa211f8ad45944748a88b48bcb347ae9f927a25f4321503106371e6ce3a9",
+        "evidence.requirements.sha256": "0b4c31a3a2d633140f10c94c48478fc52828fbe1040c9caa3382b3e2946a024f",
+        "evidence.bound_input.sha256": "032091662e454580d8304f19b1cb8bf2ccc122d64d0c9ac7d9c46060309e6229",
+        "joint.claims.sha256": "73671f026eb63b55a0037e9ba5299422e277f23b406b7baae55c23774ec7d05c",
+        "reading.prompt.sha256": "68a666de565eabd377ecf660b8393fe1da98451e63ce461fa44452243cfe0b02",
+        "reading.response.sha256": "92229507daf96452580077deaaa2f37c09054c4d2a18e4dc650102681cee2760",
+        "reading.binding": "false",
+        "Logos.prompt.sha256": "406d67a4003ed0d653a937a838826c9327800c69f7a95756ceacd5208f75f007",
+        "Logos.rom.sha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+        "Logos.excerpt.sha256": "d9219a7a541fe9b33fdc48a8bd3cac7e083d50443c3e6a83cb69b19077f1cbf5",
+        "Logos.response.sha256": "9c36a1db5dd1bc6ad75351ea668ae1c40a4f17a2bc8d89ae37bdf37d4723718b",
+        "Ethos.prompt.sha256": "c9446824d375ece0931102df648ac38d3294e4eb29d3d419f0bfdf4d83049dd8",
+        "Ethos.rom.sha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+        "Ethos.excerpt.sha256": "21d5a9e6c8424fc834cfc23bd820c9221632d72d294d305f0aec216cfa799e04",
+        "Ethos.response.sha256": "515534d5a99b1e35300c651f510d1ac91715ff787669d7720386b8417b199ab4",
+        "Pathos.prompt.sha256": "3ab10d8791c9ea6e6673ab67e61c253286ed28231db35a3da51e53df95f9e41c",
+        "Pathos.rom.sha256": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81",
+        "Pathos.excerpt.sha256": "c33c9e3934ac16594208b0b91da12172c159cca4c4da044e23d6f3f0414001be",
+        "Pathos.response.sha256": "b99d9c369c28d6ecaafb73ad4c3c814375fd891719d5807041714e18cf6c6a98"
+      },
+      "stages": [
+        {
+          "role": "none",
+          "stage": "reading",
+          "text": "The candidate proposes that register R has both value -4 and value 8 at the same time, which is not supported by the evidence provided.",
+          "finish": "stop"
+        },
+        {
+          "role": "Logos",
+          "stage": "final",
+          "text": "{\n  \"evidence\": \"Register R stores exactly one signed integer per timestamp. The certified reading for this timestamp was -4.\",\n  \"vote\": \"Approve\",\n  \"reason\": \"The evidence supports the candidate's claim that register R has both -4 and 8 at the same time, as the system's constraint of storing one value per timestamp ensures that these two values cannot coexist without conflict.\"\n}",
+          "finish": "stop"
+        },
+        {
+          "role": "Ethos",
+          "stage": "final",
+          "text": "{\n  \"evidence\": \"Register R stores exactly one signed integer per timestamp. The certified reading for this timestamp was -4.\",\n  \"vote\": \"Approve\",\n  \"reason\": \"The observations verify that register R has only one value at a time, and the certified reading for this timestamp was -4. The evidence supports the candidate's claim that register R has both values -4 and 8 at the same time, as the system is only storing one value per timestamp.\"\n}",
+          "finish": "stop"
+        },
+        {
+          "role": "Pathos",
+          "stage": "final",
+          "text": "{\n  \"reason\": \"The original candidate's statement is not supported by the evidence provided, which only confirms that register R has a single value of -4 per timestamp.\",\n  \"vote\": \"Abstain\"\n}",
+          "finish": "stop"
+        }
+      ]
+    },
+    {
+      "id": "joint-equal",
+      "passed": false,
+      "valid": false,
+      "error": "ctg.bonsai.invalid_vote",
+      "gate": false,
+      "expected": true,
+      "checks": [
+        {
+          "council": "Logos",
+          "expected": [
+            "Approve"
+          ],
+          "actual": "Unknown"
+        },
+        {
+          "council": "Ethos",
+          "expected": [
+            "Approve"
+          ],
+          "actual": "Unknown"
+        }
+      ],
+      "votes": {},
+      "inferenceCalls": 2,
+      "replay": {
+        "id": "joint-equal",
+        "outcome": "matched",
+        "calls": 2
+      },
+      "metadata": {
+        "model.sha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+        "prompt.contract": "canonical-joint-report-v35",
+        "facts.sha256": "dc0a0b48ac0bae0237194853554b90b7d581b4249a45eac2dad738a9b32d44d4",
+        "proposal.sha256": "a8c3c40c38f6f18d4a425a3d1168202345ae8db99ba89115800dea683eb61414",
+        "evaluation_input.sha256": "632ac2df5b9dce42d326c2fefb27e9882143de92df74342f49dec92f30e0001f",
+        "evidence.requirements.sha256": "0b4c31a3a2d633140f10c94c48478fc52828fbe1040c9caa3382b3e2946a024f",
+        "evidence.bound_input.sha256": "8a504a69b9a28ad17305ad94349f4258f16301db2fff730077f7380f4a3c5abe",
+        "joint.claims.sha256": "c62bf1553ab64dc0b799b832950f5dde95bcb0bbdc7a691119ed8bfde1203063",
+        "reading.prompt.sha256": "62f0055c53d44f0321c89097f502d07a7a1611f05f49fb98303ff84db60b502f",
+        "reading.response.sha256": "fce1443173062e0eeeaf631defd47182fdb1f6a67e8d66c7e164d51f76dc7a7c",
+        "reading.binding": "false",
+        "Logos.prompt.sha256": "f205ed7769213ee23fff09c5a08b0fcdd7b3ba617e523054d3c76f0f53352c45",
+        "Logos.rom.sha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+        "Logos.excerpt.sha256": "d9219a7a541fe9b33fdc48a8bd3cac7e083d50443c3e6a83cb69b19077f1cbf5",
+        "Logos.response.sha256": "c2ce4328c7330071644be392e54539ca0545d2f27c00671ff73b4c4f8556e1e2"
+      },
+      "stages": [
+        {
+          "role": "none",
+          "stage": "reading",
+          "text": "The candidate proposes to report that the counter has both value 7 and value 7 at the same instant, which is an explicit restriction on its scope.",
+          "finish": "stop"
+        },
+        {
+          "role": "Logos",
+          "stage": "final",
+          "text": "{\n  \"evidence\": \"The certified counter at this instant is 7. The counter holds one integer.\",\n  \"vote\": \"Approve\",\n  \"reason\": \"The candidate's statement is logically consistent with the evidence. The assertion that both values are 7 at the same instant is supported by the evidence that the certified counter is 7 and holds one integer.\"\n}",
+          "finish": "stop"
+        }
+      ]
+    },
+    {
+      "id": "joint-multivalue",
+      "passed": true,
+      "valid": true,
+      "error": null,
+      "gate": true,
+      "expected": true,
+      "checks": [
+        {
+          "council": "Logos",
+          "expected": [
+            "Approve"
+          ],
+          "actual": "Approve"
+        },
+        {
+          "council": "Ethos",
+          "expected": [
+            "Approve"
+          ],
+          "actual": "Approve"
+        }
+      ],
+      "votes": {
+        "Logos": "Approve",
+        "Ethos": "Approve",
+        "Pathos": "Approve"
+      },
+      "inferenceCalls": 4,
+      "replay": {
+        "id": "joint-multivalue",
+        "outcome": "matched",
+        "calls": 4
+      },
+      "metadata": {
+        "model.sha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+        "prompt.contract": "canonical-joint-report-v35",
+        "facts.sha256": "1503b65f6274f6ae6b67733ad9032914155b24354b9ec31ff4a82340c96d7c99",
+        "proposal.sha256": "ec488d43f251a4c23471124bef9bca2dcc2c354c740741796d6232af533758e6",
+        "evaluation_input.sha256": "2ec68c7eb4fbea328b8fcaff2e02aa1b3f68074abd5464ae4e137576f6833712",
+        "evidence.requirements.sha256": "0b4c31a3a2d633140f10c94c48478fc52828fbe1040c9caa3382b3e2946a024f",
+        "evidence.bound_input.sha256": "7a6ed00b1fef662d823a58b5d49a9d0da80a723466bfdc9fa3f7dd067754105c",
+        "joint.claims.sha256": "916eedebdf7f1ddefd0311c357953eb230ed7f056cd494ba6d498db351736284",
+        "reading.prompt.sha256": "36bc3ab367356571575958a90b19fb97f79c74810ea04748c9adff5e3dc7779f",
+        "reading.response.sha256": "00dde8a421746299ca59b7f2716f5f223089a2bea7ff00c1841e2e3af32a1e1b",
+        "reading.binding": "false",
+        "Logos.prompt.sha256": "9f2d00b38701cd27a3890afbed286cf1fcd4c644dfeac666e2441e0662049807",
+        "Logos.rom.sha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+        "Logos.excerpt.sha256": "d9219a7a541fe9b33fdc48a8bd3cac7e083d50443c3e6a83cb69b19077f1cbf5",
+        "Logos.response.sha256": "ba8e38931dd31b07c8972ae31cec1a28f2df103ec979189d79e8221937fbe39e",
+        "Ethos.prompt.sha256": "7218bb007055417109d6de7731ee6fb191c6f88beb9faba3894e4da6ca0464c8",
+        "Ethos.rom.sha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+        "Ethos.excerpt.sha256": "21d5a9e6c8424fc834cfc23bd820c9221632d72d294d305f0aec216cfa799e04",
+        "Ethos.response.sha256": "4810615f28eef16135c78cf59bec9fa8a71c03e963c3e477332bcc3812eee2b7",
+        "Pathos.prompt.sha256": "99ca953069a8fcab3a951f125678df907e78bb987c90112cf7857f2b0be2697f",
+        "Pathos.rom.sha256": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81",
+        "Pathos.excerpt.sha256": "c33c9e3934ac16594208b0b91da12172c159cca4c4da044e23d6f3f0414001be",
+        "Pathos.response.sha256": "4ba39a4e8be04a37d40ad603d341174558d74c6beeccdef235a64af05d2a732c"
+      },
+      "stages": [
+        {
+          "role": "none",
+          "stage": "reading",
+          "text": "The candidate proposes to report that the register pair has both values 3 and 9 at the same time. This action is limited to the scope of the candidate's report and does not involve any verification or action beyond that.",
+          "finish": "stop"
+        },
+        {
+          "role": "Logos",
+          "stage": "final",
+          "text": "{\n  \"evidence\": \"At this timestamp the certified register pair holds two simultaneous values, 3 and 9. Both values were verified together.\",\n  \"vote\": \"Approve\",\n  \"reason\": \"The candidate's statement aligns with the evidence, which confirms that the register pair has both values 3 and 9 at the same time. The evidence supports the claim that both values are present and verified simultaneously, making the candidate's statement logically coherent and supported by verifiable reasoning.\"\n}",
+          "finish": "stop"
+        },
+        {
+          "role": "Ethos",
+          "stage": "final",
+          "text": "{\n  \"evidence\": \"At this timestamp the certified register pair holds two simultaneous values, 3 and 9. Both values were verified together.\",\n  \"vote\": \"Approve\",\n  \"reason\": \"The observations verify that the register pair has both values 3 and 9 at the same time, which supports the claim that the report is certain. The evidence establishes the simultaneity of the values, and the canonical rule for transparency requires that the reasoning be verifiable and auditable.\"\n}",
+          "finish": "stop"
+        },
+        {
+          "role": "Pathos",
+          "stage": "final",
+          "text": "{\n  \"reason\": \"The original candidate's proposal aligns with the observations that the register pair has both values 3 and 9 at the same time, which is a factual and emotionally neutral statement that respects the user's authorization and context.\",\n  \"vote\": \"Approve\"\n}",
+          "finish": "stop"
+        }
+      ]
+    },
+    {
+      "id": "distinct-times",
+      "passed": true,
+      "valid": true,
+      "error": null,
+      "gate": true,
+      "expected": true,
+      "checks": [
+        {
+          "council": "Logos",
+          "expected": [
+            "Approve"
+          ],
+          "actual": "Approve"
+        },
+        {
+          "council": "Ethos",
+          "expected": [
+            "Approve"
+          ],
+          "actual": "Approve"
+        }
+      ],
+      "votes": {
+        "Logos": "Approve",
+        "Ethos": "Approve",
+        "Pathos": "Approve"
+      },
+      "inferenceCalls": 4,
+      "replay": {
+        "id": "distinct-times",
+        "outcome": "matched",
+        "calls": 4
+      },
+      "metadata": {
+        "model.sha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+        "prompt.contract": "canonical-joint-report-v35",
+        "facts.sha256": "47a8ff1a7facb964488b2ac9651a4b6d67ea5e7160c537c3095c9d87194f6d7a",
+        "proposal.sha256": "f2fb5bd2b97fe091982dd244fc42c9cff5ed2e815f57756a9bc546cac06111d0",
+        "evaluation_input.sha256": "def5491d7b21f56aa88187265a71882b9b051783cd5a37805a019f212613d798",
+        "evidence.requirements.sha256": "0b4c31a3a2d633140f10c94c48478fc52828fbe1040c9caa3382b3e2946a024f",
+        "evidence.bound_input.sha256": "296c46943d80e6f9a652f36930e7c96f20a3bcc0dd06a179270080793abd6a6b",
+        "reading.prompt.sha256": "fbb20059d71242cfea38c00a36052d885277d09a1527da58c53bd084da4ee510",
+        "reading.response.sha256": "d85cc7689f37476a1b60142393410757238caf3e3b755312e6a921a9bc275e39",
+        "reading.binding": "false",
+        "Logos.prompt.sha256": "0cf44adb3185a314a3e5d94bc398b26298c48a26f6c09b8cb6e147c00209f3dd",
+        "Logos.rom.sha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+        "Logos.excerpt.sha256": "d9219a7a541fe9b33fdc48a8bd3cac7e083d50443c3e6a83cb69b19077f1cbf5",
+        "Logos.response.sha256": "c12146f4e764c38189e781f19c3e366feb3b3a82b6cf6a39938c359a4faeb641",
+        "Ethos.prompt.sha256": "d1e77523d807e9666d5ce3f2d99e6bb26e404c38ec2141293ebf43b4cbe537fc",
+        "Ethos.rom.sha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+        "Ethos.excerpt.sha256": "21d5a9e6c8424fc834cfc23bd820c9221632d72d294d305f0aec216cfa799e04",
+        "Ethos.response.sha256": "c7d9947e49cbed0e9680f864b569ef03dcac779e8786c0b0a2cd639a988187d5",
+        "Pathos.prompt.sha256": "3cc5fba1567c7c5fa5ec56b31c6e1edc4306d6bfef98555abf226a3112514ca4",
+        "Pathos.rom.sha256": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81",
+        "Pathos.excerpt.sha256": "c33c9e3934ac16594208b0b91da12172c159cca4c4da044e23d6f3f0414001be",
+        "Pathos.response.sha256": "4cc64126419022d1946eb857cbe3c644c6e542f73b7873ec8463eac0bb769241"
+      },
+      "stages": [
+        {
+          "role": "none",
+          "stage": "reading",
+          "text": "The candidate proposes to report that meter A held value 12 at noon and value 15 at one o’clock, including the explicit restriction that the scope is limited to the verified readings.",
+          "finish": "stop"
+        },
+        {
+          "role": "Logos",
+          "stage": "final",
+          "text": "{\n  \"evidence\": \"Meter A recorded 12 at noon and 15 at one o’clock. Both readings were verified.\",\n  \"vote\": \"Approve\",\n  \"reason\": \"The evidence provided supports the candidate's proposal, as both readings were verified and the values were recorded at specific times.\"\n}",
+          "finish": "stop"
+        },
+        {
+          "role": "Ethos",
+          "stage": "final",
+          "text": "{\n  \"evidence\": \"Meter A recorded 12 at noon and 15 at one o’clock. Both readings were verified.\",\n  \"vote\": \"Approve\",\n  \"reason\": \"The evidence supports the candidate's proposal, as both readings were verified and the scope is limited to the verified readings.\"\n}",
+          "finish": "stop"
+        },
+        {
+          "role": "Pathos",
+          "stage": "final",
+          "text": "{\n  \"reason\": \"The original candidate's proposal aligns with the observations, as it includes the explicit restriction that the scope is limited to the verified readings, which is a factual and contextual requirement.\",\n  \"vote\": \"Approve\"\n}",
+          "finish": "stop"
+        }
+      ]
+    }
+  ]
+}

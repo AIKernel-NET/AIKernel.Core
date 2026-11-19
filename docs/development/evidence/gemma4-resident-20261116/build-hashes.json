@@ -1,0 +1,12 @@
+{
+  "measured-server/AIKernel.Kernel.dll": "1c22ee163867ed8d618b44957141b6893c76b76a149e7ba44fa97261bb78ac91",
+  "measured-server/AIKernel.Core.Tests.dll": "37e2f1af813d7c448970835648a1e68817543fc8801b34f58bee813c330528b3",
+  "measured-server/libaikernel_cpu_accel.so": "24d5464c26d9869975b759f4796c019060273072dfd5ec18265228839cf92e84",
+  "final-managed/AIKernel.Kernel.dll": "661e130c2234619e7f40ad2b54b2f4ea12e8bf8cfb91cb215c840b12baa50036",
+  "final-managed/AIKernel.Core.Tests.dll": "144184ce3064e962bfac82712c34b577c2489583e686e601e3cb5be681606b64",
+  "final-managed/aikernel_cpu_accel.dll": "c9d4241d2e2695358a530679300d762d5f823f542bfade55e13acca63194e24c",
+  "final-managed/aikernel_cuda_driver.dll": "c66faf9ad5b9ee5320ce4e73bbfa7c677f7679eb5f8a0e49a9dcaa7fdb79be21",
+  "source/gemma_forward.cu": "99d21c5c39a8fd3b13d5b3bee26d32b96bdc14af5f530b69a0332e89623f4c45",
+  "source/gemma_forward.ptx": "0674d670b8932883bace71602c724a14d50fa5c15397cbdc4d00ec50761951e9",
+  "source/gemma_program.inc": "313931fc21580e11e31dd30bebb03c1664da5bd5bbc2c4ee2f87184bad555739"
+}

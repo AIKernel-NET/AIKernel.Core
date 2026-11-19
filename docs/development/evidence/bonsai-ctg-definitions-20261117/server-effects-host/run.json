@@ -1,0 +1,1 @@
+{"mode": "--bonsai-ctg-effects-suite", "waitFor": "effects-api", "postChecks": false, "stopOnRegression": false}

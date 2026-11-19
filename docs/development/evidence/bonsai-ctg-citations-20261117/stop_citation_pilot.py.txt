@@ -1,0 +1,26 @@
+import sys,json,subprocess
+from pathlib import Path
+sys.path.insert(0,r'D:/AIKernel/.wp-predelete-backup')
+from xserver_ssh import connection
+remote='''from pathlib import Path
+import os,json,signal,time
+out=Path.home()/'.aikernel-inquiry-014/ctg-citations-20261117/citation-pilot-fixed'
+if (out/'completion.json').exists():
+ print('Already completed')
+else:
+ rows=json.loads((out/'result.json').read_text())
+ row=next(r for r in rows if r['id']=='ordered-holdout-status-exact')
+ record={'reason':'manual-governance-review-failed','case':row['id'],'role':'Ethos','problem':'The reason asserts required evidence is unavailable but the vote is Abstain. This is not the canonical safety-neutral finding.',
+  'responseSha256':row['result']['Evaluation']['Metadata']['Ethos.response.sha256'],'completedCases':len(rows),'utcSeconds':time.time()}
+ pid=json.loads((out/'pid.json').read_text())['pid']
+ proc=Path('/proc')/str(pid)
+ assert proc.stat().st_uid==os.getuid()
+ assert str(out/'app/AIKernel.Core.Tests.dll').encode() in (proc/'cmdline').read_bytes().split(b'\\0')
+ (out/'external-stop.json').write_text(json.dumps(record,indent=2))
+ os.kill(pid,signal.SIGTERM)
+ print(json.dumps(record))
+'''
+with connection() as ssh:
+ p=subprocess.run(ssh+['/usr/bin/python3.6 -'],input=remote.encode(),capture_output=True,timeout=90,creationflags=subprocess.CREATE_NO_WINDOW)
+assert p.returncode==0,p.stderr.decode(errors='replace')[-1000:]
+print(p.stdout.decode())

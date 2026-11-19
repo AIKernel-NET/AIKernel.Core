@@ -1,0 +1,22 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent
+run=root/'server-reading-probe-fixed'
+completion=json.loads((run/'completion.json').read_text())
+assert completion['exitCode']==0 and completion['stopReason'] is None
+result=json.loads((run/'result.json').read_text());assert result['diagnosticOnly'] and len(result['rows'])==4
+before=json.loads((root/'server-reading-probe/result.json').read_text())['rows']
+reading=result['rows'][:3];parity=result['rows'][3]
+assert parity['match'] and parity['coldResponseSha256']==parity['warmResponseSha256']
+sha=lambda text:hashlib.sha256(text.encode()).hexdigest()
+rows=[]
+for previous,current in zip(before,reading):
+ assert previous['id']==current['id']
+ a,b=previous['answer'],current['answer']
+ rows.append({'id':current['id'],'question':current['question'],'text':b['Text'],'finishReason':b['FinishReason'],
+  'responseSha256':sha(b['Text']),'matchesInitialDiagnostic':all(a[k]==b[k] for k in ('Text','InputTokens','OutputTokens','FinishReason'))})
+summary={'diagnosticOnly':True,'reading':rows,'prefixCacheParity':{k:parity[k] for k in ('id','promptSha256','coldResponseSha256','warmResponseSha256','match')},
+ 'coldReply':parity['cold']['Text'],'warmReply':parity['warm']['Text'],'coldPrefillTokens':parity['cold']['PrefillForwardTokens'],
+ 'warmPrefillTokens':parity['warm']['PrefillForwardTokens'],'notAnAccuracyOrGlobalCacheGuarantee':True}
+(root/'diagnostic-summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(summary,ensure_ascii=True,indent=2))

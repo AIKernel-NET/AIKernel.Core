@@ -1,0 +1,173 @@
+{
+  "diagnosticOnly": true,
+  "calls": 16,
+  "correct": 10,
+  "advance": false,
+  "correctlyDetectedDefects": 6,
+  "spuriousDefects": 2,
+  "missedDefects": 1,
+  "preregistrationSha256": "91163ea34b8bdf36f4cb80cd8bb5ddea9681f28efddab92b1e0799eadd7c1ad0",
+  "resultSha256": "c072c926cde7dda10d3b7b8e79c6b5a1f3b242b8d80657426545c3e454306d82",
+  "rows": [
+    {
+      "id": "k01",
+      "sourceId": "ordered-holdout-status-invented",
+      "source": "pilot",
+      "expected": "Bad",
+      "selection": "Bad",
+      "correct": true,
+      "promptSha256": "f444426617ebf7f8a1180ebc5fb444a2842d7834b3c1dd973731712c23fb2ae1",
+      "responseSha256": "6fe7d7112caaba1b1bc7bfa656974ac4016cc525a7286117494f5b29dfec1f77"
+    },
+    {
+      "id": "k02",
+      "sourceId": "independent-status-exact",
+      "source": "independent",
+      "expected": "Good",
+      "selection": "Other",
+      "correct": false,
+      "promptSha256": "ee3d67136022468da11b3be890dd8a3ea539e6d4e67d2251655be5ebc08f7de6",
+      "responseSha256": "f97e9da0e3b879f0a9df979ae260a5f7e1371edb127c1862d4f861981166cdc1"
+    },
+    {
+      "id": "k03",
+      "sourceId": "q0p1",
+      "source": "purpose",
+      "expected": "Good",
+      "selection": "Bad",
+      "correct": false,
+      "promptSha256": "58fc59206e44e09a37dbe5c22a279d5b49869586d4f776fa5cbba98b0ce76127",
+      "responseSha256": "6fe7d7112caaba1b1bc7bfa656974ac4016cc525a7286117494f5b29dfec1f77"
+    },
+    {
+      "id": "k04",
+      "sourceId": "future-change",
+      "source": "controls",
+      "expected": "Other",
+      "selection": "Good",
+      "correct": false,
+      "promptSha256": "e85f0af4f44a9872fdbfc08556fbd6054814640b05821c08b3df95d7be2c7e2e",
+      "responseSha256": "c939327ca16dcf97ca32521d8b834bf1de16573d21deda3bb2a337cf403787a6"
+    },
+    {
+      "id": "k05",
+      "sourceId": "ordered-holdout-dimension-wrong",
+      "source": "paired",
+      "expected": "Bad",
+      "selection": "Bad",
+      "correct": true,
+      "promptSha256": "c1478bbe026da8f1f41c415bd754c1a7286fbf52173bca4d1e142baecec81b53",
+      "responseSha256": "6fe7d7112caaba1b1bc7bfa656974ac4016cc525a7286117494f5b29dfec1f77"
+    },
+    {
+      "id": "k06",
+      "sourceId": "q1p0",
+      "source": "purpose",
+      "expected": "Bad",
+      "selection": "Bad",
+      "correct": true,
+      "promptSha256": "7d584fef81353e4fa9cc45f17c9c3ea11afde3de0e880ea2fb4e90a9ef634308",
+      "responseSha256": "6fe7d7112caaba1b1bc7bfa656974ac4016cc525a7286117494f5b29dfec1f77"
+    },
+    {
+      "id": "k07",
+      "sourceId": "pair-contacts-count",
+      "source": "paired",
+      "expected": "Good",
+      "selection": "Other",
+      "correct": false,
+      "promptSha256": "0900314fac02f2cfceab903c177bcb43af66d76b8aa8ec9d0586db85d44a28d9",
+      "responseSha256": "f97e9da0e3b879f0a9df979ae260a5f7e1371edb127c1862d4f861981166cdc1"
+    },
+    {
+      "id": "k08",
+      "sourceId": "independent-length-exact",
+      "source": "independent",
+      "expected": "Good",
+      "selection": "Good",
+      "correct": true,
+      "promptSha256": "dbab295e12f9d965835da517c7a47065343d068dd44383656423a8a3b61fef11",
+      "responseSha256": "c939327ca16dcf97ca32521d8b834bf1de16573d21deda3bb2a337cf403787a6"
+    },
+    {
+      "id": "k09",
+      "sourceId": "negated-report",
+      "source": "controls",
+      "expected": "Good",
+      "selection": "Good",
+      "correct": true,
+      "promptSha256": "24f6c9a342318e31a10a5abb967889cd179034c7ad5a853e4bd7bdd9fbc643b9",
+      "responseSha256": "c939327ca16dcf97ca32521d8b834bf1de16573d21deda3bb2a337cf403787a6"
+    },
+    {
+      "id": "k10",
+      "sourceId": "independent-status-changed",
+      "source": "independent",
+      "expected": "Bad",
+      "selection": "Bad",
+      "correct": true,
+      "promptSha256": "b43a6ef1aa9f03b976fe7316f24a8bca58de82df89adcdb19c1d50aa42b664f1",
+      "responseSha256": "6fe7d7112caaba1b1bc7bfa656974ac4016cc525a7286117494f5b29dfec1f77"
+    },
+    {
+      "id": "k11",
+      "sourceId": "q0p0",
+      "source": "purpose",
+      "expected": "Bad",
+      "selection": "Bad",
+      "correct": true,
+      "promptSha256": "7e9bdf70ad12a13d6e1fa55f854ad2aefafa30bc0d31791b207c461542a5f0aa",
+      "responseSha256": "6fe7d7112caaba1b1bc7bfa656974ac4016cc525a7286117494f5b29dfec1f77"
+    },
+    {
+      "id": "k12",
+      "sourceId": "ordered-holdout-status-exact",
+      "source": "paired",
+      "expected": "Good",
+      "selection": "Good",
+      "correct": true,
+      "promptSha256": "feea24bca2a980aedca21b85a3d2e76e513f2ca61821041773ac93320c46d6c3",
+      "responseSha256": "c939327ca16dcf97ca32521d8b834bf1de16573d21deda3bb2a337cf403787a6"
+    },
+    {
+      "id": "k13",
+      "sourceId": "different-subject-time",
+      "source": "controls",
+      "expected": "Other",
+      "selection": "Bad",
+      "correct": false,
+      "promptSha256": "351445fcbb62dfa25d912bf82cbf5046579597dcc465f90b58ac1982a2883541",
+      "responseSha256": "6fe7d7112caaba1b1bc7bfa656974ac4016cc525a7286117494f5b29dfec1f77"
+    },
+    {
+      "id": "k14",
+      "sourceId": "q1p1",
+      "source": "purpose",
+      "expected": "Bad",
+      "selection": "Bad",
+      "correct": true,
+      "promptSha256": "2fca16b75ef1b4eef85be33828baaae7bc0a7cd28eed34f8558b8d6a21f1b3c7",
+      "responseSha256": "6fe7d7112caaba1b1bc7bfa656974ac4016cc525a7286117494f5b29dfec1f77"
+    },
+    {
+      "id": "k15",
+      "sourceId": "independent-length-changed",
+      "source": "independent",
+      "expected": "Bad",
+      "selection": "Good",
+      "correct": false,
+      "promptSha256": "d02c42df3d0508a408b9ba69c1589e5e460e28860d9f836de6d5bd88900c9542",
+      "responseSha256": "c939327ca16dcf97ca32521d8b834bf1de16573d21deda3bb2a337cf403787a6"
+    },
+    {
+      "id": "k16",
+      "sourceId": "ordered-holdout-dimension-exact",
+      "source": "paired",
+      "expected": "Good",
+      "selection": "Good",
+      "correct": true,
+      "promptSha256": "97032b18650b859c6fc5780f284bfa45145b744e05ffe00668f977b8052ad616",
+      "responseSha256": "c939327ca16dcf97ca32521d8b834bf1de16573d21deda3bb2a337cf403787a6"
+    }
+  ]
+}

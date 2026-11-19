@@ -1,0 +1,306 @@
+{
+  "baseline": {
+    "all": {
+      "total": 46,
+      "succeeded": 46,
+      "full": 23,
+      "gate": 36,
+      "falseAllow": 1,
+      "falseDeny": 9
+    },
+    "existing": {
+      "total": 38,
+      "succeeded": 38,
+      "full": 21,
+      "gate": 31,
+      "falseAllow": 1,
+      "falseDeny": 6
+    },
+    "holdout": {
+      "total": 8,
+      "succeeded": 8,
+      "full": 2,
+      "gate": 5,
+      "falseAllow": 0,
+      "falseDeny": 3
+    },
+    "freshHoldout": {
+      "total": 0,
+      "succeeded": 0,
+      "full": 0,
+      "gate": 0,
+      "falseAllow": 0,
+      "falseDeny": 0
+    },
+    "resources": {
+      "exitCode": 1,
+      "stopReason": null,
+      "maximumRssBytes": 1137582080,
+      "seconds": 1449.4716136455536,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    }
+  },
+  "candidate-pilot": {
+    "all": {
+      "total": 6,
+      "succeeded": 6,
+      "full": 5,
+      "gate": 5,
+      "falseAllow": 1,
+      "falseDeny": 0
+    },
+    "existing": {
+      "total": 6,
+      "succeeded": 6,
+      "full": 5,
+      "gate": 5,
+      "falseAllow": 1,
+      "falseDeny": 0
+    },
+    "holdout": {
+      "total": 0,
+      "succeeded": 0,
+      "full": 0,
+      "gate": 0,
+      "falseAllow": 0,
+      "falseDeny": 0
+    },
+    "freshHoldout": {
+      "total": 0,
+      "succeeded": 0,
+      "full": 0,
+      "gate": 0,
+      "falseAllow": 0,
+      "falseDeny": 0
+    },
+    "resources": {
+      "exitCode": 1,
+      "stopReason": null,
+      "maximumRssBytes": 1124069376,
+      "seconds": 324.68090772628784,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    }
+  },
+  "candidate-full": {
+    "all": {
+      "total": 46,
+      "succeeded": 46,
+      "full": 33,
+      "gate": 39,
+      "falseAllow": 7,
+      "falseDeny": 0
+    },
+    "existing": {
+      "total": 38,
+      "succeeded": 38,
+      "full": 28,
+      "gate": 33,
+      "falseAllow": 5,
+      "falseDeny": 0
+    },
+    "holdout": {
+      "total": 8,
+      "succeeded": 8,
+      "full": 5,
+      "gate": 6,
+      "falseAllow": 2,
+      "falseDeny": 0
+    },
+    "freshHoldout": {
+      "total": 0,
+      "succeeded": 0,
+      "full": 0,
+      "gate": 0,
+      "falseAllow": 0,
+      "falseDeny": 0
+    },
+    "resources": {
+      "exitCode": 1,
+      "stopReason": null,
+      "maximumRssBytes": 1153593344,
+      "seconds": 1758.1542620658875,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false,
+      "checks": {
+        "evidence-probe": {
+          "exitCode": 0,
+          "maximumRssBytes": 1106526208,
+          "stopReason": null,
+          "seconds": 151.78221321105957
+        },
+        "normal-128": {
+          "exitCode": 0,
+          "maximumRssBytes": 432189440,
+          "stopReason": null,
+          "seconds": 12.061255693435669
+        }
+      }
+    }
+  },
+  "candidate-pilot2": {
+    "all": {
+      "total": 3,
+      "succeeded": 3,
+      "full": 0,
+      "gate": 1,
+      "falseAllow": 2,
+      "falseDeny": 0
+    },
+    "existing": {
+      "total": 3,
+      "succeeded": 3,
+      "full": 0,
+      "gate": 1,
+      "falseAllow": 2,
+      "falseDeny": 0
+    },
+    "holdout": {
+      "total": 0,
+      "succeeded": 0,
+      "full": 0,
+      "gate": 0,
+      "falseAllow": 0,
+      "falseDeny": 0
+    },
+    "freshHoldout": {
+      "total": 0,
+      "succeeded": 0,
+      "full": 0,
+      "gate": 0,
+      "falseAllow": 0,
+      "falseDeny": 0
+    },
+    "resources": {
+      "exitCode": -15,
+      "stopReason": null,
+      "maximumRssBytes": 1801543680,
+      "seconds": 529.7330257892609,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    }
+  },
+  "candidate-ordered": {
+    "all": {
+      "total": 8,
+      "succeeded": 8,
+      "full": 3,
+      "gate": 4,
+      "falseAllow": 1,
+      "falseDeny": 3
+    },
+    "existing": {
+      "total": 8,
+      "succeeded": 8,
+      "full": 3,
+      "gate": 4,
+      "falseAllow": 1,
+      "falseDeny": 3
+    },
+    "holdout": {
+      "total": 0,
+      "succeeded": 0,
+      "full": 0,
+      "gate": 0,
+      "falseAllow": 0,
+      "falseDeny": 0
+    },
+    "freshHoldout": {
+      "total": 0,
+      "succeeded": 0,
+      "full": 0,
+      "gate": 0,
+      "falseAllow": 0,
+      "falseDeny": 0
+    },
+    "resources": {
+      "exitCode": 1,
+      "stopReason": null,
+      "maximumRssBytes": 1104445440,
+      "seconds": 381.9865243434906,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false,
+      "checks": {
+        "evidence-probe": {
+          "exitCode": -6,
+          "maximumRssBytes": 87674880,
+          "stopReason": null,
+          "seconds": 2.0115866661071777
+        },
+        "normal-128": {
+          "exitCode": 0,
+          "maximumRssBytes": 433721344,
+          "stopReason": null,
+          "seconds": 13.074683904647827
+        }
+      }
+    }
+  },
+  "candidate-full3": {
+    "all": {
+      "total": 17,
+      "succeeded": 17,
+      "full": 9,
+      "gate": 14,
+      "falseAllow": 0,
+      "falseDeny": 3
+    },
+    "existing": {
+      "total": 17,
+      "succeeded": 17,
+      "full": 9,
+      "gate": 14,
+      "falseAllow": 0,
+      "falseDeny": 3
+    },
+    "holdout": {
+      "total": 0,
+      "succeeded": 0,
+      "full": 0,
+      "gate": 0,
+      "falseAllow": 0,
+      "falseDeny": 0
+    },
+    "freshHoldout": {
+      "total": 0,
+      "succeeded": 0,
+      "full": 0,
+      "gate": 0,
+      "falseAllow": 0,
+      "falseDeny": 0
+    },
+    "resources": {
+      "exitCode": -15,
+      "stopReason": null,
+      "maximumRssBytes": 1105805312,
+      "seconds": 664.4276895523071,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    }
+  }
+}

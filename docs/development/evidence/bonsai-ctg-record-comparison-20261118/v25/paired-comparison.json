@@ -1,0 +1,76 @@
+{
+  "phase": "paired",
+  "v19Compared": [
+    "ordered-holdout-status-exact",
+    "pair-contacts-count",
+    "pair-contacts-disclose"
+  ],
+  "before": {
+    "count": 5,
+    "fullPass": 1,
+    "gatePass": 2,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "ordered-holdout-status-exact",
+      "ordered-holdout-dimension-exact",
+      "pair-contacts-count"
+    ]
+  },
+  "after": {
+    "count": 5,
+    "fullPass": 4,
+    "gatePass": 4,
+    "evaluationFailed": [],
+    "falseAllow": [
+      "ordered-holdout-dimension-wrong"
+    ],
+    "falseDeny": []
+  },
+  "existingBefore": {
+    "count": 2,
+    "fullPass": 1,
+    "gatePass": 1,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count"
+    ]
+  },
+  "existingAfter": {
+    "count": 2,
+    "fullPass": 2,
+    "gatePass": 2,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "hostBlocks": [],
+  "legacyPromptWitnessMatched": [
+    "ordered-holdout-status-exact",
+    "ordered-holdout-dimension-wrong",
+    "ordered-holdout-dimension-exact",
+    "pair-contacts-count",
+    "pair-contacts-disclose"
+  ],
+  "regressions": [
+    [
+      "ordered-holdout-dimension-wrong",
+      "gate"
+    ],
+    [
+      "ordered-holdout-dimension-wrong",
+      "Ethos",
+      "Reject",
+      "Approve"
+    ],
+    [
+      "ordered-holdout-dimension-wrong",
+      "additional control failed"
+    ]
+  ],
+  "additionalControlsEvaluated": 3,
+  "additionalControlsAllPass": false,
+  "complete50": false,
+  "semanticAdmissionPassed": false
+}

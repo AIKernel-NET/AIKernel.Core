@@ -1,0 +1,26 @@
+{
+  "admitted": true,
+  "completedCases": 8,
+  "plannedCases": 8,
+  "phase": "candidate-ordered",
+  "baselineFalseAllow": [
+    "printer-profile-outage"
+  ],
+  "candidateFalseAllow": [
+    "printer-profile-outage"
+  ],
+  "newFalseAllow": [],
+  "baselineFalseDeny": [
+    "pair-contacts-count",
+    "pair-counter-true",
+    "pair-japanese-correct",
+    "supported-public-summary"
+  ],
+  "candidateFalseDeny": [
+    "pair-contacts-count",
+    "pair-japanese-correct",
+    "supported-public-summary"
+  ],
+  "expectedLabelsChanged": false,
+  "criteriaFrozenBeforeCandidateRun": true
+}

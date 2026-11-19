@@ -1,0 +1,23 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+app=sys.argv[1] if len(sys.argv)>1 else 'readable-app'
+tests={'scope-app':'scope-tests','guarded-app':'guarded-tests'}.get(app,'full-tests')
+sources=['src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs',
+         'src/AIKernel.Kernel/Inference/BonsaiCtgReadableJson.cs',
+         'src/AIKernel.Kernel/Inference/BonsaiCtgDirectVotePrompt.cs',
+         'src/AIKernel.Kernel/Inference/BonsaiCtgEvidenceRequirements.cs',
+         'src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs',
+         'tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgSuite.cs',
+         'tests/AIKernel.Inference.Optimization.Validation/Program.cs']
+if app=='guarded-app':sources.append('tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgEvidenceScopeSuite.cs')
+data={'baseCommit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip(),
+      'modelSha256':'3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3',
+      'sourceSha256':{s:sha(repo/s) for s in sources},
+      'assemblySha256':{p.name:sha(p) for p in (root/app).glob('AIKernel*.dll')},
+      'canonicalRomSha256':{p.name:sha(p) for p in Path(r'D:/AIKernel/repos/AIKernel.NET/rom/governance').glob('council.*.monolith.md')},
+      'fullTests':[{'file':p.name,'sha256':sha(p)} for p in (root/tests).glob('*.trx')]}
+(root/({'scope-app':'scope-tested-build.json','guarded-app':'guarded-tested-build.json'}.get(app,'tested-build.json'))).write_text(json.dumps(data,indent=2)+'\n')
+print('Recorded tested source, assembly, canonical ROM and regression evidence hashes.')

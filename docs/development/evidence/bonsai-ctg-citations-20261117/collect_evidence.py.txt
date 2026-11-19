@@ -1,0 +1,43 @@
+from pathlib import Path
+import json,hashlib,xml.etree.ElementTree as ET
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+dest=repo/'docs/development/evidence/bonsai-ctg-citations-20261117'
+dest.mkdir(parents=True,exist_ok=True)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+names=['admission.json','all-cases.json','guarded-cases.json','baseline-gates.json','pilot-cases.json','host-guard-cases.json','server-probe.json','server-final-state.json',
+ 'local-load-samples.json','local-retry-status.json','local-baseline-retry.json','local-baseline-retry.json.responses.json','local-baseline-retry.log','guard-regression.json','review-transitions.json']
+names += [p.name for pattern in ('*-comparison.json','*-tested-build.json') for p in root.glob(pattern)]
+for name in names:
+ if (root/name).exists():(dest/name).write_bytes((root/name).read_bytes())
+for name in ['prepare.py','record_build.py','compare.py','server_transfer.py','remote_runner.py','public_runner.py','server_results.py',
+ 'stop_citation_pilot.py','wait_local_retry.ps1','collect_evidence.py','verify_regressions.py','check_evidence.py','review_transitions.py','finish_report.py']:
+ if (root/name).exists():(dest/(name+'.txt')).write_bytes((root/name).read_bytes())
+for phase in ['citation-pilot','citation-pilot-fixed','findings-pilot','packet-pilot','packet-full','demo-pilot','demo-full','final-api','review-pilot','review-full','review-host-guards','final-v15']:
+ source=root/('server-'+phase)
+ if not source.exists():continue
+ assert (source/'completion.json').exists(),phase
+ target=dest/source.name;target.mkdir(exist_ok=True)
+ for p in source.iterdir():
+  assert p.is_file() and p.suffix in ('.json','.log','.py'),p
+  (target/(p.name+('.txt' if p.suffix=='.py' else ''))).write_bytes(p.read_bytes())
+for label in ('v11b','v12','v13','v14','v15'):
+ source=root/('sources-'+label)
+ paths=json.loads((source/'paths.json').read_text(encoding='utf-8'))
+ manifest=json.loads((root/(label+'-tested-build.json')).read_text(encoding='utf-8'))
+ target=dest/('sources-'+label);target.mkdir(exist_ok=True)
+ for index,path in enumerate(paths):
+  p=source/str(index);assert sha(p)==manifest['sourceSha256'][path],path
+  (target/(str(index)+'.cs.txt')).write_bytes(p.read_bytes())
+ (target/'paths.json').write_bytes((source/'paths.json').read_bytes())
+tests=[];ns={'t':'http://microsoft.com/schemas/VisualStudio/TeamTest/2010'}
+for label in ('v11','v11b','v12','v13','v14','v15'):
+ for p in (root/('tests-'+label)).glob('*.trx'):
+  counts=ET.parse(p).find('.//t:Counters',ns).attrib
+  assert counts['failed']=='0'
+  tests.append({'run':label,'trxSha256':sha(p),'counters':counts})
+(dest/'unit-tests.json').write_text(json.dumps(tests,indent=2)+'\n',encoding='utf-8')
+(dest/'.gitattributes').write_text('* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol\n',encoding='utf-8')
+manifest={p.relative_to(dest).as_posix():sha(p) for p in sorted(dest.rglob('*')) if p.is_file() and p.name!='evidence-sha256.json'}
+(dest/'evidence-sha256.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({'files':len(manifest),'destination':str(dest)}))

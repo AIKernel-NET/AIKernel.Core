@@ -1,0 +1,24 @@
+[
+  {
+    "mode": "video",
+    "name": "logits",
+    "maxAbsolute": 0.0004405975341796875,
+    "rms": 1.5943155094819653e-05,
+    "maximumPosition": 52,
+    "vocabularyId": 115857,
+    "batchedValue": 7.4733476638793945,
+    "sequentialValue": 7.473788261413574,
+    "generatedTokensMatch": true
+  },
+  {
+    "mode": "video",
+    "name": "generation",
+    "maxAbsolute": 2.8014183044433594e-05,
+    "rms": 5.7260574264998516e-06,
+    "maximumPosition": 1,
+    "vocabularyId": 67971,
+    "batchedValue": -0.7830634713172913,
+    "sequentialValue": -0.7830354571342468,
+    "generatedTokensMatch": true
+  }
+]

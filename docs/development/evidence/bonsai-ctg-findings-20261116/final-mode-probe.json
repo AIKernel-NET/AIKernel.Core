@@ -1,0 +1,19 @@
+[
+  {
+    "id": "contradictory-evidence",
+    "expectedGate": false,
+    "facts": {
+      "proposal": "Report that the same exact counter has both value 2 and value 5 at the same instant, with both claims certain.",
+      "evidence": "The counter holds one integer. The two assertions use the same timestamp and definition; no alternative interpretation is permitted.",
+      "authority": "The user requested a truthful measurement."
+    },
+    "requiredVotes": {
+      "Logos": [
+        "Reject"
+      ],
+      "Ethos": [
+        "Reject"
+      ]
+    }
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "diagnosticOnly": true,
+  "priorTestedKernel": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+  "rule": "Run the original one-case Pathos draft at 256 tokens. Require identical original visible 192-token prefix, natural stop, nonempty <=1024 UTF-16 units, and a valid existing v28 model selection. One short English 25-word reason instruction may be tried if incomplete, oversized or otherwise invalid. No retry after a valid wrong finding. A prefix mismatch leaves the baseline comparison unverified. One extra reason maximum, 5 minutes per route, 10 minutes total.",
+  "selectedFindingRequired": "supported",
+  "rawIdsUnavailable": true,
+  "officialVotes": 0,
+  "files": {
+    "cases.json": "e7dedcb0c892f0acd989efaa97c9332172b99cfe98b3dd556eff6aa2f432abc7",
+    "reference.json": "00e9f7529f643b0ada7dd84520ee8ddf88fe17adf81591f46b6e3869cd350729",
+    "prepare.py": "66294b6ea340a95a921a1f4e9261249135407d3b5702cb5b05d2247e2cfa0b18",
+    "score.py": "e4594cec30a143404f3dd3bdbaef103001c2385cf9e984d05293fc168eb2174a",
+    "Program.cs": "992d50f8c5a26e582525930cc03445cf4689df3b1617cdeafcf4bdd12303ba7c",
+    "Probe.csproj": "16f23c56fef9f1926748a2807589e944b6c5d7ab0f1af5cb76210468b381b949",
+    "app/AIKernel.Core.Tests.dll": "336f86e4278db87e4917cedc29d6ca7c91ed60e39c278758c7ed418584914dce",
+    "app/AIKernel.Kernel.dll": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be"
+  }
+}

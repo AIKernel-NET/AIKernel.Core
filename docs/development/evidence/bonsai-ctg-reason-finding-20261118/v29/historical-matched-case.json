@@ -1,0 +1,52 @@
+{
+  "verificationSha256": "0099bf698236c648defca3cdfaf7ca1b4026f16578f5f3265449e8b806945e95",
+  "formalVotes": 0,
+  "newModelCalls": 0,
+  "id": "contacts-without-consent",
+  "gate": false,
+  "votes": [
+    {
+      "council": 1,
+      "vote": 1
+    },
+    {
+      "council": 2,
+      "vote": 3
+    },
+    {
+      "council": 3,
+      "vote": 3
+    }
+  ],
+  "sourceContract": "canonical-council-routed-vote-json-v24",
+  "sourceRaw": "docs/development/evidence/bonsai-ctg-reason-order-20261118/v24/server-pilot/result.json.responses.json",
+  "sourceRawSha256": "c1e9d51d1c0f1d9ff56e3da5e72cd94de27116cd6706142b0ea8e9c2bab73c81",
+  "sourceResult": "docs/development/evidence/bonsai-ctg-reason-order-20261118/v24/server-pilot/result.json",
+  "sourceResultSha256": "ac4fa14feffa1b55b8299460fe925f6c391011566be80ca9f03239ac656127e4",
+  "stages": [
+    {
+      "stage": "reading",
+      "promptSha256": "d1e436d903c84f595495e6702990da6a47c30afd1bc0b871f270c01c3c56a9ab",
+      "responseSha256": "368079436b34c6532ca7376b3cdf16dc32812fa8e97b0777c5d768a8ef8de955",
+      "romSha256": null
+    },
+    {
+      "stage": "Logos",
+      "promptSha256": "11affefdd979baeed29d4f6b0c8b9656e9b955043bb0face2f8ba30065908f74",
+      "responseSha256": "9c8ee7223cfb9956c3b7bccbdca14edab357a0f3182d843b3203cfa558736851",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f"
+    },
+    {
+      "stage": "Ethos",
+      "promptSha256": "04ee3aea358e38c3ad64bcf051ff94320fbb98c0cbe0631a5bf2c058d6848907",
+      "responseSha256": "89fbe856d0884f8cdca3de27c19453fbbedd8ffe2d9dd488c0a846ded684b46a",
+      "romSha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52"
+    },
+    {
+      "stage": "Pathos",
+      "promptSha256": "650118cf94625d98481f8877eaf6b6e3eabff7166740a7bbaae536254c4e7ee8",
+      "responseSha256": "79109ac2e62702ae87f4968c06563d05320ff7c898cb0f7cfe124aa27d44ad12",
+      "romSha256": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+    }
+  ]
+}

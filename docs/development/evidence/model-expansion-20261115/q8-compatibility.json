@@ -1,0 +1,98 @@
+{
+  "pairs": [
+    {
+      "model": "1.7",
+      "mode": "cpu",
+      "precision": "avx2-int8-q8",
+      "sha256": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e",
+      "tokens": 128,
+      "matchedPriorBaseline": true,
+      "performanceBenchmark": false
+    },
+    {
+      "model": "1.7",
+      "mode": "cpu",
+      "precision": "avx2-q8",
+      "sha256": "33cf1e25ec1b1f19f486f3fedf2b26c47d47fc89ea3767b8b4a64a451848e9ef",
+      "tokens": 128,
+      "matchedPriorBaseline": true,
+      "performanceBenchmark": false
+    },
+    {
+      "model": "1.7",
+      "mode": "cuda",
+      "precision": "dp4a",
+      "sha256": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e",
+      "tokens": 128,
+      "matchedPriorBaseline": true,
+      "performanceBenchmark": false
+    },
+    {
+      "model": "1.7",
+      "mode": "cuda",
+      "precision": "q8",
+      "sha256": "33cf1e25ec1b1f19f486f3fedf2b26c47d47fc89ea3767b8b4a64a451848e9ef",
+      "tokens": 128,
+      "matchedPriorBaseline": true,
+      "performanceBenchmark": false
+    },
+    {
+      "model": "1.7",
+      "mode": "cuda",
+      "precision": "tensorcore",
+      "sha256": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e",
+      "tokens": 128,
+      "matchedPriorBaseline": true,
+      "performanceBenchmark": false
+    },
+    {
+      "model": "4",
+      "mode": "cpu",
+      "precision": "avx2-int8-q8",
+      "sha256": "04885936686fc8ef72b3b7bcf4cea727ebd1b687440342298f887e8a55a14c45",
+      "tokens": 128,
+      "matchedPriorBaseline": true,
+      "performanceBenchmark": false
+    },
+    {
+      "model": "4",
+      "mode": "cpu",
+      "precision": "avx2-q8",
+      "sha256": "04885936686fc8ef72b3b7bcf4cea727ebd1b687440342298f887e8a55a14c45",
+      "tokens": 128,
+      "matchedPriorBaseline": true,
+      "performanceBenchmark": false
+    },
+    {
+      "model": "4",
+      "mode": "cuda",
+      "precision": "dp4a",
+      "sha256": "04885936686fc8ef72b3b7bcf4cea727ebd1b687440342298f887e8a55a14c45",
+      "tokens": 128,
+      "matchedPriorBaseline": true,
+      "performanceBenchmark": false
+    },
+    {
+      "model": "4",
+      "mode": "cuda",
+      "precision": "q8",
+      "sha256": "8c6ab7dde90ae25353bcd89da14f6145df9c315d8dc3ea48f660b0d3595fca8e",
+      "tokens": 128,
+      "matchedPriorBaseline": true,
+      "performanceBenchmark": false
+    },
+    {
+      "model": "4",
+      "mode": "cuda",
+      "precision": "tensorcore",
+      "sha256": "04885936686fc8ef72b3b7bcf4cea727ebd1b687440342298f887e8a55a14c45",
+      "tokens": 128,
+      "matchedPriorBaseline": true,
+      "performanceBenchmark": false
+    }
+  ],
+  "nativeSha256": {
+    "aikernel_cpu_accel.dll": "0fe20a05cca323909b1ccbc23d94d87524a9a869251d096d581bd529f854704f",
+    "aikernel_cuda_driver.dll": "feff2bf33f6d75d1b02a8778cf5a4c42db20674572e945779099bc424d8e9009"
+  }
+}

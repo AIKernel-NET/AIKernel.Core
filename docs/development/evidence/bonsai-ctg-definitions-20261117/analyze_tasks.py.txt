@@ -1,0 +1,20 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent
+load=lambda p:json.loads((root/p).read_text(encoding='utf-8'))
+fixture=load('task-diagnostics.json');data=load('server-reading-matrix/result.json');completion=load('server-reading-matrix/completion.json')
+assert data['diagnosticOnly'] and data['planned']==len(fixture)==len(data['rows'])==4
+assert completion['exitCode']==0 and completion['stopReason'] is None
+rows=[]
+for case,row in zip(fixture,data['rows']):
+ assert case['id']==row['id'] and case['promptSha256']==row['promptSha256']
+ answer=row['answer'];assert answer['FinishReason']=='stop' and answer['Text'].strip()
+ assert answer['InputTokens']+192<=2048 and answer['ActivationPrecision']=='fp32'
+ assert hashlib.sha256(answer['Text'].encode()).hexdigest()==row['responseSha256']
+ rows.append(dict(id=case['id'],canonicalIncluded=case['canonicalIncluded'],text=answer['Text'],inputTokens=answer['InputTokens'],responseSha256=row['responseSha256']))
+for a,b in (fixture[:2],fixture[2:]):
+ assert a['user']==b['user'] and a['originalDataSha256']==b['originalDataSha256']
+ assert b['system'].startswith(a['system']+'\nCANONICAL SOURCE: ')
+result=dict(diagnosticOnly=True,complete=4,modelHash=data['modelHash'],sameDataAndQuestionWithinEachPair=True,rows=rows)
+(root/'task-analysis.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result,indent=2))

@@ -1,0 +1,93 @@
+[
+  {
+    "index": 0,
+    "GeneratedTokenSha256": "682363b2bbd23a871733982805a1d1f6d160079ecb89209c31f2b9e85f6d65e2",
+    "PrefillForwardTokens": 30,
+    "cache": {
+      "Entries": 1,
+      "Bytes": 2523136,
+      "MaximumBytes": 134217728,
+      "Hits": 0,
+      "Misses": 1,
+      "Evictions": 0
+    }
+  },
+  {
+    "index": 1,
+    "GeneratedTokenSha256": "ec571525ba4b6d8f57353624d58eb5c9be1b8e8a8374e03933c7f2e78904dad2",
+    "PrefillForwardTokens": 30,
+    "cache": {
+      "Entries": 2,
+      "Bytes": 5046272,
+      "MaximumBytes": 134217728,
+      "Hits": 0,
+      "Misses": 2,
+      "Evictions": 0
+    }
+  },
+  {
+    "index": 2,
+    "GeneratedTokenSha256": "b57037d718cc74485490cc66d1db98ac98a9b98ddfe05a5f40f8d7a2f2d24908",
+    "PrefillForwardTokens": 31,
+    "cache": {
+      "Entries": 3,
+      "Bytes": 7798784,
+      "MaximumBytes": 134217728,
+      "Hits": 0,
+      "Misses": 3,
+      "Evictions": 0
+    }
+  },
+  {
+    "index": 0,
+    "GeneratedTokenSha256": "682363b2bbd23a871733982805a1d1f6d160079ecb89209c31f2b9e85f6d65e2",
+    "PrefillForwardTokens": 19,
+    "cache": {
+      "Entries": 3,
+      "Bytes": 7798784,
+      "MaximumBytes": 134217728,
+      "Hits": 1,
+      "Misses": 3,
+      "Evictions": 0
+    }
+  },
+  {
+    "index": 3,
+    "GeneratedTokenSha256": "dbf8302545b68e4bd1ca3f8e45f8ebc796ea0eb99f2946c16b9e2e0b194dd3c3",
+    "PrefillForwardTokens": 30,
+    "cache": {
+      "Entries": 3,
+      "Bytes": 7798784,
+      "MaximumBytes": 134217728,
+      "Hits": 1,
+      "Misses": 4,
+      "Evictions": 1
+    }
+  },
+  {
+    "index": 1,
+    "GeneratedTokenSha256": "ec571525ba4b6d8f57353624d58eb5c9be1b8e8a8374e03933c7f2e78904dad2",
+    "PrefillForwardTokens": 30,
+    "cache": {
+      "Entries": 3,
+      "Bytes": 7569408,
+      "MaximumBytes": 134217728,
+      "Hits": 1,
+      "Misses": 5,
+      "Evictions": 2
+    }
+  },
+  {
+    "index": 0,
+    "GeneratedTokenSha256": "682363b2bbd23a871733982805a1d1f6d160079ecb89209c31f2b9e85f6d65e2",
+    "PrefillForwardTokens": 19,
+    "cache": {
+      "Entries": 3,
+      "Bytes": 7569408,
+      "MaximumBytes": 134217728,
+      "Hits": 2,
+      "Misses": 5,
+      "Evictions": 2
+    }
+  }
+]

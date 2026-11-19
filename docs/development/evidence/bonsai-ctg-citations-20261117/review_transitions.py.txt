@@ -1,0 +1,39 @@
+from pathlib import Path
+import json,hashlib
+
+root=Path(__file__).parent
+responses=json.loads((root/'server-review-pilot/result.json.responses.json').read_text(encoding='utf-8'))
+rows=json.loads((root/'server-review-pilot/result.json').read_text(encoding='utf-8'))
+expected={r['id']:{c['council']:c['expected'] for c in r['checks']} for r in rows}
+pairs={}
+for row in responses:
+ key=(row['id'],row['council'])
+ stage=row['stage'];assert stage in ('draft','final')
+ assert stage not in pairs.setdefault(key,{})
+ pairs[key][stage]=row['answer']
+details=[]
+for (case,role),stages in pairs.items():
+ item={'id':case,'council':role,'expected':expected.get(case,{}).get(role),'stages':{}}
+ for stage,answer in stages.items():
+  raw=answer['Text'];decoded=None
+  try:decoded=json.loads(raw)
+  except ValueError:pass
+  item['stages'][stage]={'sha256':hashlib.sha256(raw.encode('utf-8')).hexdigest(),
+   'finishReason':answer['FinishReason'],'vote':decoded.get('vote') if isinstance(decoded,dict) else None,
+   'reason':decoded.get('reason') if isinstance(decoded,dict) else None}
+ if set(stages)=={'draft','final'}:
+  a,b=item['stages']['draft'],item['stages']['final']
+  item['voteChanged']=a['vote']!=b['vote']
+  item['reasonChanged']=a['reason']!=b['reason']
+  if item['expected']:
+   item['draftVoteMatched']=a['vote'] in item['expected']
+   item['finalVoteMatched']=b['vote'] in item['expected']
+ details.append(item)
+complete=[d for d in details if 'voteChanged' in d]
+result={'completedCases':len(rows),'completedRolePairs':len(complete),
+ 'changedVotes':sum(d['voteChanged'] for d in complete),
+ 'wrongToRightVotes':sum(not d.get('draftVoteMatched',False) and d.get('finalVoteMatched',False) for d in complete),
+ 'rightToWrongVotes':sum(d.get('draftVoteMatched',False) and not d.get('finalVoteMatched',False) for d in complete),
+ 'comparisonOnly':True,'details':details}
+(root/'review-transitions.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({k:v for k,v in result.items() if k!='details'}))

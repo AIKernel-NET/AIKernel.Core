@@ -1,0 +1,30 @@
+from pathlib import Path
+import hashlib,json
+root=Path(__file__).parent;read=lambda p:json.loads((root/p).read_text(encoding='utf-8'));sha=lambda s:hashlib.sha256(s.encode()).hexdigest()
+fixtures={phase:{r['id']:r for r in read(phase+'.json')} for phase in ('grounding-matrix','grounding-reordered')}
+results={}
+for phase in fixtures:
+ completion=read('server-'+phase+'/completion.json');result=read('server-'+phase+'/result.json')
+ assert completion['exitCode']==0 and completion['stopReason'] is None and result['diagnosticOnly'] and len(result['rows'])==5
+ results[phase]={r['id']:r for r in result['rows']}
+ for id,r in results[phase].items():
+  f=fixtures[phase][id];assert sha(f['system']+'\n'+f['user'])==r['promptSha256']==f['promptSha256']
+  assert sha(r['answer']['Text'])==r['responseSha256'] and r['answer']['FinishReason']=='stop'
+rows=[]
+for id,original in fixtures['grounding-matrix'].items():
+ moved=fixtures['grounding-reordered'][id]
+ assert original['system']==moved['system'] and original['promptSha256']==moved['priorPromptSha256']
+ def packet(row):return json.loads(row['user'].split('DATA TO COMPARE:\n')[1].split('\nQUESTION:\n')[0])
+ assert packet(original)==packet(moved)
+ assert original['user'].split('\nQUESTION:\n')[1]==moved['user'].split('\nQUESTION:\n')[1]
+ rows.append(dict(id=id,before=results['grounding-matrix'][id]['answer']['Text'],after=results['grounding-reordered'][id]['answer']['Text'],
+   beforePromptSha256=original['promptSha256'],afterPromptSha256=moved['promptSha256'],
+   manualSourceComparisonCorrectBefore=id=='count-faithful-control',manualSourceComparisonCorrectAfter=False))
+summary={'diagnosticOnly':True,'onlyDataFieldOrderChanged':True,'adoptionCountsIncludeThese':False,
+ 'reviewNotes':['Both layouts repeat the false missing-count claim and conflate count output with list disclosure.',
+  'The original layout correctly accepts the faithful count rationale; the reordered layout falsely disputes it.',
+  'A proposal violating owner consent does not make an accurately describing rationale factually false; both layouts confuse these tasks.',
+  'Neither layout correctly distinguishes the actual upload proposal from its false count-only rationale.'],
+ 'decision':'Do not use these critiques as vote overrides or verified evidence. No critique stage added to the evaluator.', 'rows':rows}
+(root/'grounding-analysis.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+print('Five paired source-grounding reviews recorded; none are CTG votes.')

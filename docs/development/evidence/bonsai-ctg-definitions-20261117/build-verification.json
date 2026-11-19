@@ -1,0 +1,11 @@
+{
+  "coreTestKernelSha256": "dbca002931b0cdd363d02984ca17cf2ceb56edc27add5b3e52a845e717322ac8",
+  "matchesPublishedKernel": true,
+  "governanceMatchesPrevious": true,
+  "unchangedSource": [
+    "src/AIKernel.Kernel/Inference/BonsaiCtgFindingPolicy.cs",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgEvidenceRequirements.cs",
+    "src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs",
+    "src/AIKernel.Kernel/Inference/Qwen3CpuModel.cs"
+  ]
+}

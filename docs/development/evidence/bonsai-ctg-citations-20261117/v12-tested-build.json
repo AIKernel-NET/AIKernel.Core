@@ -1,0 +1,36 @@
+{
+  "baseCommit": "bb60e4ae448cadc0a6c54ce71d8b480add82b7d7",
+  "sourceSha256": {
+    "src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs": "df52f6a752186e6411a53cf650d7dc1e1e09437307505ff119ab2f22aca91ec4",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgCitationPrompt.cs": "5a71795215c73480c7806c95dcad5899f075f31a8326e6a41a90e00f19cedcfb",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgDirectVotePrompt.cs": "cb942ad33989cede41400b125ff5b140e672ae04f2f39cf84904b3f3676bd639",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgEvidenceRequirements.cs": "2ce215b98eb6ba948c4c7672657f4e368682126661d8e3a9df236569217f8fc6",
+    "src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs": "d05ec8567ef419a612b4c8c96d0b366ac058c445a19a4584f9e9dbdadf24ea57",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgEvidenceScopeSuite.cs": "eeed5733e5df3982102a2444683f1a38dbc2270c72261a8c219b3ce707554864",
+    "tests/AIKernel.Inference.Optimization.Validation/Program.cs": "16f624d2b039815baaca06adf622d28724a1f15a9690e47d792a59edac98821b",
+    "tests/AIKernel.Core.Tests/Inference/BonsaiCtgCitationTests.cs": "5311a99baad2d9a205b124bc57384aa1a3cb990b306866c4356da65dd6cb31a1",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgCitedFindingPrompt.cs": "fcf0e3b08302b3be113b9b2f7bb45509fc55df80156e497f3960008743638f8f",
+    "tests/AIKernel.Core.Tests/Inference/BonsaiCtgCitedFindingTests.cs": "34bf5e46a104f5bbb7c80cbb09d3eb9e29678e5c87de7f96a08670611db2cc5d",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgFindingPolicy.cs": "6e09bd99d2d678f49c9ef3cf8aec56668dac7b3711fc576a9ac0f6a2eb34dfd4"
+  },
+  "assemblySha256": {
+    "AIKernel.Abstractions.dll": "d321b8bf8bc28cfe39e360a1d847ef9daca0ff8114ae33c6a59336185335402b",
+    "AIKernel.Common.dll": "40c204b7ba9bc087e2cd1cf0acede2b727067e32fbe5b852e7d514eb5eae936f",
+    "AIKernel.Core.dll": "c6c29cba649a1f27b83e1eb462776b78b2ad0ea8dc8e74599bf2deeb876896b5",
+    "AIKernel.Core.Tests.dll": "41a1fec971e31e51329847ecd357a8e3eb0e37b37a234c21b3a0091abc0af07e",
+    "AIKernel.Dtos.dll": "a1021628aea83069fa38c80d71dbe42683c2f75925d7d033bb4bd4fc9cc5745b",
+    "AIKernel.Enums.dll": "746b2d42c474c2620beaf7768671c77c6a47bda12236b6650ff2cd42ba48fb3f",
+    "AIKernel.Kernel.dll": "ccb40962955bb3a633e5507741efb3ba9a24f7281ca0c9090a8edba89a096e10"
+  },
+  "canonicalRomSha256": {
+    "council.ethos.monolith.md": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "council.logos.monolith.md": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "council.pathos.monolith.md": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+  },
+  "tests": [
+    {
+      "file": "HP_DESKTOP-9L863PA_2026-11-17_09_41_38_net10.0.trx",
+      "sha256": "edaca9aedf62b061bf8f9d5ab01fc48ee20269ab216f1092f55a2e13ec8f882b"
+    }
+  ]
+}

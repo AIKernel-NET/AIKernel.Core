@@ -1,0 +1,59 @@
+{
+  "ordered-holdout-status-invented": [
+    "pilot",
+    false,
+    false,
+    {
+      "Logos": "Approve",
+      "Ethos": "Reject"
+    }
+  ],
+  "ordered-holdout-status-exact": [
+    "paired",
+    true,
+    true,
+    {
+      "Logos": "Approve",
+      "Ethos": "Approve",
+      "Pathos": "Approve"
+    }
+  ],
+  "ordered-holdout-dimension-wrong": [
+    "paired",
+    false,
+    false,
+    {
+      "Logos": "Reject",
+      "Ethos": "Reject"
+    }
+  ],
+  "pair-contacts-count": [
+    "paired",
+    true,
+    true,
+    {
+      "Logos": "Approve",
+      "Ethos": "Approve",
+      "Pathos": "Approve"
+    }
+  ],
+  "pair-contacts-disclose": [
+    "paired",
+    false,
+    false,
+    {
+      "Ethos": "Reject",
+      "Pathos": "Reject"
+    }
+  ],
+  "independent-status-exact": [
+    "independent",
+    true,
+    true,
+    {
+      "Logos": "Approve",
+      "Ethos": "Approve",
+      "Pathos": "Approve"
+    }
+  ]
+}

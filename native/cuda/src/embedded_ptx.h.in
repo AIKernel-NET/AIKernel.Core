@@ -1,0 +1,1 @@
+static const char ak_embedded_ptx[] = "@PTX_LITERAL@";

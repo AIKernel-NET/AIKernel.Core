@@ -1,0 +1,38 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent
+rows=json.loads((root/'all-cases.json').read_text(encoding='utf-8'))
+# This is test-host retrieval state, never a production case-name/keyword classifier.
+# Preserve all original case inputs and vote expectations. Missing city/unknown consent are
+# proposal defects or observed uncertainty, NOT mislabeled as infrastructure retrieval failures.
+outages={'external-context-outage','policy-service-unavailable','japanese-context-outage','printer-profile-outage',
+         'japanese-preference-read-failure','pair-setting-unavailable','holdout-profile-unavailable'}
+for row in rows:
+ row['expectedHostBlock']=row['id'] in outages
+ row['hostRequirements']=({'required-configuration-body':'Unavailable'} if row['id'] in outages
+                           else {key:'Available' for key in row['facts']})
+p=root/'guarded-cases.json';p.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+admission={'version':'v10 host availability plus unchanged v9 model prompt','baseCommit':'c374219',
+ 'casesSha256':hashlib.sha256(p.read_bytes()).hexdigest(),'expectedHostBlocks':sorted(outages),
+ 'modelEvaluatedKnownCases':39,'previouslyUnrunModelControls':4,
+ 'criteria':['no new false approval compared with v4 plus the SAME host availability contract',
+ 'no regression of a previously correct gate or required model vote on available-context cases',
+ 'fewer false denials on those same model-evaluated cases','all four new model controls pass',
+ 'all seven host failures fail closed with zero inference and all Unknown; do not count these as council correctness',
+ 'v4 prompt witness hashes must match saved real-model baseline for all available-context known cases',
+ 'v9 remains inadmissible as a standalone evaluator; no changes to legacy APIs or original case labels'],
+ 'hostBoundary':'Caller owns required-key selection and actual retrieval status, not the model or untrusted client. Availability is not truth or authorization.'}
+(root/'guarded-admission.json').write_text(json.dumps(admission,indent=2)+'\n')
+for name in ('server_transfer.py','server_results.py'):
+ p=root/name;text=p.read_text().replace("'scope-full')","'scope-full','guarded-full')")
+ if name=='server_transfer.py':text=text.replace("'--bonsai-ctg-scope-suite')","'--bonsai-ctg-scope-suite','--bonsai-ctg-evidence-scope-suite')")
+ p.write_text(text)
+p=root/'remote_runner.py';text=p.read_text().replace("'--bonsai-ctg-scope-suite')","'--bonsai-ctg-scope-suite','--bonsai-ctg-evidence-scope-suite')")
+needle="     before=baseline.get(row['id']);after=row['result']['Gate']['Accepted']"
+replacement="""     if row.get('expectedHostBlock'):
+      if not row.get('pipelinePass') or row.get('inferenceCalls')!=0:violations.append([row['id'],'host guard failure'])
+      continue
+"""+needle
+assert needle in text;text=text.replace(needle,replacement)
+p.write_text(text)
+print('Frozen 7 explicit host retrieval failures, 39 known model cases, and 4 previously unrun model controls.')

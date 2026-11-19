@@ -1,0 +1,191 @@
+{
+  "privateValidationJobs": 19,
+  "maximumResidentBytes": 2335473664,
+  "frozenGovernanceFiles": {
+    "governance/council.ethos.monolith.md": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "governance/council.logos.monolith.md": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "governance/council.pathos.monolith.md": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+  },
+  "cpuAffinity": [
+    4,
+    5
+  ],
+  "configuredWorkers": 4,
+  "activeOwnedValidationProcesses": {
+    "server": [],
+    "server-v29": []
+  },
+  "jobs": [
+    {
+      "folder": "server",
+      "phase": "no-reason-cycle",
+      "registrationInputSha256": "b549ac26c7d4772e711008d8b69799d167f9d148e82f70ed69e9fbca5fe72e5b",
+      "runnerSha256": "116a4594debe9069d497f134477e668e604584ffac39ee69da68353bff954734",
+      "kernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+      "stopReason": null,
+      "maxResidentBytes": 1211019264
+    },
+    {
+      "folder": "server",
+      "phase": "reason-primary",
+      "registrationInputSha256": "909bb6ca3a1c2a99ada991a962e626c9a115680a59dd851506bfa7503727617b",
+      "runnerSha256": "116a4594debe9069d497f134477e668e604584ffac39ee69da68353bff954734",
+      "kernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+      "stopReason": null,
+      "maxResidentBytes": 1222406144
+    },
+    {
+      "folder": "server",
+      "phase": "reason-cycle",
+      "registrationInputSha256": "46dca0d20c1e4bc649cbfc72ff3074e840553ba24d3c209a3447db250d46e589",
+      "runnerSha256": "116a4594debe9069d497f134477e668e604584ffac39ee69da68353bff954734",
+      "kernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+      "stopReason": null,
+      "maxResidentBytes": 1227202560
+    },
+    {
+      "folder": "server",
+      "phase": "pilot",
+      "registrationInputSha256": "c81ae4caca6c20e140c861ac91ce86acebaa47eefac1a4f7692faf69531a3bd4",
+      "runnerSha256": "5eb0e8b62679375c44b714c6b83e0ec8b69b1bedf2b388b6930965aa671af03f",
+      "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+      "stopReason": "semantic-regression",
+      "maxResidentBytes": 1534078976
+    },
+    {
+      "folder": "server",
+      "phase": "paired",
+      "registrationInputSha256": "a8d8429529e0b79fc1ab0599904043801a6b0db2e5318697f337690164f2d433",
+      "runnerSha256": "5eb0e8b62679375c44b714c6b83e0ec8b69b1bedf2b388b6930965aa671af03f",
+      "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+      "stopReason": null,
+      "maxResidentBytes": 2092888064
+    },
+    {
+      "folder": "server",
+      "phase": "cap",
+      "registrationInputSha256": "e7dedcb0c892f0acd989efaa97c9332172b99cfe98b3dd556eff6aa2f432abc7",
+      "runnerSha256": "336f86e4278db87e4917cedc29d6ca7c91ed60e39c278758c7ed418584914dce",
+      "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+      "stopReason": null,
+      "maxResidentBytes": 1080201216
+    },
+    {
+      "folder": "server",
+      "phase": "host",
+      "registrationInputSha256": "15bb27a39a859014c56617aa93143d24d4fef40ab4210244ec2df75a7906daf7",
+      "runnerSha256": "5eb0e8b62679375c44b714c6b83e0ec8b69b1bedf2b388b6930965aa671af03f",
+      "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+      "stopReason": null,
+      "maxResidentBytes": 129540096
+    },
+    {
+      "folder": "server",
+      "phase": "legacy",
+      "registrationInputSha256": "a51fae12f3cb0dda115543680f758527c6fecb21facc8c60ada1ee3babbc5909",
+      "runnerSha256": "5eb0e8b62679375c44b714c6b83e0ec8b69b1bedf2b388b6930965aa671af03f",
+      "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+      "stopReason": null,
+      "maxResidentBytes": 1081171968
+    },
+    {
+      "folder": "server",
+      "phase": "independent",
+      "registrationInputSha256": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+      "runnerSha256": "5eb0e8b62679375c44b714c6b83e0ec8b69b1bedf2b388b6930965aa671af03f",
+      "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+      "stopReason": null,
+      "maxResidentBytes": 1791176704
+    },
+    {
+      "folder": "server",
+      "phase": "semantic",
+      "registrationInputSha256": "bf08fc0b1a19eb9c0b511af0829a28eb7d0c2508dfcb1665faa4bcd3e40a8836",
+      "runnerSha256": "5eb0e8b62679375c44b714c6b83e0ec8b69b1bedf2b388b6930965aa671af03f",
+      "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+      "stopReason": null,
+      "maxResidentBytes": 1575706624
+    },
+    {
+      "folder": "server",
+      "phase": "logits",
+      "registrationInputSha256": "86865386f358739ef496254049409b5b0469bd52bda8438951536af3038aa0a1",
+      "runnerSha256": "e9898c4fca0faef326bc499df05ee98c0b6756397bfec7d4a0840039b37229e0",
+      "kernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+      "stopReason": null,
+      "maxResidentBytes": 953294848
+    },
+    {
+      "folder": "server",
+      "phase": "balanced",
+      "registrationInputSha256": "e802fb5c859a35f4ea76d56d36253627bd1e2f790996a14712617a42427d2e85",
+      "runnerSha256": "ef4343ddea0c9dd4aac2f2211388e909c0d4ecd9c9ed6fd268c7c1a19eadcfb2",
+      "kernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+      "stopReason": null,
+      "maxResidentBytes": 721920000
+    },
+    {
+      "folder": "server",
+      "phase": "source-first-final",
+      "registrationInputSha256": "143f0b3da8698b43d91eea25358aee57c6d41b9f2c50954a26bb55c9c0586498",
+      "runnerSha256": "da33a5cca9df7ee0426b60a1e4b33d95eca9cf97dc6be0d4ffbb38da54aac8ea",
+      "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+      "stopReason": null,
+      "maxResidentBytes": 988332032
+    },
+    {
+      "folder": "server",
+      "phase": "justification",
+      "registrationInputSha256": "5a57d20511f8cade92718cdea02ec92451f0da33be73d004a4a74e667cfea2a3",
+      "runnerSha256": "78d2c81b05b9f1981662ee2f95f300150fbe7502c585669b977ba4ca770a38a3",
+      "kernelSha256": "25e8a79ffc56fae14fb38a6572319926055a4b567cbdfd0bb141af9d0fd84cb0",
+      "stopReason": null,
+      "maxResidentBytes": 478769152
+    },
+    {
+      "folder": "server-v29",
+      "phase": "pilot",
+      "registrationInputSha256": "c81ae4caca6c20e140c861ac91ce86acebaa47eefac1a4f7692faf69531a3bd4",
+      "runnerSha256": "38c4d2b518e5e4bf175663103134bb6114e7fabfa638ba690f80d28b68ff2e75",
+      "kernelSha256": "25e8a79ffc56fae14fb38a6572319926055a4b567cbdfd0bb141af9d0fd84cb0",
+      "stopReason": "semantic-regression",
+      "maxResidentBytes": 1527808000
+    },
+    {
+      "folder": "server-v29",
+      "phase": "paired",
+      "registrationInputSha256": "a8d8429529e0b79fc1ab0599904043801a6b0db2e5318697f337690164f2d433",
+      "runnerSha256": "38c4d2b518e5e4bf175663103134bb6114e7fabfa638ba690f80d28b68ff2e75",
+      "kernelSha256": "25e8a79ffc56fae14fb38a6572319926055a4b567cbdfd0bb141af9d0fd84cb0",
+      "stopReason": null,
+      "maxResidentBytes": 2335473664
+    },
+    {
+      "folder": "server-v29",
+      "phase": "host",
+      "registrationInputSha256": "15bb27a39a859014c56617aa93143d24d4fef40ab4210244ec2df75a7906daf7",
+      "runnerSha256": "38c4d2b518e5e4bf175663103134bb6114e7fabfa638ba690f80d28b68ff2e75",
+      "kernelSha256": "25e8a79ffc56fae14fb38a6572319926055a4b567cbdfd0bb141af9d0fd84cb0",
+      "stopReason": null,
+      "maxResidentBytes": 135520256
+    },
+    {
+      "folder": "server-v29",
+      "phase": "legacy",
+      "registrationInputSha256": "a51fae12f3cb0dda115543680f758527c6fecb21facc8c60ada1ee3babbc5909",
+      "runnerSha256": "38c4d2b518e5e4bf175663103134bb6114e7fabfa638ba690f80d28b68ff2e75",
+      "kernelSha256": "25e8a79ffc56fae14fb38a6572319926055a4b567cbdfd0bb141af9d0fd84cb0",
+      "stopReason": null,
+      "maxResidentBytes": 1075695616
+    },
+    {
+      "folder": "server-v29",
+      "phase": "independent",
+      "registrationInputSha256": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+      "runnerSha256": "38c4d2b518e5e4bf175663103134bb6114e7fabfa638ba690f80d28b68ff2e75",
+      "kernelSha256": "25e8a79ffc56fae14fb38a6572319926055a4b567cbdfd0bb141af9d0fd84cb0",
+      "stopReason": null,
+      "maxResidentBytes": 1808523264
+    }
+  ]
+}

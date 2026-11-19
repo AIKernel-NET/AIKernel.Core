@@ -1,0 +1,122 @@
+[
+  {
+    "mode": "text",
+    "name": "logits",
+    "elements": 4194304,
+    "maxAbsolute": 2.2888184E-05,
+    "rms": 2.0271993593501013E-06,
+    "maximumIndex": 2360345,
+    "expectedAtMaximum": 27.091188,
+    "actualAtMaximum": 27.091211,
+    "gate": 0.001,
+    "pass": true
+  },
+  {
+    "mode": "text",
+    "name": "generation",
+    "elements": 1048576,
+    "maxAbsolute": 2.861023E-05,
+    "rms": 3.695998017335247E-06,
+    "maximumIndex": 787484,
+    "expectedAtMaximum": 28.99979,
+    "actualAtMaximum": 28.999762,
+    "gate": 0.001,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "patches",
+    "elements": 18432,
+    "maxAbsolute": 0,
+    "rms": 0,
+    "maximumIndex": 0,
+    "expectedAtMaximum": 1,
+    "actualAtMaximum": 1,
+    "gate": 0,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "vision",
+    "elements": 12288,
+    "maxAbsolute": 1.0609627E-05,
+    "rms": 2.067990167182699E-06,
+    "maximumIndex": 7671,
+    "expectedAtMaximum": -0.6165982,
+    "actualAtMaximum": -0.6166088,
+    "gate": 0.001,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "logits",
+    "elements": 4980736,
+    "maxAbsolute": 0.00022435188,
+    "rms": 1.3269712220479527E-05,
+    "maximumIndex": 1969570,
+    "expectedAtMaximum": -3.004044,
+    "actualAtMaximum": -3.0042684,
+    "gate": 0.001,
+    "pass": true
+  },
+  {
+    "mode": "image",
+    "name": "generation",
+    "elements": 1048576,
+    "maxAbsolute": 4.5776367E-05,
+    "rms": 6.245838976035476E-06,
+    "maximumIndex": 81486,
+    "expectedAtMaximum": 8.552712,
+    "actualAtMaximum": 8.552758,
+    "gate": 0.001,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "patches",
+    "elements": 147456,
+    "maxAbsolute": 0,
+    "rms": 0,
+    "maximumIndex": 0,
+    "expectedAtMaximum": 1,
+    "actualAtMaximum": 1,
+    "gate": 0,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "vision",
+    "elements": 98304,
+    "maxAbsolute": 2.4333596E-05,
+    "rms": 2.147530915268225E-06,
+    "maximumIndex": 46666,
+    "expectedAtMaximum": 0.21462086,
+    "actualAtMaximum": 0.21459652,
+    "gate": 0.001,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "logits",
+    "elements": 19136512,
+    "maxAbsolute": 0.0006227493,
+    "rms": 2.1574827561875077E-05,
+    "maximumIndex": 8654776,
+    "expectedAtMaximum": -1.2943544,
+    "actualAtMaximum": -1.2937317,
+    "gate": 0.001,
+    "pass": true
+  },
+  {
+    "mode": "video",
+    "name": "generation",
+    "elements": 1048576,
+    "maxAbsolute": 5.5789948E-05,
+    "rms": 7.433528130335868E-06,
+    "maximumIndex": 1278,
+    "expectedAtMaximum": 1.7946182,
+    "actualAtMaximum": 1.7945625,
+    "gate": 0.001,
+    "pass": true
+  }
+]

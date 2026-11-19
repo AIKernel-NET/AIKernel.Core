@@ -1,0 +1,6 @@
+{
+  "ctg-build": "cc0ea888237a91f1b67eb42249efe6e2c7e87911eb0c4fc3255a37cfa3b59587",
+  "reference-build": "ae2aed8b0b2018afbd8f84996593d9b24d4aedae3f265be2975bc61e17d2fd66",
+  "public-api-build": "d800274cebfd2eb36edae9f702a6c8766d531f1bddc2870826b6aa1127b1e609",
+  "final-unit-build": "d800274cebfd2eb36edae9f702a6c8766d531f1bddc2870826b6aa1127b1e609"
+}

@@ -1,0 +1,34 @@
+{
+  "repository": "nvidia/Cosmos3-Edge",
+  "revision": "6afc1256321c3a8e623d89be3bc5117a1e90f96b",
+  "mode": "text-image-video-to-text",
+  "requiredTensors": 670,
+  "excludedSourceTensors": 28,
+  "transformations": "tensor names only; dtype and data bytes unchanged",
+  "shards": [
+    {
+      "source": "transformer/diffusion_pytorch_model-00001-of-00002.safetensors",
+      "sourceSha256": "116134e5492c514df79a2f07214e577c397aa961387dbe1c5dda488e7994ff6b",
+      "sourceBytes": 5000040072,
+      "output": "reasoner-01.safetensors",
+      "outputSha256": "e76013cd9927683ac74d66be8429598e79af974e52b63a63c2c00d6cc2c3e3fc",
+      "tensorCount": 181
+    },
+    {
+      "source": "transformer/diffusion_pytorch_model-00002-of-00002.safetensors",
+      "sourceSha256": "3b4c0aafe2705c900ac7bc743085a8e9e09c906624331bc2baa21e172e5d48e4",
+      "sourceBytes": 1739335512,
+      "output": "reasoner-02.safetensors",
+      "outputSha256": "9e2850cc199fadd9185adc779b42748bb7da8b6cace1a5f58608ceb76ca33382",
+      "tensorCount": 46
+    },
+    {
+      "source": "vision_encoder/model.safetensors",
+      "sourceSha256": "2180ad739ecc96b5c1e9386892d3c5c08bfa42b9cdab9aabc53b028671db89b3",
+      "sourceBytes": 978739880,
+      "output": "reasoner-03.safetensors",
+      "outputSha256": "23f4d78caac2dac0f00bb8688e96d06c1d72fbcf3ccaa09aab4b61f79fd46561",
+      "tensorCount": 443
+    }
+  ]
+}

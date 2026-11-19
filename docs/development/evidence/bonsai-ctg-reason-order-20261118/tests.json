@@ -1,0 +1,124 @@
+[
+  {
+    "label": "v22",
+    "file": "core-retry.trx",
+    "sha256": "03d347d8becb6e3d0c7f39653dbe5478a4bd98881739e7e26dd16d58b030d9c3",
+    "counts": {
+      "total": "1098",
+      "executed": "1098",
+      "passed": "1098",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "failed": []
+  },
+  {
+    "label": "v22",
+    "file": "core.trx",
+    "sha256": "7f4d8613d8e89f3ff830a3702506cdf9314c254a384de9fde063c0c724c8a707",
+    "counts": {
+      "total": "1098",
+      "executed": "1098",
+      "passed": "1097",
+      "failed": "1",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "failed": [
+      "AIKernel.Core.Tests.Inference.CpuAutoTuningTests.MalformedOrUnsupportedCacheCannotSelectAKernel(content: \"{\\\"Schema\\\":1,\\\"Identity\\\":\\\"fixture\\\",\\\"Prefill\\\"\"\u00b7\u00b7\u00b7)"
+    ]
+  },
+  {
+    "label": "v23",
+    "file": "core.trx",
+    "sha256": "c2fec1925570526482c6118eb1b98705519edf07906114ee18180775418e8869",
+    "counts": {
+      "total": "1128",
+      "executed": "1128",
+      "passed": "1128",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "failed": []
+  },
+  {
+    "label": "v23",
+    "file": "final-core.trx",
+    "sha256": "5d0068843f6f8cf4c9ea9a8084dd0eb587c4a4fab5184ed5c565531853240055",
+    "counts": {
+      "total": "1128",
+      "executed": "1128",
+      "passed": "1128",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "failed": []
+  },
+  {
+    "label": "v24",
+    "file": "core.trx",
+    "sha256": "88080e891e223db6cf4e2589b4428249dc63c15c2c2caa1f1b1d53d7a894092b",
+    "counts": {
+      "total": "1136",
+      "executed": "1136",
+      "passed": "1136",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "failed": []
+  }
+]

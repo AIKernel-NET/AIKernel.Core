@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>AIKernel.Accelerator.Validation</AssemblyName>
+    <AppDir>$(MSBuildThisFileDirectory)../app-v28/</AppDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    <Reference Include="AIKernel.Kernel" HintPath="$(AppDir)AIKernel.Kernel.dll"/>
+    <Reference Include="AIKernel.Core" HintPath="$(AppDir)AIKernel.Core.dll"/>
+    <Reference Include="AIKernel.Common" HintPath="$(AppDir)AIKernel.Common.dll"/>
+    <Reference Include="AIKernel.Abstractions" HintPath="$(AppDir)AIKernel.Abstractions.dll"/>
+    <Reference Include="AIKernel.Dtos" HintPath="$(AppDir)AIKernel.Dtos.dll"/>
+    <Reference Include="AIKernel.Enums" HintPath="$(AppDir)AIKernel.Enums.dll"/>
+  </ItemGroup>
+</Project>

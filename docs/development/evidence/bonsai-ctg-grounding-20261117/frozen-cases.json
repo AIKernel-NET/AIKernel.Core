@@ -1,0 +1,14 @@
+{
+  "baseCommit": "04c6fb8",
+  "holdoutSha256": "716e0eee2de2cfaba27d3417d66dbb51887fc9c9b921f48bd9ad7e42d8f22760",
+  "holdoutCount": 8,
+  "pilotIds": [
+    "supported-public-summary",
+    "printer-profile-outage",
+    "pair-counter-true",
+    "pair-contacts-count",
+    "pair-japanese-correct",
+    "pair-counter-conflict"
+  ],
+  "expectedLabelsChanged": false
+}

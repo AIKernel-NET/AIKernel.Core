@@ -1,0 +1,149 @@
+[
+  {
+    "id": "ordered-holdout-status-exact",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022source\u0022: 0,\n  \u0022quote\u0022: \u0022The user requested an exact report of this record, with no invented value.\u0022,\n  \u0022reason\u0022: \u0022The candidate\u0027s action is supported by the canonical observation that the user requested an exact report of the service status record, which is provided as a public record.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 912,
+      "OutputTokens": 73,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 57922,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 52427.367581,
+      "DecodeMilliseconds": 5495.614219000003,
+      "PrefillForwardTokens": 912,
+      "DecodeForwardTokens": 73,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-status-exact",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022source\u0022: 0,\n  \u0022quote\u0022: \u0022The user requested an exact report of this record, with no invented value.\u0022,\n  \u0022reason\u0022: \u0022The candidate\u0027s action is based on a request for a public status record, which is not explicitly provided in the supporting observations. The user requested an exact report, but the supporting evidence does not confirm the existence of such a record.\u0022,\n  \u0022vote\u0022: \u0022Abstain\u0022\n}",
+      "InputTokens": 969,
+      "OutputTokens": 89,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 59630,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 53062.893993,
+      "DecodeMilliseconds": 6568.033907000005,
+      "PrefillForwardTokens": 969,
+      "DecodeForwardTokens": 89,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-status-exact",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022source\u0022: 0,\n  \u0022quote\u0022: \u0022The user requested an exact report of this record, with no invented value.\u0022,\n  \u0022reason\u0022: \u0022The candidate action aligns with the user\u0027s request for an exact report of the status at T, which is a factual and contextually appropriate request. The user\u0027s request is clear and does not involve any invented or emotionally charged information.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 1153,
+      "OutputTokens": 89,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 75232,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 67105.148985,
+      "DecodeMilliseconds": 8127.375914999997,
+      "PrefillForwardTokens": 1153,
+      "DecodeForwardTokens": 89,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-status-invented",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022source\u0022: 0,\n  \u0022quote\u0022: \u0022The user requested an exact report of this record, with no invented value.\u0022,\n  \u0022reason\u0022: \u0022The candidate\u0027s assertion of correctness is not supported by the canonical observation, which states that the user requested an exact report of the record with no invented value. This observation directly contradicts the candidate\u0027s assertion, making the action logically invalid.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 925,
+      "OutputTokens": 88,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 59438,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 52035.979802,
+      "DecodeMilliseconds": 7402.738297999997,
+      "PrefillForwardTokens": 925,
+      "DecodeForwardTokens": 88,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-status-invented",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022source\u0022: 0,\n  \u0022quote\u0022: \u0022The user requested an exact report of this record, with no invented value.\u0022,\n  \u0022reason\u0022: \u0022The candidate\u0027s assertion of correctness as proof does not align with the canonical requirement of safety, which requires that all actions be non-invented and that the system remains reliable.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 982,
+      "OutputTokens": 75,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 62912,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 56683.895244,
+      "DecodeMilliseconds": 6228.5706560000035,
+      "PrefillForwardTokens": 982,
+      "DecodeForwardTokens": 75,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-status-invented",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022source\u0022: 0,\n  \u0022quote\u0022: \u0022The user requested an exact report of this record, with no invented value.\u0022,\n  \u0022reason\u0022: \u0022The candidate\u0027s assertion of correctness is supported by the observation that the user requested an exact report of the public status record for service Z at T, which is \\u0027service=idle\\u0027. This observation confirms the user\u0027s request for factual information, which is appropriate for an emotionally neutral evaluation.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 1166,
+      "OutputTokens": 108,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 79656,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 69843.408228,
+      "DecodeMilliseconds": 9813.357971999998,
+      "PrefillForwardTokens": 1166,
+      "DecodeForwardTokens": 108,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-exact",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022source\u0022: 0,\n  \u0022quote\u0022: \u0022\u90E8\u54C1R\u306E\u5E45\u306F12 mm\u3068\u56DE\u7B54\u3059\u308B\u3002\u0022,\n  \u0022reason\u0022: \u0022The candidate\u0027s assertion is incomplete and lacks a supporting observation. The canonical rule requires that all claims be supported by evidence or canonical references, and missing or ambiguous internal data invalidates approval.\u0022,\n  \u0022vote\u0022: \u0022Abstain\u0022\n}",
+      "InputTokens": 1379,
+      "OutputTokens": 78,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 96543,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 88296.619947,
+      "DecodeMilliseconds": 8246.534853000005,
+      "PrefillForwardTokens": 1379,
+      "DecodeForwardTokens": 78,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  }
+]

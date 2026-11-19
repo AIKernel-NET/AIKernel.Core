@@ -1,0 +1,12 @@
+{
+  "checkedUtc": "2026-11-18T13:15:36.505338+00:00",
+  "frozenSummaryCapturedUtc": "2026-11-18T13:14:55.732352+00:00",
+  "case": "pair-japanese-self-assertion",
+  "frozenSampleCount": 769,
+  "latestCpuPercent": 100.0,
+  "samplesAtOrBelowThreshold": 0,
+  "oneShotModelStarts": 0,
+  "startMarkerPresent": false,
+  "resultPresent": false,
+  "observedSupervisorPid": 451624
+}

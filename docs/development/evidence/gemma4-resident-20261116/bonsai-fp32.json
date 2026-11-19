@@ -1,0 +1,33 @@
+{
+  "pass": true,
+  "checks": [
+    {
+      "model": "1.7",
+      "mode": "avx2",
+      "elements": 910014,
+      "bitwiseEqual": true,
+      "sha256": "1e099f555ac940977b00e18f4ae7146edd3878619355b84742fae591b8b158c8"
+    },
+    {
+      "model": "1.7",
+      "mode": "cuda-fp32",
+      "elements": 910014,
+      "bitwiseEqual": true,
+      "sha256": "e6c71a25ef26849ca34cc2ba28950dd2154e4d53f771723f4059c4af039a407e"
+    },
+    {
+      "model": "4",
+      "mode": "avx2",
+      "elements": 910014,
+      "bitwiseEqual": true,
+      "sha256": "412b0ad0302490e9cc10410e675c1e0fdb5a9e660be32fb52e8391fe553dce99"
+    },
+    {
+      "model": "4",
+      "mode": "cuda-fp32",
+      "elements": 910014,
+      "bitwiseEqual": true,
+      "sha256": "4f4f10ba66479df383190cb06b6c983ebb95c2bf27dfb9d88c1761871dc4eb5d"
+    }
+  ]
+}

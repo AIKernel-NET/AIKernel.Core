@@ -1,0 +1,22 @@
+{
+  ".gitattributes": "2cacd8c5b88d28a6324a5b106d17970ce30df8e32f9b76c87d00d4ca430747a8",
+  "analyze.py.txt": "5e09d6f3a8fa4d8d3916579a16f5439f531230c4a6a5f60f77f35d5a58ea7ba1",
+  "baseline-exit.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+  "baseline-pairs-input.json": "f61b9f2c8b5e379e10d24f07b5148da0a40130014f6709be8c0038e991d4b555",
+  "baseline-pairs.json": "ac44722f37673c9bc721e27dc62113d978fa7800696ace3200096f625acb0879",
+  "baseline-pairs.json.responses.json": "b4fa77f8206e44db774277eba446cf867a83a96f193aad5385d572c7a23f3c73",
+  "candidate.json": "63d441075d623a24e1a02daf6dc3716921ae92b88ca3f4ccb470adc00f040351",
+  "candidate.json.responses.json": "582aaa4f9ed7ee036a27fe80f31317e126cfcc39652ea586cadfaebad685c707",
+  "collect_evidence.py.txt": "ad61fc9ddf7efbaacc1c69815d94838de941c00d8e465bb8243531e9ae2ec823",
+  "comparison.json": "4e4bb8fdf240d40f9171bb7190e703ad35feca3ebd52d1e5507649515904eca0",
+  "exit-codes.json": "403132e70f20474ed7a596e06b2bb673e191c9a191d6fe1874513811372e8e9d",
+  "generation128.json": "c481e9507dc20e4c54b6711c53d74b07dec2f2a0b378393a9d72ecf9b39b21ad",
+  "prior-proposal-citations.json": "600ebb5aaa757ff662f592bd1a38ba61902c51986672369e02d6289ae61d0c89",
+  "rejected-first-pilot.json": "dcf1fc78aa7b38adea3456991f3749e986dc1f972412a161db4c903dccd7f599",
+  "rejected-first-pilot.json.responses.json": "3c6a674d7a3d5fb08691612388d57c18d312f9d2e9c1edc817528092783985fb",
+  "retry-incomplete-input.json": "69052d38e136486e8e1d7dd0463303f41956395fce495d0f25c7fb896c3f0b5d",
+  "rom-preflight.json": "8e292bf9661592f3239a22ed0fb6dd1797a6735210c5a33f127d5363e14f3b27",
+  "tested-build.json": "3a90efbb135e1a47508ec316ea93bb1a9935df4e180782bc62d7650205227625",
+  "rejected-first-pilot-source/BonsaiCtgCouncilEvaluator.cs.txt": "ffe52faf2a3354ed0f940025d979a25d9da56daf3a45590b788a4bc8ba55d134",
+  "rejected-first-pilot-source/BonsaiCtgDirectVotePrompt.cs.txt": "56eb00549dc4f163ec2422b9a23cf4acd5632835d34b66291fb92103524812c6"
+}

@@ -1,0 +1,25 @@
+[
+  {
+    "file": "core-v26.trx",
+    "sha256": "8952fe46ace6a5f32106d7316b30ad21d2164df2b151ba8620fd6d5953d2a9b3",
+    "counts": {
+      "total": "1222",
+      "executed": "1222",
+      "passed": "1222",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "failed": []
+  }
+]

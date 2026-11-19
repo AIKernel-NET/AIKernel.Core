@@ -1,0 +1,25 @@
+{
+  "diagnosticOnly": true,
+  "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "frozenInputs": {
+    "no-reason-primary-cases.json": "af3a60fd0a97e63584dc26ae53bbf20c123d918d351929a821ce8ffb3f66cb8f",
+    "no-reason-cycle-cases.json": "b549ac26c7d4772e711008d8b69799d167f9d148e82f70ed69e9fbca5fe72e5b",
+    "reason-primary-cases.json": "909bb6ca3a1c2a99ada991a962e626c9a115680a59dd851506bfa7503727617b",
+    "reason-cycle-cases.json": "46dca0d20c1e4bc649cbfc72ff3074e840553ba24d3c209a3447db250d46e589",
+    "design.json": "97cc80dbfca9ed8e42b233bf9098aaee03bef90da0fcb3fd39d82618e92d7ebd",
+    "source-reasons.json": "10c2cea148d3d4d238e7bbfa45df02bf189815af56fa84dc7bb65da30b1f3611",
+    "reused-results.json": "b0a5747ed9595124449076f3123c0fbe335b2eafe58d635972bd2c1deed8b1ed",
+    "prepare.py": "f0b7a20aaa584eef811a5794333a71a3c7c6407c6fca3602a7e10f87b7758001",
+    "score.py": "af8fcae80953fb2944e68f5f5045d250cf55eb272013bf4ef3bb20a92a0976c9"
+  },
+  "sourceEvidenceSha256": {
+    "choice/primary-cases.json": "ce3c173f10eb7897ab0ef4ec8b44e656dc47465abff394b05ee30c64153db58c",
+    "choice/primary-result.json": "9540a8daaf4dd50fd7f1b0b505a002ffd7be290e730b7a7b9c64672d823bc5d0",
+    "choice/primary-mapping.json": "c8ca724e9fb526510d612f2a0c592b86fd2a21a76e7d0164b5d5b7fae42d33c3",
+    "choice/expectations.json": "28560249e635068f0a69dd2398048e3374ce7a5b7441143ea41160df15231a21",
+    "v25/observed-votes.json": "6eefc9fa4d691b3aec18112c55649a31f559ae93fe8776570fd61c535bcfd876",
+    "v26/observed-votes.json": "2d8df1b8f9341f53222dd7a7bd52baf975f4b990380c56dc56b6d4674720de5d"
+  },
+  "plan": "Report all four arms; six paired positions each. Reuse the exact hashed no-reason-primary six. Measure the other three arms (18 calls). No early stop. Classifier receives only id, system, user, labels, diagnosticOnly and promptSha256. Compare symbol stability versus semantic finding stability across rotations, and the effect of adding the real council reason within each mapping. Score the full eligible set. No council votes or gates are inferred.",
+  "limitations": "Four Logos reasons are from v26; its malformed assessments do not become votes. Two Ethos reasons are from v25 because v26 stopped before Ethos. Each reason is a nonbinding archived model interpretation. The old six and prompts are previously seen. Adding a reason also adds its fixed data envelope and tokens. No stochastic replicates or counterbalanced neutral-text length control."
+}

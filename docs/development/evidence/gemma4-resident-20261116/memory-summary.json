@@ -1,0 +1,40 @@
+[
+  {
+    "name": "stress-Avx512",
+    "promptTokens": 1920,
+    "outputTokens": 128,
+    "peakRssBytes": 2531119104,
+    "counterSources": {
+      "dotnet": 2531119104,
+      "proc": 2527137792,
+      "ru_maxrss": 2519863296
+    },
+    "statistics": {
+      "RamBlocks": 538,
+      "VramBlocks": 0,
+      "SwapBlocks": 0,
+      "SwapReads": 0,
+      "DevicePageIns": 0,
+      "BackingReads": 538
+    }
+  },
+  {
+    "name": "wide-Avx512",
+    "promptTokens": 482,
+    "outputTokens": 128,
+    "peakRssBytes": 4408692736,
+    "counterSources": {
+      "dotnet": 4406927360,
+      "proc": 4408692736,
+      "ru_maxrss": 4399304704
+    },
+    "statistics": {
+      "RamBlocks": 986,
+      "VramBlocks": 0,
+      "SwapBlocks": 0,
+      "SwapReads": 0,
+      "DevicePageIns": 0,
+      "BackingReads": 986
+    }
+  }
+]

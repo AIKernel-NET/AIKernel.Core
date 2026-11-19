@@ -1,0 +1,25 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent
+p=root/'verify_build.py';s=p.read_text(encoding='utf-8').replace('import json,hashlib,subprocess','import json,hashlib,subprocess,sys')
+s=s.replace("build=json.loads((root/'defined-tested-build.json')", "label=sys.argv[1] if len(sys.argv)>1 else 'defined'\nbuild=json.loads((root/(label+'-tested-build.json'))")
+s=s.replace("(root/'build-verification.json')", "(root/('build-verification-effects.json' if label=='effects' else 'build-verification.json'))")
+p.write_text(s,encoding='utf-8')
+p=root/'collect_evidence.py';s=p.read_text(encoding='utf-8')
+s=s.replace("'build-verification.json'", "'build-verification.json','build-verification-effects.json','v20-guard-regression.json','monitor-attempt1-status.json','monitor-attempt1.err','monitor2.err'")
+s=s.replace("('defined',)", "('defined','effects')")
+start=s.index("for p in (root/'tests').glob('*.trx'):")
+end=s.index("(dest/'unit-tests.json')",start)
+s=s[:start]+'''for label,folder,count in [('defined','tests','1088'),('effects','tests-effects','1094')]:
+ paths=list((root/folder).glob('*.trx'));assert len(paths)==1
+ for p in paths:
+  counts=ET.parse(p).find('.//t:Counters',ns).attrib;assert counts['failed']=='0' and counts['passed']==count
+  tests.append(dict(label=label,trxSha256=sha(p),counters=counts))
+assert len(tests)==2
+'''+s[end:]
+p.write_text(s,encoding='utf-8')
+p=root/'check_evidence.py';s=p.read_text(encoding='utf-8').replace("build=read('defined-tested-build.json')", "build=read('effects-tested-build.json')")
+s=s.replace("('defined',)","('defined','effects')").replace("label='defined'", "label='effects' if run.name.startswith('server-effects-') else 'defined'")
+p.write_text(s,encoding='utf-8')
+p=root/'fixture-sha256.json';data=json.loads(p.read_text(encoding='utf-8'));data['task-diagnostics.json']=hashlib.sha256((root/'task-diagnostics.json').read_bytes()).hexdigest();p.write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
+print('Evidence checks preserve both tested revisions and actual transferred runners.')

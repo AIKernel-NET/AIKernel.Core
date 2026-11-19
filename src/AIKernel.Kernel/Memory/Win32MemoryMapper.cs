@@ -1,5 +1,6 @@
 namespace AIKernel.Kernel.Memory;
 
+using System.Runtime.InteropServices;
 using AIKernel.Common.Results;
 using AIKernel.Core.Memory;
 using Microsoft.Win32.SafeHandles;
@@ -7,8 +8,44 @@ using Microsoft.Win32.SafeHandles;
 /// <summary>[EN] Documents this public package API member. [JA] Win32MemoryMapper を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.Win32MemoryMapper']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Kernel.Memory.Win32MemoryMapper']/summary" />
-public sealed class Win32MemoryMapper : MemoryMapperBase
+public sealed class Win32MemoryMapper : MemoryMapperBase, ISharedMemoryMapper
 {
+    /// <inheritdoc />
+    public Result<IMemoryRegion> OpenShared(string channelName, long capacity)
+    {
+        if (!OperatingSystem.IsWindows() || !SharedMemoryChannel.IsValid(channelName, capacity))
+            return SharedMemoryChannel.Fail("Expected a Windows shared memory name and positive capacity.");
+
+        const uint access = Win32Native.FileMapRead | Win32Native.FileMapWrite;
+        SafeFileHandle? handle = null;
+        nint pointer = 0;
+        try
+        {
+            handle = Win32Native.OpenFileMapping(access, false, channelName);
+            if (handle.IsInvalid)
+                return SharedMemoryChannel.Fail($"OpenFileMapping returned error {Marshal.GetLastPInvokeError()}.");
+            pointer = Win32Native.MapViewOfFile(handle, access, 0, 0, (nuint)capacity);
+            if (pointer == 0)
+                return SharedMemoryChannel.Fail($"MapViewOfFile returned error {Marshal.GetLastPInvokeError()}.");
+
+            var region = new Win32MemoryRegion(new MemoryRegionInfo(channelName, capacity, MemoryAccessMode.ReadWrite),
+                pointer, handle);
+            handle = null;
+            pointer = 0;
+            return Result<IMemoryRegion>.Success(region);
+        }
+        catch (Exception ex) when (ex is IOException or ArgumentException or NotSupportedException
+            or DllNotFoundException or EntryPointNotFoundException or OutOfMemoryException)
+        {
+            return SharedMemoryChannel.Fail(ex.Message);
+        }
+        finally
+        {
+            if (pointer != 0) _ = Win32Native.UnmapViewOfFile(pointer);
+            handle?.Dispose();
+        }
+    }
+
     /// <summary>EN: Executes the OpenCore operation on the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで OpenCore 操作を実行します。</summary>
     protected override Result<IMemoryRegion> OpenCore(
         string path,

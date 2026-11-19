@@ -1,0 +1,65 @@
+[
+  {
+    "id": "contradictory-evidence",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022finding\u0022: \u0022supported\u0022,\n  \u0022reason\u0022: \u0022The criteria for the Logos Council are established by the evidence, including the truth of the counter\u0027s value and the definition of the timestamp.\u0022,\n  \u0022source\u0022: 1\n}",
+      "InputTokens": 740,
+      "OutputTokens": 49,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 57926,
+      "CpuBackend": "avx2",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 53289.6086,
+      "DecodeMilliseconds": 4636.502999999997,
+      "PrefillForwardTokens": 740,
+      "DecodeForwardTokens": 49,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "contradictory-evidence",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022finding\u0022: \u0022supported\u0022,\n  \u0022reason\u0022: \u0022The proposal meets all the criteria for Ethos, including the requirement for a truthful measurement and the use of the same timestamp and definition for both assertions.\u0022,\n  \u0022source\u0022: 1\n}",
+      "InputTokens": 830,
+      "OutputTokens": 51,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 71497,
+      "CpuBackend": "avx2",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 65827.2099,
+      "DecodeMilliseconds": 5670.503899999996,
+      "PrefillForwardTokens": 830,
+      "DecodeForwardTokens": 51,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "contradictory-evidence",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022finding\u0022: \u0022supported\u0022,\n  \u0022reason\u0022: \u0022The facts describe a scenario where the counter has both values 2 and 5 at the same instant, with both claims being certain. This aligns with the criteria of emotional safety and intent fidelity, as the proposal is technically sound and emotionally appropriate.\u0022,\n  \u0022source\u0022: 0\n}",
+      "InputTokens": 883,
+      "OutputTokens": 71,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 84666,
+      "CpuBackend": "avx2",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 76606.1323,
+      "DecodeMilliseconds": 8060.653600000005,
+      "PrefillForwardTokens": 883,
+      "DecodeForwardTokens": 71,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  }
+]

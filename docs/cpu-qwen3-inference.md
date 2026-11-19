@@ -1,0 +1,357 @@
+# CPU Qwen3 inference (0.1.4 development)
+
+This implementation runs dense Qwen3 GGUF models with **F32 and Q1_0 g128** tensors. It is not a general GGUF loader. Other architectures and quantization types fail explicitly. No CUDA or LibTorch library, external inference service, or native model runtime is required.
+
+```csharp
+using AIKernel.Kernel.Inference;
+
+using var model = new Qwen3CpuModel(modelPath, cpuThreads: 4, contextTokens: 1024);
+using var deadline = new CancellationTokenSource(TimeSpan.FromMinutes(3));
+var result = await model.GenerateAsync(
+    "Draft a brief reply in Japanese.",
+    "The application reports a missing model.",
+    maxNewTokens: 96,
+    cancellationToken: deadline.Token);
+Console.WriteLine(result.Text);
+Console.WriteLine(result.FinishReason); // stop or length
+```
+
+`ClassifyAsync(system, user, labels, cancellationToken)` scores only the supplied single-token labels. It reports the winning label, not a calibrated confidence probability. Prompts still affect classification quality.
+
+## Bounds and state
+
+- Dense models up to the four-billion-parameter class; context 64–2048 tokens; 1–6 CPU workers; 1–256 output tokens.
+- The tokenizer uses GGUF Qwen2 BPE vocabulary/merges and NFC. Literal special-token spellings in user input do not introduce chat roles.
+- Trusted Qwen chat boundaries and the no-thinking prefix use dedicated token IDs. Only the final answer is returned; incomplete control sequences fail.
+- Weights remain read-only memory mapped. Per-request KV and activation buffers are cleared after use.
+- Only a trusted system-prefix KV is reused, never user text or generated replies.
+- `WarmupAsync(system, cancellationToken)` prepares that prefix before admission. Publish readiness only after all required prefixes are prepared. It does not persist KV across process restarts.
+- Calls on a model instance are serialized. Dispose the model only after active calls have stopped.
+- Cancellation is checked during token, layer and row work. A proxy can delay propagation of a disconnected browser.
+- The caller must independently verify model provenance, SHA-256 and license before loading. Model paths are trusted operator configuration.
+
+## CPU selection
+
+The default selects AVX-512F, then AVX2+FMA, AVX, scalar. .NET intrinsic support includes operating-system support. `AIKERNEL_CPU_GEMV=scalar|avx|avx2|avx512|auto` can select a path for testing; unsupported forced paths throw. AVX does not use FMA or AVX2 instructions.
+
+The original constructor retains this automatic behavior. To force a matrix instruction
+set for one model without changing process-wide environment variables:
+
+```csharp
+using var model = new Qwen3CpuModel(path, 4, 1024, instructionSet: "avx2");
+Console.WriteLine(model.RequestedInstructionSet); // requested policy
+Console.WriteLine(model.CpuBackend);               // actual selection
+```
+
+`CpuInstructionSets.Available` lists CPU/OS/native-library-supported choices. An explicit
+`"auto"` overrides the environment and preserves FP32 activations. Null inherits the
+environment; without an environment override it is automatic. Unknown names and
+unsupported forced choices fail before opening the model. Forced choices remain fixed
+even if `TuneCpuAsync` is called or another caller changes the environment later.
+The selection concerns Q1_0 matrix kernels, not a global ban on other instructions
+used by the .NET runtime, tokenizer, attention or OS.
+
+For same-CPU ISA comparisons, use `CpuAutoTuningOptions.TuneThreadCount = false`
+to hold workers constant during automatic ISA calibration; its production default
+remains true. `GenerateBenchmarkAsync` explicitly ignores EOS and generates exactly
+the requested number of greedy steps (1–256); ordinary `GenerateAsync` still stops
+at EOS. Benchmark output is not intended as a customer reply. Decode time includes
+output projection and sampling; for N generated tokens there are N−1 additional
+transformer forwards. Report prefill separately from Decode milliseconds/N.
+
+```text
+AIKernel.FixedToken.Benchmark cpu model.gguf --workers 4 --tokens 128
+AIKernel.FixedToken.Benchmark cpu model.gguf --instruction-set avx --workers 4 --tokens 128
+AIKernel.FixedToken.Benchmark cpu model.gguf --instruction-set avx2 --workers 4 --tokens 128
+AIKernel.FixedToken.Benchmark --list-instruction-sets
+```
+
+The benchmark's omitted `--instruction-set` is `auto`, calibrated before warmup.
+Q8 remains an opt-in precision change (`q8-auto` or an explicit `*-q8` choice).
+
+Direct quantized-vector computation is the default. `AIKERNEL_Q1_KERNEL=lookup` is an experimental alternative. Previous development-machine timings were affected by concurrent work and must be repeated after reboot before drawing performance conclusions. AVX-512F support does not imply use of VNNI or BF16.
+
+## Optional GPU matrix offload
+
+`Qwen3GpuModel` uses the same transformer with quantized matrices resident on CUDA.
+Attention, normalization, RoPE and KV remain on the CPU. It requires the matching
+AIKernel CUDA Driver library and an NVIDIA driver; CUDA Toolkit and LibTorch are
+not runtime dependencies. The CPU API above still loads no CUDA library.
+See [GPU setup, allocation limits and validation](../native/cuda/README.md#quantized-qwen3-matrix-offload).
+
+GPU functional checks and performance comparisons are separate. The November 15
+prototype measurements are frozen; optimization comparisons use new measurement
+directories and the documented quiet-background gate. Diagnostic timings from
+functional tests must not be presented as benchmark results.
+
+## Validation
+
+```text
+dotnet run --project tests/AIKernel.CpuInference.Validation -- MODEL.gguf tests/AIKernel.CpuInference.Validation/fixtures/bonsai-tokenizer.json --checks
+dotnet run --project tests/AIKernel.Hosting.Validation
+```
+
+The tokenizer fixture was generated with Hugging Face tokenizers 0.22.2 from the official Bonsai 1.7B tokenizer JSON, SHA-256 `aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4`. It tests full trusted chat templates as well as Japanese, English, combining accents, emoji and leading newlines. Tokenizer reference tooling is not a runtime dependency.
+
+The quantized arithmetic check independently decodes 257 rows of actual model bytes and compares scalar, AVX, AVX2 and AVX-512 paths at 1/2/4 workers, for direct-vector and lookup kernels. All passed on the EPYC 9555 XServer on 2026-11-14. Unsupported AVX-512 is rejected on the Xeon E-2174G development machine. The separate physical i7-3770K / Ubuntu validation also passed with AVX=true and AVX2/FMA/AVX-512=false, including automatic calibration and cache reuse. These finite checks are not exhaustive numerical proof. The fixed Japanese inquiry produced identical 48-token replies across the tested AVX2/AVX-512 runs (96-token ceiling).
+
+Model format references: [Bonsai 1.7B](https://huggingface.co/prism-ml/Bonsai-1.7B-gguf), [Bonsai 4B](https://huggingface.co/prism-ml/Bonsai-4B-gguf), [PrismML quantization implementation](https://github.com/PrismML-Eng/llama.cpp/blob/master/ggml/src/ggml-quants.c).
+
+## Hosting primitives
+
+`PrivateFileCredentialProvider` resolves an immutable allowlist of names to private files. It rejects public-root files, symlinks and permissive Unix file modes. Use restrictive Windows ACLs. Do not accept paths or secret names from public requests.
+
+`DurableTokenBudget` reserves before external dispatch, appends flushed checksummed records, and settles once using authoritative usage. Missing usage remains charged. Its journal is private runtime state, must survive restart and must not be deleted to replenish limits. Corrupt or incomplete journals fail closed. It is a single-host budget, not a distributed ledger, and does not defend against an attacker controlling the same OS account.
+
+日本語: 対応対象はQwen3 denseのF32 / Q1_0 g128です。CPUの命令を実行時に分岐し、利用者入力の特殊トークンと信頼したチャット境界を分離します。分類精度・応答速度はモデルと指示文に依存します。公開デモの起動手順・資源計測はWebSiteの問い合わせデモ文書を参照してください。
+
+
+## Measured CPU selection
+
+Call `TuneCpuAsync(new CpuAutoTuningOptions(privateProfileDirectory, verifiedModelSha256))` before warmup to enable calibration. The model identity must be the SHA-256 already verified when installing the immutable GGUF. The host keeps admission closed during calibration. Explicit `AIKERNEL_CPU_GEMV=scalar|avx|avx2|avx512` overrides tuning; unavailable instructions are rejected. Automatic choices include supported AVX2/FMA and AVX-512 paths (or the supported AVX/scalar fallback) and worker ceilings 1, 2, 4, 6 within the constructor and effective processor limits.
+
+Prefill and decode have separate choices. Current prefill remains sequential token GEMV, not batched GEMM. FP32 auto uses floating-point kernels; explicitly selected Q8 modes can use native VNNI kernels. Calibration samples Q, FFN gate/down matrices from the first, middle and final layers; decode also samples the output projection. It checks candidate arithmetic against scalar results, warms each candidate, then uses three paired rounds with reversed order. Median timings feed a 0.25 EMA; an incumbent changes only for an estimated improvement above 5 percent. This is a workload sample, not proof of a globally optimal kernel or thread count.
+
+The default calibration budget is two seconds, with at most one in-flight matrix probe of overrun. Incomplete measurements do not create a winning profile. Cache keys include verified model hash and shape, CPU brand/features, affinity, effective processors, thread/context ceilings, OS/runtime and the compiled kernel module ID. Profiles are bounded JSON, atomically replaced in a private directory. Invalid, unsupported, future-dated or expired profiles are remeasured. Fixed system KV stays private to the model and can be reused across numerically validated kernel choices.
+
+`CpuGeneration` exposes prefill/decode milliseconds and forward-token counts. Aggregate, context-bucketed online timing is retained without prompt/reply text and saved at the next calibration. It does not directly compare unrelated customer prompts or route random customer requests to an experimental path. The WebSite host recalibrates after a 15-minute interval only if no request has run for two minutes and it obtains exclusive admission. Operators can omit tuning or pin a backend to preserve a chosen configuration.
+
+GEMV divides output rows between workers, aligning boundaries to actual 64-byte output addresses. One-worker calls bypass Parallel.For. Multi-worker calls reuse the .NET thread pool; no persistent busy-spin loop was added. These changes address this GEMV output boundary only, not every possible source of false sharing in the engine.
+
+## RAM and SSD scope
+
+The GGUF mapping is read-only and uses OS page caching. `VirtualMemorySpace` separately supports budgeted RAM and SSD swap, but this Qwen3 engine's mutable KV arrays are not connected to that paging API. A 7 GB resident / 12 GB logical LLM workload has not been validated. Increasing the virtual-address limit does not establish a resident-memory bound. Such an integration requires admission accounting for model pages, KV, activations, temporary workspaces and runtime overhead, plus bounded encrypted swap I/O and failure tests.
+
+The quantized matrix tables have an explicit static initializer. Tuning can invoke multiplication before the first embedding row read; leaving initialization as beforefieldinit caused lazy static-base helpers to remain in the hot Q1 loop under the tested .NET 10.0.15 JIT. A before/after disassembly check found three GC-static-base helper call sites before the fix and none afterward. Keep first-use calibration and cached-startup benchmarks in performance validation.
+
+## Optimization baseline and stage diagnostics (2026-11-15)
+
+The November 15 fixed-token prototype is frozen before algorithm changes: 225
+included requests and 15 excluded diagnostic requests, preserved as complete
+blocks with their exclusion reasons. It is not an optimized release claim.
+Future measurements must use separate output directories, fixed workers/affinity,
+the same power scheme and two consecutive 15-second CPU averages at or below 10%.
+The public shared-host label is Server; its account budget remains six CPU workers
+in total and 7 GiB resident memory, including the concurrently running demo.
+
+Set `AIKERNEL_INFERENCE_PROFILE=1` **before constructing** a model to attach an
+`InferenceProfile` to completed CPU, CUDA or Vulkan results. The fixed-token
+harness exposes this as `--profile true`. Prefill and Decode separately aggregate
+embedding, matrix, normalization, RoPE, attention, SwiGLU, residual and argmax wall
+time. Q8 quantization is a nested part of Matrix, so do not add it twice. Attention
+includes KV writes and the head-worker dispatch. No per-worker timing is collected.
+When disabled, no profiling object, timestamps, GC counters or stage dictionary
+are created; existing generation timings still operate as before.
+
+Request-stage diagnostics include tokenization, state allocation, prefix copying
+and state clearing. The allocation delta is process-wide GC allocation, including
+runtime worker activity; it is not retained memory, RSS or solely this request.
+Managed request time excludes GPU scratch cleanup. External wall time
+remains the end-to-end measurement. The actual model dimensions, CPU backend and
+activation precision accompany each profile.
+
+Instrumentation-only validation on the development machine, Bonsai 1.7B, fixed
+128 tokens, four physical cores, five requests per block:
+
+| Path | Profile off median | Profile on median | Repeated off median |
+| --- | ---: | ---: | ---: |
+| AVX2 FP32 | 13.724 s | 13.808 s | 14.175 s |
+| RTX 4000 SFF Ada FP32 offload | 9.722 s | 9.726 s | — |
+
+All CPU token hashes matched the frozen November 15 AVX2 sequence. CUDA profile
+on/off hashes also matched each other. Differences of +0.61% and +0.05% are within
+the observed sample variability; this is not proof of zero overhead. On this CPU
+condition Matrix accounted for approximately 88% of elapsed work, SwiGLU 2% and
+RoPE 0.7%. CUDA Matrix includes staging, transfers, kernels and synchronization;
+it cannot be interpreted as pure GPU arithmetic. The GGUF reports width 2048,
+hidden size 6144, 28 layers, 16 query heads and eight KV heads.
+
+For a separate CUDA timeline diagnostic, also set `AIKERNEL_CUDA_EVENT_PROFILE=1`,
+or use `--profile true --cuda-events true` in CUDA benchmark mode. This requires
+the matching native library with `ak_profile_configure` and `ak_profile_read`.
+Four events on the existing private stream bracket GEMV upload, kernel and download;
+the existing synchronization is timed separately on the host. Event intervals
+include stream scheduling gaps, and host wait overlaps device time. Never sum
+these overlapping measures or use event-instrumented latency as the performance
+baseline. No CUDA events or event timers are used when this option is disabled.
+See the [CUDA Driver event API](https://docs.nvidia.com/cuda/cuda-driver-api/cuda_driver_api/group__CUDA__EVENT.html).
+
+### Order and correctness gates for 0.1.4
+
+1. Preserve this instrumentation-only baseline before changing algorithms.
+2. Reuse RoPE trigonometric values, request workspaces and shared-input Q8
+   preparation. Require unchanged token hashes for the same actual kernel and
+   precision; cancellation and cross-request isolation must also pass.
+3. Group accumulator-order changes and any measured worthwhile SwiGLU/Norm/Dot
+   vectorization in a separate numerical change. Compare against independent
+   scalar calculations and explicit logit tolerances before taking new hashes.
+   Keeping `auto` at FP32 does not make changed summation order bit-identical.
+
+`auto` remains FP32. Q8 precision remains explicit. Full GPU-resident forward/KV,
+true batched prefill, NUMA placement and expanded AMX work are later stages, not
+requirements silently folded into this first arithmetic-preserving change.
+
+Workspace reuse must clear its used high-water range before reuse, including KV,
+logits, attention scores, quantized buffers and pinned host staging. A trusted
+system-prefix cache is private model state, excluded from per-request clearing;
+it must never contain inquiry tokens and must be cleared on replacement/disposal.
+GPU wipe failure must reach the caller; context destruction alone is not evidence
+of VRAM zeroing. Preserve both the original inference failure and any cleanup
+failure, and stop admission to an instance whose cleanup failed.
+
+GPU auto selection must cover the output projection during startup warmup, not
+only layer shapes. Record per-process shape choices and repeat across launches;
+retune after GPU-resident forward changes. Replay diagnostics should retain actual
+kernel names, activation precision and per-phase worker counts alongside model
+and binary identity, rather than recording only the requested `auto` option.
+
+For future scale-only caches, FP16 scales add 2/18 (about 11%) of Q1 payload size;
+decoded FP32 scales add 4/18 (about 22%). Account for this difference in RAM limits.
+Neither estimate is a measured resident-memory guarantee.
+
+### First arithmetic-preserving implementation
+
+RoPE now evaluates each position's cos/sin once and reuses the exact float values
+for all layers and heads. One model-owned workspace is reused under the admission
+gate. KV and per-head attention scores are cleared through the largest touched
+position before another lease; activations and logits are cleared in full.
+Cancellation marks the possible write range before forward work starts. The
+workspace has bounded capacity equal to the configured context, including a
+small per-head score array; it is retained until model disposal, not an unbounded
+global pool. Quantization buffers still use their existing clearing pools.
+
+CUDA/Vulkan scratch cleanup now completes inside the request admission gate.
+`InferenceCleanupException` preserves both inference and wipe errors and disables
+the affected model. A queued request cancelled before acquiring the gate does
+not clear the active request's scratch. Unit tests cover partial KV clearing,
+large-then-small leases, bit-identical rotary values and cleanup failures; real
+CPU/CUDA validation covers concurrent requests and cancellation recovery.
+
+CUDA INT8 warmup covers the full output projection and single-label row shape in
+addition to layer matrices. The benchmark's setup record includes the selected
+integer shape map so later first-request calibration can be detected. CPU results
+retain activation precision without enabling profiling, alongside actual backend
+and per-phase worker counts. The subsequent shared-Q8 and FP32 SIMD stages below
+were validated separately from this first implementation.
+
+The first repeated stage comparison preserved all five token hashes for each of
+AVX2 FP32, AVX2 INT8-Q8, CUDA FP32 and CUDA DP4A on Bonsai 1.7B, and AVX2 FP32 on
+Bonsai 4B. In the 1.7B FP32 profiles, per-request GC allocation fell from about
+373 MB to 87 MB on CPU and 297 MB to 11 MB on CUDA offload. These are allocation
+totals, not resident-memory limits. RoPE time fell from about 102 ms to 22 ms on
+CPU and 98 ms to 22 ms on CUDA offload. Overall median latency did **not** show a
+consistent improvement (CPU 13.81 to 13.88 s, CUDA 9.73 to 9.99 s). Keep the public
+article as a prototype baseline until an end-to-end gain is established.
+
+The full CUDA event diagnostic added substantial overhead: 17.86 s versus 9.73 s
+with ordinary stage timing. Its 34,232 GEMV calls and transfer byte counts are
+useful diagnostics, but its intervals must not be substituted into a normal
+latency comparison. Ordinary stage profiling remains independently switchable.
+
+### Shared Q8 input preparation
+
+Q/K/V now share one prepared activation, and Gate/Up share a second one. Each
+lease ends before the source activation is overwritten. CPU native INT8, rounded
+Q8-to-FP32 and CUDA DP4A/Tensor Core use the original quantizer without changing
+scales, rounding or integer sums. All rented buffers are cleared on return,
+including exception and cancellation unwinding; no cache uses array identity
+across forward calls. FP32 auto does not prepare Q8 activations.
+
+The isolated sharing change passed 810 unit tests. Frozen pre-change and changed
+binaries generated identical fixed-128 token hashes for both Bonsai 1.7B and 4B
+on AVX2 INT8-Q8, AVX2 rounded Q8, CUDA DP4A, CUDA rounded Q8 and Tensor Core
+(10 before/after pairs). These functional checks did not require an idle CPU and
+are not performance measurements. For 47 prompt and 127 decode forwards, Q8
+preparations fall from 34,232 to 19,616 (1.7B), or 43,976 to 25,184 (4B).
+`SharedQuantization` is outside `Matrix`; the ordinary per-projection
+`Quantization` stage remains nested inside `Matrix`.
+
+The separate optimization validator can capture teacher-forced full-vocabulary
+logits from frozen DLLs, and compares real mapped Q1 matrices to independently
+decoded double-precision dot products. It is a diagnostic harness, not a public
+API or a throughput benchmark.
+
+### FP32 accumulation and SIMD stage
+
+Q1 FP32 vector and lookup kernels use four independent accumulators. Common
+FP32 dot products, RMS normalization, SwiGLU and residual addition use guarded
+AVX/AVX-512 vectors, with scalar tails/fallback. AVX-only CPUs do not execute
+unconditional AVX2 integer or FMA instructions. The existing explicit matrix ISA
+selector and FP32 default are unchanged; it does not constrain the runtime's
+common non-matrix operations.
+
+Applying the common-stage changes to Q8 initially exceeded the predeclared logit
+error limits, despite all checked greedy choices matching. Small floating-point
+changes crossed activation rounding boundaries. The accepted implementation
+therefore retains the original Q8 dot/normalization/SwiGLU and rounded-Q8 matrix
+accumulation order. It benefits from shared preparation, without inheriting the
+FP32 arithmetic changes. The rejected experiment and its error measurements are
+retained, rather than increasing the tolerance to accept it.
+
+834 unit tests cover tail lengths, in-place normalization, extreme SwiGLU inputs
+and independent double-precision dot calculations. Mapped real-model Q1 samples
+are also checked against independent double-precision decoded weights, using
+`2e-6 * sum(abs(weight * input)) + 1e-6` as the error bound. The model-level gate
+feeds the same 32-token history to both binaries and compares all vocabulary
+logits at steps 0, 1, 3, 7, 15 and 31. FP32 limits are max absolute 0.01 and RMS
+0.001, with at least 30/32 matching greedy decisions. These are regression gates,
+not general task-quality guarantees.
+
+On real AVX-only i7-3770K, AVX2 development and AVX-512 Server hardware, both
+models passed: largest observed FP32 logit difference was 0.00006223, RMS below
+0.00000683, and all checked greedy decisions matched. The accepted native-Q8
+CPU and CUDA paths produced zero logit difference on the development machine.
+Server validation used two workers, CPU affinity 4/5 and an account RSS abort
+guard at 7 GiB. These checks do not establish a latency gain; benchmark the
+frozen prototype and candidate separately with profiling disabled.
+
+### Controlled prototype comparison (2026-11-15)
+
+Frozen prototype binaries and the optimized candidate were measured again on the
+development Xeon E-2174G, with four workers, affinity `0x55`, .NET 10.0.15 and
+NVIDIA driver 596.59. Each condition used ABBA order and five measured requests
+per block, giving ten samples per version. Before each process, two consecutive
+15-second CPU averages had to be at most 10%. Each request greedily generated
+128 tokens while ignoring EOS; model load, calibration and one initial request
+were excluded. Stage profiling and CUDA events were disabled.
+
+| Path | 1.7B: prototype -> optimized | 4B: prototype -> optimized |
+| --- | --- | --- |
+| CPU AVX2, FP32 activation | 13.73 -> 8.62 s (-37.2%) | 32.12 -> 20.20 s (-37.1%) |
+| CPU AVX2 INT8, Q8 activation | 9.35 -> 9.15 s (-2.1%) | 21.41 -> 20.98 s (-2.0%) |
+| RTX 4000 SFF Ada, FP32 activation | 9.18 -> 7.04 s (-23.3%) | 12.84 -> 11.37 s (-11.4%) |
+
+All weights were Q1_0. These are median total generation-call latencies including
+managed request cleanup, not just matrix time. Gains are cumulative with the
+earlier workspace/RoPE changes, not an isolated measurement of each change. The
+Q8 differences are small; do not present them as established performance gains.
+`auto` still retains FP32 activation precision.
+
+A major background CPU spike affected one CUDA 1.7B block. The complete ABBA
+condition (20 requests) was retained separately and repeated. A retrospective
+quality rule (median estimated background CPU over 15% or p95 over 40%) was
+applied to every original block, independently of its latency. The final dataset
+contains 120 accepted requests and 20 excluded diagnostic requests. Start-time
+and whole-process background estimates are retained with every block.
+
+The exact measured candidate also passed teacher-forced CUDA FP32 logit checks:
+max absolute error below 0.000060, RMS below 0.0000068 and all 32 greedy choices
+matching on both models. Native Q8 paths retain zero logit difference. AVX-only
+and Server AVX-512 checks in this update establish numerical regressions only;
+their new latency was not measured. AMX remains outside physical validation.
+
+The WebSite repository's November 15 article keeps the original prototype
+snapshot and publishes the new comparison separately, including raw logs,
+excluded data, binary hashes and chart regeneration scripts. The internal
+optimization validation executable is explicitly non-packable.
+
+## Planned model expansion
+
+[Gemma 4 and GPT-OSS implementation plan (Japanese)](development/model-expansion-gemma4-gptoss-jp.md)
+
+Gemma 4 E2B now has a separate CPU text reference graph, tokenizer, and shared-KV implementation.
+See [Gemma 4 E2B usage and validation (Japanese)](gemma4-e2b-inference.md).
+Its performance and resource limits have not been qualified for production hosting.
+records the current loader/runtime limits, verified model-specific requirements,
+implementation order and acceptance gates. These models are not yet supported;
+0.1.4's verified Qwen3/Q1_0 path remains the compatibility baseline.

@@ -1,0 +1,5 @@
+ParentContainsErrorRecordException: D:\AIKernel\.website-audit\ctg-definitions-20261117\wait_local_retry.ps1:11
+Line |
+  11 |          try { [IO.File]::Move($temporary,$target,$true); return }
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Exception calling "Move" with "3" argument(s): "Access to the path is denied."

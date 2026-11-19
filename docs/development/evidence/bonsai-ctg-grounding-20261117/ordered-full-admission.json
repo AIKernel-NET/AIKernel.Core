@@ -1,0 +1,11 @@
+{
+  "frozenBeforeFullRun": true,
+  "comparisonCases": 46,
+  "freshHoldoutCases": 4,
+  "noNewFalseApproval": true,
+  "noRegressionOfPreviouslyCorrectGate": true,
+  "noRegressionOfPreviouslyPassingRequiredVotes": true,
+  "fewerFalseDenials": true,
+  "freshHoldoutMustPass": true,
+  "publicDefaultUnchangedUnlessAdmitted": true
+}

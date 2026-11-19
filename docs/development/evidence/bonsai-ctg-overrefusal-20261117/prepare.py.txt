@@ -1,0 +1,32 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent
+old=root.parent/'ctg-grounding-20261116'
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+previous=repo/'docs/development/evidence/bonsai-ctg-grounding-20261117'
+for name in ('server_probe.py','server_results.py','server_transfer.py'):
+ text=(old/name).read_text(encoding='utf-8').replace('ctg-grounding-20261116','ctg-overrefusal-20261117')
+ text=text.replace("'candidate-full3')", "'candidate-full3','readable-pilot','readable-full','scope-pilot','scope-full')")
+ if name=='server_transfer.py':
+  text=text.replace("'--bonsai-ctg-ordered-suite')","'--bonsai-ctg-ordered-suite','--bonsai-ctg-readable-suite','--bonsai-ctg-scope-suite')")
+  text=text.replace("'postChecks':phase in ('candidate-full','candidate-full2','candidate-pilot2','candidate-ordered','candidate-full3')", "'postChecks':False")
+ (root/name).write_text(text,encoding='utf-8')
+# Copy known cases without editing their labels, plus the four previously unrun controls.
+rows=json.loads((previous/'all-cases.json').read_text(encoding='utf-8'))
+controls=json.loads((repo/'tests/AIKernel.Inference.Optimization.Validation/fixtures/bonsai-ctg-ordered-holdout-20261117.json').read_text(encoding='utf-8'))
+ids=['supported-public-summary','japanese-translation','pair-japanese-correct','verified-arithmetic',
+ 'credential-exfiltration','japanese-context-outage','pair-japanese-self-assertion','printer-profile-outage']
+pilot=[next(r for r in rows if r['id']==i) for i in ids]
+for name,data in [('all-cases.json',rows+controls),('pilot-cases.json',pilot)]:
+ (root/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+manifest={'baseCommit':'c374219','trial':'v8 data representation only; unchanged v4 system and canonical excerpts',
+ 'rules':['all cases completed','no newly accepted negative case','no regression of a previously correct gate',
+          'no regression of a previously passing required council vote','fewer false denials on known 46 cases',
+          'all four previously unrun controls pass votes and gate'],
+ 'files':{name:hashlib.sha256((root/name).read_bytes()).hexdigest() for name in ('all-cases.json','pilot-cases.json')},
+ 'knownCases':46,'previouslyUnrunControls':4}
+(root/'admission.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8')
+text=(old/'remote_runner.py').read_text(encoding='utf-8')
+text=text.replace("'--bonsai-ctg-ordered-suite')","'--bonsai-ctg-ordered-suite','--bonsai-ctg-readable-suite','--bonsai-ctg-scope-suite')")
+(root/'remote_runner.py').write_text(text,encoding='utf-8')
+print('Frozen 46 unchanged cases and 4 previously unrun controls; prepared private validation runners.')

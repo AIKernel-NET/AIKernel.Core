@@ -1,0 +1,33 @@
+{
+  "baseCommit": "5c3e09b",
+  "baseline": "v4 with identical host evidence requirements",
+  "modelCases": 43,
+  "hostBlocks": 7,
+  "additionalControls": [
+    "ordered-holdout-status-exact",
+    "ordered-holdout-status-invented",
+    "ordered-holdout-dimension-exact",
+    "ordered-holdout-dimension-wrong"
+  ],
+  "criteria": [
+    "No new false approvals",
+    "No previously correct gate or required council vote may regress",
+    "Fewer false denials in the existing 39 model cases",
+    "All four additional control cases must pass gate and required votes",
+    "All seven host blocks must reject before model inference",
+    "Legacy contracts and 128-token generation hash unchanged"
+  ],
+  "defaultAdoption": "Only after every criterion passes; incomplete, invalid or unrun cases cannot count as correct",
+  "controlsArePreviouslySeen": true,
+  "predeclaredCandidates": [
+    "v16: exact interaction sections for all councils; original v4 input representation",
+    "v17: v16 plus separate verbatim observation records and explicit scope of negation/conditions"
+  ],
+  "experimentsDoNotAlterCriteria": true,
+  "criterionCandidate": {
+    "contract": "canonical-per-criterion-json-v18",
+    "plannedPilotCases": 8,
+    "failFastOnFrozenCriterionViolation": true,
+    "combination": "Any internal defect rejects; unavailable evaluation abstains except Ethos rejects; all required criteria supported approves. Invalid or incomplete assessments fail closed; no early approval."
+  }
+}

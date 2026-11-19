@@ -1,0 +1,15 @@
+$ErrorActionPreference='Stop'
+$taskRoot='D:\AIKernel\.website-audit\ctg-binding-20261117'
+$state=Get-Content -Raw -LiteralPath ($taskRoot+'\local-retry-status.json') | ConvertFrom-Json
+if($state.state -eq 'completed' -or $state.state -eq 'deferred-high-load') { exit 0 }
+if($state.state -ne 'waiting' -or $state.consecutive -ne 0 -or $state.cpuPercent -le 10) { throw 'Low-load retry may be starting; leave it running.' }
+if(([DateTime]::UtcNow-[DateTime]$state.utc).TotalSeconds -gt 30) { throw 'Load state is stale.' }
+$monitors=@(Get-CimInstance Win32_Process -Filter "Name='pwsh.exe'" | Where-Object { $_.ProcessId -ne $PID -and $_.CommandLine -like '*ctg-binding-20261117\wait_local_retry.ps1*' })
+if($monitors.Count -ne 1 -or $monitors[0].ProcessId -ne 374724) { throw 'Unexpected monitor identity.' }
+$children=@(Get-CimInstance Win32_Process -Filter 'ParentProcessId=374724' | Where-Object { $_.Name -ne 'conhost.exe' -or $_.ExecutablePath -ne 'C:\WINDOWS\system32\conhost.exe' })
+if($children.Count -ne 0) { throw 'Monitor has a running child; do not interrupt.' }
+Stop-Process -Id 374724
+$finished=[pscustomobject]@{state='deferred-high-load';threshold=10;utc=[DateTime]::UtcNow.ToString('o');lastCpuPercent=$state.cpuPercent;reason='Other validation finished; stopped only the owned idle monitor';monitorPid=374724}
+[IO.File]::WriteAllText($taskRoot+'\local-retry-status.json',($finished|ConvertTo-Json))
+[IO.File]::WriteAllText($taskRoot+'\local-monitor-stop.json',([pscustomobject]@{priorState=$state;finalState=$finished}|ConvertTo-Json -Depth 5))
+$finished|ConvertTo-Json

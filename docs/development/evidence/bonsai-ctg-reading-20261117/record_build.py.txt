@@ -1,0 +1,20 @@
+from pathlib import Path
+import hashlib,json,sys
+root=Path(__file__).parent;repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+label=sys.argv[1];app=root/('app-'+label);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+paths=['src/AIKernel.Kernel/Inference/'+n+'.cs' for n in ['BonsaiCtgCouncilEvaluator','BonsaiCtgDirectVotePrompt','BonsaiCtgProvenancePrompt','BonsaiCtgFocusedPrompt','BonsaiCtgFindingPolicy','BonsaiCtgEvidenceRequirements']]
+paths+=['tests/AIKernel.Inference.Optimization.Validation/'+n+'.cs' for n in ['BonsaiCtgReadingMatrix','Program','BonsaiCtgEvidenceScopeSuite']]
+paths+=['tests/AIKernel.Core.Tests/Inference/BonsaiCtgFocusedTests.cs','src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs']
+paths=[p for p in paths if (repo/p).exists()]
+data={'baseCommit':'001263e','sourceSha256':{p:sha(repo/p) for p in paths},'assemblySha256':{p.name:sha(p) for p in app.glob('AIKernel*.dll')},
+ 'canonicalRomSha256':{p.name:sha(p) for p in Path(r'D:/AIKernel/repos/AIKernel.NET/rom/governance').glob('council.*.monolith.md')}}
+assert len(data['assemblySha256'])==7 and len(data['canonicalRomSha256'])==3
+if label=='diagnostic':
+ baseline=json.loads((root.parent/'ctg-binding-20261117/retry-tested-build.json').read_text(encoding='utf-8'))
+ assert all(data['assemblySha256'][k]==v for k,v in baseline['assemblySha256'].items() if k!='AIKernel.Core.Tests.dll')
+ data['kernelAssembliesMatchBaseline']=True
+(root/(label+'-tested-build.json')).write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
+dest=root/('sources-'+label);dest.mkdir(exist_ok=True)
+for i,p in enumerate(paths):(dest/(str(i)+'.cs.txt')).write_bytes((repo/p).read_bytes())
+(dest/'paths.json').write_text(json.dumps(paths,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({'label':label,'files':len(paths)}))

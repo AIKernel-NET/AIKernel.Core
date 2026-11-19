@@ -1,0 +1,34 @@
+from pathlib import Path
+import subprocess,sys,json,shlex
+sys.path.insert(0,r'D:/AIKernel/.wp-predelete-backup')
+from xserver_ssh import connection
+root=Path(__file__).parent
+phases=('criteria-pilot','final-v18','host-guards','final-fixed')
+pids={phase:json.loads((root/(phase+'-transfer.json')).read_text())['runnerPid'] for phase in phases}
+script=r'''from pathlib import Path
+import json,os,signal,time
+root=Path.home()/'.aikernel-inquiry-014/ctg-binding-20261117'
+pids=PIDS
+failure=json.loads((root/'reading-probe/completion.json').read_text())
+assert failure['exitCode']==-6 and failure['stopReason'] is None
+assert 'Configure trusted prefixes before inference' in (root/'reading-probe/output.log').read_text()
+records=[]
+for phase,pid in pids.items():
+ out=root/phase
+ assert not (out/'pid.json').exists(), 'Inference already started; do not interrupt'
+ assert not (out/'completion.json').exists()
+ try:command=(Path('/proc')/str(pid)/'cmdline').read_bytes().split(b'\0')
+ except OSError:command=[]
+ stopped=False
+ if str(out/'runner.py').encode() in command:
+  os.kill(pid,signal.SIGTERM);stopped=True
+ (out/'completion.json').write_text(json.dumps({'exitCode':None,'stopReason':'dependency-failed','inferenceStarted':False,
+  'dependency':'reading-probe','runnerStopped':stopped,'maximumRssBytes':0,'cpuAffinity':[4,5],'performanceBenchmark':False},indent=2))
+ records.append({'phase':phase,'pid':pid,'stopped':stopped,'inferenceStarted':False})
+print(json.dumps(records))
+'''.replace('PIDS',repr(pids))
+with connection() as ssh:
+ p=subprocess.run(ssh+['/usr/bin/python3.6 -'],input=script.encode(),capture_output=True,timeout=60,creationflags=subprocess.CREATE_NO_WINDOW)
+if p.returncode:raise RuntimeError(p.stderr.decode(errors='replace')[-2000:])
+(root/'dependency-cancellation.json').write_text(json.dumps(json.loads(p.stdout),indent=2)+'\n',encoding='utf-8')
+print(p.stdout.decode())

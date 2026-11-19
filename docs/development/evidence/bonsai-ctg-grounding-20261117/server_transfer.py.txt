@@ -1,0 +1,46 @@
+from pathlib import Path
+import sys, subprocess, json, hashlib, io, tarfile, shlex
+sys.path.insert(0, r'D:/AIKernel/.wp-predelete-backup')
+from xserver_ssh import connection
+ROOT=Path(__file__).parent
+phase,app,mode,cases=sys.argv[1:]
+assert phase in ('baseline','candidate-pilot','candidate-full','candidate-pilot2','candidate-full2','public-api','candidate-ordered','final-api','candidate-full3')
+assert mode in ('--bonsai-ctg-separated-suite','--bonsai-ctg-grounded-suite','--bonsai-ctg-comparative-suite','--bonsai-ctg-ordered-suite')
+app=Path(app)
+paths={ 'app/'+p.relative_to(app).as_posix():p for p in app.rglob('*') if p.is_file() and p.suffix in ('.dll','.json','.so') }
+paths.update({'governance/'+p.name:p for p in Path(r'D:\AIKernel\repos\AIKernel.NET\rom\governance').glob('council.*.monolith.md')})
+paths.update({'cases.json':Path(cases),'probe-cases.json':ROOT/'all-cases.json','runner.py':ROOT/('public_runner.py' if phase in ('public-api','final-api') else 'remote_runner.py')})
+settings=json.dumps({'mode':mode,'waitFor':{'candidate-pilot':'baseline','candidate-full':'candidate-pilot','candidate-pilot2':'public-api','candidate-full2':'candidate-ordered','candidate-ordered':'candidate-pilot2','candidate-full3':'final-api'}.get(phase),'postChecks':phase in ('candidate-full','candidate-full2','candidate-pilot2','candidate-ordered','candidate-full3')}).encode()
+data=io.BytesIO()
+manifest={}
+with tarfile.open(fileobj=data,mode='w:gz') as archive:
+ for name,path in sorted(paths.items()):
+  payload=path.read_bytes();manifest[name]=hashlib.sha256(payload).hexdigest()
+  item=tarfile.TarInfo(name);item.size=len(payload);item.mode=0o600
+  archive.addfile(item,io.BytesIO(payload))
+ item=tarfile.TarInfo('run.json');item.size=len(settings);item.mode=0o600
+ archive.addfile(item,io.BytesIO(settings));manifest['run.json']=hashlib.sha256(settings).hexdigest()
+remote=r'''from pathlib import Path
+import os,sys,tarfile,json,hashlib,subprocess
+os.umask(0o077)
+root=Path.home()/'.aikernel-inquiry-014/ctg-grounding-20261116'
+root.mkdir(mode=0o700,exist_ok=True)
+out=root/PHASE
+out.mkdir(mode=0o700,exist_ok=False)
+manifest=MANIFEST
+archive=tarfile.open(fileobj=sys.stdin.buffer,mode='r|gz')
+for item in archive:
+ if not item.isfile() or item.name not in manifest or '..' in Path(item.name).parts or item.name.startswith('/'):raise ValueError('Unsafe archive member')
+ archive.extract(item,str(out))
+for name,digest in manifest.items():assert hashlib.sha256((out/name).read_bytes()).hexdigest()==digest
+(out/'transferred-files.json').write_text(json.dumps(manifest,indent=2))
+with (out/'runner.log').open('wb') as log:
+ p=subprocess.Popen(['/usr/bin/python3.6',str(out/'runner.py')],stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+print(json.dumps({'path':str(out),'runnerPid':p.pid,'verifiedFiles':len(manifest)}))
+'''.replace('PHASE',repr(phase)).replace('MANIFEST',repr(manifest))
+with connection() as ssh:
+ p=subprocess.run(ssh+['/usr/bin/python3.6 -c '+shlex.quote(remote)],input=data.getvalue(),capture_output=True,timeout=180,creationflags=subprocess.CREATE_NO_WINDOW)
+if p.returncode:raise RuntimeError(p.stderr.decode(errors='replace')[-2000:])
+result=json.loads(p.stdout)
+(ROOT/(phase+'-transfer.json')).write_text(json.dumps(dict(result,files=manifest,archiveBytes=len(data.getvalue())),indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result))

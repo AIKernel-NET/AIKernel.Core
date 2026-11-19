@@ -1,0 +1,36 @@
+from pathlib import Path
+import sys, subprocess, json
+sys.path.insert(0, r'D:/AIKernel/.wp-predelete-backup')
+from xserver_ssh import connection
+
+remote = r'''from pathlib import Path
+import json, os, hashlib
+root=Path.home()/'.aikernel-inquiry-014'
+runtime=Path(json.loads((root/'runtime.lock.json').read_text())['path'])/'dotnet'
+model=root/'models/bonsai1.7b/Bonsai-1.7B-Q1_0.gguf'
+digest=hashlib.sha256()
+with model.open('rb') as stream:
+ while True:
+  block=stream.read(8*1024*1024)
+  if not block: break
+  digest.update(block)
+host=[]
+record=root/'private/process.json'
+if record.exists():
+ pid=int(json.loads(record.read_text())['pid'])
+ status=Path('/proc')/str(pid)/'status'
+ if status.exists():host=[s for s in status.read_text().splitlines() if s.startswith(('VmRSS:','Cpus_allowed_list:'))]
+cpus=[]
+for cpu in sorted(os.sched_getaffinity(0))[:16]:
+ p=Path('/sys/devices/system/cpu/cpu'+str(cpu)+'/topology')
+ cpus.append({'id':cpu,'socket':int((p/'physical_package_id').read_text()),'core':int((p/'core_id').read_text())})
+print(json.dumps({'root':str(root),'runtime':str(runtime),'model':str(model),'modelSha256':digest.hexdigest(),
+ 'cpus':cpus,'host':host,'load':os.getloadavg(),'privateTestDirectories':[p.name for p in root.glob('*ctg*')]}))
+'''
+with connection() as ssh:
+    p=subprocess.run(ssh+['/usr/bin/python3.6 -'], input=remote.encode(), capture_output=True, timeout=90,
+                     creationflags=subprocess.CREATE_NO_WINDOW)
+if p.returncode: raise RuntimeError(p.stderr.decode(errors='replace')[-1000:])
+result=json.loads(p.stdout)
+Path(__file__).with_name('server-probe.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result,indent=2))

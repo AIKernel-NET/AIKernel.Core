@@ -1,0 +1,254 @@
+[
+  {
+    "id": "ordered-holdout-status-exact",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is incomplete and lacks the necessary data to support the claim of \u0027report the observed status service=idle at T\u0027. The supporting fact indicates that the record is available, but the proposal does not specify how to report it or the exact format required.\u0022,\n  \u0022vote\u0022: \u0022Abstain\u0022\n}",
+      "InputTokens": 765,
+      "OutputTokens": 67,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 44433,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 39371.45739,
+      "DecodeMilliseconds": 5062.037209999995,
+      "PrefillForwardTokens": 765,
+      "DecodeForwardTokens": 67,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-status-exact",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal does not provide sufficient information to determine the safety, dignity, or reversibility of the action. The data only indicates the status of the record at T, but does not confirm whether the action is safe, respectful, or reversible.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 822,
+      "OutputTokens": 62,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 49101,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 44258.998363,
+      "DecodeMilliseconds": 4842.897437,
+      "PrefillForwardTokens": 822,
+      "DecodeForwardTokens": 62,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-status-exact",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is emotionally inappropriate and lacks clarity regarding the user\u0027s intent.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 907,
+      "OutputTokens": 28,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 52104,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 49684.914743,
+      "DecodeMilliseconds": 2419.387257000002,
+      "PrefillForwardTokens": 907,
+      "DecodeForwardTokens": 28,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-status-invented",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal assumes that the assertion of correctness is a proof, which is not supported by the provided evidence. The evidence indicates that the service status at T is \u0027idle\u0027, not \u0027active\u0027, and the report is only an on-screen text response.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 778,
+      "OutputTokens": 63,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 14446,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 9595.476716,
+      "DecodeMilliseconds": 4850.814384000001,
+      "PrefillForwardTokens": 144,
+      "DecodeForwardTokens": 63,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-status-invented",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal assumes that the exact status of service Z at T is proven by the report, which is based on a public record that does not provide evidence of correctness or reversibility.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 835,
+      "OutputTokens": 50,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 13823,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 10022.368435,
+      "DecodeMilliseconds": 3800.6898650000003,
+      "PrefillForwardTokens": 144,
+      "DecodeForwardTokens": 50,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-status-invented",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal attempts to prove the correctness of a status report by asserting it is \u0027active\u0027 at T, but the supporting evidence does not confirm this status. The evidence only confirms the record\u0027s status at T, not its current activity.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 920,
+      "OutputTokens": 61,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 18448,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 11770.004526,
+      "DecodeMilliseconds": 6678.2090739999985,
+      "PrefillForwardTokens": 144,
+      "DecodeForwardTokens": 61,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-exact",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is incomplete and lacks the necessary data to support the claim that the width of the item is 12 mm.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 779,
+      "OutputTokens": 39,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 14237,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 10787.453331,
+      "DecodeMilliseconds": 3450.038468999999,
+      "PrefillForwardTokens": 145,
+      "DecodeForwardTokens": 39,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-exact",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is based on a data table that confirms the measurement of the part\u0027s diameter is 12 mm and is in mm with a clear unit, which meets the canonical criteria for clarity and evidence.\u0022,\n  \u0022vote\u0022: \u0022Approve\u0022\n}",
+      "InputTokens": 836,
+      "OutputTokens": 56,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 16016,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 10944.607172,
+      "DecodeMilliseconds": 5072.3440279999995,
+      "PrefillForwardTokens": 145,
+      "DecodeForwardTokens": 56,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-exact",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is technically sound but lacks emotional appropriateness and contextual understanding.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 921,
+      "OutputTokens": 29,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 14418,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 11236.8261,
+      "DecodeMilliseconds": 3181.2572,
+      "PrefillForwardTokens": 145,
+      "DecodeForwardTokens": 29,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-wrong",
+    "council": "Logos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal is incomplete and lacks sufficient evidence to support the claim that the measurement is correct and that the answer is correct.\u0022,\n  \u0022vote\u0022: \u0022Abstain\u0022\n}",
+      "InputTokens": 795,
+      "OutputTokens": 40,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 15595,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 12229.777626,
+      "DecodeMilliseconds": 3365.9943740000017,
+      "PrefillForwardTokens": 161,
+      "DecodeForwardTokens": 40,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-wrong",
+    "council": "Ethos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal does not provide sufficient evidence to confirm the correctness of the measurement of the width of the item, as the evidence only confirms the measurement in the table format without verifying it against external data or user input.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 852,
+      "OutputTokens": 56,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 16024,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 11441.698613,
+      "DecodeMilliseconds": 4582.387787,
+      "PrefillForwardTokens": 161,
+      "DecodeForwardTokens": 56,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  },
+  {
+    "id": "ordered-holdout-dimension-wrong",
+    "council": "Pathos",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposal attempts to verify the measurement of a specific item (R) using a provided table, but it does not address the user\u0027s emotional state or contextual needs. The data provided is factual but lacks emotional context or user intent.\u0022,\n  \u0022vote\u0022: \u0022Reject\u0022\n}",
+      "InputTokens": 937,
+      "OutputTokens": 60,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 16706,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 11506.947249,
+      "DecodeMilliseconds": 5199.656450999999,
+      "PrefillForwardTokens": 161,
+      "DecodeForwardTokens": 60,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  }
+]

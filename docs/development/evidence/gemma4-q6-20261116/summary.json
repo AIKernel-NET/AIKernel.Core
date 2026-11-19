@@ -1,0 +1,248 @@
+{
+  "date": "2026-11-16",
+  "baselineCommit": "bebeafdf440cd21d3601f8a283ad809460ed6f22",
+  "modelSha256": "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",
+  "hash": "29cc8c11ad7997fc82c61fdbd19e7846f6ace8a6f7ac71859fef754e6498637e",
+  "inputTokens": 23,
+  "outputTokens": 128,
+  "decodeForwards": 127,
+  "timing": "prefill + decode; load, allocation, wipe, HTTP excluded",
+  "rows": [
+    {
+      "id": "development-avx2",
+      "label": "Development / AVX2",
+      "before": {
+        "medianSeconds": 130.94194620000002,
+        "minSeconds": 119.0432479,
+        "maxSeconds": 141.0676623,
+        "decodeMsPerToken": 993.4909141732285,
+        "runs": [
+          130.94194620000002,
+          119.0432479,
+          141.0676623
+        ]
+      },
+      "after": {
+        "medianSeconds": 20.2217294,
+        "minSeconds": 19.744238499999998,
+        "maxSeconds": 20.5325397,
+        "decodeMsPerToken": 139.90853543307088,
+        "runs": [
+          20.2217294,
+          20.5325397,
+          19.744238499999998
+        ]
+      },
+      "reductionPercent": 84.55672151908186,
+      "speedup": 6.4753089911291175
+    },
+    {
+      "id": "server-avx2",
+      "label": "Server / AVX2",
+      "before": {
+        "medianSeconds": 57.699393799999996,
+        "minSeconds": 48.7298451,
+        "maxSeconds": 59.5714184,
+        "decodeMsPerToken": 434.31686614173225,
+        "runs": [
+          48.7298451,
+          59.5714184,
+          57.699393799999996
+        ]
+      },
+      "after": {
+        "medianSeconds": 15.7008257,
+        "minSeconds": 13.059714099999999,
+        "maxSeconds": 17.184317500000002,
+        "decodeMsPerToken": 107.20978503937008,
+        "runs": [
+          15.7008257,
+          17.184317500000002,
+          13.059714099999999
+        ]
+      },
+      "reductionPercent": 72.78857771985811,
+      "speedup": 3.6749273511137694
+    },
+    {
+      "id": "server-avx512",
+      "label": "Server / AVX-512",
+      "before": {
+        "medianSeconds": 50.1450306,
+        "minSeconds": 48.760231399999995,
+        "maxSeconds": 62.160061,
+        "decodeMsPerToken": 376.7875007874016,
+        "runs": [
+          48.760231399999995,
+          62.160061,
+          50.1450306
+        ]
+      },
+      "after": {
+        "medianSeconds": 13.4779203,
+        "minSeconds": 13.415553099999999,
+        "maxSeconds": 14.230926799999999,
+        "decodeMsPerToken": 90.53057637795276,
+        "runs": [
+          13.4779203,
+          13.415553099999999,
+          14.230926799999999
+        ]
+      },
+      "reductionPercent": 73.12212169634213,
+      "speedup": 3.7205317648302167
+    },
+    {
+      "id": "server-vnni",
+      "label": "Server / AVX-VNNI residual",
+      "before": {
+        "medianSeconds": 58.225114999999995,
+        "minSeconds": 55.0215884,
+        "maxSeconds": 64.0590964,
+        "decodeMsPerToken": 428.5977889763779,
+        "runs": [
+          55.0215884,
+          64.0590964,
+          58.225114999999995
+        ]
+      },
+      "after": {
+        "medianSeconds": 22.7396858,
+        "minSeconds": 22.4427931,
+        "maxSeconds": 23.4214691,
+        "decodeMsPerToken": 152.89664251968503,
+        "runs": [
+          22.4427931,
+          23.4214691,
+          22.7396858
+        ]
+      },
+      "reductionPercent": 60.945228188900956,
+      "speedup": 2.560506574809402
+    },
+    {
+      "id": "server-vnni512",
+      "label": "Server / AVX-512 VNNI residual",
+      "before": {
+        "medianSeconds": 59.618512499999994,
+        "minSeconds": 59.31585990000001,
+        "maxSeconds": 66.99719329999999,
+        "decodeMsPerToken": 438.0676307086614,
+        "runs": [
+          59.618512499999994,
+          66.99719329999999,
+          59.31585990000001
+        ]
+      },
+      "after": {
+        "medianSeconds": 24.0981297,
+        "minSeconds": 23.0019274,
+        "maxSeconds": 30.616036800000003,
+        "decodeMsPerToken": 161.36001968503936,
+        "runs": [
+          30.616036800000003,
+          24.0981297,
+          23.0019274
+        ]
+      },
+      "reductionPercent": 59.579451600708744,
+      "speedup": 2.4739891951033854
+    },
+    {
+      "id": "ada",
+      "label": "RTX 4000 SFF Ada / resident",
+      "before": {
+        "medianSeconds": 2.8976083,
+        "minSeconds": 2.8945266999999997,
+        "maxSeconds": 2.9023295,
+        "decodeMsPerToken": 19.846185826771652,
+        "runs": [
+          2.9023295,
+          2.8976083,
+          2.8945266999999997
+        ]
+      },
+      "after": {
+        "medianSeconds": 2.9192706,
+        "minSeconds": 2.9090409,
+        "maxSeconds": 2.9364596,
+        "decodeMsPerToken": 20.031270866141732,
+        "runs": [
+          2.9192706,
+          2.9364596,
+          2.9090409
+        ]
+      },
+      "reductionPercent": -0.7475924195827321,
+      "speedup": 0.9925795505219694
+    },
+    {
+      "id": "t1000",
+      "label": "T1000 / resident",
+      "before": {
+        "medianSeconds": 7.3028838,
+        "minSeconds": 7.227129,
+        "maxSeconds": 7.4778465999999995,
+        "decodeMsPerToken": 50.419062204724405,
+        "runs": [
+          7.4778465999999995,
+          7.227129,
+          7.3028838
+        ]
+      },
+      "after": {
+        "medianSeconds": 7.3032109,
+        "minSeconds": 7.2825479,
+        "maxSeconds": 7.3911003,
+        "decodeMsPerToken": 50.76745118110236,
+        "runs": [
+          7.3032109,
+          7.3911003,
+          7.2825479
+        ]
+      },
+      "reductionPercent": -0.004479052507999626,
+      "speedup": 0.9999552114810213
+    }
+  ],
+  "memory": [
+    {
+      "name": "stress",
+      "promptTokens": 1920,
+      "outputTokens": 128,
+      "peakRssBytes": 2531364864,
+      "counterSources": {
+        "dotnet": 2531364864,
+        "proc": 2527313920,
+        "ru_maxrss": 2518540288
+      },
+      "statistics": {
+        "RamBlocks": 538,
+        "VramBlocks": 0,
+        "SwapBlocks": 0,
+        "SwapReads": 0,
+        "DevicePageIns": 0,
+        "BackingReads": 538
+      }
+    },
+    {
+      "name": "wide",
+      "promptTokens": 482,
+      "outputTokens": 128,
+      "peakRssBytes": 4411555840,
+      "counterSources": {
+        "dotnet": 4411555840,
+        "proc": 4400050176,
+        "ru_maxrss": 4400050176
+      },
+      "statistics": {
+        "RamBlocks": 986,
+        "VramBlocks": 0,
+        "SwapBlocks": 0,
+        "SwapReads": 0,
+        "DevicePageIns": 0,
+        "BackingReads": 986
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "exitCode": null,
+  "stopReason": "dependency-failed",
+  "inferenceStarted": false,
+  "dependency": "reading-probe",
+  "runnerStopped": false,
+  "maximumRssBytes": 0,
+  "cpuAffinity": [
+    4,
+    5
+  ],
+  "performanceBenchmark": false
+}

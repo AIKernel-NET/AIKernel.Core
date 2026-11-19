@@ -1,0 +1,21 @@
+{
+  "tokens": [
+    31414,
+    3652,
+    236924,
+    106,
+    106,
+    106,
+    1,
+    106,
+    1,
+    1,
+    106,
+    106
+  ],
+  "elapsedSeconds": 125.57800000000134,
+  "torch": "2.15.0+cpu",
+  "reference": "Transformers Gemma4TextModel/eager/fp32",
+  "sameQuantizedWeights": true,
+  "originalBfloat16CheckpointCompared": false
+}

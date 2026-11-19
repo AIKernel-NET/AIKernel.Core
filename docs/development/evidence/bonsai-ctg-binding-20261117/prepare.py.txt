@@ -1,0 +1,35 @@
+from pathlib import Path
+import json,re,hashlib
+root=Path(__file__).parent
+prior=root.parent/'ctg-citations-20261117'
+phases=('scope-pilot','provenance-pilot','scope-full','provenance-full','host-guards','final-api','reading-probe')
+modes=('--bonsai-ctg-council-scope-suite','--bonsai-ctg-provenance-suite','--bonsai-ctg-separated-suite','--bonsai-ctg-reading-probe')
+for name in ('server_transfer.py','remote_runner.py','server_results.py','inspect_responses.py','server_final_state.py','server_probe.py','compare.py','verify_regressions.py'):
+ text=(prior/name).read_text(encoding='utf-8').replace('ctg-citations-20261117','ctg-binding-20261117')
+ if name in ('server_transfer.py','server_results.py','inspect_responses.py'):
+  text=re.sub(r'^assert phase in .+$','assert phase in '+repr(phases),text,flags=re.M)
+ if name=='server_transfer.py':
+  text=re.sub(r'^assert mode in .+$','assert mode in '+repr(modes),text,flags=re.M)
+  text=text.replace("ROOT/('public_runner.py' if phase in ('public-api','final-api','final-v15') else 'remote_runner.py')","ROOT/('public_runner.py' if phase=='final-api' else 'remote_runner.py')")
+  text=re.sub(r'^settings=json.dumps.+$',"settings=json.dumps({'mode':mode,'waitFor':'scope-pilot' if phase=='provenance-pilot' else None,'postChecks':phase in ('scope-full','provenance-full'),'stopOnRegression':phase in ('scope-full','provenance-full')}).encode()",text,flags=re.M)
+ if name=='remote_runner.py':
+  start=text.index(" if settings['waitFor']=='controls-baseline':")
+  end=text.index('assert {4,5}',start)
+  text=text[:start]+" assert previous['stopReason'] is None and previous['exitCode'] in (0,1),'Preceding run failed operationally'\n assert len(json.loads((dependency/'result.json').read_text()))==8\n"+text[end:]
+  text=re.sub(r"^assert settings\['mode'\] in .+$","assert settings['mode'] in "+repr(modes),text,flags=re.M)
+  text=text.replace("before=baseline.get(row['id']);after=row['result']['Gate']['Accepted']", "before=baseline.get(row['id']);after=row['result']['Gate']['Accepted']\n     if row['id'].startswith('ordered-holdout-') and not row['pass']:violations.append([row['id'],'additional control failed'])")
+ if name=='compare.py':
+  text=text.replace("expected_calls=6 if phase.startswith('review-') else 3","expected_calls=3")
+ if name=='server_results.py':text=text.replace("archive.extract(item,str(target))","archive.extract(item,str(target),filter='data')")
+ (root/name).write_text(text,encoding='utf-8')
+text=(prior/'public_runner.py').read_text(encoding='utf-8').replace("out.parent/'review-pilot'","out.parent/'provenance-pilot'")
+(root/'public_runner.py').write_text(text,encoding='utf-8')
+admission=json.loads((root/'admission.json').read_text(encoding='utf-8'))
+admission['baseCommit']='5c3e09b'
+admission['predeclaredCandidates']=['v16: exact interaction sections for all councils; original v4 input representation','v17: v16 plus separate verbatim observation records and explicit scope of negation/conditions']
+admission['experimentsDoNotAlterCriteria']=True
+(root/'admission.json').write_text(json.dumps(admission,indent=2)+'\n',encoding='utf-8')
+fixtures=['all-cases.json','guarded-cases.json','baseline-gates.json','pilot-cases.json','host-guard-cases.json']
+for name in fixtures:assert (root/name).read_bytes()==(prior/name).read_bytes(),name
+(root/'fixture-sha256.json').write_text(json.dumps({name:hashlib.sha256((root/name).read_bytes()).hexdigest() for name in fixtures},indent=2)+'\n',encoding='utf-8')
+print('Prepared fixed comparisons and private Server scripts.')

@@ -1,0 +1,8 @@
+{
+  "transformers": "4.57.1",
+  "torch": "2.15.0+cpu",
+  "seed": 437,
+  "weightDtype": "f32",
+  "synthetic": true,
+  "weightsSha256": "d1a74043bb0e979ef45765fa9b454463c3170c307aee0041ae51ebf140b1a641"
+}

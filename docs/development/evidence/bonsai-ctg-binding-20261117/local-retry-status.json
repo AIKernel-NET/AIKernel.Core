@@ -1,0 +1,8 @@
+{
+  "state": "deferred-high-load",
+  "threshold": 10,
+  "utc": "2026-11-17T13:54:17.2809234Z",
+  "lastCpuPercent": 52.0,
+  "reason": "Other validation finished; stopped only the owned idle monitor",
+  "monitorPid": 374724
+}

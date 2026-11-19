@@ -21,10 +21,10 @@ def test_managed_assembly_manifest_is_stable() -> None:
     )
 
 
-def test_require_managed_assemblies_fails_closed_when_not_bundled() -> None:
-    assemblies = managed.managed_assemblies()
-    if assemblies.is_complete:
-        pytest.skip("Managed assemblies are bundled in this environment.")
+def test_require_managed_assemblies_fails_closed_when_not_bundled(monkeypatch, tmp_path) -> None:
+    monkeypatch.setattr(managed, "_managed_package_root", lambda: tmp_path / "empty-bundle")
+    monkeypatch.delenv("AIKERNEL_MANAGED_ASSEMBLY_PATH", raising=False)
+    monkeypatch.setenv("NUGET_PACKAGES", str(tmp_path / "empty-nuget"))
 
     with pytest.raises(FileNotFoundError, match="managed assemblies"):
         managed.require_managed_assemblies()
@@ -42,6 +42,7 @@ def test_managed_assemblies_resolve_from_env_override(
     tmp_path,
 ) -> None:
     _write_required_assemblies(tmp_path)
+    monkeypatch.setattr(managed, "_managed_package_root", lambda: tmp_path / "empty-bundle")
     monkeypatch.setenv("AIKERNEL_MANAGED_ASSEMBLY_PATH", str(tmp_path))
     monkeypatch.setenv("NUGET_PACKAGES", str(tmp_path / "empty-nuget"))
 
@@ -56,6 +57,8 @@ def test_managed_assemblies_resolve_from_nuget_cache(
     tmp_path,
 ) -> None:
     nuget_root = tmp_path / "nuget"
+    monkeypatch.setattr(managed, "_managed_package_root", lambda: tmp_path / "empty-bundle")
+    monkeypatch.delenv("AIKERNEL_MANAGED_ASSEMBLY_PATH", raising=False)
     for assembly_name, package_name in {
         "AIKernel.Abstractions.dll": "AIKernel.Abstractions",
         "AIKernel.Common.dll": "AIKernel.Common",
@@ -64,7 +67,7 @@ def test_managed_assemblies_resolve_from_nuget_cache(
         "AIKernel.Dtos.dll": "AIKernel.Dtos",
         "AIKernel.Enums.dll": "AIKernel.Enums",
     }.items():
-        version = "0.1.3"
+        version = aikernel_net.__version__.replace("rc", "-rc.")
         assembly_path = nuget_root / package_name.lower() / version / "lib" / "net10.0" / assembly_name
         assembly_path.parent.mkdir(parents=True, exist_ok=True)
         assembly_path.write_text("", encoding="utf-8")

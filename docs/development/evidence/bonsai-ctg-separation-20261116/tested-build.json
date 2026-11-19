@@ -1,0 +1,194 @@
+{
+  "baseCommit": "dc004db",
+  "legacyContract": "canonical-assessment-json-v2",
+  "separatedContract": "canonical-separated-assessment-json-v4",
+  "legacyPublicApiPreserved": true,
+  "separationRequiresExplicitMethod": true,
+  "legacyPromptGoldenHashesPreserved": true,
+  "canonicalExcerptsPreserved": true,
+  "baselineFinalAssemblyVerified": true,
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "finalAssemblySha256": {
+    "AIKernel.Kernel.dll": "c1f5847f281bce6e2a31f8dc570985c7d4350f0011610e82957348cd55b24abb",
+    "AIKernel.Core.Tests.dll": "8da72e85e7d254af91fe09117e0ac0c153d4a786ef49bd312c648da22ac4cf6a"
+  },
+  "sourceSha256": {
+    "src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs": "ffe52faf2a3354ed0f940025d979a25d9da56daf3a45590b788a4bc8ba55d134",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgPrompt.cs": "81e8cf44e84ea29792e883305a6406685c6439fece0e2052e7f2804b7f8cf82f",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgDirectVotePrompt.cs": "bbd875e75d5eae2626de67c2db2c5566b2889ce7e3654d49947047af14a3c8b9",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgFindingPolicy.cs": "6e09bd99d2d678f49c9ef3cf8aec56668dac7b3711fc576a9ac0f6a2eb34dfd4",
+    "src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs": "d05ec8567ef419a612b4c8c96d0b366ac058c445a19a4584f9e9dbdadf24ea57",
+    "tests/AIKernel.Core.Tests/Inference/BonsaiCtgTests.cs": "f3f628c52e0b9afcd91b0f3a947fca2d37bf8bd08d00d1872842126772cf579e",
+    "tests/AIKernel.Core.Tests/Inference/BonsaiCtgSeparatedTests.cs": "f7e163c381529eaf5ee8577fd64bda01638848ab15f4ed7212b835fdc447eeff",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgSuite.cs": "6849c830e64b233eee5eea13296cd16628a8b1a2e9805d1638450eda767274c6",
+    "tests/AIKernel.Inference.Optimization.Validation/Program.cs": "f6a8e2f26a5eee6ce346110f632c3e2f8ae512c7020b08c3dd8eaedaf24f8071"
+  },
+  "fixtureSha256": "323a2102f47ca1259f63c67da20a510ef9a2a300f3aea58e38bed63c1172af22",
+  "prior30CaseMigrationVerified": true,
+  "new8BaselineInputsVerified": true,
+  "contrastPairInputHashesVerified": true,
+  "romSha256": {
+    "council.logos.monolith.md": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "council.ethos.monolith.md": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "council.pathos.monolith.md": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+  },
+  "unitTests": {
+    "total": "959",
+    "executed": "959",
+    "passed": "959",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "trxSha256": "2f7b3bfc03797449bfb833f1c38ca88d417aded11ca1c909968380ed232cad6b",
+  "generation128HashMatched": true,
+  "backend": "AVX2/FP32",
+  "cpuWorkers": 4,
+  "contextTokens": 2048,
+  "recordedCouncilResponses": 113,
+  "responseBackendAndTokenBoundsVerified": true,
+  "maximumReplyTokens": 192,
+  "prefixPayloadCapBytes": 536870912,
+  "maximumObservedCandidatePrefixPayloadBytes": 481918976,
+  "suiteDeadlineMinutes": 10,
+  "defaultDeadlineMinutes": 3,
+  "performanceBenchmark": false,
+  "server7GBRevalidated": false,
+  "rejectedFirstPilot": {
+    "completedCases": 1,
+    "aborted": true,
+    "adopted": false,
+    "assemblySha256": {
+      "AIKernel.Kernel.dll": "99c33fa041026791c9f48c0ff84694c51c40bb10499ebc06591d212ee21f4eac",
+      "AIKernel.Core.Tests.dll": "8da72e85e7d254af91fe09117e0ac0c153d4a786ef49bd312c648da22ac4cf6a"
+    }
+  },
+  "summary": {
+    "baseline": {
+      "count": 38,
+      "votesPass": 21,
+      "gatePass": 31,
+      "evaluationFailures": 0,
+      "falseAllow": 2,
+      "falseDeny": 5
+    },
+    "baseline-groups": {
+      "existing": {
+        "count": 10,
+        "votesPass": 7,
+        "gatePass": 10,
+        "evaluationFailures": 0,
+        "falseAllow": 0,
+        "falseDeny": 0
+      },
+      "previous-holdout": {
+        "count": 12,
+        "votesPass": 8,
+        "gatePass": 11,
+        "evaluationFailures": 0,
+        "falseAllow": 0,
+        "falseDeny": 1
+      },
+      "findings-holdout": {
+        "count": 8,
+        "votesPass": 3,
+        "gatePass": 6,
+        "evaluationFailures": 0,
+        "falseAllow": 1,
+        "falseDeny": 1
+      },
+      "new-pairs": {
+        "count": 8,
+        "votesPass": 3,
+        "gatePass": 4,
+        "evaluationFailures": 0,
+        "falseAllow": 1,
+        "falseDeny": 3
+      }
+    },
+    "candidate": {
+      "count": 38,
+      "votesPass": 21,
+      "gatePass": 31,
+      "evaluationFailures": 1,
+      "falseAllow": 1,
+      "falseDeny": 6
+    },
+    "candidate-groups": {
+      "existing": {
+        "count": 10,
+        "votesPass": 6,
+        "gatePass": 9,
+        "evaluationFailures": 0,
+        "falseAllow": 0,
+        "falseDeny": 1
+      },
+      "previous-holdout": {
+        "count": 12,
+        "votesPass": 8,
+        "gatePass": 11,
+        "evaluationFailures": 0,
+        "falseAllow": 0,
+        "falseDeny": 1
+      },
+      "findings-holdout": {
+        "count": 8,
+        "votesPass": 5,
+        "gatePass": 6,
+        "evaluationFailures": 0,
+        "falseAllow": 1,
+        "falseDeny": 1
+      },
+      "new-pairs": {
+        "count": 8,
+        "votesPass": 2,
+        "gatePass": 5,
+        "evaluationFailures": 1,
+        "falseAllow": 0,
+        "falseDeny": 3
+      }
+    }
+  },
+  "matchedCompleted": {
+    "baseline": {
+      "count": 37,
+      "votesPass": 21,
+      "gatePass": 30,
+      "evaluationFailures": 0,
+      "falseAllow": 2,
+      "falseDeny": 5
+    },
+    "candidate": {
+      "count": 37,
+      "votesPass": 21,
+      "gatePass": 30,
+      "evaluationFailures": 0,
+      "falseAllow": 1,
+      "falseDeny": 6
+    }
+  },
+  "notes": [
+    "The proposal and supporting observations are separate parameters and JSON sections. The host must supply observations rather than self-assertions.",
+    "This input contract does not verify the truth or relevance of a supporting fact. No model vote is overridden by scenario names or keywords.",
+    "The baseline combines 30 stored DirectVotes results and eight additional cases run with the preserved previous binary.",
+    "All 38 cases preserve expected labels. The eight new contrast cases were frozen before candidate trials and were not used to tune the final prompt.",
+    "The first rejected wording was revised using the first existing arithmetic case. Its incomplete result and source snapshots are retained.",
+    "The final 38-case suite ran in one process. Stored baseline groups ran in separate processes; timings are not performance comparisons.",
+    "The intervention changes input layout and its explanation together, not a layout-only ablation.",
+    "No arithmetic kernels, numerical precision, canonical ROM or CTG voting rules changed. No proposal operation was executed.",
+    "All roles share one model. Semantic failures remain; this is not an RH proof or a production authorization authority.",
+    "The last case timed out under observed host CPU saturation. Its all-Unknown denial is not treated as a semantic pass. A matched-completed comparison excludes it from both sides.",
+    "The user chose to continue broadcasting and other work. No applications were stopped; the one incomplete case remains available in retry-incomplete-input.json for a lower-load rerun.",
+    "Prefix payload bytes are not process RSS. No new Server 7GB or GPU validation was performed."
+  ]
+}

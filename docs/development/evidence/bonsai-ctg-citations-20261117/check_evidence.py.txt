@@ -1,0 +1,29 @@
+from pathlib import Path
+import json,hashlib,subprocess,re
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+folder=repo/'docs/development/evidence/bonsai-ctg-citations-20261117'
+sha=lambda b:hashlib.sha256(b).hexdigest()
+manifest=json.loads((folder/'evidence-sha256.json').read_text(encoding='utf-8'))
+for name,digest in manifest.items():
+ p=folder/name
+ assert sha(p.read_bytes())==digest,name
+ assert sha(subprocess.check_output(['git','show',':'+p.relative_to(repo).as_posix()],cwd=repo))==digest,('staged',name)
+build=json.loads((folder/'v15-tested-build.json').read_text(encoding='utf-8'))
+for name,digest in build['sourceSha256'].items():
+ content=(repo/name).read_bytes();assert sha(content)==digest,name
+ staged=subprocess.check_output(['git','show',':'+name],cwd=repo)
+ assert staged.replace(b'\r\n',b'\n')==content.replace(b'\r\n',b'\n'),('staged source',name)
+for run in folder.glob('server-*'):
+ if not run.is_dir():continue
+ transferred=json.loads((run/'transferred-files.json').read_text(encoding='utf-8'))
+ labels={'server-citation-pilot':'v11','server-citation-pilot-fixed':'v11b','server-findings-pilot':'v12','server-packet-pilot':'v13','server-demo-pilot':'v14','server-final-api':'v14','server-review-host-guards':'v15','server-review-pilot':'v15','server-final-v15':'v15'}
+ tested=json.loads((folder/(labels[run.name]+'-tested-build.json')).read_text(encoding='utf-8'))
+ for name,digest in tested['assemblySha256'].items():assert transferred['app/'+name]==digest,(run.name,'assembly',name)
+ for name,digest in tested['canonicalRomSha256'].items():assert transferred['governance/'+name]==digest,(run.name,'ROM',name)
+ for name,digest in transferred.items():
+  p=run/(name+'.txt' if name.endswith('.py') else name)
+  if p.exists():assert sha(p.read_bytes())==digest,(run.name,name)
+report=repo/'docs/development/bonsai-ctg-citations-20261117-jp.md'
+text=report.read_text(encoding='utf-8');assert 'RESULTS_PENDING' not in text
+for link in re.findall(r'\]\(([^)]+)\)',text):assert (report.parent/link).exists(),link
+print(str(len(manifest))+' artifacts match staged and working hashes; sources, transferred records and report links match.')

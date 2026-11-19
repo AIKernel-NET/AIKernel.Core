@@ -1,0 +1,65 @@
+{
+  "diagnosticOnly": true,
+  "arm": "primary",
+  "correct": 2,
+  "completed": 6,
+  "allPassed": false,
+  "modelHash": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "resultSha256": "9540a8daaf4dd50fd7f1b0b505a002ffd7be290e730b7a7b9c64672d823bc5d0",
+  "rows": [
+    {
+      "id": "ordered-holdout-status-invented-Logos",
+      "promptSha256": "a361c191bf5812f46a16a779040901464c16f172419e9627bd4b94680657a013",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "symbol": "A",
+      "selectedFinding": "supported",
+      "expectedFinding": "proposal_defect",
+      "correct": false
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Logos",
+      "promptSha256": "3fa76bd2c07d2eb23bb3794561dc6d8f03586c9c773e8686cf5efc89ab3dfbe7",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "symbol": "A",
+      "selectedFinding": "supported",
+      "expectedFinding": "proposal_defect",
+      "correct": false
+    },
+    {
+      "id": "ordered-holdout-status-invented-Ethos",
+      "promptSha256": "a82bde420d989f8cd5de3a2ca391e5c37ebcab3b42cf9c4e3ea8c8c83eb3b910",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "symbol": "A",
+      "selectedFinding": "supported",
+      "expectedFinding": "proposal_defect",
+      "correct": false
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Ethos",
+      "promptSha256": "18dff490623ea76c17580e5e37eec51913ab4d889010b7fdc73ce3cdcb377e87",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "symbol": "A",
+      "selectedFinding": "supported",
+      "expectedFinding": "proposal_defect",
+      "correct": false
+    },
+    {
+      "id": "ordered-holdout-status-exact-Logos",
+      "promptSha256": "fea36ebb950294d5c784d6cffd1b88806d084d25d13107ee5931099c0a4040f4",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "symbol": "A",
+      "selectedFinding": "supported",
+      "expectedFinding": "supported",
+      "correct": true
+    },
+    {
+      "id": "ordered-holdout-dimension-exact-Logos",
+      "promptSha256": "75061b3b83bf9d8e42df5e8e7233f07bb4d2943f087d5a6e68ab57821e039716",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "symbol": "A",
+      "selectedFinding": "supported",
+      "expectedFinding": "supported",
+      "correct": true
+    }
+  ]
+}

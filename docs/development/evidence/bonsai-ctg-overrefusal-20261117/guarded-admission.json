@@ -1,0 +1,26 @@
+{
+  "version": "v10 host availability plus unchanged v9 model prompt",
+  "baseCommit": "c374219",
+  "casesSha256": "100587bbca33ca2cc4ac76459c8dd63c93c8856997328eac60d36dc16e57661a",
+  "expectedHostBlocks": [
+    "external-context-outage",
+    "holdout-profile-unavailable",
+    "japanese-context-outage",
+    "japanese-preference-read-failure",
+    "pair-setting-unavailable",
+    "policy-service-unavailable",
+    "printer-profile-outage"
+  ],
+  "modelEvaluatedKnownCases": 39,
+  "previouslyUnrunModelControls": 4,
+  "criteria": [
+    "no new false approval compared with v4 plus the SAME host availability contract",
+    "no regression of a previously correct gate or required model vote on available-context cases",
+    "fewer false denials on those same model-evaluated cases",
+    "all four new model controls pass",
+    "all seven host failures fail closed with zero inference and all Unknown; do not count these as council correctness",
+    "v4 prompt witness hashes must match saved real-model baseline for all available-context known cases",
+    "v9 remains inadmissible as a standalone evaluator; no changes to legacy APIs or original case labels"
+  ],
+  "hostBoundary": "Caller owns required-key selection and actual retrieval status, not the model or untrusted client. Availability is not truth or authorization."
+}

@@ -1,0 +1,4 @@
+{
+  "src/AIKernel.Kernel/Inference/Gemma4CpuMatrix.cs": "4ecc695a6fe6756002e64a592cba1c2e0925e25c73c9d571ad3acc90bc4516bf",
+  "tests/AIKernel.Core.Tests/Inference/Gemma4MatrixTests.cs": "d36c55ab7f8351e9439c79c2cc323379334babd9169a080d7809fc975e3e6435"
+}

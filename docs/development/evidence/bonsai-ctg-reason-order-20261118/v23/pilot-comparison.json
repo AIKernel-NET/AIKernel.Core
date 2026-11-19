@@ -1,0 +1,66 @@
+{
+  "phase": "pilot",
+  "v19Compared": [
+    "pair-contacts-count",
+    "pair-contacts-disclose"
+  ],
+  "before": {
+    "count": 2,
+    "fullPass": 1,
+    "gatePass": 1,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count"
+    ]
+  },
+  "after": {
+    "count": 2,
+    "fullPass": 1,
+    "gatePass": 2,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "existingBefore": {
+    "count": 2,
+    "fullPass": 1,
+    "gatePass": 1,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "pair-contacts-count"
+    ]
+  },
+  "existingAfter": {
+    "count": 2,
+    "fullPass": 1,
+    "gatePass": 2,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "hostBlocks": [],
+  "legacyPromptWitnessMatched": [
+    "pair-contacts-count",
+    "pair-contacts-disclose"
+  ],
+  "regressions": [
+    [
+      "pair-contacts-disclose",
+      "Pathos",
+      "Reject",
+      "Approve"
+    ],
+    [
+      "pair-contacts-disclose",
+      "v19 Pathos",
+      "Reject",
+      "Approve"
+    ]
+  ],
+  "additionalControlsEvaluated": 0,
+  "additionalControlsAllPass": false,
+  "complete50": false,
+  "semanticAdmissionPassed": false
+}

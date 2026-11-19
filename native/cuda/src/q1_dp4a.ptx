@@ -1,0 +1,48 @@
+// Q1_0 bit=1 -> +1. Compute unsigned 0/1 dot signed Q8 then 2*dot-sum(x).
+// One warp per row, four rows per CTA. Inputs/scales are prequantized once.
+.version 6.4
+.target sm_61
+.address_size 64
+.visible .entry matvec_q1_q8_dp4a(
+ .param .u64 weights, .param .u64 input, .param .u64 scales, .param .u64 sums,
+ .param .u64 output, .param .u32 rows, .param .u32 columns)
+{
+ .reg .pred %p<4>;
+ .reg .b16 %h;
+ .reg .b32 %r<24>;
+ .reg .b64 %d<18>;
+ .reg .f32 %f<6>;
+ ld.param.u64 %d0,[weights]; ld.param.u64 %d1,[input];
+ ld.param.u64 %d2,[scales]; ld.param.u64 %d3,[sums]; ld.param.u64 %d4,[output];
+ ld.param.u32 %r0,[rows]; ld.param.u32 %r1,[columns];
+ mov.u32 %r2,%tid.x; and.b32 %r3,%r2,31; shr.u32 %r4,%r2,5;
+ mov.u32 %r5,%ctaid.x; mad.lo.u32 %r6,%r5,4,%r4;
+ setp.ge.u32 %p0,%r6,%r0; @%p0 ret;
+ shr.u32 %r7,%r1,7; mul.lo.u32 %r8,%r6,%r7;
+ mul.wide.u32 %d5,%r8,18; add.u64 %d5,%d0,%d5;
+ shr.u32 %r9,%r3,1; and.b32 %r10,%r3,1; shl.b32 %r10,%r10,2;
+ mul.wide.u32 %d6,%r3,4; add.u64 %d6,%d1,%d6;
+ cvt.u64.u32 %d7,%r9; add.u64 %d7,%d7,2;
+ mov.u32 %r11,0; mov.f32 %f0,0f00000000;
+Lblock:
+ add.u64 %d8,%d5,%d7; ld.global.u8 %r12,[%d8];
+ shr.u32 %r12,%r12,%r10; and.b32 %r12,%r12,15;
+ mul.lo.u32 %r12,%r12,0x00204081; and.b32 %r12,%r12,0x01010101;
+ ld.global.u32 %r13,[%d6];
+ dp4a.u32.s32 %r14,%r12,%r13,0;
+ shfl.sync.bfly.b32 %r15,%r14,16,31,0xffffffff; add.s32 %r14,%r14,%r15;
+ shfl.sync.bfly.b32 %r15,%r14,8,31,0xffffffff; add.s32 %r14,%r14,%r15;
+ shfl.sync.bfly.b32 %r15,%r14,4,31,0xffffffff; add.s32 %r14,%r14,%r15;
+ shfl.sync.bfly.b32 %r15,%r14,2,31,0xffffffff; add.s32 %r14,%r14,%r15;
+ shfl.sync.bfly.b32 %r15,%r14,1,31,0xffffffff; add.s32 %r14,%r14,%r15;
+ ld.global.s32 %r16,[%d3]; shl.b32 %r14,%r14,1; sub.s32 %r14,%r14,%r16;
+ ld.global.b16 %h,[%d5]; cvt.f32.f16 %f1,%h; ld.global.f32 %f2,[%d2];
+ mul.f32 %f1,%f1,%f2; cvt.rn.f32.s32 %f3,%r14;
+ mul.f32 %f3,%f3,%f1; add.f32 %f0,%f0,%f3;
+ add.u64 %d5,%d5,18; add.u64 %d6,%d6,128;
+ add.u64 %d2,%d2,4; add.u64 %d3,%d3,4;
+ add.u32 %r11,%r11,1; setp.lt.u32 %p1,%r11,%r7; @%p1 bra Lblock;
+ setp.eq.u32 %p2,%r3,0; mul.wide.u32 %d9,%r6,4; add.u64 %d9,%d4,%d9;
+ @%p2 st.global.f32 [%d9],%f0;
+ ret;
+}

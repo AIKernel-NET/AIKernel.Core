@@ -1,0 +1,54 @@
+{
+  "revisions": {
+    "transformers": "3a134bc37f7c22c801b618e289b0255425f22647",
+    "llama": "de32b268c4ad55d45f3b7b16c029f4e077f4ba74",
+    "google": "4adf15748de9e1a0097b6274cee9c15836c41c37"
+  },
+  "files": {
+    "modeling_gemma4.py": {
+      "url": "https://raw.githubusercontent.com/huggingface/transformers/3a134bc37f7c22c801b618e289b0255425f22647/src/transformers/models/gemma4/modeling_gemma4.py",
+      "sha256": "9d669bf4f9fe4cccb22721738e6364e6a196287aefda5047913ed60d74f09d22",
+      "bytes": 130591
+    },
+    "configuration_gemma4.py": {
+      "url": "https://raw.githubusercontent.com/huggingface/transformers/3a134bc37f7c22c801b618e289b0255425f22647/src/transformers/models/gemma4/configuration_gemma4.py",
+      "sha256": "7996e0e66d775662e288d5bc19cd8bbbee2f8ccecee7c43b51ab7eb0fb850fea",
+      "bytes": 17185
+    },
+    "gemma4.cpp": {
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/de32b268c4ad55d45f3b7b16c029f4e077f4ba74/src/models/gemma4.cpp",
+      "sha256": "bc2a9d0741ab8ff4fe00e0159f2d43dad3ee1edcf0f098be5daa6fa093a54339",
+      "bytes": 26055
+    },
+    "llama-vocab.cpp": {
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/de32b268c4ad55d45f3b7b16c029f4e077f4ba74/src/llama-vocab.cpp",
+      "sha256": "066d117901071f326d53b4b808bffe1cd502e89afd2af2c6d1bd6542f65bc529",
+      "bytes": 205569
+    },
+    "convert_hf_to_gguf.py": {
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/de32b268c4ad55d45f3b7b16c029f4e077f4ba74/convert_hf_to_gguf.py",
+      "sha256": "297502d115010e97b996e20dc9cdcfc90ee293df9b616259e5a646b64f410630",
+      "bytes": 14871
+    },
+    "config.json": {
+      "url": "https://huggingface.co/google/gemma-4-E2B-it/resolve/4adf15748de9e1a0097b6274cee9c15836c41c37/config.json",
+      "sha256": "1b28f3d2c3100f6c594754b81107428bd7b822a7f48272ca681dae9d2ec38330",
+      "bytes": 4954
+    },
+    "tokenizer.json": {
+      "url": "https://huggingface.co/google/gemma-4-E2B-it/resolve/4adf15748de9e1a0097b6274cee9c15836c41c37/tokenizer.json",
+      "sha256": "ab26b2add729e6f645bd869f228f14190a06615538f3be6f7786f33d13d78ad2",
+      "bytes": 32155733
+    },
+    "tokenizer_config.json": {
+      "url": "https://huggingface.co/google/gemma-4-E2B-it/resolve/4adf15748de9e1a0097b6274cee9c15836c41c37/tokenizer_config.json",
+      "sha256": "9f4fec4b1dc6ecddf8f4a92e9caea5971c0e67d81309f3f9066a2bee8c362633",
+      "bytes": 3082
+    },
+    "chat_template.jinja": {
+      "url": "https://huggingface.co/google/gemma-4-E2B-it/resolve/4adf15748de9e1a0097b6274cee9c15836c41c37/chat_template.jinja",
+      "sha256": "0a2c8073c878ab1da004bee933a998606537bbb62016310352c7285c3f01c5b5",
+      "bytes": 18569
+    }
+  }
+}

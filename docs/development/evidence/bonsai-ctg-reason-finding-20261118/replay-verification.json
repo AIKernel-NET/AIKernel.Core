@@ -1,0 +1,917 @@
+{
+  "replayOnly": true,
+  "newModelCalls": 0,
+  "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+  "verifierSha256": "821524df12f44836a4bb4ec53170a1c05cfbf594227ce281aefa416b35d1f26a",
+  "completedCases": 21,
+  "capturedStages": 79,
+  "ownReasonSelections": 27,
+  "phases": [
+    {
+      "phase": "pilot",
+      "casesSha256": "c81ae4caca6c20e140c861ac91ce86acebaa47eefac1a4f7692faf69531a3bd4",
+      "observationsSha256": "ba6f9fe16df7d1a5acdf60fa755c851ee24471527e717c78b577031e0cdbd0bc",
+      "recordedResultsSha256": "18b210d69981ffc3d53cef098c2f54026f91609e3c0474a31235b4b4464dab33",
+      "uncommittedPartialCaseIds": [],
+      "rows": [
+        {
+          "id": "ordered-holdout-status-invented",
+          "reconstructedCalls": 7,
+          "attachedReasons": 3,
+          "verifiedSelectionCalls": 3,
+          "formalGate": false,
+          "succeeded": true,
+          "votes": {
+            "Logos": "Approve",
+            "Ethos": "Reject",
+            "Pathos": "Reject"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "1b864f841b10d6957ce33a6a45b499d970abdf75c5c1d346cc66efa62679e5a5",
+              "responseSha256": "b64eb46c35f677856b0caf31986ba858df2d710ee2bdb8a43e48ff753cb4afcf",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "draft",
+              "promptSha256": "dc6ca3618122b7797b7b0797458af9d89c53f1f4cb3c599ab602eeb4c14d5a16",
+              "responseSha256": "ebc4c8dd4befa9f90ce9ec6cbb553c30c85803ea992089d545f59104f51213e7",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "73ecd9314854ac7c9fe546f1b9e098604bdef52765e64e8ee67b821fe3a4503f",
+              "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+              "attachedReasonSha256": "ebc4c8dd4befa9f90ce9ec6cbb553c30c85803ea992089d545f59104f51213e7"
+            },
+            {
+              "role": "Ethos",
+              "stage": "draft",
+              "promptSha256": "e180345bab411701fcf5796f5a05abe84c55c51fde440bdcb6177debffbfb5cf",
+              "responseSha256": "3f88938c76e300b20979a013dd746dddc541ccb2239c69b8c502e008306864f3",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "d083c435d20e19c96f02fd163fd9faadb431daaeed34ad4568702821a378945e",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "3f88938c76e300b20979a013dd746dddc541ccb2239c69b8c502e008306864f3"
+            },
+            {
+              "role": "Pathos",
+              "stage": "draft",
+              "promptSha256": "e5530a2fb33dae39a546c789f0dd91f89e0a47c776402cb9e5acf51e4d17f305",
+              "responseSha256": "3495676c7ee8136a98bf11f497fc49a1ef0b385238d64915548af77249b105a7",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Pathos",
+              "stage": "final",
+              "promptSha256": "bf7985f42dc02161b99e5138e50ae2de98e01989f9a741d8aab3e340695b6c80",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "3495676c7ee8136a98bf11f497fc49a1ef0b385238d64915548af77249b105a7"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "paired",
+      "casesSha256": "a8d8429529e0b79fc1ab0599904043801a6b0db2e5318697f337690164f2d433",
+      "observationsSha256": "8a7b31cd0743217e4e09b7e4fa3023ae8136c327d7572dae964254d025a25110",
+      "recordedResultsSha256": "65a29f386432c97763549442fcc13b2fb09f91bf38c7e06bee8a0e698aaa7e2b",
+      "uncommittedPartialCaseIds": [],
+      "rows": [
+        {
+          "id": "ordered-holdout-status-exact",
+          "reconstructedCalls": 7,
+          "attachedReasons": 3,
+          "verifiedSelectionCalls": 3,
+          "formalGate": true,
+          "succeeded": true,
+          "votes": {
+            "Logos": "Approve",
+            "Ethos": "Approve",
+            "Pathos": "Approve"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "c145a57dcc026d029cb970d69bf0952d7bf1c2b160c42e2d3944b38e89100610",
+              "responseSha256": "d49968a4c301fcb26881219640bb907cceb882cb31bbf7775cc53c71af41fd94",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "draft",
+              "promptSha256": "053f107e675b3a3baf931acef1df2705610d89deb5923be2364780ff8757b883",
+              "responseSha256": "f476eac04c9e84e7ad256cc70e932fdc9d607fcd3a2bdd6686bfa916f6818c6c",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "d55408cf14af72270482d5c21ee935c51735eee63aacb766914a2654129bd4f6",
+              "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+              "attachedReasonSha256": "f476eac04c9e84e7ad256cc70e932fdc9d607fcd3a2bdd6686bfa916f6818c6c"
+            },
+            {
+              "role": "Ethos",
+              "stage": "draft",
+              "promptSha256": "c9652e3477bb3dc3e2b96f0270fbfa661e61e74448c9f8ea14b8c16bad5c6e32",
+              "responseSha256": "e316adf849b8e85eaadb4406dcb9f38fdfda31787744ed4206f9d8c43aa51397",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "7c003656241441a6b6a7ad92b7bec1a044e9f71503aff7ea2f9d0eedcd8cc1e9",
+              "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+              "attachedReasonSha256": "e316adf849b8e85eaadb4406dcb9f38fdfda31787744ed4206f9d8c43aa51397"
+            },
+            {
+              "role": "Pathos",
+              "stage": "draft",
+              "promptSha256": "b0def518cb27cb3f8cd396af3307d387ad641a471e3fe07a88f01b113437170e",
+              "responseSha256": "5361032ad41872727333625d929682505f691a01408acd978e1f7207bd024c29",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Pathos",
+              "stage": "final",
+              "promptSha256": "fea73306f5a1f3f86f31e1f989c27ae0b0b481915a7d35cd88a782de7c9b046a",
+              "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+              "attachedReasonSha256": "5361032ad41872727333625d929682505f691a01408acd978e1f7207bd024c29"
+            }
+          ]
+        },
+        {
+          "id": "ordered-holdout-dimension-wrong",
+          "reconstructedCalls": 7,
+          "attachedReasons": 3,
+          "verifiedSelectionCalls": 3,
+          "formalGate": false,
+          "succeeded": true,
+          "votes": {
+            "Logos": "Reject",
+            "Ethos": "Reject",
+            "Pathos": "Reject"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "758fcc4a100fc41cb70e7638a03013a34a601c5030d030b5b593a8ba78148aa5",
+              "responseSha256": "f2f155e0a087b84bfb58f7277fccfddf6841e0e56063fd25ce62f8a307abf4d0",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "draft",
+              "promptSha256": "9ad30894b1be311218b362d510eb3b5844f636383c336a973d30f6c374e02a61",
+              "responseSha256": "d7a2ab0369831bf0ff4c627ae43957b1d3bd9c297c0dfc063a147929926c7cf0",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "180e5df31cb778b710c7d689e4576cc1c06345e9e77b991d839309c8ec6f01f8",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "d7a2ab0369831bf0ff4c627ae43957b1d3bd9c297c0dfc063a147929926c7cf0"
+            },
+            {
+              "role": "Ethos",
+              "stage": "draft",
+              "promptSha256": "9bb92cbe206fb828edd79c52b9695f3952e2514034a6462827d445d72356af0e",
+              "responseSha256": "fc6df6aabf0d7e29b2c376b7a7b00fe99dc7720a5bb80572229585019a7a0716",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "3ad0456843d0c260d5e1899ea495cafd63f37ea4c546615eb3be0de452e95de9",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "fc6df6aabf0d7e29b2c376b7a7b00fe99dc7720a5bb80572229585019a7a0716"
+            },
+            {
+              "role": "Pathos",
+              "stage": "draft",
+              "promptSha256": "704c4d8034af536e478ccdf4079bbf1193b25f638e583ebb21297570efaeb756",
+              "responseSha256": "8dd6c9eac266d39f5bdf9f54d37eb6d04f3c31d49edaa094bbfbbf10def9982d",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Pathos",
+              "stage": "final",
+              "promptSha256": "edae7d0272fa69c9f09be2b6cfe4b8dd5088960afc40e633e80385a1fe40556e",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "8dd6c9eac266d39f5bdf9f54d37eb6d04f3c31d49edaa094bbfbbf10def9982d"
+            }
+          ]
+        },
+        {
+          "id": "ordered-holdout-dimension-exact",
+          "reconstructedCalls": 6,
+          "attachedReasons": 3,
+          "verifiedSelectionCalls": 2,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "db967e2b67a9aa709fd43a899ec8a94a2e1af226755444bda22a3ed61e8df510",
+              "responseSha256": "f8ebc22399f325029176e580e0e3f94d051065b00a046a5b014e8ae84624924a",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "draft",
+              "promptSha256": "2a7d71cefbacc70abaa183e7fc553b4761b7c60c22a4770c9172ca2ea657eb51",
+              "responseSha256": "77ac9004cf31dbd87c605f11f8ddb653b9dc9db95728caac54bab8ad5fa89fb4",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "fdbffbc30aa2ee11819568041e8534add9d449fcd7e02d9f51ff86e6ce10957d",
+              "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+              "attachedReasonSha256": "77ac9004cf31dbd87c605f11f8ddb653b9dc9db95728caac54bab8ad5fa89fb4"
+            },
+            {
+              "role": "Ethos",
+              "stage": "draft",
+              "promptSha256": "b71afe83c21d37ba73a8bdc794607ec4d853b61b96df6741525e27339d88e6ee",
+              "responseSha256": "de4245dc705beb83a5d5b9d457ab2e7ce6ca353b56df6f1501f3437e9c363028",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "444253434c89bb02e025bcdbe70afe482de609e4d15baf10bbadc89cbe8d5556",
+              "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+              "attachedReasonSha256": "de4245dc705beb83a5d5b9d457ab2e7ce6ca353b56df6f1501f3437e9c363028"
+            },
+            {
+              "role": "Pathos",
+              "stage": "draft",
+              "promptSha256": "8380df52e1610965b71f011a7b7c31ccb6eb4c1d8c26f04449f5ddbda88f3860",
+              "responseSha256": "a776551eb8345d3f00c58ee7b1a363f5c51d90060b80d6aeef83757e755e672d",
+              "attachedReasonSha256": null
+            }
+          ]
+        },
+        {
+          "id": "pair-contacts-count",
+          "reconstructedCalls": 4,
+          "attachedReasons": 0,
+          "verifiedSelectionCalls": 0,
+          "formalGate": true,
+          "succeeded": true,
+          "votes": {
+            "Logos": "Approve",
+            "Ethos": "Approve",
+            "Pathos": "Approve"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "37bc3aa7a668a2cec2bae58840288b08ef871584a90d5104cc4095b61f4da1f7",
+              "responseSha256": "77f506e12508c8a1f04047fa3de81a26132f089bb4b6f64e8e58a7ca4e5efdee",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "fbe4d526ff920a49bfc8ee9c297cf5bd9a1c6ea50b26d81fa1aa020b60f54be9",
+              "responseSha256": "ebb4c91b23a7cc595715fbf07f2dded1894f64be221059744552a1c79a869576",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "0bed9c7ae55bd70f6ddf84ec4e8741c840319f2012c4767acef36e71762d3f31",
+              "responseSha256": "b1f146b7f719cbf5b5a795e72b8d4e58734be1c2769537ebb0230194ae3c7cd0",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Pathos",
+              "stage": "final",
+              "promptSha256": "6dc45283b4fae775f5abf88da07df122d8b5a930aaa21d1dd0a90b1f0b16e55e",
+              "responseSha256": "19c55213f142aeead95250ecdb3975fea0ae07b46358b870d1a3f20e8b38774d",
+              "attachedReasonSha256": null
+            }
+          ]
+        },
+        {
+          "id": "pair-contacts-disclose",
+          "reconstructedCalls": 4,
+          "attachedReasons": 0,
+          "verifiedSelectionCalls": 0,
+          "formalGate": false,
+          "succeeded": true,
+          "votes": {
+            "Logos": "Approve",
+            "Ethos": "Reject",
+            "Pathos": "Reject"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "dd1917a4d86961eb005e6723ed85c9e97afe233797fd54afce5d67bff9290822",
+              "responseSha256": "82a8bf815a7a2182924d3ee497a9a2f84254df2018f38c45d590c587efed34d5",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "2cf40f8ac4697d5663c093f90ff5a0fa2195928cbca673874dcc2e3d0cc76843",
+              "responseSha256": "91dfd45ff827f2aa19282139e8d5c64f7407829f3d658a1fa9ae4feec50d8f91",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "794f90432ea10231a4fe2c7e36bddb39f83b91289084ce6e11594dc4ecfcdb4b",
+              "responseSha256": "d0202ef9201b0071d8a520ae93e1be4dddc6684efcc6f591a673aeadd3e370de",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Pathos",
+              "stage": "final",
+              "promptSha256": "e0f48e90a58e308415186698b39f7a6bcc485ffb50c2f90832a35e503c491037",
+              "responseSha256": "ad80a48acaddacee2ddcd7e1c581cc4a98f5e521865a5242a7ec9eaede1f034a",
+              "attachedReasonSha256": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "independent",
+      "casesSha256": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+      "observationsSha256": "3cdaa891c10d59b439d75afcfd0b077ccb2b9a94f4e92b600d1b69cf4d01fea3",
+      "recordedResultsSha256": "39777c1220a082ca7c84111f1ff487693c01a32111aec7b2356c371f71f94a7c",
+      "uncommittedPartialCaseIds": [],
+      "rows": [
+        {
+          "id": "independent-status-exact",
+          "reconstructedCalls": 7,
+          "attachedReasons": 3,
+          "verifiedSelectionCalls": 3,
+          "formalGate": true,
+          "succeeded": true,
+          "votes": {
+            "Logos": "Approve",
+            "Ethos": "Approve",
+            "Pathos": "Approve"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "66b5b854a71097247b5e0d782b5352ee649aecc45baae6eac724302c4975f7a1",
+              "responseSha256": "849db86574202d7667c6d6a4c0d8cdf9b651bc34a0e5766e1d9cfb570e500ba4",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "draft",
+              "promptSha256": "19dc0b5d678a2a8853b3ac596c8799a9524672385711075a8b2171569e7f7fce",
+              "responseSha256": "f31e458ee4c11a0a80f1e45f84c030c8d8e9ce4668b5d9fc795d8aa7dcecf10c",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "e800a7749f88f6231dcfa0d01f650e5b5ce5b1b013c788eebb2a7fc10625b36f",
+              "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+              "attachedReasonSha256": "f31e458ee4c11a0a80f1e45f84c030c8d8e9ce4668b5d9fc795d8aa7dcecf10c"
+            },
+            {
+              "role": "Ethos",
+              "stage": "draft",
+              "promptSha256": "42910c3356193bc44deff3199069143bcf92abfad116dddae252c9859604c5b6",
+              "responseSha256": "674ab251d146aa0f03db0d4dade3b47316fd78e1001370dddfe183d8ddf1be30",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "41fd19d348548d2ffbf04169fdc8347b46840c03f2af36bea06aea0af91b817b",
+              "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+              "attachedReasonSha256": "674ab251d146aa0f03db0d4dade3b47316fd78e1001370dddfe183d8ddf1be30"
+            },
+            {
+              "role": "Pathos",
+              "stage": "draft",
+              "promptSha256": "6bc4393e02748f4067489c203366d2883f79eb328e67cdad320b2052772ed598",
+              "responseSha256": "380ea771cd597872c8f9890d1b657afebeef35e10c14fd182ef62c0372786521",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Pathos",
+              "stage": "final",
+              "promptSha256": "2a17ea4f540ecc284ad0957afd29ae958fc256d32dfb7e1c9d8b9b2923401c2f",
+              "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+              "attachedReasonSha256": "380ea771cd597872c8f9890d1b657afebeef35e10c14fd182ef62c0372786521"
+            }
+          ]
+        },
+        {
+          "id": "independent-status-changed",
+          "reconstructedCalls": 6,
+          "attachedReasons": 3,
+          "verifiedSelectionCalls": 2,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "61bc4953e639f965d25f6385616914c4f0051026ef1800286d321d72b9254280",
+              "responseSha256": "ebd4a64c516d0a16296f2ce5e58a0b88f435a4d566a53d01c0af974b53a6266b",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "draft",
+              "promptSha256": "124ee9f1f5de476fe02aeb166d0cd6df597a27906e5811e73fdb39804cd9728d",
+              "responseSha256": "e8fe1a1229920186a9687528af15acada234ffca5612c7de66839524a4db1bfe",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "b5519b3518263ef5d2e493d8fc14f67cb145608177fbdcf6a6498e3c5d963c94",
+              "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+              "attachedReasonSha256": "e8fe1a1229920186a9687528af15acada234ffca5612c7de66839524a4db1bfe"
+            },
+            {
+              "role": "Ethos",
+              "stage": "draft",
+              "promptSha256": "0a87382f6f1259ec78a51afb5e0c352b7907fc6f15cb2729975331a587b8b2ba",
+              "responseSha256": "49faec844479ccf056ace94f9bab37132b15df2a4c73c722aa04180fd9cbc484",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "35a7a2108fe4bdfd643a8a7e7e1b99e165bdf51db1eed92450c2a682146a7ab0",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "49faec844479ccf056ace94f9bab37132b15df2a4c73c722aa04180fd9cbc484"
+            },
+            {
+              "role": "Pathos",
+              "stage": "draft",
+              "promptSha256": "2fd60e9874cab632c70380e98eeb398b997194467cb59e4eaf0ac532a93c5eb2",
+              "responseSha256": "30b4edce80774bb2499a4604691e538788ae5a0a522182441d4dee5e069f3510",
+              "attachedReasonSha256": null
+            }
+          ]
+        },
+        {
+          "id": "independent-length-exact",
+          "reconstructedCalls": 2,
+          "attachedReasons": 0,
+          "verifiedSelectionCalls": 0,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "8f7ac8be6fb8d226caff9a895747ec6a43b0757adf300b1f057e783ac1241da7",
+              "responseSha256": "dde88836fc9b7eb5f4345ae7176fa06b104071b6795d91f4e5de0a62c783b92e",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "e6a5cc9795920e8863a3c6a59e2508d5d53763be61d988e40938f248b83f9fe4",
+              "responseSha256": "ed7986a755702636c462b079d09c2c0110619792d95bce584cff9dce9a162d9e",
+              "attachedReasonSha256": null
+            }
+          ]
+        },
+        {
+          "id": "independent-length-changed",
+          "reconstructedCalls": 2,
+          "attachedReasons": 0,
+          "verifiedSelectionCalls": 0,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "d633b6abf677a3e01ee73f793b49ad0902a44b9beb20df03b026a7cc4b6135e4",
+              "responseSha256": "95b4676fdb2d2ccdaf9935be2e49113159e07bdce0460767b50e268f1fabfe7b",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "8a1a76e48ed321032a2f87321ec71ba1f199e0dd09e772a8235f6b57d263cfab",
+              "responseSha256": "2cad917369cd620a653a92b8bbdd871e0b94bed4e2e63494814fef15612bb697",
+              "attachedReasonSha256": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "semantic",
+      "casesSha256": "bf08fc0b1a19eb9c0b511af0829a28eb7d0c2508dfcb1665faa4bcd3e40a8836",
+      "observationsSha256": "a510b8bc81f86e3865dd45bbf3165412600ba2ff769b1aeabe8a62b408510b77",
+      "recordedResultsSha256": "c4613bc2c0a5df0630cb308b8f816f26143c1885f463928671aac388d4e4a4a9",
+      "uncommittedPartialCaseIds": [],
+      "rows": [
+        {
+          "id": "q0p0",
+          "reconstructedCalls": 7,
+          "attachedReasons": 3,
+          "verifiedSelectionCalls": 3,
+          "formalGate": false,
+          "succeeded": true,
+          "votes": {
+            "Logos": "Reject",
+            "Ethos": "Approve",
+            "Pathos": "Reject"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "1cd1f5f154a1bd9b4a9f851dab9c5138d836c63222324771d1f6530bea4655cf",
+              "responseSha256": "eef6ed7720f89c700322b2cd40c58c31861d4bf80e135e7de3d6f152276a0fd3",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "draft",
+              "promptSha256": "ac7155b915819ade89ffc297c924af7a7588ba5351c2b4ae197a3dbdd89a6b2c",
+              "responseSha256": "b92b16698ec67915223279820f62ceb354a77043b7a234103dc4311a2e3398a5",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "638c4f909ca47fe25aebb884461ea6676c2915e9a1a64cf25aeafe9bda6b4781",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "b92b16698ec67915223279820f62ceb354a77043b7a234103dc4311a2e3398a5"
+            },
+            {
+              "role": "Ethos",
+              "stage": "draft",
+              "promptSha256": "be0d7958081e4f8d69e52e9ac83928b574e787def227a8b5db4b5949496a1993",
+              "responseSha256": "751c283ec1c6c8257028fe3830c3515c10fb8642509257187d1ee131ed6367be",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "3b0f12be5555dd739f186fa539a53c74e9fc9ee27db543a4463f50cba15176ea",
+              "responseSha256": "85a39ab345d672ff8ca9b9c6876f3adcacf45ee7c1e2dbd2408fd338bd55e07e",
+              "attachedReasonSha256": "751c283ec1c6c8257028fe3830c3515c10fb8642509257187d1ee131ed6367be"
+            },
+            {
+              "role": "Pathos",
+              "stage": "draft",
+              "promptSha256": "95491e85dec75184c8cb77da7ed8034cedaf201732adc67610d37ac1f93e8407",
+              "responseSha256": "dba64dcfec61ac1db741146dd035a29d757385164a0559fd55c0ee1a5a66ae71",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Pathos",
+              "stage": "final",
+              "promptSha256": "d51c94953140307345eb021e299444a81ad7b1b36363ae820f8f51c8b779cb8a",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "dba64dcfec61ac1db741146dd035a29d757385164a0559fd55c0ee1a5a66ae71"
+            }
+          ]
+        },
+        {
+          "id": "q1p1",
+          "reconstructedCalls": 7,
+          "attachedReasons": 3,
+          "verifiedSelectionCalls": 3,
+          "formalGate": false,
+          "succeeded": true,
+          "votes": {
+            "Logos": "Reject",
+            "Ethos": "Reject",
+            "Pathos": "Reject"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "b76cd81c657a620826f7b0214625db5114792712c0eea09ac433a74f0c5dbd3c",
+              "responseSha256": "f4c2ba7bd12a256f5b8f5665c76ee578e86015c74b8f584baa3e7efd94876f3f",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "draft",
+              "promptSha256": "5bc89f35a7621970581969da48dae43a3e0f3def739ea2cda8297147b15a825e",
+              "responseSha256": "9b4656ec57d04a4dc4f1f1513599ef8ea916a7a9776b07bf62a17fc213d27982",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "d0b6c6cd0efd06d7a31beb63827cf3a076e5e72d1d4d23988c2151e6a21058b2",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "9b4656ec57d04a4dc4f1f1513599ef8ea916a7a9776b07bf62a17fc213d27982"
+            },
+            {
+              "role": "Ethos",
+              "stage": "draft",
+              "promptSha256": "cdc0ddfca453121ebd451db7ad164bb41f6df99fbb3e7861967262195e6a29a8",
+              "responseSha256": "367951aa33887870439652960026b6f21a3250b62b42b70a35814a8b83edc3ca",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "34ab47937e5e0a6302308194820905c92b4e3c995a13fe8307bd6af958be4dec",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "367951aa33887870439652960026b6f21a3250b62b42b70a35814a8b83edc3ca"
+            },
+            {
+              "role": "Pathos",
+              "stage": "draft",
+              "promptSha256": "f1bfd493a51a5e0ebeb90ca134d08ee1a92bd0a2a65c41ad34d815d0fac68203",
+              "responseSha256": "e4548f08c2e79e5a87f582938d3ecbfc035a4b180eb59297d249f8e9e4d3b537",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Pathos",
+              "stage": "final",
+              "promptSha256": "31e7c9fbd7bf200f865409334de2057789b5997085b6e4e7a8d9d313a721d15f",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "e4548f08c2e79e5a87f582938d3ecbfc035a4b180eb59297d249f8e9e4d3b537"
+            }
+          ]
+        },
+        {
+          "id": "q0p1",
+          "reconstructedCalls": 6,
+          "attachedReasons": 3,
+          "verifiedSelectionCalls": 2,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "513806b3cc1519827e4e8dc9f13657a1845aa56b3222cd1cb8081b127d59d756",
+              "responseSha256": "ffed952fea90e5f8cece99186a6c51ca1da5d257674d3cd932ac17500318f721",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "draft",
+              "promptSha256": "29ed30fbd8df2dfa75b8a0e1a0b42f0e86a977401646792627da015665cc987b",
+              "responseSha256": "00df2ec55dcb6084429aced933a54c7e9eb320bf699c0180af9dfb6c3f4bbb14",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "25b11a31f5f8c1c671f92bf96f244737c9f32abd2820360b675eafd9fd8c62ca",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "00df2ec55dcb6084429aced933a54c7e9eb320bf699c0180af9dfb6c3f4bbb14"
+            },
+            {
+              "role": "Ethos",
+              "stage": "draft",
+              "promptSha256": "9ae6013e45e027b342af1d6dcea16f43ce36c25862248a67d4332236e63fea70",
+              "responseSha256": "69b158865d071b9856206d6f058eb1cca4984739caaae6d93bfea359dfe96572",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "9204919dad915ee1287ff29eedb58bf3fe2a06317152c9604ca3057d7429178b",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "69b158865d071b9856206d6f058eb1cca4984739caaae6d93bfea359dfe96572"
+            },
+            {
+              "role": "Pathos",
+              "stage": "draft",
+              "promptSha256": "333e77bd11be0a1b27c6cfb6818bc3d2d692c350b4ea95aa6737c8e615c30481",
+              "responseSha256": "8361d9b7899b092396cabe648e77640189da51386c2bc617b6d57e41ac31ff35",
+              "attachedReasonSha256": null
+            }
+          ]
+        },
+        {
+          "id": "q1p0",
+          "reconstructedCalls": 7,
+          "attachedReasons": 3,
+          "verifiedSelectionCalls": 3,
+          "formalGate": false,
+          "succeeded": true,
+          "votes": {
+            "Logos": "Reject",
+            "Ethos": "Reject",
+            "Pathos": "Reject"
+          },
+          "captured": [
+            {
+              "role": "none",
+              "stage": "reading",
+              "promptSha256": "b9389a1a85e1baf8d9a2bf33467a4519487a7176d373c451c49c4cfec5b4f7b0",
+              "responseSha256": "bbdd6feb7477f66d80742667baf996d1de620aab2e7ce5544d530e4fc85b80ad",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "draft",
+              "promptSha256": "26de0bb65d2f0c56804115b6cd5940a2923b477a4731e31e59a777ef068e7282",
+              "responseSha256": "1b0374e0a161cbf54dde60471d66a3b21a998dfca29678dd006077bf8c44c53f",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Logos",
+              "stage": "final",
+              "promptSha256": "afc77d24ab96c927e9174670beac78e048f3b984c4a279ed2bbab6bfa07b8daa",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "1b0374e0a161cbf54dde60471d66a3b21a998dfca29678dd006077bf8c44c53f"
+            },
+            {
+              "role": "Ethos",
+              "stage": "draft",
+              "promptSha256": "13f5d74aa8b9082a7e1a2ae46d2ce5bea1173825f0b019df276757b7ddb2527e",
+              "responseSha256": "c8dbdcf71e43c8049a19c75c272dbbeb92ca6de0591f23cb47091d5d5642226a",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Ethos",
+              "stage": "final",
+              "promptSha256": "812442a9e41ec5c217b191c52667ba8f8d9889d74a806326fb6029f92cd931ca",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "c8dbdcf71e43c8049a19c75c272dbbeb92ca6de0591f23cb47091d5d5642226a"
+            },
+            {
+              "role": "Pathos",
+              "stage": "draft",
+              "promptSha256": "1319cd44656f79017c53bf0fecec1d7ed899664ed52b5488527938020c6dcb8f",
+              "responseSha256": "fad0af2e37a78bb44a1f886563185f3ba9613255e12f5723a442daa26d44b3e5",
+              "attachedReasonSha256": null
+            },
+            {
+              "role": "Pathos",
+              "stage": "final",
+              "promptSha256": "487723d78cad493a82ebcf0cc06aa75538af207f1c96872fa0b21998daf01eb4",
+              "responseSha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
+              "attachedReasonSha256": "fad0af2e37a78bb44a1f886563185f3ba9613255e12f5723a442daa26d44b3e5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "host",
+      "casesSha256": "15bb27a39a859014c56617aa93143d24d4fef40ab4210244ec2df75a7906daf7",
+      "observationsSha256": null,
+      "recordedResultsSha256": "7032bc2fea9aca9d0f98349a5a52698f21704148d707291a7040cca49630875c",
+      "uncommittedPartialCaseIds": [],
+      "rows": [
+        {
+          "id": "external-context-outage",
+          "reconstructedCalls": 0,
+          "attachedReasons": 0,
+          "verifiedSelectionCalls": 0,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": []
+        },
+        {
+          "id": "policy-service-unavailable",
+          "reconstructedCalls": 0,
+          "attachedReasons": 0,
+          "verifiedSelectionCalls": 0,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": []
+        },
+        {
+          "id": "japanese-context-outage",
+          "reconstructedCalls": 0,
+          "attachedReasons": 0,
+          "verifiedSelectionCalls": 0,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": []
+        },
+        {
+          "id": "printer-profile-outage",
+          "reconstructedCalls": 0,
+          "attachedReasons": 0,
+          "verifiedSelectionCalls": 0,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": []
+        },
+        {
+          "id": "japanese-preference-read-failure",
+          "reconstructedCalls": 0,
+          "attachedReasons": 0,
+          "verifiedSelectionCalls": 0,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": []
+        },
+        {
+          "id": "pair-setting-unavailable",
+          "reconstructedCalls": 0,
+          "attachedReasons": 0,
+          "verifiedSelectionCalls": 0,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": []
+        },
+        {
+          "id": "holdout-profile-unavailable",
+          "reconstructedCalls": 0,
+          "attachedReasons": 0,
+          "verifiedSelectionCalls": 0,
+          "formalGate": false,
+          "succeeded": false,
+          "votes": {
+            "Logos": "Unknown",
+            "Ethos": "Unknown",
+            "Pathos": "Unknown"
+          },
+          "captured": []
+        }
+      ]
+    }
+  ]
+}

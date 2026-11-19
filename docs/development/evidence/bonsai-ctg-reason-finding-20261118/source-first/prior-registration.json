@@ -1,0 +1,22 @@
+{
+  "diagnosticOnly": true,
+  "newModelCalls": 12,
+  "council": "Logos",
+  "expectedUnseen": false,
+  "hypothesis": "Repeat the literal observation and candidate in separate source-first fields for the reason stage only; the v28 limited choice sees the generated reason with the original v28 system and user base.",
+  "gate": "All six selections must match the previously specified Logos finding, with valid draft and classified token, preserving all previously correct answers. Only then consider a formal candidate. No diagnostic is a vote.",
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "files": {
+    "source-inputs.json": "c8e23e1181a18cd28ff5ff587106f85e092f3784bc0f60ec77ad742d742adc1c",
+    "sources.json": "bb67018f7756aa9993f38e165b37260b9200f988fe57d132091eb7a8df6e16a9",
+    "expectations.json": "5f72164c3601c2639412fe87a74569d4e312f8e3f4391e31be8ea25decbfa89c",
+    "prompts.json": "5cf1ddf1d020e7650229121bcd5fbf7492dafe39bf3fdf03db8bd198f2c7644d",
+    "cases.json": "143f0b3da8698b43d91eea25358aee57c6d41b9f2c50954a26bb55c9c0586498",
+    "prepare.py": "7f499646fcb7b8d3718810b08b97b3be5cb6c06f2277e9bbecbae72480ad94f0",
+    "score.py": "6226bb8d3dae1bb8a94e17723e7739c8ced15c7fa8a0a100c5a928e23fab0924",
+    "Probe.csproj": "90c416e77c08f7c3e919214643d9fbaeccc931f69c325af4315cee1c8fb15c3e",
+    "Program.cs": "069f36ce356196a765c9d5a362fee76c70ecb42fe689e4afe06df07156c7984a",
+    "app/AIKernel.Core.Tests.dll": "cc870aa44cf28239f62e350d5a019ee223b87096d59aaf4b0c6bfc692a09a8d1",
+    "app/AIKernel.Kernel.dll": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be"
+  }
+}

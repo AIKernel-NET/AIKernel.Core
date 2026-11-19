@@ -1,0 +1,69 @@
+{
+  "phase": "citation-pilot-fixed",
+  "before": {
+    "count": 3,
+    "fullPass": 1,
+    "gatePass": 1,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "ordered-holdout-status-exact",
+      "ordered-holdout-dimension-exact"
+    ]
+  },
+  "after": {
+    "count": 3,
+    "fullPass": 2,
+    "gatePass": 2,
+    "evaluationFailed": [
+      "ordered-holdout-dimension-exact"
+    ],
+    "falseAllow": [],
+    "falseDeny": [
+      "ordered-holdout-dimension-exact"
+    ]
+  },
+  "existingBefore": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "existingAfter": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "hostBlocks": [],
+  "legacyPromptWitnessMatched": [
+    "ordered-holdout-status-exact",
+    "ordered-holdout-status-invented",
+    "ordered-holdout-dimension-exact"
+  ],
+  "regressions": [
+    [
+      "ordered-holdout-dimension-exact",
+      "evaluation failed",
+      "ctg.bonsai.invalid_assessment"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "Ethos",
+      "Approve",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-dimension-exact",
+      "additional control failed"
+    ]
+  ],
+  "additionalControlsEvaluated": 3,
+  "additionalControlsAllPass": false,
+  "complete50": false,
+  "semanticAdmissionPassed": false
+}

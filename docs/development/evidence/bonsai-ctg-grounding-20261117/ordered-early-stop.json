@@ -1,0 +1,8 @@
+{
+  "reason": "regression of previously correct gate violates frozen admission criterion",
+  "caseId": "japanese-arithmetic",
+  "completedCases": 17,
+  "pid": 1716770,
+  "signal": "SIGTERM",
+  "timeUtcSeconds": 1794846808.8955467
+}

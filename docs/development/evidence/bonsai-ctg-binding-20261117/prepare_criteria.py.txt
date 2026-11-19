@@ -1,0 +1,24 @@
+from pathlib import Path
+import json,re
+root=Path(__file__).parent
+for name in ('server_transfer.py','server_results.py','inspect_responses.py'):
+ text=(root/name).read_text(encoding='utf-8').replace("'reading-probe')","'reading-probe', 'criteria-pilot', 'criteria-full', 'final-v18')")
+ if name=='server_transfer.py':
+  text=text.replace("'--bonsai-ctg-reading-probe')","'--bonsai-ctg-reading-probe','--bonsai-ctg-criteria-suite')")
+  text=text.replace("'public_runner.py' if phase=='final-api' else 'remote_runner.py'","'criteria_public_runner.py' if phase=='final-v18' else 'public_runner.py' if phase=='final-api' else 'remote_runner.py'")
+  text=re.sub(r'^settings=json.dumps.+$',"settings=json.dumps({'mode':mode,'waitFor':{'provenance-pilot':'scope-pilot','reading-probe':'final-api','criteria-pilot':'reading-probe','host-guards':'final-v18'}.get(phase),'postChecks':phase in ('scope-full','provenance-full','criteria-full'),'stopOnRegression':phase in ('scope-full','provenance-full','criteria-pilot','criteria-full')}).encode()",text,flags=re.M)
+ (root/name).write_text(text,encoding='utf-8')
+text=(root/'remote_runner.py').read_text(encoding='utf-8').replace("if settings['waitFor']=='final-api':","if settings['waitFor'] in ('final-api','final-v18'):")
+text=text.replace(" else:\n  assert previous['stopReason']", " elif settings['waitFor']=='reading-probe':\n  assert previous['stopReason'] is None and previous['exitCode']==0\n  diagnostic=json.loads((dependency/'result.json').read_text());assert diagnostic['diagnosticOnly'] and diagnostic['rows'][-1]['match']\n else:\n  assert previous['stopReason']")
+text=text.replace("'--bonsai-ctg-reading-probe')","'--bonsai-ctg-reading-probe','--bonsai-ctg-criteria-suite')")
+(root/'remote_runner.py').write_text(text,encoding='utf-8')
+text=(root/'public_runner.py').read_text(encoding='utf-8').replace("out.parent/'provenance-pilot'","out.parent/'criteria-pilot'")
+text=text.replace("assert previous['stopReason'] is None and previous['exitCode'] in (0,1)\nassert len(json.loads((dependency/'result.json').read_text()))==8", "assert (previous['stopReason'] is None and previous['exitCode'] in (0,1)) or (previous['stopReason']=='semantic-regression' and previous['exitCode']==-15 and (dependency/'stop-record.json').exists())\nassert len(json.loads((dependency/'result.json').read_text()))>=1")
+(root/'criteria_public_runner.py').write_text(text,encoding='utf-8')
+text=(root/'compare.py').read_text(encoding='utf-8').replace('expected_calls=3',"expected_calls=16 if phase.startswith('criteria-') else 3")
+(root/'compare.py').write_text(text,encoding='utf-8')
+admission=json.loads((root/'admission.json').read_text(encoding='utf-8'))
+admission['criterionCandidate']={'contract':'canonical-per-criterion-json-v18','plannedPilotCases':8,'failFastOnFrozenCriterionViolation':True,
+ 'combination':'Any internal defect rejects; unavailable evaluation abstains except Ethos rejects; all required criteria supported approves. Invalid or incomplete assessments fail closed; no early approval.'}
+(root/'admission.json').write_text(json.dumps(admission,indent=2)+'\n',encoding='utf-8')
+print('Criteria experiment and bounded failure handling prepared.')

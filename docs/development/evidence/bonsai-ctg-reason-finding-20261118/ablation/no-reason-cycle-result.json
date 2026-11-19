@@ -1,0 +1,139 @@
+{
+  "diagnosticOnly": true,
+  "modelHash": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "planned": 6,
+  "rows": [
+    {
+      "id": "c07",
+      "promptSha256": "33ec50c976410c389dbf1ff062707fec691336f4fce763df679a41d1d2c20341",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1412,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 91911,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 91911.25747,
+        "DecodeMilliseconds": 0.38642999999865424,
+        "PrefillForwardTokens": 1412,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    },
+    {
+      "id": "c08",
+      "promptSha256": "f2e871b1b618f5a6693159cb4519d8e4fe29800a4dc2ba26f4232b27acc632bd",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1439,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 33553,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 33553.775527,
+        "DecodeMilliseconds": 0.1416730000055395,
+        "PrefillForwardTokens": 411,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    },
+    {
+      "id": "c09",
+      "promptSha256": "52a97be65f580341c61b6b260a9eabf1637d139579332ca59f72fd68bd15c554",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1508,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 97529,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 97529.421543,
+        "DecodeMilliseconds": 0.02385699999285862,
+        "PrefillForwardTokens": 1508,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    },
+    {
+      "id": "c10",
+      "promptSha256": "931786427952f97221ee210f75c1e903c112ff6e63f0d90ba4287fbf3ec57155",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1535,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 36034,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 36034.308928,
+        "DecodeMilliseconds": 0.01407199999812292,
+        "PrefillForwardTokens": 411,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    },
+    {
+      "id": "c11",
+      "promptSha256": "6a3c369711b542eaf5e06b2731a5a9708d867db38c185d5be16c2e84a63b99ec",
+      "responseSha256": "df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c",
+      "answer": {
+        "Text": "B",
+        "InputTokens": 1419,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 88795,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 88795.671733,
+        "DecodeMilliseconds": 0.013467000011587515,
+        "PrefillForwardTokens": 1419,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    },
+    {
+      "id": "c12",
+      "promptSha256": "8e14a18afe5c39466469f7cefc89f2eaa5de05c7d9600222e8a041f07e81e46e",
+      "responseSha256": "df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c",
+      "answer": {
+        "Text": "B",
+        "InputTokens": 1429,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 32985,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 32985.620181,
+        "DecodeMilliseconds": 0.01481900000362657,
+        "PrefillForwardTokens": 401,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    }
+  ]
+}

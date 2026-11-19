@@ -1,0 +1,101 @@
+#ifndef AIKERNEL_CUDA_H
+#define AIKERNEL_CUDA_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef _WIN32
+#define AK_EXPORT __declspec(dllexport)
+#else
+#define AK_EXPORT __attribute__((visibility("default")))
+#endif
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+enum { AK_ABI = 1, AK_OK = 0, AK_INVALID = 1, AK_DRIVER_MISSING = 2, AK_NO_DEVICE = 3,
+       AK_OOM = 4, AK_DRIVER_SYMBOL = 5, AK_VERSION = 6, AK_CUDA_ERROR_BASE = 10000 };
+
+typedef struct ak_context ak_context;
+
+typedef struct ak_stats {
+    uint32_t size;
+    uint32_t version;
+    uint64_t device_blocks;
+    uint64_t device_bytes;
+    uint64_t pinned_blocks;
+    uint64_t pinned_bytes;
+    uint64_t scratch_bytes_per_tier;
+} ak_stats;
+
+/* Opt-in GEMV stream timeline. Events perturb timing; host sync overlaps GPU time.
+ * Counters exclude model uploads, scratch wipes and non-GEMV kernels. */
+typedef struct ak_matrix_profile {
+    uint32_t size, version;
+    uint64_t calls, upload_bytes, download_bytes;
+    double upload_ms, kernel_ms, download_ms, host_sync_ms;
+} ak_matrix_profile;
+AK_EXPORT int32_t ak_profile_configure(ak_context *ctx, uint32_t enabled);
+AK_EXPORT int32_t ak_profile_read(ak_context *ctx, ak_matrix_profile *result);
+
+/* Calls on one context must be serialized. A NULL context selects host execution for math. */
+AK_EXPORT uint32_t ak_abi_version(void);
+AK_EXPORT int32_t ak_get_device_count(int32_t *count);
+/* Resolves a CUDA device ordinal without creating a context. */
+AK_EXPORT int32_t ak_get_device_pci_bus_id(int32_t ordinal, char *target, int32_t capacity);
+AK_EXPORT int32_t ak_create(uint32_t version, int32_t ordinal, ak_context **result);
+AK_EXPORT int32_t ak_destroy(ak_context *ctx);
+AK_EXPORT int32_t ak_get_stats(ak_context *ctx, ak_stats *result);
+AK_EXPORT int32_t ak_device_alloc(ak_context *ctx, size_t bytes, uint64_t *address);
+AK_EXPORT int32_t ak_device_free(ak_context *ctx, uint64_t address);
+AK_EXPORT int32_t ak_pinned_alloc(ak_context *ctx, size_t bytes, void **address);
+AK_EXPORT int32_t ak_pinned_free(ak_context *ctx, void *address);
+AK_EXPORT int32_t ak_upload(ak_context *ctx, uint64_t address, const void *source, size_t bytes);
+AK_EXPORT int32_t ak_upload_shared(ak_context *ctx, uint64_t address, void *base, size_t capacity,
+                                       size_t offset, size_t bytes);
+AK_EXPORT int32_t ak_wipe_device(ak_context *ctx, uint64_t address, size_t bytes);
+AK_EXPORT int32_t ak_wipe_scratch(ak_context *ctx);
+AK_EXPORT int32_t ak_get_pci_bus_id(ak_context *ctx, char *target, int capacity);
+AK_EXPORT int32_t ak_download(ak_context *ctx, uint64_t address, void *destination, size_t bytes);
+AK_EXPORT int32_t ak_gemv(ak_context *ctx, uint64_t weights, const float *x, float *y, uint32_t rows, uint32_t cols);
+/* Device-only GGUF Q1_0 g128 GEMV. Weights stay encoded; cols must be a multiple of 128. */
+AK_EXPORT int32_t ak_gemv_q1_0(ak_context *ctx, uint64_t weights, const float *x, float *y, uint32_t rows, uint32_t cols);
+/* Encoded Gemma F16/Q4_0/Q6_K, FP32 activations, no activation quantization. */
+AK_EXPORT int32_t ak_gemv_gemma(ak_context *ctx, uint64_t weights, const float *x, float *y,
+    uint32_t rows, uint32_t cols, uint32_t type);
+/* Resident Gemma graph commands. All ranges are validated at configuration; calls are serialized.
+ * Normal forward transfers only an 8-byte token/status pair, with one stream synchronization.
+ * Trace and full-logit transfers are opt-in diagnostics. Reset wipes all request buffers. */
+typedef struct ak_gemma_command {
+    uint32_t op,n,m,k,type,flags,offset,reserved;
+    uint64_t a,b,c,d;
+    float scale;
+    uint32_t padding;
+} ak_gemma_command;
+typedef struct ak_gemma_forward_stats { uint64_t calls,synchronizations,download_bytes; } ak_gemma_forward_stats;
+AK_EXPORT int32_t ak_gemma_configure(ak_context*,const ak_gemma_command*,uint32_t,uint32_t,uint64_t,size_t,uint64_t,uint64_t,uint32_t);
+AK_EXPORT int32_t ak_gemma_forward(ak_context*,uint32_t,uint32_t,uint32_t,float*,float*,uint32_t*);
+AK_EXPORT int32_t ak_gemma_reset(ak_context*);
+AK_EXPORT int32_t ak_gemma_read_stats(ak_context*,ak_gemma_forward_stats*);
+/* Capability bits 1=DP4A, 2=SM80 integer MMA. Calls on one context are serialized. */
+AK_EXPORT int32_t ak_get_int8_capabilities(ak_context *ctx, uint32_t *flags);
+AK_EXPORT int32_t ak_gemv_q1_q8(ak_context *ctx, uint64_t weights, const int8_t *x,
+    const float *scales, const int32_t *sums, float *y, uint32_t rows, uint32_t cols, uint32_t backend);
+/* Selected host FP32 GEMV path. An unsupported/invalid forced path returns -1.
+ * Configure AIKERNEL_CPU_GEMV before calls: auto (default), scalar, avx, avx2, avx512. */
+enum { AK_CPU_UNAVAILABLE = -1, AK_CPU_SCALAR = 0, AK_CPU_AVX2 = 1, AK_CPU_AVX512 = 2, AK_CPU_AVX = 3 };
+AK_EXPORT int32_t ak_cpu_gemv_backend(void);
+AK_EXPORT int32_t ak_normalize(ak_context *ctx, const float *x, const float *scale, float *y,
+                               uint32_t count, float epsilon, int32_t center);
+AK_EXPORT int32_t ak_rope(ak_context *ctx, float *x, const float *sin_cos, uint32_t count);
+AK_EXPORT int32_t ak_swiglu(ak_context *ctx, float *gate, const float *up, uint32_t count);
+AK_EXPORT int32_t ak_softmax(ak_context *ctx, float *x, uint32_t count);
+/* Reads a tile of interleaved key/value rows. Mode 0 emits scores, mode 1 emits a weighted value sum. */
+AK_EXPORT int32_t ak_attention_tile(ak_context *ctx, uint64_t page, const float *x, float *y,
+                                    uint32_t rows, uint32_t kv_width, uint32_t head_offset,
+                                    uint32_t head_width, uint32_t mode);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

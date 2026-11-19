@@ -1,0 +1,28 @@
+{
+  "cpu": "AMD EPYC 9555 64-Core Processor",
+  "kernel": "6.8.0-147-bet01-generic",
+  "architecture": "x86_64",
+  "flags": [
+    "avx",
+    "avx2",
+    "avx512f",
+    "avx512bw",
+    "avx_vnni",
+    "avx512_vnni"
+  ],
+  "runtime": [
+    "Microsoft.AspNetCore.App 10.0.15",
+    "Microsoft.NETCore.App 10.0.15"
+  ],
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "threads": 6,
+  "rssBudgetBytes": 7000000000,
+  "modelSha256": "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634"
+}

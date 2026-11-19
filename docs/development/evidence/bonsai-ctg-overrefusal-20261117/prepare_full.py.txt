@@ -1,0 +1,35 @@
+from pathlib import Path
+import json
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+rows=json.loads((repo/'docs/development/evidence/bonsai-ctg-grounding-20261117/server-baseline/result.json').read_text())
+baseline={r['id']:{'gate':r['result']['Gate']['Accepted'],'expected':r['expectedGate'],
+                  'passingVotes':{c['council']:c['expected'] for c in r['checks'] if c['actual'] in c['expected']}} for r in rows}
+(root/'baseline-gates.json').write_text(json.dumps(baseline,indent=2)+'\n')
+p=root/'server_transfer.py';text=p.read_text()
+text=text.replace("'probe-cases.json':ROOT/'all-cases.json',", "'probe-cases.json':ROOT/'all-cases.json','baseline-gates.json':ROOT/'baseline-gates.json',")
+text=text.replace("'postChecks':phase in ('readable-full','scope-full')", "'postChecks':phase in ('readable-full','scope-full'),'stopOnRegression':phase in ('readable-full','scope-full')")
+p.write_text(text)
+p=root/'remote_runner.py';text=p.read_text()
+needle="  if time.time()-start>7200:stop_reason='suite-deadline'"
+addition='''  if settings.get('stopOnRegression') and (out/'result.json').exists():
+   try:
+    baseline=json.loads((out/'baseline-gates.json').read_text())
+    completed=json.loads((out/'result.json').read_text())
+    violations=[]
+    for row in completed:
+     before=baseline.get(row['id']);after=row['result']['Gate']['Accepted']
+     if not row['result']['Evaluation']['Succeeded']:violations.append([row['id'],'evaluation failed'])
+     if before:
+      if before['gate']==before['expected'] and after!=before['expected']:violations.append([row['id'],'gate regression'])
+      for c in row['checks']:
+       if c['council'] in before['passingVotes'] and c['actual'] not in before['passingVotes'][c['council']]:violations.append([row['id'],c['council']+' vote regression'])
+     elif not row['pass']:violations.append([row['id'],'previously unrun control failed'])
+    if violations:
+     stop_reason='semantic-regression'
+     (out/'stop-record.json').write_text(json.dumps({'reason':stop_reason,'violations':violations,'completed':len(completed)},indent=2))
+   except ValueError:pass
+'''
+assert needle in text;text=text.replace(needle,addition+needle);p.write_text(text)
+(root/'public_runner.py').write_bytes((root.parent/'ctg-grounding-20261116/public_runner.py').read_bytes())
+print('Full-run monitor stops only its owned child on a frozen admission violation.')

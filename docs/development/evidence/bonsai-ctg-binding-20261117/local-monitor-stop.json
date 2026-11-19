@@ -1,0 +1,17 @@
+{
+  "priorState": {
+    "state": "waiting",
+    "threshold": 10,
+    "cpuPercent": 52.0,
+    "consecutive": 0,
+    "utc": "2026-11-17T13:54:03.7386183Z"
+  },
+  "finalState": {
+    "state": "deferred-high-load",
+    "threshold": 10,
+    "utc": "2026-11-17T13:54:17.2809234Z",
+    "lastCpuPercent": 52.0,
+    "reason": "Other validation finished; stopped only the owned idle monitor",
+    "monitorPid": 374724
+  }
+}

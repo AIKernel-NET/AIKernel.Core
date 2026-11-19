@@ -1,0 +1,8 @@
+test_metadata_refresh_replaces_stale_snapshot (test_import_cosmos3.ImportTests.test_metadata_refresh_replaces_stale_snapshot) ... ok
+test_official_names_remain_family_specific (test_import_cosmos3.ImportTests.test_official_names_remain_family_specific) ... ok
+test_wrong_hash_never_promotes_download (test_import_cosmos3.ImportTests.test_wrong_hash_never_promotes_download) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.225s
+
+OK

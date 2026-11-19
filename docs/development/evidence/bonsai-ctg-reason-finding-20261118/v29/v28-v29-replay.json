@@ -1,0 +1,186 @@
+{
+  "compared": 10,
+  "unchangedEvents": 50,
+  "cases": [
+    {
+      "id": "independent-length-changed",
+      "unchangedEvents": [
+        "reading",
+        "Logos"
+      ],
+      "truncations": [],
+      "v28Gate": false,
+      "v29Gate": false,
+      "v29Evaluated": false,
+      "v28Pass": false,
+      "v29Pass": false
+    },
+    {
+      "id": "independent-length-exact",
+      "unchangedEvents": [
+        "reading",
+        "Logos"
+      ],
+      "truncations": [],
+      "v28Gate": false,
+      "v29Gate": false,
+      "v29Evaluated": false,
+      "v28Pass": false,
+      "v29Pass": false
+    },
+    {
+      "id": "independent-status-changed",
+      "unchangedEvents": [
+        "reading",
+        "Logos.draft",
+        "Logos",
+        "Ethos.draft",
+        "Ethos"
+      ],
+      "truncations": [
+        {
+          "role": "Pathos",
+          "initialResponseSha256": "30b4edce80774bb2499a4604691e538788ae5a0a522182441d4dee5e069f3510",
+          "finalDraftSha256": "9bbbec602465491f4b68610e738dd76ee5b840fa524ee24d8e6b453abcd8eda9",
+          "promptSha256": "2fd60e9874cab632c70380e98eeb398b997194467cb59e4eaf0ac532a93c5eb2",
+          "retryFinish": "length",
+          "realChoice": null,
+          "realFinding": null
+        }
+      ],
+      "v28Gate": false,
+      "v29Gate": false,
+      "v29Evaluated": false,
+      "v28Pass": false,
+      "v29Pass": false
+    },
+    {
+      "id": "independent-status-exact",
+      "unchangedEvents": [
+        "reading",
+        "Logos.draft",
+        "Logos",
+        "Ethos.draft",
+        "Ethos",
+        "Pathos.draft",
+        "Pathos"
+      ],
+      "truncations": [],
+      "v28Gate": true,
+      "v29Gate": true,
+      "v29Evaluated": true,
+      "v28Pass": true,
+      "v29Pass": true
+    },
+    {
+      "id": "ordered-holdout-dimension-exact",
+      "unchangedEvents": [
+        "reading",
+        "Logos.draft",
+        "Logos",
+        "Ethos.draft",
+        "Ethos"
+      ],
+      "truncations": [
+        {
+          "role": "Pathos",
+          "initialResponseSha256": "a776551eb8345d3f00c58ee7b1a363f5c51d90060b80d6aeef83757e755e672d",
+          "finalDraftSha256": "fcd7aae4f047ae55fe0775977987037d254b88e37f63f5e3f7d158bcad7b870c",
+          "promptSha256": "8380df52e1610965b71f011a7b7c31ccb6eb4c1d8c26f04449f5ddbda88f3860",
+          "retryFinish": "stop",
+          "realChoice": "Yes",
+          "realFinding": "supported"
+        }
+      ],
+      "v28Gate": false,
+      "v29Gate": true,
+      "v29Evaluated": true,
+      "v28Pass": false,
+      "v29Pass": true
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong",
+      "unchangedEvents": [
+        "reading",
+        "Logos.draft",
+        "Logos",
+        "Ethos.draft",
+        "Ethos",
+        "Pathos.draft",
+        "Pathos"
+      ],
+      "truncations": [],
+      "v28Gate": false,
+      "v29Gate": false,
+      "v29Evaluated": true,
+      "v28Pass": true,
+      "v29Pass": true
+    },
+    {
+      "id": "ordered-holdout-status-exact",
+      "unchangedEvents": [
+        "reading",
+        "Logos.draft",
+        "Logos",
+        "Ethos.draft",
+        "Ethos",
+        "Pathos.draft",
+        "Pathos"
+      ],
+      "truncations": [],
+      "v28Gate": true,
+      "v29Gate": true,
+      "v29Evaluated": true,
+      "v28Pass": true,
+      "v29Pass": true
+    },
+    {
+      "id": "ordered-holdout-status-invented",
+      "unchangedEvents": [
+        "reading",
+        "Logos.draft",
+        "Logos",
+        "Ethos.draft",
+        "Ethos",
+        "Pathos.draft",
+        "Pathos"
+      ],
+      "truncations": [],
+      "v28Gate": false,
+      "v29Gate": false,
+      "v29Evaluated": true,
+      "v28Pass": false,
+      "v29Pass": false
+    },
+    {
+      "id": "pair-contacts-count",
+      "unchangedEvents": [
+        "reading",
+        "Logos",
+        "Ethos",
+        "Pathos"
+      ],
+      "truncations": [],
+      "v28Gate": true,
+      "v29Gate": true,
+      "v29Evaluated": true,
+      "v28Pass": true,
+      "v29Pass": true
+    },
+    {
+      "id": "pair-contacts-disclose",
+      "unchangedEvents": [
+        "reading",
+        "Logos",
+        "Ethos",
+        "Pathos"
+      ],
+      "truncations": [],
+      "v28Gate": false,
+      "v29Gate": false,
+      "v29Evaluated": true,
+      "v28Pass": true,
+      "v29Pass": true
+    }
+  ]
+}

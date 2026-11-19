@@ -1,0 +1,59 @@
+{
+  "host": [
+    {
+      "id": "external-context-outage",
+      "calls": 0,
+      "error": "ctg.bonsai.required_evidence_unavailable"
+    },
+    {
+      "id": "policy-service-unavailable",
+      "calls": 0,
+      "error": "ctg.bonsai.required_evidence_unavailable"
+    },
+    {
+      "id": "japanese-context-outage",
+      "calls": 0,
+      "error": "ctg.bonsai.required_evidence_unavailable"
+    },
+    {
+      "id": "printer-profile-outage",
+      "calls": 0,
+      "error": "ctg.bonsai.required_evidence_unavailable"
+    },
+    {
+      "id": "japanese-preference-read-failure",
+      "calls": 0,
+      "error": "ctg.bonsai.required_evidence_unavailable"
+    },
+    {
+      "id": "pair-setting-unavailable",
+      "calls": 0,
+      "error": "ctg.bonsai.required_evidence_unavailable"
+    },
+    {
+      "id": "holdout-profile-unavailable",
+      "calls": 0,
+      "error": "ctg.bonsai.required_evidence_unavailable"
+    }
+  ],
+  "kernel": "2317a2b6ae8b9dc935e202f02449e7c2e87479fba86056abe4acfcde912194bc",
+  "publicVotesAndGateMatch": true,
+  "publicCalls": 3,
+  "matchedMetadataKeys": [
+    "prompt.contract",
+    "model.sha256",
+    "facts.sha256",
+    "proposal.sha256",
+    "evaluation_input.sha256",
+    "Logos.prompt.sha256",
+    "Logos.response.sha256",
+    "Logos.rom.sha256",
+    "Ethos.prompt.sha256",
+    "Ethos.response.sha256",
+    "Ethos.rom.sha256",
+    "Pathos.prompt.sha256",
+    "Pathos.response.sha256",
+    "Pathos.rom.sha256"
+  ],
+  "normal128Sha256": "f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e"
+}

@@ -1,0 +1,265 @@
+[
+  {
+    "id": "contradictory-evidence",
+    "pass": true,
+    "expectedGate": false,
+    "checks": [
+      {
+        "council": "Logos",
+        "expected": [
+          "Reject"
+        ],
+        "actual": "Reject"
+      },
+      {
+        "council": "Ethos",
+        "expected": [
+          "Reject"
+        ],
+        "actual": "Reject"
+      }
+    ],
+    "result": {
+      "Evaluation": {
+        "OperationId": "contradictory-evidence",
+        "Succeeded": true,
+        "Decision": {
+          "DecisionId": "",
+          "DecisionKind": 0,
+          "Votes": [
+            {
+              "VoteId": "",
+              "CouncilKind": 1,
+              "VoteValue": 3,
+              "Confidence": null,
+              "RiskScore": null,
+              "Reason": null,
+              "CanonReferences": [
+                {
+                  "CanonId": "Canon.CTG.Monolith.Council.Logos",
+                  "Path": "rom/governance/council.logos.monolith.md",
+                  "Section": "1. Purpose; 3. Evaluation Criteria; 4. Voting Behavior; 6. Abstain Semantics",
+                  "Anchor": null,
+                  "ContentHash": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f"
+                }
+              ],
+              "ObservedAt": "2026-11-16T10:50:36.5667006+00:00",
+              "Metadata": {
+                "prompt.sha256": "f89bb5bddd52b41baf17740edac255e7f68a665cc8db133c7b8e442166025f63",
+                "label": "Reject"
+              }
+            },
+            {
+              "VoteId": "",
+              "CouncilKind": 2,
+              "VoteValue": 3,
+              "Confidence": null,
+              "RiskScore": null,
+              "Reason": null,
+              "CanonReferences": [
+                {
+                  "CanonId": "Canon.CTG.Monolith.Council.Ethos",
+                  "Path": "rom/governance/council.ethos.monolith.md",
+                  "Section": "1. Purpose; 4. Evaluation Criteria; 5. Voting Behavior; 6. Fail-Closed Behavior",
+                  "Anchor": null,
+                  "ContentHash": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52"
+                }
+              ],
+              "ObservedAt": "2026-11-16T10:51:39.8778252+00:00",
+              "Metadata": {
+                "prompt.sha256": "2422f45d02d1b93c750b841e5ed1b309473409f62689a9f686f63be6c4f4eff1",
+                "label": "Reject"
+              }
+            },
+            {
+              "VoteId": "",
+              "CouncilKind": 3,
+              "VoteValue": 1,
+              "Confidence": null,
+              "RiskScore": null,
+              "Reason": null,
+              "CanonReferences": [
+                {
+                  "CanonId": "Canon.CTG.Monolith.Council.Pathos",
+                  "Path": "rom/governance/council.pathos.monolith.md",
+                  "Section": "1. Purpose; 3. Evaluation Criteria; 4. Voting Behavior; 6. Abstain Semantics",
+                  "Anchor": null,
+                  "ContentHash": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+                }
+              ],
+              "ObservedAt": "2026-11-16T10:52:47.194798+00:00",
+              "Metadata": {
+                "prompt.sha256": "19d558eab5f66ebbcc979424c197fd623063a1801210d180099173b78a7f70c0",
+                "label": "Approve"
+              }
+            }
+          ],
+          "RejectReasons": [],
+          "CanonReferences": [],
+          "Confidence": null,
+          "RiskScore": null,
+          "ObservedAt": "2026-11-16T10:52:47.1957435+00:00",
+          "CorrelationId": null,
+          "TraceId": null,
+          "Metadata": {}
+        },
+        "ErrorCode": null,
+        "ErrorMessage": null,
+        "RejectReasons": [],
+        "CanonReferences": [
+          {
+            "CanonId": "Canon.CTG.Monolith.Council.Logos",
+            "Path": "rom/governance/council.logos.monolith.md",
+            "Section": "1. Purpose; 3. Evaluation Criteria; 4. Voting Behavior; 6. Abstain Semantics",
+            "Anchor": null,
+            "ContentHash": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f"
+          },
+          {
+            "CanonId": "Canon.CTG.Monolith.Council.Ethos",
+            "Path": "rom/governance/council.ethos.monolith.md",
+            "Section": "1. Purpose; 4. Evaluation Criteria; 5. Voting Behavior; 6. Fail-Closed Behavior",
+            "Anchor": null,
+            "ContentHash": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52"
+          },
+          {
+            "CanonId": "Canon.CTG.Monolith.Council.Pathos",
+            "Path": "rom/governance/council.pathos.monolith.md",
+            "Section": "1. Purpose; 3. Evaluation Criteria; 4. Voting Behavior; 6. Abstain Semantics",
+            "Anchor": null,
+            "ContentHash": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+          }
+        ],
+        "Diagnostics": [],
+        "ObservedAt": "2026-11-16T10:52:47.195816+00:00",
+        "CorrelationId": null,
+        "TraceId": null,
+        "Metadata": {
+          "evaluator": "bonsai-1.7b-provisional",
+          "model.sha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+          "rh.verified": "false",
+          "roles.independent": "false",
+          "prompt.contract": "canonical-assessment-json-v2",
+          "facts.sha256": "0acb07b7108df0bb182e0d59914316a26b5857cb8ddffbd2d7b4789d0333c77e",
+          "Logos.prompt.sha256": "f89bb5bddd52b41baf17740edac255e7f68a665cc8db133c7b8e442166025f63",
+          "Logos.rom.sha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+          "Logos.excerpt.sha256": "772dfe320b71b33f5b054fa005e9de03ec4ba975924dfad0bc1183d843874bec",
+          "Logos.response.sha256": "50041d72c4498bfcc4e6b342a92dc0b760a63853ba382c419b98c11e5bb9920d",
+          "Logos.backend": "avx2",
+          "Logos.activation_precision": "fp32",
+          "Logos.finish_reason": "stop",
+          "Logos.output_tokens": "42",
+          "Logos.input_tokens": "699",
+          "Logos.elapsed_ms": "65791",
+          "Logos.prefill_forward_tokens": "699",
+          "Ethos.prompt.sha256": "2422f45d02d1b93c750b841e5ed1b309473409f62689a9f686f63be6c4f4eff1",
+          "Ethos.rom.sha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+          "Ethos.excerpt.sha256": "b351bbc9fff6b71dd59eec9cc7931c853b990917b052568a7783f5b465308b9b",
+          "Ethos.response.sha256": "aea4b18e23befffb1f821fabc963ffd8bacec950bf11c22e49278e056e8d5911",
+          "Ethos.backend": "avx2",
+          "Ethos.activation_precision": "fp32",
+          "Ethos.finish_reason": "stop",
+          "Ethos.output_tokens": "39",
+          "Ethos.input_tokens": "756",
+          "Ethos.elapsed_ms": "63292",
+          "Ethos.prefill_forward_tokens": "756",
+          "Pathos.prompt.sha256": "19d558eab5f66ebbcc979424c197fd623063a1801210d180099173b78a7f70c0",
+          "Pathos.rom.sha256": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81",
+          "Pathos.excerpt.sha256": "98ceffd73687d487ac6795ac8d9f601706705a404da2772181644003279e9af2",
+          "Pathos.response.sha256": "b0b310b35deb05b0f1fae485ad491d484be1cb5850a1b15d342e7b72510632b2",
+          "Pathos.backend": "avx2",
+          "Pathos.activation_precision": "fp32",
+          "Pathos.finish_reason": "stop",
+          "Pathos.output_tokens": "37",
+          "Pathos.input_tokens": "841",
+          "Pathos.elapsed_ms": "67299",
+          "Pathos.prefill_forward_tokens": "841",
+          "prefix_cache.bytes": "464715776",
+          "prefix_cache.hits": "0",
+          "prefix_cache.maximum_bytes": "536870912"
+        }
+      },
+      "Gate": {
+        "OperationId": "contradictory-evidence",
+        "Succeeded": true,
+        "DecisionKind": 2,
+        "Accepted": false,
+        "RejectReasons": [
+          {
+            "ReasonId": "ctg.decision_gate.ethos_veto",
+            "Kind": 7,
+            "ReasonCode": "ETHOS_VETO",
+            "Message": "Ethos rejected the step.",
+            "CanonReferences": [
+              {
+                "CanonId": "Canon.CTG.Monolith.Council.Logos",
+                "Path": "rom/governance/council.logos.monolith.md",
+                "Section": "1. Purpose; 3. Evaluation Criteria; 4. Voting Behavior; 6. Abstain Semantics",
+                "Anchor": null,
+                "ContentHash": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f"
+              },
+              {
+                "CanonId": "Canon.CTG.Monolith.Council.Ethos",
+                "Path": "rom/governance/council.ethos.monolith.md",
+                "Section": "1. Purpose; 4. Evaluation Criteria; 5. Voting Behavior; 6. Fail-Closed Behavior",
+                "Anchor": null,
+                "ContentHash": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52"
+              },
+              {
+                "CanonId": "Canon.CTG.Monolith.Council.Pathos",
+                "Path": "rom/governance/council.pathos.monolith.md",
+                "Section": "1. Purpose; 3. Evaluation Criteria; 4. Voting Behavior; 6. Abstain Semantics",
+                "Anchor": null,
+                "ContentHash": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+              }
+            ],
+            "ObservedAt": "2026-11-16T10:52:47.2000224+00:00",
+            "Metadata": {
+              "logos_vote": "Reject",
+              "ethos_vote": "Reject",
+              "pathos_vote": "Approve",
+              "approve_count": "1"
+            }
+          }
+        ],
+        "CanonReferences": [
+          {
+            "CanonId": "Canon.CTG.Monolith.Council.Logos",
+            "Path": "rom/governance/council.logos.monolith.md",
+            "Section": "1. Purpose; 3. Evaluation Criteria; 4. Voting Behavior; 6. Abstain Semantics",
+            "Anchor": null,
+            "ContentHash": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f"
+          },
+          {
+            "CanonId": "Canon.CTG.Monolith.Council.Ethos",
+            "Path": "rom/governance/council.ethos.monolith.md",
+            "Section": "1. Purpose; 4. Evaluation Criteria; 5. Voting Behavior; 6. Fail-Closed Behavior",
+            "Anchor": null,
+            "ContentHash": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52"
+          },
+          {
+            "CanonId": "Canon.CTG.Monolith.Council.Pathos",
+            "Path": "rom/governance/council.pathos.monolith.md",
+            "Section": "1. Purpose; 3. Evaluation Criteria; 4. Voting Behavior; 6. Abstain Semantics",
+            "Anchor": null,
+            "ContentHash": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+          }
+        ],
+        "ErrorCode": null,
+        "ErrorMessage": null,
+        "Diagnostics": [],
+        "ObservedAt": "2026-11-16T10:52:47.2011161+00:00",
+        "CorrelationId": null,
+        "TraceId": null,
+        "Metadata": {
+          "operation_id": "contradictory-evidence",
+          "step_id": "observation",
+          "logos_vote": "Reject",
+          "ethos_vote": "Reject",
+          "pathos_vote": "Approve",
+          "approve_count": "1",
+          "decision_kind": "Deny"
+        }
+      }
+    }
+  }
+]

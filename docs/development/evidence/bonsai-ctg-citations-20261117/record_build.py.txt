@@ -1,0 +1,21 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+label=sys.argv[1]
+sources=['src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs','src/AIKernel.Kernel/Inference/BonsaiCtgCitationPrompt.cs',
+ 'src/AIKernel.Kernel/Inference/BonsaiCtgDirectVotePrompt.cs','src/AIKernel.Kernel/Inference/BonsaiCtgEvidenceRequirements.cs',
+ 'src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs','tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgEvidenceScopeSuite.cs',
+ 'tests/AIKernel.Inference.Optimization.Validation/Program.cs','tests/AIKernel.Core.Tests/Inference/BonsaiCtgCitationTests.cs']
+if label in ('v12','v13','v14','v15'):sources+=['src/AIKernel.Kernel/Inference/BonsaiCtgCitedFindingPrompt.cs','tests/AIKernel.Core.Tests/Inference/BonsaiCtgCitedFindingTests.cs','src/AIKernel.Kernel/Inference/BonsaiCtgFindingPolicy.cs']
+if label in ('v13','v14','v15'):sources+=['src/AIKernel.Kernel/Inference/BonsaiCtgPacketPrompt.cs','tests/AIKernel.Core.Tests/Inference/BonsaiCtgPacketTests.cs']
+if label in ('v14','v15'):sources+=['src/AIKernel.Kernel/Inference/BonsaiCtgDemonstrationPrompt.cs','tests/AIKernel.Core.Tests/Inference/BonsaiCtgDemonstrationTests.cs']
+if label=='v15':sources+=['src/AIKernel.Kernel/Inference/BonsaiCtgReviewPrompt.cs','tests/AIKernel.Core.Tests/Inference/BonsaiCtgReviewTests.cs']
+data={'baseCommit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip(),
+ 'sourceSha256':{s:sha(repo/s) for s in sources},'assemblySha256':{p.name:sha(p) for p in (root/('app-'+label)).glob('AIKernel*.dll')},
+ 'canonicalRomSha256':{p.name:sha(p) for p in Path(r'D:/AIKernel/repos/AIKernel.NET/rom/governance').glob('council.*.monolith.md')},
+ 'tests':[{'file':p.name,'sha256':sha(p)} for p in (root/('tests-'+label)).glob('*.trx')]}
+assert data['assemblySha256'] and data['tests']
+(root/(label+'-tested-build.json')).write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
+print('Recorded build '+label)

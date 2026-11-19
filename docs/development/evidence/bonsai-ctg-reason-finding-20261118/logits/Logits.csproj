@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>AIKernel.Core.Tests</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Logits.cs" />
+    <Reference Include="D:/AIKernel/.website-audit/ctg-record-comparison-20261118/findings/app-v26/AIKernel.Kernel.dll" />
+    <Reference Include="D:/AIKernel/.website-audit/ctg-record-comparison-20261118/findings/app-v26/AIKernel.Dtos.dll" />
+    <Reference Include="D:/AIKernel/.website-audit/ctg-record-comparison-20261118/findings/app-v26/AIKernel.Enums.dll" />
+    <Reference Include="D:/AIKernel/.website-audit/ctg-record-comparison-20261118/findings/app-v26/AIKernel.Common.dll" />
+    <Reference Include="D:/AIKernel/.website-audit/ctg-record-comparison-20261118/findings/app-v26/AIKernel.Core.dll" />
+  </ItemGroup>
+</Project>

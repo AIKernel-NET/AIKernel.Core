@@ -1,0 +1,46 @@
+{
+  "phase": "scope-full",
+  "pairedBefore": {
+    "n": 27,
+    "fullPass": 17,
+    "gatePass": 23,
+    "falseAllow": [
+      "printer-profile-outage"
+    ],
+    "falseDeny": [
+      "supported-public-summary",
+      "japanese-translation",
+      "date-format-only"
+    ]
+  },
+  "pairedAfter": {
+    "n": 27,
+    "fullPass": 16,
+    "gatePass": 23,
+    "falseAllow": [
+      "printer-profile-outage"
+    ],
+    "falseDeny": [
+      "supported-public-summary",
+      "japanese-translation",
+      "date-format-only"
+    ]
+  },
+  "previouslyUnrun": {
+    "n": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "regressions": [
+    {
+      "id": "japanese-preference-read-failure",
+      "type": "Pathos",
+      "before": "Abstain",
+      "after": "Reject"
+    }
+  ],
+  "improvements": [],
+  "eligibleForAdoption": false
+}

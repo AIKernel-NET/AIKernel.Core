@@ -1,0 +1,39 @@
+{
+  "diagnosticOnly": true,
+  "model": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "kernel": "25e8a79ffc56fae14fb38a6572319926055a4b567cbdfd0bb141af9d0fd84cb0",
+  "rom": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+  "council": "Logos",
+  "canonLines": [
+    "- **Justification** — Claims must be supported by evidence or canonical reference.",
+    "- **Non-contradiction** — No part of the reasoning may contradict another part or the Canon."
+  ],
+  "scope": "One local finding about the proposed report's material consistency with the source and its reporting instruction. No overall votes or existing reasons.",
+  "cells": 16,
+  "labels": [
+    "Good",
+    "Bad",
+    "Other"
+  ],
+  "tokenIds": [
+    15216,
+    17082,
+    11409
+  ],
+  "plannedInferenceCalls": 16,
+  "gate": "Advance only on 16/16 exact one-token classifications including all seven material defects, seven faithful reports and two out-of-scope claims. If all pass, separately test the auxiliary check only on eligible v29 Logos supports; only a real Bad can bind the allowed Reject, without modifying host guards, other councils or other results. No advance or formal use on any error.",
+  "arithmetic": "Decimal length conversion alone, with full originals and separately attributed literals; no equality, relation, verdict, case identity, previous reason or expected class is supplied.",
+  "files": {
+    "cases.json": "5a57d20511f8cade92718cdea02ec92451f0da33be73d004a4a74e667cfea2a3",
+    "key.json": "6af94dc35051d28d2dddfe1ee12def0a4462094d5f678a1aa5e9cd7dc945295b",
+    "sources.json": "184f09078fe7f75319543a0a37f2d2321c3aa1fff7fa46945854cc243e41b883",
+    "controls.json": "7f7d6b4d92c510c19f35cf03789fa187a83397e357bba17819578aed5809628f",
+    "originals.json": "94d951763ea592f76ec905a3601673c81856a0738a1c4c84eab575a11a7f2a25",
+    "prepare.py": "105be18622179d6e9d5790413c7e525948402bfc8559bc7c46145328f931da1f",
+    "score.py": "bfa437c76bfbe629944ec3e63c63c660c364876318ec44b1152542a6a3555681",
+    "Program.cs": "0003f71c0dacface9d74f8c0ed11108f4b5cb0dcf04ea70b7815980d7ac8f704",
+    "Probe.csproj": "b71b95f4c670d23dd6753792f4e820f672579a4d70754d329619b453f0b8f0f8",
+    "app/AIKernel.Core.Tests.dll": "78d2c81b05b9f1981662ee2f95f300150fbe7502c585669b977ba4ca770a38a3",
+    "app/AIKernel.Kernel.dll": "25e8a79ffc56fae14fb38a6572319926055a4b567cbdfd0bb141af9d0fd84cb0"
+  }
+}

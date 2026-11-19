@@ -1,0 +1,15 @@
+{
+  "activeOwnedValidationProcesses": [],
+  "checkedPhases": [
+    "baseline",
+    "candidate-full",
+    "candidate-full2",
+    "candidate-full3",
+    "candidate-ordered",
+    "candidate-pilot",
+    "candidate-pilot2",
+    "final-api",
+    "public-api"
+  ],
+  "utcSeconds": 1794847362.4386666
+}

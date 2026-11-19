@@ -1,0 +1,130 @@
+from pathlib import Path
+import hashlib,json,shutil,subprocess,xml.etree.ElementTree as ET
+ROOT=Path(__file__).parent
+REPO=Path(r'D:\AIKernel\artifacts\cuda-driver-native\core-context-free-pci')
+DEST=REPO/'docs/development/evidence/bonsai-ctg-grounding-20261117'
+FIXTURES=REPO/'tests/AIKernel.Inference.Optimization.Validation/fixtures'
+PRIOR=REPO/'docs/development/evidence/bonsai-ctg-separation-20261116'
+ROM=Path(r'D:\AIKernel\repos\AIKernel.NET\rom\governance')
+def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def write(p,obj):p.write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+def metrics(rows):
+ return dict(total=len(rows),succeeded=sum(r['result']['Evaluation']['Succeeded'] for r in rows),
+  full=sum(r['pass'] for r in rows),gate=sum(r['expectedGate']==r['result']['Gate']['Accepted'] for r in rows),
+  falseAllow=sum(not r['expectedGate'] and r['result']['Gate']['Accepted'] for r in rows),
+  falseDeny=sum(r['expectedGate'] and not r['result']['Gate']['Accepted'] for r in rows))
+original_cases=read(ROOT/'all-cases.json')
+assert original_cases==read(FIXTURES/'bonsai-ctg-separated-20261116.json')+read(FIXTURES/'bonsai-ctg-grounded-holdout-20261116.json')
+assert len(original_cases)==46
+cases=read(ROOT/'ordered-all-cases.json')
+assert cases==original_cases+read(FIXTURES/'bonsai-ctg-ordered-holdout-20261117.json')
+prior=read(PRIOR/'tested-build.json')
+baseline=ROOT.parent/'bonsai-ctg-separation-20261116/final'
+assert all(sha(baseline/name)==digest for name,digest in prior['finalAssemblySha256'].items())
+rom_hashes={name:sha(ROM/name) for name in prior['romSha256']}
+assert rom_hashes==prior['romSha256']
+DEST.mkdir(parents=True,exist_ok=True)
+(DEST/'.gitattributes').write_text('* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol\n',encoding='utf-8')
+summary={};all_rows={}
+for phase in ('baseline','candidate-pilot','candidate-full','candidate-pilot2','candidate-ordered','candidate-full3'):
+ src=ROOT/('server-'+phase)
+ rows=read(src/'result.json');responses=read(src/'result.json.responses.json');completion=read(src/'completion.json')
+ if phase in ('candidate-pilot2','candidate-full3'):
+  expected='new false approval violates frozen semantic admission criterion' if phase=='candidate-pilot2' else 'regression of previously correct gate violates frozen admission criterion'
+  assert completion['exitCode']==-15 and read(src/'stop-record.json')['reason']==expected
+ else:assert completion['exitCode'] in (0,1) and completion['stopReason'] is None
+ assert completion['maximumRssBytes']<=7*1024**3
+ assert len(rows)==({'candidate-pilot':6,'candidate-pilot2':3,'candidate-ordered':8,'candidate-full3':17}.get(phase,46))
+ assert 0<len(responses)<=({'candidate-pilot2':8,'candidate-full3':50}.get(phase,len(rows)))*3
+ assert all(r['answer']['CpuBackend']=='avx512' and r['answer']['ActivationPrecision']=='fp32' for r in responses)
+ assert all(r['answer']['OutputTokens']<=192 and r['answer']['InputTokens']<=2048 for r in responses)
+ contract='canonical-separated-assessment-json-v4' if phase=='baseline' else 'canonical-comparative-assessment-json-v6' if phase=='candidate-pilot2' else 'canonical-observation-first-json-v7' if phase in ('candidate-ordered','candidate-full3') else 'canonical-grounded-assessment-json-v5'
+ for row in rows:
+  metadata=row['result']['Evaluation']['Metadata']
+  assert metadata['prompt.contract']==contract and metadata['model.sha256']==prior['modelSha256']
+  for role in ('Logos','Ethos','Pathos'):
+   if role+'.rom.sha256' in metadata:assert metadata[role+'.rom.sha256']==rom_hashes['council.'+role.lower()+'.monolith.md']
+  case=next(c for c in cases if c['id']==row['id'])
+  assert case['expectedGate']==row['expectedGate']
+  assert {c['council']:c['expected'] for c in row['checks']}==case['requiredVotes']
+ summary[phase]={'all':metrics(rows),'existing':metrics([r for r in rows if not r['id'].startswith(('holdout-','ordered-holdout-'))]),
+  'holdout':metrics([r for r in rows if r['id'].startswith('holdout-')]),
+  'freshHoldout':metrics([r for r in rows if r['id'].startswith('ordered-holdout-')]),'resources':completion}
+ all_rows[phase]=rows
+ target=DEST/('server-'+phase);target.mkdir(exist_ok=True)
+ for p in src.iterdir():
+  if p.is_file():shutil.copyfile(p,target/p.name)
+for a,b in zip(all_rows['baseline'],all_rows['candidate-full']):
+ assert a['id']==b['id']
+ am=a['result']['Evaluation']['Metadata'];bm=b['result']['Evaluation']['Metadata']
+ for key in ('model.sha256','facts.sha256','proposal.sha256','evaluation_input.sha256'):assert am[key]==bm[key]
+baseline_by_id={r['id']:r for r in all_rows['baseline']}
+for phase in ('candidate-pilot','candidate-pilot2','candidate-ordered','candidate-full3'):
+ for row in all_rows[phase]:
+  if row['id'] not in baseline_by_id:continue
+  old=baseline_by_id[row['id']]['result']['Evaluation']['Metadata'];new=row['result']['Evaluation']['Metadata']
+  for key in ('model.sha256','facts.sha256','proposal.sha256','evaluation_input.sha256'):assert old[key]==new[key]
+probe=read(ROOT/'server-final-api/evidence-probe.json')
+assert probe['hostGuardPassed'] and probe['inferenceCalls']==3
+assert all(not b['result']['Gate']['Accepted'] and not b['result']['Evaluation']['Succeeded'] and b['inferenceCalls']==0 for b in probe['blocked'])
+actual=next(r for r in all_rows['baseline'] if r['id']=='verified-arithmetic')
+for role in ('Logos','Ethos','Pathos'):
+ for suffix in ('.prompt.sha256','.response.sha256'):
+  key=role+suffix
+  assert actual['result']['Evaluation']['Metadata'][key]==probe['availableResult']['Evaluation']['Metadata'][key]
+normal=[json.loads(line) for line in (ROOT/'server-final-api/normal-128.log').read_text().splitlines() if line.startswith('{')][-1]
+assert normal['OutputTokens']==128 and normal['GeneratedTokenSha256']=='f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e'
+for phase in ('candidate-full','public-api','final-api'):
+ for key,result in read(ROOT/('server-'+phase)/'checks.json').items():assert result['exitCode']==0 and result['stopReason'] is None and result['maximumRssBytes']<=7*1024**3
+for phase in ('public-api','final-api'):
+ target=DEST/('server-'+phase);target.mkdir(exist_ok=True)
+ for p in (ROOT/('server-'+phase)).iterdir():
+  if p.is_file():shutil.copyfile(p,target/p.name)
+trx=ROOT/'tests/ordered-final.trx'
+counters=ET.parse(trx).getroot().find('.//{*}Counters').attrib
+assert int(counters['failed'])==0 and int(counters['passed'])>=985
+files=['all-cases.json','pilot-cases.json','frozen-cases.json','local-load-samples.json','local-retry-status.json','server-probe.json']
+files+=['local-load-samples-first.json','local-retry-status-first.json','local-baseline-retry.json','local-baseline-retry.json.responses.json','local-baseline-retry.log']
+files+=['comparative-pilot-cases.json','comparative-pilot-admission.json','comparative-admission-result.json']
+files+=['ordered-all-cases.json','ordered-frozen-cases.json','ordered-full-admission.json','ordered-admission-result.json','ordered-full-admission-result.json','local-monitor-errors.txt','comparative-early-stop.json']
+files+=['ordered-early-stop.json']
+files+=['guard-regression.json']
+files+=['candidate-full2-status.json','candidate-full2-transfer.json']
+files+=['server-final-state.json']
+for name in files:
+ if (ROOT/name).exists():shutil.copyfile(ROOT/name,DEST/name)
+for name in ('analyze.py','collect_evidence.py','remote_runner.py','public_runner.py','server_transfer.py','wait_local_retry.ps1','admit_pilot.py','admit_full.py','verify_guard_regression.py','stop_failed_pilot.py','stop_regressing_full.py'):
+ shutil.copyfile(ROOT/name,DEST/(name+'.txt'))
+source_paths=[p.relative_to(REPO).as_posix() for p in (REPO/'src/AIKernel.Kernel/Inference').glob('BonsaiCtg*.cs')]
+source_paths+=['src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs']
+source_paths +=[p.relative_to(REPO).as_posix() for p in (REPO/'tests/AIKernel.Core.Tests/Inference').glob('BonsaiCtg*.cs')]
+source_paths +=['tests/AIKernel.Inference.Optimization.Validation/'+name for name in ('Program.cs','BonsaiCtgSuite.cs','BonsaiCtgEvidenceValidation.cs')]
+source_paths +=['tests/AIKernel.Core.Tests/AIKernel.Core.Tests.csproj','tests/AIKernel.Core.Tests/Inference/Fixtures/BonsaiCtgSeparatedPromptContracts.json']
+for p in ('src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs','src/AIKernel.Kernel/Inference/BonsaiCtgDirectVotePrompt.cs'):
+ assert sha(REPO/p)==prior['sourceSha256'][p]
+manifest={'baseCommit':'04c6fb8','modelSha256':prior['modelSha256'],'romSha256':rom_hashes,
+ 'publicLegacyContractsUnchanged':['canonical-assessment-json-v2','canonical-separated-assessment-json-v4'],
+ 'newEvidenceApiContract':'canonical-separated-assessment-json-v4',
+ 'newEvidenceApiRequiresHostOwnedPrerequisites':True,
+ 'promptCandidatesAdopted':False,
+ 'comparativeAdmission':read(ROOT/'comparative-admission-result.json'),
+ 'orderedAdmission':read(ROOT/'ordered-full-admission-result.json'),
+ 'unitTests':dict(counters),'trxSha256':sha(trx),'sourceSha256':{p:sha(REPO/p) for p in source_paths},
+ 'finalAssemblySha256':{p:sha(ROOT/'candidate-v7'/p) for p in ('AIKernel.Kernel.dll','AIKernel.Core.Tests.dll')},
+ 'comparativeAssemblySha256':{p:sha(ROOT/'candidate-v6'/p) for p in ('AIKernel.Kernel.dll','AIKernel.Core.Tests.dll')},
+ 'rejectedPublicV5PrototypeAssemblySha256':{p:sha(ROOT/'public-final'/p) for p in ('AIKernel.Kernel.dll','AIKernel.Core.Tests.dll')},
+ 'fullSuiteAssemblySha256':{p:sha(ROOT/'candidate-final'/p) for p in ('AIKernel.Kernel.dll','AIKernel.Core.Tests.dll')},
+ 'pilotAssemblySha256':{p:sha(ROOT/'candidate-v5'/p) for p in ('AIKernel.Kernel.dll','AIKernel.Core.Tests.dll')},
+ 'original38InputsAndExpectedLabelsPreserved':True,'extra8FrozenBeforeCandidateRun':True,'sameServerInputsMatched':True,
+ 'canonicalRomAndDeterministicGateUnchanged':True,'generation128':normal,'summary':summary,
+ 'guardProbe':{'blocked':len(probe['blocked']),'hostGuardPassed':probe['hostGuardPassed'],'semanticGateAccepted':probe['semanticGateAccepted']},
+ 'localRetry':read(ROOT/'local-retry-status.json'),
+ 'notes':['Host availability admission and model semantic votes are reported separately.',
+ 'All three roles use the same Bonsai model; no independent council or RH proof is established.',
+ 'Only synthetic cases were evaluated; no proposed operation or public website change was executed.',
+ 'Server AVX512/FP32 comparison is not a performance comparison with the busy development host.']}
+write(DEST/'tested-build.json',manifest)
+write(DEST/'comparison.json',summary)
+write(DEST/'evidence-sha256.json',{p.relative_to(DEST).as_posix():sha(p) for p in DEST.rglob('*') if p.is_file() and p.name!='evidence-sha256.json'})
+print(json.dumps({'summary':summary,'unitTests':counters['passed'],'localRetry':manifest['localRetry']},ensure_ascii=False,indent=2))

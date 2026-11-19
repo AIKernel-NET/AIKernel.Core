@@ -1,0 +1,40 @@
+#version 450
+// AIKernel's FP32 and Q1_0 GEMV. No FP16 storage, int8 storage or subgroup extension.
+layout(local_size_x=128) in;
+layout(set=0,binding=0,std430) readonly buffer Weights { uint w[]; };
+layout(set=0,binding=1,std430) readonly buffer Input { float x[]; };
+layout(set=0,binding=2,std430) writeonly buffer Output { float y[]; };
+layout(push_constant) uniform Shape { uint columns; uint rows; uint type; uint offsetBytes; uint groupWidth; } p;
+shared float partial[128];
+uint byteAt(uint address) { return (w[address>>2] >> ((address&3)*8)) & 255; }
+void main() {
+    uint row=gl_WorkGroupID.x+gl_WorkGroupID.y*p.groupWidth;
+    if(row>=p.rows)return;
+    uint lane=gl_LocalInvocationID.x;
+    precise float sum=0;
+    if(p.type==42) {
+        // Diagnostic only: consume every encoded byte and retain a checksum.
+        uint bytes=(p.columns/128)*18;
+        uint base=p.offsetBytes+row*bytes;
+        for(uint offset=lane;offset<bytes;offset+=128)sum+=float(byteAt(base+offset));
+    } else if(p.type==41) {
+        uint base=p.offsetBytes+row*(p.columns/128)*18;
+        for(uint column=lane;column<p.columns;column+=128) {
+            uint block=base+(column/128)*18;
+            float scale=unpackHalf2x16(byteAt(block)|(byteAt(block+1)<<8)).x;
+            uint bit=(byteAt(block+2+(column%128)/8)>>(column%8))&1;
+            sum+=(bit==0?-scale:scale)*x[column];
+        }
+    } else {
+        uint base=(p.offsetBytes/4)+row*p.columns;
+        for(uint column=lane;column<p.columns;column+=128)
+            sum+=uintBitsToFloat(w[base+column])*x[column];
+    }
+    partial[lane]=sum;
+    barrier();
+    for(uint stride=64;stride>0;stride>>=1) {
+        if(lane<stride)partial[lane]+=partial[lane+stride];
+        barrier();
+    }
+    if(lane==0)y[row]=partial[0];
+}

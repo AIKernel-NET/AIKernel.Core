@@ -1,0 +1,168 @@
+{
+  "phaseCoverage": [
+    "dimension-pair"
+  ],
+  "formalAdmissionCalculatedSeparately": true,
+  "planned": 4,
+  "fullPass": 0,
+  "gatePass": 2,
+  "falseAllow": [],
+  "falseDeny": [
+    "independent-status-exact",
+    "independent-length-exact"
+  ],
+  "rows": [
+    {
+      "id": "independent-status-exact",
+      "phase": "dimension-pair",
+      "succeeded": false,
+      "passed": false,
+      "expectedGate": true,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Unknown",
+        "Ethos": "Unknown",
+        "Pathos": "Unknown"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Approve"
+        ],
+        "Ethos": [
+          "Approve",
+          "Abstain"
+        ],
+        "Pathos": [
+          "Approve"
+        ]
+      },
+      "inferenceCalls": 2,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "849db86574202d7667c6d6a4c0d8cdf9b651bc34a0e5766e1d9cfb570e500ba4",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "35ee5dad923c474308df1143763df2f98555d658b6dadfc3c8c186b7bf43ae6d",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    },
+    {
+      "id": "independent-status-changed",
+      "phase": "dimension-pair",
+      "succeeded": false,
+      "passed": false,
+      "expectedGate": false,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Unknown",
+        "Ethos": "Unknown",
+        "Pathos": "Unknown"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Reject"
+        ],
+        "Ethos": [
+          "Reject"
+        ]
+      },
+      "inferenceCalls": 2,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "ebd4a64c516d0a16296f2ce5e58a0b88f435a4d566a53d01c0af974b53a6266b",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "f996aea769be2f5688150638c95f5e7f1612e35d7c31b11380c5eb3ef659fddb",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    },
+    {
+      "id": "independent-length-exact",
+      "phase": "dimension-pair",
+      "succeeded": false,
+      "passed": false,
+      "expectedGate": true,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Unknown",
+        "Ethos": "Unknown",
+        "Pathos": "Unknown"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Approve"
+        ],
+        "Ethos": [
+          "Approve",
+          "Abstain"
+        ],
+        "Pathos": [
+          "Approve"
+        ]
+      },
+      "inferenceCalls": 2,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "dde88836fc9b7eb5f4345ae7176fa06b104071b6795d91f4e5de0a62c783b92e",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "ed7986a755702636c462b079d09c2c0110619792d95bce584cff9dce9a162d9e",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    },
+    {
+      "id": "independent-length-changed",
+      "phase": "dimension-pair",
+      "succeeded": false,
+      "passed": false,
+      "expectedGate": false,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Unknown",
+        "Ethos": "Unknown",
+        "Pathos": "Unknown"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Reject"
+        ],
+        "Ethos": [
+          "Reject"
+        ]
+      },
+      "inferenceCalls": 2,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "95b4676fdb2d2ccdaf9935be2e49113159e07bdce0460767b50e268f1fabfe7b",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "2cad917369cd620a653a92b8bbdd871e0b94bed4e2e63494814fef15612bb697",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    }
+  ]
+}

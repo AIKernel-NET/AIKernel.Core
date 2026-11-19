@@ -1,0 +1,22 @@
+from pathlib import Path
+import json
+root=Path(__file__).parent
+for name in ['server_transfer.py','server_results.py']:
+ p=root/name;s=p.read_text(encoding='utf-8').replace("'grounding-reordered')","'grounding-reordered','effects-pilot','effects-api','effects-host')")
+ if name=='server_transfer.py':
+  s=s.replace("'--bonsai-ctg-canonical-matrix'","'--bonsai-ctg-canonical-matrix','--bonsai-ctg-effects-suite'")
+  s=s.replace("'public_runner.py' if phase=='final-api'", "'effects_public_runner.py' if phase=='effects-api' else 'public_runner.py' if phase=='final-api'")
+  s=s.replace("'reading-matrix':'host-guards'", "'effects-pilot':'reading-matrix','effects-host':'effects-api','reading-matrix':'host-guards'")
+  s=s.replace("'criteria-pilot-fixed','focus-pilot','focus-full')", "'criteria-pilot-fixed','focus-pilot','focus-full','effects-pilot')")
+ p.write_text(s,encoding='utf-8')
+p=root/'remote_runner.py';s=p.read_text(encoding='utf-8')
+s=s.replace("'--bonsai-ctg-canonical-matrix'","'--bonsai-ctg-canonical-matrix','--bonsai-ctg-effects-suite'")
+s=s.replace("elif settings['waitFor']=='host-guards':", "elif settings['waitFor']=='reading-matrix':\n  assert previous['stopReason'] is None and previous['exitCode']==0\n  diagnostic=json.loads((dependency/'result.json').read_text())\n  assert diagnostic['diagnosticOnly'] and len(diagnostic['rows'])==4\n elif settings['waitFor']=='host-guards':")
+s=s.replace("('final-api','final-v18','final-complete')","('final-api','final-v18','final-complete','effects-api')")
+p.write_text(s,encoding='utf-8')
+s=(root.parent/'ctg-reading-20261117/public_runner.py').read_text(encoding='utf-8').replace("out.parent/'focus-pilot'","out.parent/'effects-pilot'")
+(root/'effects_public_runner.py').write_text(s,encoding='utf-8')
+p=root/'compare.py';p.write_text(p.read_text(encoding='utf-8').replace("phase.startswith('focus-')","phase.startswith(('focus-','effects-'))"),encoding='utf-8')
+p=root/'admission.json';data=json.loads(p.read_text(encoding='utf-8'));data['secondCandidate']='v21: v20 plus actual-action/observed-outcome reading; interpretation remains untrusted';p.write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
+(root/'v20-guard-regression.json').write_bytes((root/'guard-regression.json').read_bytes())
+print('Prepared sequential v21 pilot, default API and host guard checks.')

@@ -1,0 +1,26 @@
+{
+  "diagnosticOnly": true,
+  "council": "Logos",
+  "expectedUnseen": false,
+  "hypothesis": "Repeat the literal observation and candidate in separate source-first fields for the reason stage only; the v28 limited choice sees the generated reason with the original v28 system and user base.",
+  "gate": "All six selections must match the previously specified Logos finding, with valid draft and classified token, preserving all previously correct answers. Only then consider a formal candidate. No diagnostic is a vote.",
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "files": {
+    "cases.json": "143f0b3da8698b43d91eea25358aee57c6d41b9f2c50954a26bb55c9c0586498",
+    "source-inputs.json": "c8e23e1181a18cd28ff5ff587106f85e092f3784bc0f60ec77ad742d742adc1c",
+    "sources.json": "bb67018f7756aa9993f38e165b37260b9200f988fe57d132091eb7a8df6e16a9",
+    "expectations.json": "5f72164c3601c2639412fe87a74569d4e312f8e3f4391e31be8ea25decbfa89c",
+    "prompts.json": "5cf1ddf1d020e7650229121bcd5fbf7492dafe39bf3fdf03db8bd198f2c7644d",
+    "Program.cs": "7cc61cae49b4249ee3af238671ae83e8ed39b5698b69c5765916dac707095d4d",
+    "Probe.csproj": "a568241acc15fe32315ab070b7e63fdcbf30c4cd16cd028f8156ef253f3c1c00",
+    "score.py": "1596bf2eaef82a291a52c733a0d700d35eb2879a56768085466fc39345e22ed7",
+    "freeze.py": "c9a3e3c7b8c0caed53ba62d583f014616686d5603eba3c68d1da0608aa4f256b",
+    "prior-registration.json": "7c2003d502be71301ecdd3a3f442c05fcf3a0b77466ac82c0575ce2e7df490e2",
+    "app/AIKernel.Core.Tests.dll": "da33a5cca9df7ee0426b60a1e4b33d95eca9cf97dc6be0d4ffbb38da54aac8ea",
+    "app/AIKernel.Kernel.dll": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be"
+  },
+  "priorRegistrationSha256": "7c2003d502be71301ecdd3a3f442c05fcf3a0b77466ac82c0575ce2e7df490e2",
+  "amendmentBeforeInference": true,
+  "amendment": "Keep failed cells and their raw draft or selection when available, continue to later cells, score each invalid output as a failure. No candidate input, expected finding, original wording, or adoption criteria changed.",
+  "maximumNewModelCalls": 12
+}

@@ -1,0 +1,322 @@
+{
+  "cells": [
+    {
+      "id": "ordered-holdout-status-invented-Logos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable"
+      ],
+      "rotations": [
+        {
+          "bySymbol": [
+            15.983262062072754,
+            14.490636825561523,
+            14.410810470581055
+          ],
+          "findingIndices": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "bySymbol": [
+            15.194175720214844,
+            14.47506046295166,
+            14.412511825561523
+          ],
+          "findingIndices": [
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "bySymbol": [
+            15.802556991577148,
+            14.229775428771973,
+            14.38865852355957
+          ],
+          "findingIndices": [
+            1,
+            2,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Logos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable"
+      ],
+      "rotations": [
+        {
+          "bySymbol": [
+            15.94603157043457,
+            13.967195510864258,
+            13.56668472290039
+          ],
+          "findingIndices": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "bySymbol": [
+            15.178140640258789,
+            14.43118667602539,
+            13.377367973327637
+          ],
+          "findingIndices": [
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "bySymbol": [
+            15.89024543762207,
+            13.98039722442627,
+            14.156211853027344
+          ],
+          "findingIndices": [
+            1,
+            2,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ordered-holdout-status-invented-Ethos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable",
+        "safety_neutral"
+      ],
+      "rotations": [
+        {
+          "bySymbol": [
+            15.608688354492188,
+            13.042977333068848,
+            14.392589569091797,
+            15.571931838989258
+          ],
+          "findingIndices": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "bySymbol": [
+            15.129865646362305,
+            12.76753044128418,
+            13.849662780761719,
+            14.833036422729492
+          ],
+          "findingIndices": [
+            3,
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "bySymbol": [
+            14.79801082611084,
+            14.57563591003418,
+            14.622369766235352,
+            15.120981216430664
+          ],
+          "findingIndices": [
+            2,
+            3,
+            0,
+            1
+          ]
+        },
+        {
+          "bySymbol": [
+            15.551124572753906,
+            13.75243854522705,
+            15.070121765136719,
+            14.967330932617188
+          ],
+          "findingIndices": [
+            1,
+            2,
+            3,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Ethos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable",
+        "safety_neutral"
+      ],
+      "rotations": [
+        {
+          "bySymbol": [
+            15.170795440673828,
+            12.276464462280273,
+            13.018146514892578,
+            15.14952278137207
+          ],
+          "findingIndices": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "bySymbol": [
+            14.520960807800293,
+            12.92335319519043,
+            12.305431365966797,
+            13.890317916870117
+          ],
+          "findingIndices": [
+            3,
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "bySymbol": [
+            14.366922378540039,
+            14.198131561279297,
+            14.500913619995117,
+            13.604059219360352
+          ],
+          "findingIndices": [
+            2,
+            3,
+            0,
+            1
+          ]
+        },
+        {
+          "bySymbol": [
+            14.845425605773926,
+            12.6481294631958,
+            14.508289337158203,
+            14.880840301513672
+          ],
+          "findingIndices": [
+            1,
+            2,
+            3,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ordered-holdout-status-exact-Logos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable"
+      ],
+      "rotations": [
+        {
+          "bySymbol": [
+            16.134984970092773,
+            14.002817153930664,
+            14.477113723754883
+          ],
+          "findingIndices": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "bySymbol": [
+            15.405415534973145,
+            14.883016586303711,
+            14.32699203491211
+          ],
+          "findingIndices": [
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "bySymbol": [
+            15.747575759887695,
+            13.956537246704102,
+            14.865766525268555
+          ],
+          "findingIndices": [
+            1,
+            2,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ordered-holdout-dimension-exact-Logos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable"
+      ],
+      "rotations": [
+        {
+          "bySymbol": [
+            16.102825164794922,
+            12.815147399902344,
+            12.623558044433594
+          ],
+          "findingIndices": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "bySymbol": [
+            15.143916130065918,
+            15.57541561126709,
+            12.792706489562988
+          ],
+          "findingIndices": [
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "bySymbol": [
+            15.817848205566406,
+            13.184530258178711,
+            15.11331558227539
+          ],
+          "findingIndices": [
+            1,
+            2,
+            0
+          ]
+        }
+      ]
+    }
+  ]
+}

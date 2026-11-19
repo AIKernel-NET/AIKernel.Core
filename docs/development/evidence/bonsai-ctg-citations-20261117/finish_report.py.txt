@@ -1,0 +1,63 @@
+from pathlib import Path
+import json
+
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+report=repo/'docs/development/bonsai-ctg-citations-20261117-jp.md'
+load=lambda name:json.loads((root/name).read_text(encoding='utf-8'))
+prefix='evidence/bonsai-ctg-citations-20261117/'
+link=lambda title,name:f'[{title}]({prefix}{name})'
+phases=[('v11 引用（途中停止）','citation-pilot-fixed'),('v12 引用＋判断区分','findings-pilot'),('v13 短いパケット','packet-pilot'),('v14 適用例','demo-pilot'),('v15 下書き＋再点検','review-pilot')]
+baseline=load('demo-pilot-comparison.json')['before']
+comparisons={phase:load(phase+'-comparison.json') for _,phase in phases}
+latest=comparisons['review-pilot'];assert not latest['semanticAdmissionPassed']
+guards=load('review-host-guards-comparison.json');assert len(guards['hostBlocks'])==7 and not guards['regressions']
+regression=load('guard-regression.json');assert regression['phase']=='final-v15' and regression['generation128HashMatched']
+transitions=load('review-transitions.json')
+local=load('local-retry-status.json');assert local['state']!='waiting'
+samples=load('local-load-samples.json')
+final=load('server-final-state.json');assert not final['activeOwnedValidationProcesses']
+
+def line(name,t):
+ n=t['count']
+ return f"| {name} | {n} | {t['fullPass']}/{n} | {t['gatePass']}/{n} | {len(t['falseAllow'])} | {len(t['falseDeny'])} | {len(t['evaluationFailed'])} |"
+
+parts=['## 最終結果','',
+ '今回の候補は採用基準に達しなかった。既定の評価器には反映していない。',
+ '表の「指定票一致」は、ゲートとfixtureに指定された評議票の一致であり、理由文の妥当性を自動証明する値ではない。','',
+ '| 候補 | 完了例 | ゲート＋指定票一致 | ゲート一致 | 誤承認 | 過剰拒否 | 評価不成立 |',
+ '| --- | ---: | ---: | ---: | ---: | ---: | ---: |',line('旧v4（同じ予備8例）',baseline)]
+for title,phase in phases:parts.append(line(title,comparisons[phase]['after']))
+parts+=['',
+ 'v11は3例で停止したため他行の8例と正答率を直接比較しない。v12のゲート一致4件は全例評価不成立のfail-closed結果であり、4件をモデルの正解と扱わない。',
+ 'v14で過剰拒否が2件になっても、誤った状態報告のEthos票などが悪化したため採用しない。v15も追加例と既存票の維持条件を満たさない。',
+ 'この範囲で最終ゲートの誤承認は0件だったが、未実行の50例全体や未知入力での保証ではない。','',
+ 'v15の下書きと正式評価を対にした結果：','',
+ f"- 完了した評議対：{transitions['completedRolePairs']}。票が変化した対：{transitions['changedVotes']}。",
+ f"- 指定票の不一致から一致へ変わった対：{transitions['wrongToRightVotes']}。一致から不一致へ変わった対：{transitions['rightToWrongVotes']}。",
+ '- 下書きの不足・誤読を指摘して再点検するだけでは、供給済み観測の見落としや不要な感情条件を安定して訂正できなかった。','',
+ '比較原票：'+', '.join(link(title,phase+'-comparison.json') for title,phase in phases)+'。',
+ link('下書きと正式票の対応','review-transitions.json')+'には、原応答へのSHA-256と理由・票を記録した。','',
+ '## 維持した回帰と資源枠','',
+ '- 最新実装のCore回帰は1,045件成功、失敗・スキップ0件。',
+ '- 同じ最新バイナリのv15で、取得失敗7例はすべてモデル呼び出し0回・全票Unknown・ゲート拒否。モデルの意味評価とは別集計した。',
+ '- 公開APIの取得状態3パターンは推論前拒否を維持。利用可能な観測を渡した旧v4経路は3回推論し、プロンプト・応答・入力・ROMのハッシュが旧基準と一致した。',
+ '- Bonsai通常生成の128トークン固定ハッシュは `f01d3d7490428e69842c1509cdec3f453d579bc0108aff9a48a72b05e72b7c2e` と一致した。',
+ f"- 今回の各実行・回帰確認で観測した最大RSSは {regression['maximumObservedRssBytes']:,} bytes（{regression['maximumObservedRssBytes']/1024**3:.2f} GiB）。7 GiBのRSS監視下で上限超過は観測されなかった。1秒ごとのRSS監視値であり、瞬間値の厳密な保証とは区別する。",
+ '- governance ROM、投票対応表、既存決定ゲート、推論カーネルを変更していない。検証終了後、今回のServer検証プロセスが残っていないことを確認した。','',
+ link('回帰の照合結果','guard-regression.json')+'、'+link('取得失敗7例','review-host-guards-comparison.json')+'、'+link('Coreテスト集計','unit-tests.json')+'。','',
+ '## 端末の保留例','']
+if local['state']=='deferred-high-load':
+ parts += [f"今回の監視は{len(samples)}回、CPU使用率は{min(s['cpuPercent'] for s in samples):g}〜{max(s['cpuPercent'] for s in samples):g}%だった。",
+  '10%以下が15秒間隔で3回続く開始条件を満たさなかったため、`pair-japanese-self-assertion` は未実行のまま保留した。',
+  '利用者のアプリを停止せず、低負荷条件や旧バイナリによる再検証条件も変更していない。']
+else:
+ raise AssertionError('Local retry completed: inspect its actual result and document it before finishing the report')
+parts += [link('最終待機状態','local-retry-status.json')+'、'+link('CPU負荷の記録','local-load-samples.json')+'。','',
+ '## 再現用の記録','',
+ link('凍結した採用条件','admission.json')+'とfixture、原応答、実際に転送した実行スクリプト、ソース版、バイナリ・ROMハッシュを同じ証拠ディレクトリーに保存した。',
+ '実行物・観測記録は'+link('最新テスト済みビルド','v15-tested-build.json')+'と'+link('証拠ファイルのSHA-256一覧','evidence-sha256.json')+'で照合する。',
+ link('Serverの最終プロセス確認','server-final-state.json')+'も保持する。実モデルファイル、鍵、非公開認証情報はリポジトリへ含めない。','']
+text=report.read_text(encoding='utf-8');assert '<!-- RESULTS_PENDING -->' in text
+report.write_text(text.replace('<!-- RESULTS_PENDING -->','\n'.join(parts)).rstrip()+'\n',encoding='utf-8')
+print('Final report generated from completed evidence.')

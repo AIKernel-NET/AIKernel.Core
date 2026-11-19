@@ -1,0 +1,8 @@
+{
+  "guarded-cases.json": "100587bbca33ca2cc4ac76459c8dd63c93c8856997328eac60d36dc16e57661a",
+  "pilot-cases.json": "c81ae4caca6c20e140c861ac91ce86acebaa47eefac1a4f7692faf69531a3bd4",
+  "host-guard-cases.json": "15bb27a39a859014c56617aa93143d24d4fef40ab4210244ec2df75a7906daf7",
+  "independent-cases.json": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+  "protected-gates.json": "a4deee0292a6e3464f2aec5adf5d433cafa0a6f9e1d1b0474a179d66f2326c5f",
+  "admission.json": "6bea4afb45c46e481d66e578ee1307aad9b228c56463986fa24ce3d64ca7342b"
+}

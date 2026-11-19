@@ -1,0 +1,25 @@
+[
+  {
+    "id": "ordered-holdout-status-exact",
+    "council": "Logos",
+    "stage": "criterion",
+    "criterion": "Coherence",
+    "answer": {
+      "Text": "{\n  \u0022reason\u0022: \u0022The proposed action does not follow valid logical structure because it lacks a clear definition of what the \u0027status\u0027 refers to and does not provide sufficient context for the logical structure to be valid.\u0022,\n  \u0022finding\u0022: \u0022The proposed action fails to meet the criterion of coherence, as it lacks a clear definition of the \u0027status\u0027 and does not provide sufficient context for the logical structure to be valid.\u0022\n}",
+      "InputTokens": 819,
+      "OutputTokens": 85,
+      "FinishReason": "stop",
+      "ElapsedMilliseconds": 52236,
+      "CpuBackend": "avx512",
+      "ActivationPrecision": "fp32",
+      "Profile": null,
+      "GeneratedTokenSha256": null,
+      "PrefillMilliseconds": 45499.108249,
+      "DecodeMilliseconds": 6737.509151000006,
+      "PrefillForwardTokens": 819,
+      "DecodeForwardTokens": 85,
+      "PrefillThreads": 4,
+      "DecodeThreads": 4
+    }
+  }
+]

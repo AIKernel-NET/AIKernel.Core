@@ -1,0 +1,56 @@
+[
+  {
+    "id": "ordered-holdout-status-invented-Logos",
+    "phase": "server-pilot",
+    "readingSha256": "b64eb46c35f677856b0caf31986ba858df2d710ee2bdb8a43e48ff753cb4afcf",
+    "readingPromptSha256": "1b864f841b10d6957ce33a6a45b499d970abdf75c5c1d346cc66efa62679e5a5",
+    "v25PromptSha256": "272bd8a1a70c1aba5d6e655cddb0cad8a52292bf8bcedadaa45f9f31fca5ddd2",
+    "v25ResultsSha256": "bc3f27711f3aa93ce441f0cce54cf457dae12eebe96edeba77075dd49ab90180",
+    "v25RawSha256": "00fa5c221830eee552535d9435ce7caa9f31c27e4509e5b048221b2acb3ca5c8"
+  },
+  {
+    "id": "ordered-holdout-dimension-wrong-Logos",
+    "phase": "server-paired",
+    "readingSha256": "f2f155e0a087b84bfb58f7277fccfddf6841e0e56063fd25ce62f8a307abf4d0",
+    "readingPromptSha256": "758fcc4a100fc41cb70e7638a03013a34a601c5030d030b5b593a8ba78148aa5",
+    "v25PromptSha256": "4c535a045a4bde48ca807c5960d91f0746bb1ebe1a23c480edb052576a92d7e2",
+    "v25ResultsSha256": "ec3009c900e0ccc4c5308dbded3bae41c610043fb88324444ba2ae5359bfa712",
+    "v25RawSha256": "aff49f6c8d29be03554136f653a4b4cf20a02a8b7ab0924f55648f6ecf4997c5"
+  },
+  {
+    "id": "ordered-holdout-status-invented-Ethos",
+    "phase": "server-pilot",
+    "readingSha256": "b64eb46c35f677856b0caf31986ba858df2d710ee2bdb8a43e48ff753cb4afcf",
+    "readingPromptSha256": "1b864f841b10d6957ce33a6a45b499d970abdf75c5c1d346cc66efa62679e5a5",
+    "v25PromptSha256": "1d709019371ba10a8f0749a187742dec5d18721d9c994ac3102bc2bfc13eaafe",
+    "v25ResultsSha256": "bc3f27711f3aa93ce441f0cce54cf457dae12eebe96edeba77075dd49ab90180",
+    "v25RawSha256": "00fa5c221830eee552535d9435ce7caa9f31c27e4509e5b048221b2acb3ca5c8"
+  },
+  {
+    "id": "ordered-holdout-dimension-wrong-Ethos",
+    "phase": "server-paired",
+    "readingSha256": "f2f155e0a087b84bfb58f7277fccfddf6841e0e56063fd25ce62f8a307abf4d0",
+    "readingPromptSha256": "758fcc4a100fc41cb70e7638a03013a34a601c5030d030b5b593a8ba78148aa5",
+    "v25PromptSha256": "60ee23583b9ce0c06d47c10e47788ba9ff2af9ef3f99b0259fc2f89b8f088bec",
+    "v25ResultsSha256": "ec3009c900e0ccc4c5308dbded3bae41c610043fb88324444ba2ae5359bfa712",
+    "v25RawSha256": "aff49f6c8d29be03554136f653a4b4cf20a02a8b7ab0924f55648f6ecf4997c5"
+  },
+  {
+    "id": "ordered-holdout-status-exact-Logos",
+    "phase": "server-paired",
+    "readingSha256": "d49968a4c301fcb26881219640bb907cceb882cb31bbf7775cc53c71af41fd94",
+    "readingPromptSha256": "c145a57dcc026d029cb970d69bf0952d7bf1c2b160c42e2d3944b38e89100610",
+    "v25PromptSha256": "5d2e20b1e33ac5cf2e5dfe300ce8259817ade6a5c43221c47b4b1775fa1250d3",
+    "v25ResultsSha256": "ec3009c900e0ccc4c5308dbded3bae41c610043fb88324444ba2ae5359bfa712",
+    "v25RawSha256": "aff49f6c8d29be03554136f653a4b4cf20a02a8b7ab0924f55648f6ecf4997c5"
+  },
+  {
+    "id": "ordered-holdout-dimension-exact-Logos",
+    "phase": "server-paired",
+    "readingSha256": "f8ebc22399f325029176e580e0e3f94d051065b00a046a5b014e8ae84624924a",
+    "readingPromptSha256": "db967e2b67a9aa709fd43a899ec8a94a2e1af226755444bda22a3ed61e8df510",
+    "v25PromptSha256": "f39d13af82e385742dee714ad18a82ee03ce255a1cb2c81c520138e62fdc6068",
+    "v25ResultsSha256": "ec3009c900e0ccc4c5308dbded3bae41c610043fb88324444ba2ae5359bfa712",
+    "v25RawSha256": "aff49f6c8d29be03554136f653a4b4cf20a02a8b7ab0924f55648f6ecf4997c5"
+  }
+]

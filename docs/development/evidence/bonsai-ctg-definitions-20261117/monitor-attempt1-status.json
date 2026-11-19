@@ -1,0 +1,7 @@
+{
+  "state": "waiting",
+  "threshold": 10,
+  "cpuPercent": 100.0,
+  "consecutive": 0,
+  "utc": "2026-11-17T15:18:55.5606880Z"
+}

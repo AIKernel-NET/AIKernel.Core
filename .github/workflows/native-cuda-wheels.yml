@@ -1,0 +1,166 @@
+name: native-cuda-wheels
+
+# [EN] Builds and publishes the aikernel-cuda-driver wheels using GitHub-hosted standard
+#      runners only. The C ABI loads the CUDA Driver at runtime and embeds pre-generated
+#      PTX, so no GPU, NVIDIA driver, CUDA Toolkit or self-hosted runner is needed.
+#      Publishing runs only for tags named py-aikernel-cuda-driver-v<version>.
+# [JA] aikernel-cuda-driver の wheel を GitHub-hosted の標準 runner だけでビルド・公開します。
+#      C ABI は CUDA Driver を実行時に読み込み、生成済み PTX を埋め込むため、GPU、NVIDIA
+#      driver、CUDA Toolkit、self-hosted runner はいずれも不要です。
+#      公開は py-aikernel-cuda-driver-v<version> 形式のタグでのみ実行します。
+
+on:
+  push:
+    branches: [dev, main]
+    paths: ["native/cuda/**", ".github/workflows/native-cuda-wheels.yml"]
+    tags: ["py-aikernel-cuda-driver-v*"]
+  pull_request:
+    paths: ["native/cuda/**", ".github/workflows/native-cuda-wheels.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-cuda-wheels-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+env:
+  PACKAGE_DIR: native/cuda
+  TAG_PREFIX: py-aikernel-cuda-driver-v
+
+jobs:
+  sdist:
+    name: sdist and version check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check tag matches pyproject version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          version=$(python -c "import tomllib; print(tomllib.load(open('$PACKAGE_DIR/pyproject.toml','rb'))['project']['version'])")
+          tag="${GITHUB_REF_NAME#"$TAG_PREFIX"}"
+          echo "pyproject=$version tag=$tag"
+          test "$version" = "$tag" || { echo "::error::Tag $GITHUB_REF_NAME does not match pyproject version $version"; exit 1; }
+
+      - name: Build sdist
+        run: |
+          python -m pip install --upgrade build twine
+          python -m build --sdist --outdir dist "$PACKAGE_DIR"
+          python -m twine check --strict dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cuda-driver-sdist
+          path: dist/*.tar.gz
+          if-no-files-found: error
+
+  build-windows:
+    name: wheel win_amd64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build wheel (MSVC, static CRT)
+        shell: bash
+        run: |
+          python -m pip install --upgrade build twine
+          python -m build --wheel --outdir wheels "$PACKAGE_DIR"
+          python -m twine check --strict wheels/*.whl
+          ls wheels/*-py3-none-win_amd64.whl
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cuda-driver-win-amd64
+          path: wheels/*-py3-none-win_amd64.whl
+          if-no-files-found: error
+
+  test-windows:
+    name: test win_amd64 py${{ matrix.python }}
+    needs: build-windows
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: cuda-driver-win-amd64
+          path: wheels
+      - name: Install wheel and run host smoke test
+        shell: pwsh
+        run: |
+          $wheel = Get-ChildItem wheels -Filter *.whl | Select-Object -First 1
+          python -m pip install --no-deps $wheel.FullName
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python native/cuda/tests/smoke.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+  build-linux:
+    name: wheel manylinux_2_28_x86_64
+    runs-on: ubuntu-latest
+    container: quay.io/pypa/manylinux_2_28_x86_64
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build, repair and test wheel
+        shell: bash
+        run: |
+          py=/opt/python/cp312-cp312/bin/python
+          "$py" -m pip wheel --no-deps "$PACKAGE_DIR" -w raw
+          auditwheel repair --plat manylinux_2_28_x86_64 --only-plat raw/*.whl -w wheels
+          auditwheel show wheels/*.whl
+          "$py" -m pip install --quiet twine
+          "$py" -m twine check --strict wheels/*.whl
+          for v in 39 310 311 312 313; do
+            interp=/opt/python/cp$v-cp$v/bin/python
+            "$interp" -m pip install --no-deps --force-reinstall wheels/*.whl
+            "$interp" native/cuda/tests/smoke.py --no-driver
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cuda-driver-manylinux-x86-64
+          path: wheels/*-py3-none-manylinux*x86_64.whl
+          if-no-files-found: error
+
+  publish:
+    name: publish to PyPI
+    needs: [sdist, test-windows, build-linux]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/py-aikernel-cuda-driver-v')
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/aikernel-cuda-driver
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: cuda-driver-*
+          merge-multiple: true
+          path: dist
+
+      - name: Show distributions and trusted publisher claims
+        run: |
+          ls -l dist
+          echo "PyPI project: aikernel-cuda-driver"
+          echo "Expected owner/repository: AIKernel-NET/AIKernel.Core"
+          echo "Expected workflow: native-cuda-wheels.yml"
+          echo "Expected environment: pypi"
+          echo "Actual repository: ${GITHUB_REPOSITORY}"
+          echo "Actual workflow ref: ${GITHUB_WORKFLOW_REF}"
+
+      - name: Publish distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

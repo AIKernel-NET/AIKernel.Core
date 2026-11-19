@@ -1,0 +1,127 @@
+{
+  "testedKernelSha256": "3d425bce222fa1e5cc0cd9e6f17863864d6e63aa23c18be434cca389773ca641",
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "governanceSha256": {
+    "governance/council.ethos.monolith.md": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "governance/council.logos.monolith.md": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "governance/council.pathos.monolith.md": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+  },
+  "sourceCommit": "b84ceb1",
+  "trials": {
+    "server-form": {
+      "completion": {
+        "exitCode": 1,
+        "stopReason": null,
+        "maximumRssBytes": 1916207104,
+        "seconds": 2175.311434030533,
+        "cpuAffinity": [
+          2,
+          3
+        ],
+        "configuredWorkers": 4,
+        "performanceBenchmark": false
+      },
+      "fixtureSha256": "364b0963e807c68e7ee3acad7e652c6eedf33d33ba13a5c80877bb500e3e70a9"
+    },
+    "server-full": {
+      "completion": {
+        "exitCode": -15,
+        "stopReason": "semantic-regression",
+        "maximumRssBytes": 1463848960,
+        "seconds": 440.7640233039856,
+        "cpuAffinity": [
+          2,
+          3
+        ],
+        "configuredWorkers": 4,
+        "performanceBenchmark": false
+      },
+      "fixtureSha256": "ea3ff97ad44f8f6dbd3f5e2609756ef22dae35fd6f6926cdfe3e0006b83132b4"
+    },
+    "server-host": {
+      "completion": {
+        "exitCode": 0,
+        "stopReason": null,
+        "maximumRssBytes": 130453504,
+        "seconds": 3.0182948112487793,
+        "cpuAffinity": [
+          2,
+          3
+        ],
+        "configuredWorkers": 4,
+        "performanceBenchmark": false
+      },
+      "fixtureSha256": "15bb27a39a859014c56617aa93143d24d4fef40ab4210244ec2df75a7906daf7"
+    },
+    "server-legacy": {
+      "completion": {
+        "checks": {
+          "evidence-probe": {
+            "exitCode": 0,
+            "maximumRssBytes": 1077047296,
+            "stopReason": null,
+            "seconds": 147.8011016845703
+          },
+          "normal-128": {
+            "exitCode": 0,
+            "maximumRssBytes": 434167808,
+            "stopReason": null,
+            "seconds": 13.070720195770264
+          }
+        },
+        "cpuAffinity": [
+          2,
+          3
+        ],
+        "configuredWorkers": 4,
+        "performanceBenchmark": false
+      },
+      "fixtureSha256": "a51fae12f3cb0dda115543680f758527c6fecb21facc8c60ada1ee3babbc5909"
+    },
+    "server-paired": {
+      "completion": {
+        "exitCode": 0,
+        "stopReason": null,
+        "maximumRssBytes": 2165714944,
+        "seconds": 2492.2148571014404,
+        "cpuAffinity": [
+          2,
+          3
+        ],
+        "configuredWorkers": 4,
+        "performanceBenchmark": false
+      },
+      "fixtureSha256": "23c1ce16fd3128fc85b491f4cde1ef77f830925f921822c6663b0b6d4b426266"
+    },
+    "server-pilot": {
+      "completion": {
+        "exitCode": 0,
+        "stopReason": null,
+        "maximumRssBytes": 1962745856,
+        "seconds": 784.894816160202,
+        "cpuAffinity": [
+          2,
+          3
+        ],
+        "configuredWorkers": 4,
+        "performanceBenchmark": false
+      },
+      "fixtureSha256": "68327d440743995b7bd92e5aec32d63e7f6c8bc83eddae3f3a6cec38540d3155"
+    },
+    "server-test": {
+      "completion": {
+        "exitCode": 0,
+        "stopReason": null,
+        "maximumRssBytes": 515825664,
+        "seconds": 82.4694492816925,
+        "cpuAffinity": [
+          2,
+          3
+        ],
+        "configuredWorkers": 4,
+        "performanceBenchmark": false
+      },
+      "fixtureSha256": "003ead6cbd856093cec8eba6957e16e775ca358db1f0443b8ff5923f9e953b74"
+    }
+  }
+}

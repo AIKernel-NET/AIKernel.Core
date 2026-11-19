@@ -1,0 +1,60 @@
+{
+  "baselineCase": "verified-arithmetic",
+  "baselineFileSha256": "fe814082b0c8337eb4ee580d0dadd7d860734b42371031cd31e83a2b17bce9be",
+  "baseline": {
+    "evaluationSucceeded": true,
+    "gateSucceeded": true,
+    "gateAccepted": true,
+    "decisionKind": 1,
+    "votes": {
+      "Logos": 1,
+      "Ethos": 1,
+      "Pathos": 1
+    },
+    "voteLabels": {
+      "Logos": "Approve",
+      "Ethos": "Approve",
+      "Pathos": "Approve"
+    }
+  },
+  "contract": "canonical-separated-assessment-json-v4",
+  "comparedMetadataKeys": [
+    "prompt.contract",
+    "model.sha256",
+    "facts.sha256",
+    "proposal.sha256",
+    "evaluation_input.sha256",
+    "Logos.rom.sha256",
+    "Logos.prompt.sha256",
+    "Logos.response.sha256",
+    "Ethos.rom.sha256",
+    "Ethos.prompt.sha256",
+    "Ethos.response.sha256",
+    "Pathos.rom.sha256",
+    "Pathos.prompt.sha256",
+    "Pathos.response.sha256"
+  ],
+  "runs": {
+    "v25": {
+      "probeFileSha256": "1c3d68d5eb48486687f71353c565b3711185478f7466dd029157c18abebf653e",
+      "result": {
+        "evaluationSucceeded": true,
+        "gateSucceeded": true,
+        "gateAccepted": true,
+        "decisionKind": 1,
+        "votes": {
+          "Logos": 1,
+          "Ethos": 1,
+          "Pathos": 1
+        },
+        "voteLabels": {
+          "Logos": "Approve",
+          "Ethos": "Approve",
+          "Pathos": "Approve"
+        }
+      },
+      "inputPromptResponseRomHashesMatched": true
+    }
+  },
+  "scope": "One available v4 probe per binary. Generated operation IDs and timestamps differ."
+}

@@ -1,0 +1,1 @@
+{"mode": "--bonsai-ctg-evidence-scope-suite", "waitFor": "controls-baseline", "postChecks": true, "stopOnRegression": false}

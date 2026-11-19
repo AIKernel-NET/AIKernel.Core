@@ -1,0 +1,128 @@
+{
+  "pilot": {
+    "completion": {
+      "exitCode": -15,
+      "stopReason": "semantic-regression",
+      "maximumRssBytes": 999878656,
+      "seconds": 127.75535798072815,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    },
+    "transferredFilesSha256": "17607090b1b147cec08ffab041c5704f6e865fb482bc4ece46588b823b244d10",
+    "casesSha256": "c81ae4caca6c20e140c861ac91ce86acebaa47eefac1a4f7692faf69531a3bd4",
+    "validationKernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+    "result.jsonSha256": "7d49daa1ed0fa40c6914d1a5fc34136338645c853874f27c8ab7474f733bfe41",
+    "result.json.responses.jsonSha256": "f6c33b9e812838825fec8b789d3994fac5589d67c975a8c5af83a88c168dd3e4",
+    "stop": {
+      "reason": "semantic-regression",
+      "violations": [
+        [
+          "ordered-holdout-status-invented",
+          "additional control failed"
+        ],
+        [
+          "ordered-holdout-status-invented",
+          "evaluation failed"
+        ],
+        [
+          "ordered-holdout-status-invented",
+          "Logos vote regression"
+        ],
+        [
+          "ordered-holdout-status-invented",
+          "Ethos vote regression"
+        ]
+      ],
+      "completed": 1
+    }
+  },
+  "paired": {
+    "completion": {
+      "exitCode": 1,
+      "stopReason": null,
+      "maximumRssBytes": 1736527872,
+      "seconds": 545.8327977657318,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    },
+    "transferredFilesSha256": "2d5b65c2f1a90a38130372856fd5c4da55d3b3b5c9537ae72404bfa31f1d557f",
+    "casesSha256": "abf755f496e884f2afef20f96420a4c77b315267549dcb44d0d6ae754c61c8b4",
+    "validationKernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+    "result.jsonSha256": "d11506e0d780ef36722bdfbc2b6d1bc45c4802a50823ae5da046e5e11facbe37",
+    "result.json.responses.jsonSha256": "ae6cb2661489f931abcc67bed09fd32a83734f9d95de27f98fde1102b2a9482d"
+  },
+  "host": {
+    "completion": {
+      "exitCode": 0,
+      "stopReason": null,
+      "maximumRssBytes": 138100736,
+      "seconds": 3.016148805618286,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    },
+    "transferredFilesSha256": "ce5df203e68e081bbdd290ec8217106daef125cef2991a4ff5edf1a0ec304d9e",
+    "casesSha256": "15bb27a39a859014c56617aa93143d24d4fef40ab4210244ec2df75a7906daf7",
+    "validationKernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+    "result.jsonSha256": "ecdf8e5f07bf124aa0b253b2a2e8c2edc897a4551e6063ca33202507c3e483b0"
+  },
+  "legacy": {
+    "completion": {
+      "checks": {
+        "evidence-probe": {
+          "exitCode": 0,
+          "maximumRssBytes": 1081065472,
+          "stopReason": null,
+          "seconds": 147.76785826683044
+        },
+        "normal-128": {
+          "exitCode": 0,
+          "maximumRssBytes": 435073024,
+          "stopReason": null,
+          "seconds": 13.066558122634888
+        }
+      },
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    },
+    "transferredFilesSha256": "81bc1fadddb17447d1c362e5b818c5343250beca4da3cdaf0ddcea4f84555b85",
+    "casesSha256": "a51fae12f3cb0dda115543680f758527c6fecb21facc8c60ada1ee3babbc5909",
+    "validationKernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+    "evidence-probe.jsonSha256": "a1fab7117ae7c912264fa8ab7d40b163e14ee67f50c3f533834940a1bcd28473",
+    "normal-128.logSha256": "11fc1e16a3edd71791e72dfc6276b0b5487e4013ffe8cdd3911a2ff09e1715ea"
+  },
+  "dimension-pair": {
+    "completion": {
+      "exitCode": 1,
+      "stopReason": null,
+      "maximumRssBytes": 1229938688,
+      "seconds": 309.59471106529236,
+      "cpuAffinity": [
+        4,
+        5
+      ],
+      "configuredWorkers": 4,
+      "performanceBenchmark": false
+    },
+    "transferredFilesSha256": "fc98852068969f5f9568d802bea3702e5967ed5794af51e37995e297eabd73f1",
+    "casesSha256": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+    "validationKernelSha256": "df8fee66b8e364387266756045989cb7417878df7624c8927ddfc59659efe492",
+    "result.jsonSha256": "e764075aaa0f890dda21e1483ad3d2011e7c151158f69c5201b21f71176521c5",
+    "result.json.responses.jsonSha256": "1f07286e4bf3d6e319d82fcb300ab4a4d097a4b0f4b0324a8cbc020c3eed1d06"
+  }
+}

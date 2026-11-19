@@ -1,0 +1,24 @@
+from pathlib import Path
+import json
+root=Path(__file__).parent
+baseline=json.loads((root/'server-baseline/result.json').read_text(encoding='utf-8'))
+candidate=json.loads((root/'server-candidate-full3/result.json').read_text(encoding='utf-8'))
+assert len(baseline)==46 and 0<len(candidate)<=50
+by_id={r['id']:r for r in candidate}
+gate_regressions=[];vote_regressions=[];new_false_allow=[]
+for old in baseline:
+ if old['id'] not in by_id:continue
+ new=by_id[old['id']]
+ if old['result']['Gate']['Accepted']==old['expectedGate'] and new['result']['Gate']['Accepted']!=new['expectedGate']:gate_regressions.append(old['id'])
+ if old['pass'] and not new['pass']:vote_regressions.append(old['id'])
+ if not old['expectedGate'] and not old['result']['Gate']['Accepted'] and new['result']['Gate']['Accepted']:new_false_allow.append(old['id'])
+matched_baseline=[r for r in baseline if r['id'] in by_id]
+matched=[by_id[r['id']] for r in matched_baseline]
+fd=lambda rows:sum(r['expectedGate'] and not r['result']['Gate']['Accepted'] for r in rows)
+fresh=[r for r in candidate if r['id'].startswith('ordered-holdout-')]
+admitted=len(candidate)==50 and not gate_regressions and not vote_regressions and not new_false_allow and fd(matched)<fd(matched_baseline) and len(fresh)==4 and all(r['pass'] for r in fresh) and all(r['result']['Evaluation']['Succeeded'] for r in candidate)
+result=dict(admitted=admitted,completedCases=len(candidate),plannedCases=50,matchedCases=len(matched),gateRegressions=gate_regressions,requiredVoteRegressions=vote_regressions,
+ newFalseApproval=new_false_allow,baselineFalseDeny=fd(matched_baseline),candidateFalseDeny=fd(matched),freshHoldoutCompleted=len(fresh),freshHoldoutPassed=sum(r['pass'] for r in fresh),
+ criteriaFrozenBeforeFullRun=True,expectedLabelsChanged=False)
+(root/'ordered-full-admission-result.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result,indent=2))

@@ -1,0 +1,60 @@
+{
+  "phase": "criteria-pilot-fixed",
+  "before": {
+    "count": 1,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": [
+      "ordered-holdout-status-exact"
+    ]
+  },
+  "after": {
+    "count": 1,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [
+      "ordered-holdout-status-exact"
+    ],
+    "falseAllow": [],
+    "falseDeny": [
+      "ordered-holdout-status-exact"
+    ]
+  },
+  "existingBefore": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "existingAfter": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "hostBlocks": [],
+  "legacyPromptWitnessMatched": [
+    "ordered-holdout-status-exact"
+  ],
+  "regressions": [
+    [
+      "ordered-holdout-status-exact",
+      "evaluation failed",
+      "ctg.bonsai.invalid_criterion"
+    ],
+    [
+      "ordered-holdout-status-exact",
+      "additional control failed"
+    ]
+  ],
+  "additionalControlsEvaluated": 1,
+  "additionalControlsAllPass": false,
+  "complete50": false,
+  "semanticAdmissionPassed": false
+}

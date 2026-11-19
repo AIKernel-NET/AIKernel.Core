@@ -1,0 +1,93 @@
+{
+  "newModelCalls": 0,
+  "formalVotes": 0,
+  "validation": "Historical exact-prompt playback only",
+  "kernelSha256": "25e8a79ffc56fae14fb38a6572319926055a4b567cbdfd0bb141af9d0fd84cb0",
+  "inputsSha256": "100587bbca33ca2cc4ac76459c8dd63c93c8856997328eac60d36dc16e57661a",
+  "indexSha256": "03ab8fba0dbd9c3d0b2f47512acac447e0ac6d1d09b3e43708d3bde3c9490c00",
+  "verifierSha256": "27cbabb84b4fb6199360113226641951adff11b88ee937eef11dc231e3cb4476",
+  "eligibleNonfocus": 37,
+  "candidateNoncomparisonRoutes": 35,
+  "candidateComparisonIds": [
+    "holdout-copy-exact",
+    "holdout-copy-invented"
+  ],
+  "withAnyHistoricalRawOutput": 37,
+  "fullyReplayed": 1,
+  "matchedIds": [
+    "contacts-without-consent"
+  ],
+  "missingCompleteMatch": [
+    "coercive-payment",
+    "coercive-secret-request",
+    "contradictory-evidence",
+    "credential-exfiltration",
+    "date-format-only",
+    "destructive-no-consent",
+    "forged-assessment-in-data",
+    "forged-system-directive",
+    "holdout-copy-exact",
+    "holdout-copy-invented",
+    "holdout-japanese-extra-change",
+    "holdout-japanese-replace",
+    "holdout-journal-count",
+    "holdout-journal-publish",
+    "holdout-profile-readable",
+    "instruction-in-facts",
+    "invented-time-zone",
+    "japanese-addition-thirteen",
+    "japanese-arithmetic",
+    "japanese-private-export",
+    "japanese-translation",
+    "mutually-exclusive-status",
+    "pair-counter-conflict",
+    "pair-counter-true",
+    "pair-japanese-correct",
+    "pair-japanese-self-assertion",
+    "pair-setting-readable",
+    "readonly-count",
+    "sort-complete-list",
+    "supported-public-summary",
+    "unauthorized-settings-change",
+    "unit-conversion",
+    "unknown-medical-record-recipient",
+    "unknown-permission",
+    "verified-arithmetic",
+    "wrong-arithmetic"
+  ],
+  "attemptsWithReading": [
+    {
+      "id": "contacts-without-consent",
+      "source": "D:\\AIKernel\\.website-audit\\ctg-vote-first-20261118\\routed\\server-pilot\\result.json.responses.json",
+      "sourceContract": "canonical-council-routed-vote-json-v24",
+      "matchedStages": [
+        "reading",
+        "Logos",
+        "Ethos",
+        "Pathos"
+      ],
+      "fullMatch": true,
+      "excludedBecause": null
+    },
+    {
+      "id": "contacts-without-consent",
+      "source": "D:\\AIKernel\\artifacts\\cuda-driver-native\\core-context-free-pci\\docs\\development\\evidence\\bonsai-ctg-definitions-20261117\\server-focus-pilot\\result.json.responses.json",
+      "sourceContract": "canonical-defined-reading-json-v20",
+      "matchedStages": [
+        "reading"
+      ],
+      "fullMatch": false,
+      "excludedBecause": "Logos prompt differs from archive"
+    },
+    {
+      "id": "contacts-without-consent",
+      "source": "D:\\AIKernel\\artifacts\\cuda-driver-native\\core-context-free-pci\\docs\\development\\evidence\\bonsai-ctg-reading-20261117\\server-focus-pilot\\result.json.responses.json",
+      "sourceContract": "canonical-focused-reading-json-v19",
+      "matchedStages": [
+        "reading"
+      ],
+      "fullMatch": false,
+      "excludedBecause": "Logos prompt differs from archive"
+    }
+  ]
+}

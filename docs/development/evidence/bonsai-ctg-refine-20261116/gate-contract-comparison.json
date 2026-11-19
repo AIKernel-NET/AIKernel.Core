@@ -1,0 +1,38 @@
+{
+  "paperSha256": "e9c6156cba57add7ae890454d40c5ff8be6917008de4a563b067638e1b27e816",
+  "paperPath": "docs\\papers\\12-canonical-trajectory-governance\\aikernel_canonical_trajectory_governance_ctg_v0_1_0_canonical_en_rev1_final_clean\\paper-en.md",
+  "romSha256": "4075759771e30ed721dc473eabffc36f70bba21d9e156c3503990fee73686bfc",
+  "romPath": "rom\\governance\\gate.decision.monolith.md",
+  "comparedTriples": 27,
+  "differences": [
+    {
+      "votes": {
+        "Logos": "Abstain",
+        "Ethos": "Abstain",
+        "Pathos": "Approve"
+      },
+      "paperAllow": true,
+      "governanceRomAllow": false
+    },
+    {
+      "votes": {
+        "Logos": "Abstain",
+        "Ethos": "Approve",
+        "Pathos": "Abstain"
+      },
+      "paperAllow": true,
+      "governanceRomAllow": false
+    },
+    {
+      "votes": {
+        "Logos": "Approve",
+        "Ethos": "Abstain",
+        "Pathos": "Abstain"
+      },
+      "paperAllow": true,
+      "governanceRomAllow": false
+    }
+  ],
+  "runtimeDecision": "Unchanged: governance ROM approve count >= 2, Ethos veto, invalid/unknown fail closed.",
+  "authority": "User explicitly directed runtime implementation to use governance ROM rather than locale."
+}

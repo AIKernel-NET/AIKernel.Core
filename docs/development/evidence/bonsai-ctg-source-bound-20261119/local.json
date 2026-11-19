@@ -1,0 +1,21 @@
+{
+  "case": "pair-japanese-self-assertion",
+  "capturedJst": "2026-11-19T04:56:48.138861+09:00",
+  "lastStatus": {
+    "state": "waiting",
+    "threshold": 10,
+    "cpuPercent": 68.0,
+    "consecutive": 0,
+    "utc": "2026-11-18T19:56:38.7325385Z"
+  },
+  "threshold": 10,
+  "requiredConsecutive": 3,
+  "sampleIntervalSeconds": 15,
+  "observations": 2252,
+  "minCpu": 34.0,
+  "eligibleSamples": 0,
+  "longestConsecutive": 0,
+  "supervisorPid": 451624,
+  "verifiedRunning": true,
+  "resultExists": false
+}

@@ -1,0 +1,22 @@
+{
+  "checks": {
+    "evidence-probe": {
+      "exitCode": 0,
+      "maximumRssBytes": 1072603136,
+      "stopReason": null,
+      "seconds": 145.75298976898193
+    },
+    "normal-128": {
+      "exitCode": 0,
+      "maximumRssBytes": 433029120,
+      "stopReason": null,
+      "seconds": 13.071611881256104
+    }
+  },
+  "cpuAffinity": [
+    4,
+    5
+  ],
+  "configuredWorkers": 4,
+  "performanceBenchmark": false
+}

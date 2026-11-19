@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType>
+    <AssemblyName>AIKernel.Core.Tests</AssemblyName><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <Reference Include="../app-v29/AIKernel.Kernel.dll" />
+    <Reference Include="../app-v29/AIKernel.Dtos.dll" />
+    <Reference Include="../app-v29/AIKernel.Enums.dll" />
+    <Reference Include="../app-v29/AIKernel.Common.dll" />
+    <Reference Include="../app-v29/AIKernel.Core.dll" />
+  </ItemGroup>
+</Project>

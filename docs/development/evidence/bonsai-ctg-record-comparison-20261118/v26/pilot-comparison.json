@@ -1,0 +1,74 @@
+{
+  "phase": "pilot",
+  "v19Compared": [],
+  "before": {
+    "count": 1,
+    "fullPass": 1,
+    "gatePass": 1,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "after": {
+    "count": 1,
+    "fullPass": 0,
+    "gatePass": 1,
+    "evaluationFailed": [
+      "ordered-holdout-status-invented"
+    ],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "existingBefore": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "existingAfter": {
+    "count": 0,
+    "fullPass": 0,
+    "gatePass": 0,
+    "evaluationFailed": [],
+    "falseAllow": [],
+    "falseDeny": []
+  },
+  "hostBlocks": [],
+  "legacyPromptWitnessMatched": [
+    "ordered-holdout-status-invented"
+  ],
+  "regressions": [
+    [
+      "ordered-holdout-status-invented",
+      "evaluation failed",
+      "ctg.bonsai.invalid_assessment"
+    ],
+    [
+      "ordered-holdout-status-invented",
+      "Logos",
+      "Reject",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-status-invented",
+      "Ethos",
+      "Reject",
+      "Unknown"
+    ],
+    [
+      "ordered-holdout-status-invented",
+      "additional control failed"
+    ],
+    [
+      "ordered-holdout-status-invented",
+      "v25 Ethos",
+      "Unknown"
+    ]
+  ],
+  "additionalControlsEvaluated": 1,
+  "additionalControlsAllPass": false,
+  "complete50": false,
+  "semanticAdmissionPassed": false
+}

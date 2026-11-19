@@ -1,0 +1,7 @@
+{
+  "reason": "new false approval violates frozen semantic admission criterion",
+  "completedCases": 3,
+  "pid": 1613220,
+  "signal": "SIGTERM",
+  "timeUtcSeconds": 1794845277.172717
+}

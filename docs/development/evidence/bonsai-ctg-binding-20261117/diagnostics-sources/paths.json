@@ -1,0 +1,4 @@
+[
+  "tests/AIKernel.Inference.Optimization.Validation/Program.cs",
+  "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgReadingProbe.cs"
+]

@@ -1,0 +1,30 @@
+{
+  "baseCommit": "001263e",
+  "sourceSha256": {
+    "src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs": "89a71a9901db4845ff9904d2c86f9a5c48d617de07e5a8603677c1c2a46db4a0",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgDirectVotePrompt.cs": "14cb1d390a976f6499c5bda07e63e16ba204c3f65976c51162e40ea08f4aa878",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgProvenancePrompt.cs": "7d18e6c76bde75894fcc67fe61fe304fc02571d723e08849ab0526a943b754f1",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgFocusedPrompt.cs": "062a78d80f59e9ffe4f46d6ede79489f16ab8029d03075b46e09dec55287f87c",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgFindingPolicy.cs": "6e09bd99d2d678f49c9ef3cf8aec56668dac7b3711fc576a9ac0f6a2eb34dfd4",
+    "src/AIKernel.Kernel/Inference/BonsaiCtgEvidenceRequirements.cs": "2ce215b98eb6ba948c4c7672657f4e368682126661d8e3a9df236569217f8fc6",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgReadingMatrix.cs": "161200c663025975d956230288ed514e210965226ac4dd3c43ee82ab682ae925",
+    "tests/AIKernel.Inference.Optimization.Validation/Program.cs": "1ae4f3a694b4eb382ad3b94c46a0d338126df05a640b9e0bc46964ca4509ce21",
+    "tests/AIKernel.Inference.Optimization.Validation/BonsaiCtgEvidenceScopeSuite.cs": "5470020d40810df6ef4d20bdb6f7c95477460807f170bd3914b8bcff3fd9f025",
+    "tests/AIKernel.Core.Tests/Inference/BonsaiCtgFocusedTests.cs": "eb8922844219250bcba4914d9efc906b90e2b83e0ecb622bb87f03788db70df5",
+    "src/AIKernel.Core/Governance/CtgDecisionGateEvaluator.cs": "d05ec8567ef419a612b4c8c96d0b366ac058c445a19a4584f9e9dbdadf24ea57"
+  },
+  "assemblySha256": {
+    "AIKernel.Abstractions.dll": "d321b8bf8bc28cfe39e360a1d847ef9daca0ff8114ae33c6a59336185335402b",
+    "AIKernel.Common.dll": "43d8aec7bd7741c14860000767bc6076a37862acf18ffd6b4e5dd23bec8465d9",
+    "AIKernel.Core.dll": "ea169c0c535ed59f0a0e27c4d2b7941889d6344ca413c603e5eb06301fe5ab1c",
+    "AIKernel.Core.Tests.dll": "dac58b548d9a5e4537af15af750b41e9d040f9296f35d0073d7e2b8488c577a4",
+    "AIKernel.Dtos.dll": "a1021628aea83069fa38c80d71dbe42683c2f75925d7d033bb4bd4fc9cc5745b",
+    "AIKernel.Enums.dll": "746b2d42c474c2620beaf7768671c77c6a47bda12236b6650ff2cd42ba48fb3f",
+    "AIKernel.Kernel.dll": "ac0206145a99e0c9d068ee96b7e3d72adcfe2086d4987ff8a6e118bb9520fd2a"
+  },
+  "canonicalRomSha256": {
+    "council.ethos.monolith.md": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+    "council.logos.monolith.md": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+    "council.pathos.monolith.md": "364ed60935d3686024ec5ccd6b95242c89f5f114c6cf424fd7e406b931455a81"
+  }
+}

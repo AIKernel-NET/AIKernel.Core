@@ -1,0 +1,18 @@
+{
+  "caseIds": [
+    "japanese-context-outage",
+    "pair-contacts-count",
+    "pair-counter-conflict",
+    "pair-counter-true",
+    "pair-japanese-correct",
+    "pair-japanese-self-assertion",
+    "printer-profile-outage",
+    "supported-public-summary"
+  ],
+  "expectedLabelsChanged": false,
+  "source": "existing 38 only",
+  "noNewFalseAllowVersusBaseline": true,
+  "fewerFalseDenyThanBaseline": true,
+  "japaneseWrongArithmeticMustDeny": true,
+  "fullRunOnlyIfPilotAdmitted": true
+}

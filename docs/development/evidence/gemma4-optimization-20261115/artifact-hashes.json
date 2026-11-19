@@ -1,0 +1,27 @@
+{
+  "AIKernel.Kernel.dll": {
+    "sha256": "bdaf56eebddbf2b7d9cd8c971b0213a57b72ca23f7c04d554985b34c08866e50",
+    "bytes": 360960
+  },
+  "aikernel_cuda_driver.dll": {
+    "sha256": "a9b8759f8a5a19838f3e97fbf742ffecd019ae0a82150b3008e9f183bd4f9f37",
+    "bytes": 150528
+  },
+  "aikernel_cpu_accel.dll": {
+    "sha256": "0fe20a05cca323909b1ccbc23d94d87524a9a869251d096d581bd529f854704f",
+    "bytes": 119296
+  },
+  "libaikernel_cuda_driver.so": {
+    "sha256": "05bead78074996fd5d2f498e1f77d0e5618c0ad6fc2bb74b0fc897a62b73f32c",
+    "bytes": 60096
+  },
+  "gemma4-final.trx": {
+    "sha256": "ec8104512e17ddc985e8a8931c45c7bc3eae7889ffd75c04dc631d24af1e135d",
+    "bytes": 1313738
+  },
+  "AIKernel.Kernel.final.dll": {
+    "sha256": "b08c3461a89b52c4ad6ea057bec6df9c87d844039c6c729ad818d889c3869845",
+    "bytes": 360960,
+    "note": "Post-measurement change only disposes an empty paging arena when constructor RSS admission fails; numerical kernels are unchanged."
+  }
+}

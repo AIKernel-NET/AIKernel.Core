@@ -1,0 +1,755 @@
+{
+  "diagnosticOnly": true,
+  "planned": 20,
+  "modelHash": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "rows": [
+    {
+      "id": "run-01",
+      "role": "Logos",
+      "promptSha256": "da15afc4e1bd5dffd7efa52f9ec0ad4525d21b1d22c1350c4017a05a1231f47a",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1485,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.983262062072754,
+          "bits": 1098890097
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 14.490636825561523,
+          "bits": 1097324966
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 14.410810470581055,
+          "bits": 1097241262
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-02",
+      "role": "Logos",
+      "promptSha256": "f83d2e5a91a7c1d1cf11c8c50bb2efd93a1a59362c2127b5c3ab3562031ee2f2",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1485,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.194175720214844,
+          "bits": 1098062680
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 14.47506046295166,
+          "bits": 1097308633
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 14.412511825561523,
+          "bits": 1097243046
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-03",
+      "role": "Logos",
+      "promptSha256": "632d23b06e0a14c02a01f12fec6c8b7e8d57869c2435f08184615952ad971964",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1485,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.802556991577148,
+          "bits": 1098700614
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 14.229775428771973,
+          "bits": 1097051433
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 14.38865852355957,
+          "bits": 1097218034
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-04",
+      "role": "Logos",
+      "promptSha256": "e6e64081a252bbdda87293fa753e4ea1f88f9c161963a1ff07330f7211501849",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1529,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.94603157043457,
+          "bits": 1098851058
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 13.967195510864258,
+          "bits": 1096776098
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 13.56668472290039,
+          "bits": 1096356132
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-05",
+      "role": "Logos",
+      "promptSha256": "a2c320345b3a60fb2ed3251c989fa3fd90173e9143c91a0c0f329ba0e805e4c0",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1529,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.178140640258789,
+          "bits": 1098045866
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 14.43118667602539,
+          "bits": 1097262628
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 13.377367973327637,
+          "bits": 1096157619
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-06",
+      "role": "Logos",
+      "promptSha256": "6de54167f23a6155f648f1c4c667618f81d02a492b6441be91e681a040d05546",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1529,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.89024543762207,
+          "bits": 1098792562
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 13.98039722442627,
+          "bits": 1096789941
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 14.156211853027344,
+          "bits": 1096974296
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-07",
+      "role": "Ethos",
+      "promptSha256": "f0765f3b03d458c52037f28de3bf10189eb1dac061d3dcbe169fbe5cb4416235",
+      "romSha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1598,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.608688354492188,
+          "bits": 1098497328
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 13.042977333068848,
+          "bits": 1095806985
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 14.392589569091797,
+          "bits": 1097222156
+        },
+        {
+          "symbol": "D",
+          "tokenId": 35,
+          "score": 15.571931838989258,
+          "bits": 1098458786
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-08",
+      "role": "Ethos",
+      "promptSha256": "0b78282287538ccdca96f7b2d36ad1e91f0a2bec4d44cce8baa90d80ae36dd64",
+      "romSha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1598,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.129865646362305,
+          "bits": 1097995246
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 12.76753044128418,
+          "bits": 1095518158
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 13.849662780761719,
+          "bits": 1096652856
+        },
+        {
+          "symbol": "D",
+          "tokenId": 35,
+          "score": 14.833036422729492,
+          "bits": 1097683998
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-09",
+      "role": "Ethos",
+      "promptSha256": "11c40123cfa2827cf0f82be795072eb2abdc7f441c708792d1f1ac8a8d480c32",
+      "romSha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1598,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 14.79801082611084,
+          "bits": 1097647271
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 14.57563591003418,
+          "bits": 1097414094
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 14.622369766235352,
+          "bits": 1097463098
+        },
+        {
+          "symbol": "D",
+          "tokenId": 35,
+          "score": 15.120981216430664,
+          "bits": 1097985930
+        }
+      ],
+      "localMaxima": [
+        "D"
+      ]
+    },
+    {
+      "id": "run-10",
+      "role": "Ethos",
+      "promptSha256": "d75855b1b63a2d6fa93c16a6cb939323a5062b61e0082cc2cdfd6a128b7d6021",
+      "romSha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1598,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.551124572753906,
+          "bits": 1098436968
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 13.75243854522705,
+          "bits": 1096550909
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 15.070121765136719,
+          "bits": 1097932600
+        },
+        {
+          "symbol": "D",
+          "tokenId": 35,
+          "score": 14.967330932617188,
+          "bits": 1097824816
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-11",
+      "role": "Ethos",
+      "promptSha256": "72d7952ade8f6aeabdf0e72e6390278859118129fb9e5e8c2f13a416320ce60a",
+      "romSha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1596,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.170795440673828,
+          "bits": 1098038164
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 12.276464462280273,
+          "bits": 1095003238
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 13.018146514892578,
+          "bits": 1095780948
+        },
+        {
+          "symbol": "D",
+          "tokenId": 35,
+          "score": 15.14952278137207,
+          "bits": 1098015858
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-12",
+      "role": "Ethos",
+      "promptSha256": "3faa3057aaa5ff18f322b7e7282910f7b2c9d939e45539b20416aae8f80cd062",
+      "romSha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1596,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 14.520960807800293,
+          "bits": 1097356763
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 12.92335319519043,
+          "bits": 1095681550
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 12.305431365966797,
+          "bits": 1095033612
+        },
+        {
+          "symbol": "D",
+          "tokenId": 35,
+          "score": 13.890317916870117,
+          "bits": 1096695486
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-13",
+      "role": "Ethos",
+      "promptSha256": "9076a48be43638e529f68c20eadf61e98249d032ee74d02251206433c20e6c76",
+      "romSha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1596,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 14.366922378540039,
+          "bits": 1097195242
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 14.198131561279297,
+          "bits": 1097018252
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 14.500913619995117,
+          "bits": 1097335742
+        },
+        {
+          "symbol": "D",
+          "tokenId": 35,
+          "score": 13.604059219360352,
+          "bits": 1096395322
+        }
+      ],
+      "localMaxima": [
+        "C"
+      ]
+    },
+    {
+      "id": "run-14",
+      "role": "Ethos",
+      "promptSha256": "4cb3075de334ec9de209da20c79e6cdd949e77f78a8bf7993394d8e35aa1860f",
+      "romSha256": "239f57d98880a2364dee421768021a70ab2425947d63a37337355d923b659a52",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1596,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 14.845425605773926,
+          "bits": 1097696989
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 12.6481294631958,
+          "bits": 1095392957
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 14.508289337158203,
+          "bits": 1097343476
+        },
+        {
+          "symbol": "D",
+          "tokenId": 35,
+          "score": 14.880840301513672,
+          "bits": 1097734124
+        }
+      ],
+      "localMaxima": [
+        "D"
+      ]
+    },
+    {
+      "id": "run-15",
+      "role": "Logos",
+      "promptSha256": "7717126e71ccd5dd0ff48d9ef59887b314a8e87880ef91e9b3566dc60eaf74c2",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1467,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 16.134984970092773,
+          "bits": 1098978419
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 14.002817153930664,
+          "bits": 1096813450
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 14.477113723754883,
+          "bits": 1097310786
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-16",
+      "role": "Logos",
+      "promptSha256": "46b2163bedb78943e581552f7da825a959c9d77d85bc05a59201af9e1d4ca57d",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1467,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.405415534973145,
+          "bits": 1098284181
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 14.883016586303711,
+          "bits": 1097736406
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 14.32699203491211,
+          "bits": 1097153372
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-17",
+      "role": "Logos",
+      "promptSha256": "909054a9b81afd8e544eaf41ad215f2a4d3b0c407a967ab1c5f61904468ad0be",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1467,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.747575759887695,
+          "bits": 1098642962
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 13.956537246704102,
+          "bits": 1096764922
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 14.865766525268555,
+          "bits": 1097718318
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-18",
+      "role": "Logos",
+      "promptSha256": "d713cd2ec60fbbbb473b18b347f2a532a41574a679a2f859a6e1192eb3003526",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1516,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 16.102825164794922,
+          "bits": 1098961558
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 12.815147399902344,
+          "bits": 1095568088
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 12.623558044433594,
+          "bits": 1095367192
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    },
+    {
+      "id": "run-19",
+      "role": "Logos",
+      "promptSha256": "012e6ddb14645bcff32cbc043b6c57a49744793efd7a0b258eeb040673c5bfe8",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1516,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.143916130065918,
+          "bits": 1098009979
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 15.57541561126709,
+          "bits": 1098462439
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 12.792706489562988,
+          "bits": 1095544557
+        }
+      ],
+      "localMaxima": [
+        "B"
+      ]
+    },
+    {
+      "id": "run-20",
+      "role": "Logos",
+      "promptSha256": "bccd960466252ecf8543735916a4d207701dacf8e73ab488b1dc56b573e3bf12",
+      "romSha256": "69ee4cc887865f2c7f0b366bc928d97c841f8de132d08a796faf45d3a7ff0c1f",
+      "prefill": "avx512",
+      "decode": "avx512",
+      "prefillThreads": 4,
+      "decodeThreads": 4,
+      "historyTokens": 1516,
+      "allFinite": true,
+      "raw": [
+        {
+          "symbol": "A",
+          "tokenId": 32,
+          "score": 15.817848205566406,
+          "bits": 1098716648
+        },
+        {
+          "symbol": "B",
+          "tokenId": 33,
+          "score": 13.184530258178711,
+          "bits": 1095955414
+        },
+        {
+          "symbol": "C",
+          "tokenId": 34,
+          "score": 15.11331558227539,
+          "bits": 1097977892
+        }
+      ],
+      "localMaxima": [
+        "A"
+      ]
+    }
+  ]
+}

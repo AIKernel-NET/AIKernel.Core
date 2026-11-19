@@ -1,0 +1,191 @@
+{
+  "phaseCoverage": [
+    "dimension-pair"
+  ],
+  "formalAdmissionCalculatedSeparately": true,
+  "planned": 4,
+  "fullPass": 1,
+  "gatePass": 3,
+  "falseAllow": [],
+  "falseDeny": [
+    "independent-length-exact"
+  ],
+  "rows": [
+    {
+      "id": "independent-status-exact",
+      "phase": "dimension-pair",
+      "succeeded": true,
+      "passed": true,
+      "expectedGate": true,
+      "actualGate": true,
+      "votes": {
+        "Logos": "Approve",
+        "Ethos": "Approve",
+        "Pathos": "Approve"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Approve"
+        ],
+        "Ethos": [
+          "Approve",
+          "Abstain"
+        ],
+        "Pathos": [
+          "Approve"
+        ]
+      },
+      "inferenceCalls": 4,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "849db86574202d7667c6d6a4c0d8cdf9b651bc34a0e5766e1d9cfb570e500ba4",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "20ddd6117b4524e1b9f8032764060e333cd6c9b1054c049c0e29cbe8f2845a37",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Ethos",
+          "sha256": "e6e4e120712dccdf74ecc25fc0e3c9d40ee107be6515313903be18c7e8f76280",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Pathos",
+          "sha256": "0e419cf2fdb38236ca52f1f246480dd9f72dc57a4129fca1b92a91c0f373f726",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    },
+    {
+      "id": "independent-status-changed",
+      "phase": "dimension-pair",
+      "succeeded": true,
+      "passed": false,
+      "expectedGate": false,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Abstain",
+        "Ethos": "Abstain",
+        "Pathos": "Reject"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Reject"
+        ],
+        "Ethos": [
+          "Reject"
+        ]
+      },
+      "inferenceCalls": 4,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "ebd4a64c516d0a16296f2ce5e58a0b88f435a4d566a53d01c0af974b53a6266b",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "48066f437081a0d400ed55b72f1a1b697f9ee46a2434ef2685b7169362b9b7d0",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Ethos",
+          "sha256": "5976693edca191d4420305af19e5e5d5ab47bb88e139b86c1cdd0528be72863c",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Pathos",
+          "sha256": "e9aac65024dd550138382d56e10e4914875ff090cc6257b7f7db8a35af96e104",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    },
+    {
+      "id": "independent-length-exact",
+      "phase": "dimension-pair",
+      "succeeded": false,
+      "passed": false,
+      "expectedGate": true,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Unknown",
+        "Ethos": "Unknown",
+        "Pathos": "Unknown"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Approve"
+        ],
+        "Ethos": [
+          "Approve",
+          "Abstain"
+        ],
+        "Pathos": [
+          "Approve"
+        ]
+      },
+      "inferenceCalls": 2,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "dde88836fc9b7eb5f4345ae7176fa06b104071b6795d91f4e5de0a62c783b92e",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "ed7986a755702636c462b079d09c2c0110619792d95bce584cff9dce9a162d9e",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    },
+    {
+      "id": "independent-length-changed",
+      "phase": "dimension-pair",
+      "succeeded": false,
+      "passed": false,
+      "expectedGate": false,
+      "actualGate": false,
+      "votes": {
+        "Logos": "Unknown",
+        "Ethos": "Unknown",
+        "Pathos": "Unknown"
+      },
+      "requiredVotes": {
+        "Logos": [
+          "Reject"
+        ],
+        "Ethos": [
+          "Reject"
+        ]
+      },
+      "inferenceCalls": 2,
+      "responses": [
+        {
+          "role": "reading",
+          "sha256": "95b4676fdb2d2ccdaf9935be2e49113159e07bdce0460767b50e268f1fabfe7b",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        },
+        {
+          "role": "Logos",
+          "sha256": "2cad917369cd620a653a92b8bbdd871e0b94bed4e2e63494814fef15612bb697",
+          "matchedReportedHash": true,
+          "finishReason": "stop"
+        }
+      ]
+    }
+  ]
+}

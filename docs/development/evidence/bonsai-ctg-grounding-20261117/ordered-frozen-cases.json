@@ -1,0 +1,7 @@
+{
+  "holdoutSha256": "185322c10c7f936b6694b764c5cab11eb2dde4f264ab390a5bfb8b6375a5e0d4",
+  "totalCount": 50,
+  "newHoldoutCount": 4,
+  "prior46InputsAndLabelsChanged": false,
+  "usedToTunePrompt": false
+}

@@ -1,0 +1,117 @@
+[
+  {
+    "model": "edge",
+    "mode": "text",
+    "Text": "4",
+    "TokenIds": [
+      1052,
+      11
+    ],
+    "InputTokens": 32,
+    "FinishReason": "stop",
+    "ElapsedMilliseconds": 9146,
+    "officialTokensMatch": true,
+    "tokenSha256": "bbfb29dd029d960cabf5f1cb7d4fb8bea9b61cfe0839433d52e590c6c49235d8",
+    "benchmark": false
+  },
+  {
+    "model": "edge",
+    "mode": "image",
+    "Text": "The image is entirely red.",
+    "TokenIds": [
+      1784,
+      3937,
+      1395,
+      17262,
+      4804,
+      1046,
+      11
+    ],
+    "InputTokens": 38,
+    "FinishReason": "stop",
+    "ElapsedMilliseconds": 15808,
+    "officialTokensMatch": true,
+    "tokenSha256": "d56c5a9a3acd8b83b7c27412a1e8dc642f99cb1859badd9dcf88180569a806ad",
+    "benchmark": false
+  },
+  {
+    "model": "edge",
+    "mode": "video",
+    "Text": "red, orange, yellow, green, blue, indigo, purple",
+    "TokenIds": [
+      2338,
+      1044,
+      32300,
+      1044,
+      19502,
+      1044,
+      11223,
+      1044,
+      10991,
+      1044,
+      2495,
+      7378,
+      1044,
+      47568,
+      11
+    ],
+    "InputTokens": 146,
+    "FinishReason": "stop",
+    "ElapsedMilliseconds": 48121,
+    "officialTokensMatch": true,
+    "tokenSha256": "e2df2b1617cee1ed52975bc561e021a1b1587053f92ac2b803aa1977af734afc",
+    "benchmark": false
+  },
+  {
+    "model": "nano",
+    "mode": "text",
+    "Text": "4",
+    "TokenIds": [
+      19,
+      151645
+    ],
+    "InputTokens": 28,
+    "FinishReason": "stop",
+    "ElapsedMilliseconds": 22426,
+    "officialTokensMatch": true,
+    "tokenSha256": "0dff21e74918712ff9eeb71bc8fcfb7ed55c930907184fa425edbd86ce7557a0",
+    "benchmark": false
+  },
+  {
+    "model": "nano",
+    "mode": "image",
+    "Text": "Red",
+    "TokenIds": [
+      6033,
+      151645
+    ],
+    "InputTokens": 34,
+    "FinishReason": "stop",
+    "ElapsedMilliseconds": 30884,
+    "officialTokensMatch": true,
+    "tokenSha256": "20a706f922340aa346ea711bd56bdb7b8f247935f05d2c2634428bc85e8ae849",
+    "benchmark": false
+  },
+  {
+    "model": "nano",
+    "mode": "video",
+    "Text": "Red, orange, green, blue.",
+    "TokenIds": [
+      6033,
+      11,
+      18575,
+      11,
+      6176,
+      11,
+      6303,
+      13,
+      151645
+    ],
+    "InputTokens": 87,
+    "FinishReason": "stop",
+    "ElapsedMilliseconds": 74601,
+    "officialTokensMatch": true,
+    "tokenSha256": "015b5c6d4b30ee56e879a1056cc339bc57518a752b4ede9c0bbc333e75641f20",
+    "benchmark": false
+  }
+]

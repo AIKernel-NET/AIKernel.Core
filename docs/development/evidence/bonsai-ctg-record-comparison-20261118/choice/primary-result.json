@@ -1,0 +1,139 @@
+{
+  "diagnosticOnly": true,
+  "modelHash": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "planned": 6,
+  "rows": [
+    {
+      "id": "ordered-holdout-status-invented-Logos",
+      "promptSha256": "a361c191bf5812f46a16a779040901464c16f172419e9627bd4b94680657a013",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1412,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 89638,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 89637.806567,
+        "DecodeMilliseconds": 0.39573299999756273,
+        "PrefillForwardTokens": 1412,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Logos",
+      "promptSha256": "3fa76bd2c07d2eb23bb3794561dc6d8f03586c9c773e8686cf5efc89ab3dfbe7",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1439,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 34931,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 34931.666936,
+        "DecodeMilliseconds": 0.13856400000076974,
+        "PrefillForwardTokens": 411,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    },
+    {
+      "id": "ordered-holdout-status-invented-Ethos",
+      "promptSha256": "a82bde420d989f8cd5de3a2ca391e5c37ebcab3b42cf9c4e3ea8c8c83eb3b910",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1508,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 96037,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 96037.087696,
+        "DecodeMilliseconds": 0.018104000002495013,
+        "PrefillForwardTokens": 1508,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Ethos",
+      "promptSha256": "18dff490623ea76c17580e5e37eec51913ab4d889010b7fdc73ce3cdcb377e87",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1535,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 35786,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 35786.37095,
+        "DecodeMilliseconds": 0.014250000000174623,
+        "PrefillForwardTokens": 411,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    },
+    {
+      "id": "ordered-holdout-status-exact-Logos",
+      "promptSha256": "fea36ebb950294d5c784d6cffd1b88806d084d25d13107ee5931099c0a4040f4",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1419,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 88812,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 88812.88552,
+        "DecodeMilliseconds": 0.019780000002356246,
+        "PrefillForwardTokens": 1419,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    },
+    {
+      "id": "ordered-holdout-dimension-exact-Logos",
+      "promptSha256": "75061b3b83bf9d8e42df5e8e7233f07bb4d2943f087d5a6e68ab57821e039716",
+      "responseSha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd",
+      "answer": {
+        "Text": "A",
+        "InputTokens": 1429,
+        "OutputTokens": 1,
+        "FinishReason": "classified",
+        "ElapsedMilliseconds": 34038,
+        "CpuBackend": "avx512",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": null,
+        "PrefillMilliseconds": 34038.725042,
+        "DecodeMilliseconds": 0.015358000004198402,
+        "PrefillForwardTokens": 401,
+        "DecodeForwardTokens": 0,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    }
+  ]
+}

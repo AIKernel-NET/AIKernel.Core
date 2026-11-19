@@ -1,0 +1,55 @@
+{
+  "sourceCommit": "5245d58574494bc378144781b42757be83f3614a",
+  "kernelSha256": "25e8a79ffc56fae14fb38a6572319926055a4b567cbdfd0bb141af9d0fd84cb0",
+  "validationHarnessSha256": "38c4d2b518e5e4bf175663103134bb6114e7fabfa638ba690f80d28b68ff2e75",
+  "testAssemblySha256": "b351a3093d2da6b3b5597cc73ff5117a6bb480f13dd4ecf9ac10245033b3da5a",
+  "runSettingsSha256": "44a27e57e311f2d84adbf480ffa8e515eb7050b9328fdf1fcff334391b22989e",
+  "tests": {
+    "completed-targeted": {
+      "startedUtc": "2026-11-18T14:51:33.869484+00:00",
+      "endedUtc": "2026-11-18T14:52:31.706614+00:00",
+      "trxSha256": "8695bdf7e8a49b67d1a60a53a04750ff6a8f92eb142bdfab4e22a59a3c221099",
+      "counts": {
+        "total": "12",
+        "executed": "12",
+        "passed": "12",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      }
+    },
+    "core-v29": {
+      "startedUtc": "2026-11-18T14:52:31.742634+00:00",
+      "endedUtc": "2026-11-18T14:53:34.170585+00:00",
+      "trxSha256": "f64ecd45b052bd81b052c56489f99766a187081d31da70ba91d19d3ca7afa0fa",
+      "counts": {
+        "total": "1250",
+        "executed": "1250",
+        "passed": "1250",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      }
+    }
+  }
+}

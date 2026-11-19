@@ -1,0 +1,10 @@
+{
+  "admission.json": "86fa23fe48509fceab73e06eda82b5cc458884823a7c4bc82be78ecaced93f29",
+  "protected-gates.json": "b4e0f9574deaba9aa60a88cb2f5608544e73b972b9ae571430b97559cf369bb3",
+  "v28-valid-baseline.json": "d0844e4b178a69d92fcba98ac30a5b8ee265a9c2b2f5de1a661edbddd6db7c5f",
+  "pilot-cases.json": "c81ae4caca6c20e140c861ac91ce86acebaa47eefac1a4f7692faf69531a3bd4",
+  "guarded-cases.json": "100587bbca33ca2cc4ac76459c8dd63c93c8856997328eac60d36dc16e57661a",
+  "host-guard-cases.json": "15bb27a39a859014c56617aa93143d24d4fef40ab4210244ec2df75a7906daf7",
+  "independent-cases.json": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+  "purpose-cases.json": "bf08fc0b1a19eb9c0b511af0829a28eb7d0c2508dfcb1665faa4bcd3e40a8836"
+}

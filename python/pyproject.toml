@@ -32,6 +32,10 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+gpu = [
+  "aikernel-cuda-driver==0.1.4",
+  "pythonnet>=3.0,<4"
+]
 test = [
   "pytest>=9.0"
 ]

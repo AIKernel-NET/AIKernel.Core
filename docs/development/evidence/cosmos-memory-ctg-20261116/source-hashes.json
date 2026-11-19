@@ -1,0 +1,20 @@
+{
+  "src/AIKernel.Kernel/Inference/BonsaiCtgCouncilEvaluator.cs": "4203fc3652b85903129b460ed2222d31c0c950c3158862d54077b59fc6d95c1c",
+  "src/AIKernel.Kernel/Inference/Cosmos/Cosmos3Model.cs": "b989fe2b2b580634b3a1ddf5c6a8f267c0810d266cfb4eea6296e7afb0d154c4",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosArtifactIdentity.cs": "750be1d3c7786b1f8268e0c833767f711edf5860a90c4d281fec30d67b284818",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosEdgeVisionEncoder.cs": "f5c6b5af4068057daaacf02ae551a7273b48ff1fd64c138faf67133f26d0e94c",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosMath.cs": "f12020f8a0e818d3f68e4298e2aa8a2acc82e3b6b612fe278ce5501d3f38bde9",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosMedia.cs": "a6a9477c3856c75784cec153f5f990b1680d44de2ffbb811ce37b29ea7d6387f",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosMediaDecoder.cs": "81fd5387433353c39260c32ed3757615f3ded15eae48339177740f084c80562b",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosMemoryBudget.cs": "a2b5a92f131be7b7ad9e922472ee0d8911457903835ff22d03437165b4e5c26b",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosMemoryOptions.cs": "5a2382e82dab5393e2b453149656f2ff45454338bf7d67b5fdc348f731598427",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosModelDefinition.cs": "3022feeace259805c65ac89ffcb4a33cf0c119fbd4bd308ec4dacba0c6e0d768",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosPagedKv.cs": "f2e97023b2edcfdbf5e7709f894d9101109c47a60e9d6e7c5e99986714e4b0b0",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosPagedWeights.cs": "d654a9dfaa0cbb9032884bc98dee3d22ed1298f80c6307ccd6f641b4d555f910",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosReason2Model.cs": "3c89d5c26bf0cc4d34396ce2b90004e4a4fe6b40c7339577377539ac17649920",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosTextDecoder.cs": "04651da00c486ea297a50b8a826d2f99a2e24086f1e30e4c9f12e35142a44ab7",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosTokenizer.cs": "c7e1d7ca87172a670ca0230dc0419ce2f0fed456994b542fbab837069d6a5b09",
+  "src/AIKernel.Kernel/Inference/Cosmos/CosmosVisionEncoder.cs": "cfb172938b239165a451d07379b6ffcdcc2e5726bbcbed577b4b7549eafa1ee5",
+  "src/AIKernel.Kernel/Inference/Cosmos/SafeTensorWeights.cs": "65440ef7a2989d1281125bb352e0d22324e4b4071ad05eb70261e15b6b43d4f2",
+  "src/AIKernel.Kernel/Memory/VirtualMemorySpace.cs": "584a50fdaf38bad640e029d40f0a2cc730b66df3723303cb87a8ffa425483462"
+}

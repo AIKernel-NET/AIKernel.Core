@@ -1,0 +1,12 @@
+{
+  "test_gemma_cuda.py": {
+    "code": 0,
+    "stdout": "{\"pass\": true, \"gpu\": 0, \"bounds\": true, \"argmaxTies\": true, \"singleSync\": true, \"eightByteResult\": true, \"privateStateWipe\": true, \"nonFiniteFailClosed\": true}\n",
+    "stderr": ""
+  },
+  "test_gemma_vnni.py": {
+    "code": 0,
+    "stdout": "{\"pass\": true, \"capabilities\": 0, \"cases\": []}\n",
+    "stderr": ""
+  }
+}

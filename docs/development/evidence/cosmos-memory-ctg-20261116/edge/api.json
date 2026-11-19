@@ -1,0 +1,27 @@
+{
+  "Text": "4",
+  "TokenIds": [
+    1052,
+    11
+  ],
+  "InputTokens": 32,
+  "FinishReason": "stop",
+  "ElapsedMilliseconds": 77677,
+  "MemoryPlan": {
+    "Modules": [
+      "text-decoder"
+    ],
+    "ContextTokens": 36,
+    "SelectedWeightBytes": 3892547584,
+    "LogicalKvBytes": 8257536,
+    "MaximumResidentBytes": 7000000000,
+    "ProtectedResidentBytes": 0,
+    "Storage": "immutable-source+encrypted-kv-swap"
+  },
+  "Artifact": {
+    "Repository": "nvidia/Cosmos3-Edge",
+    "Revision": "6afc1256321c3a8e623d89be3bc5117a1e90f96b",
+    "ManifestSha256": "8f696d470adeb78ffcc949f804c7c9ac8d7dd5bd9ac350a4a162037120a6c882",
+    "TrustedManifestPinned": true
+  }
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "id": "s1",
+    "originalId": "ordered-holdout-status-invented",
+    "phase": "pilot",
+    "factsSha256": "040aac6afedc7d824ff4587c402c19e006e501cdb0b1aaf73f2ef0e2dacd4398",
+    "proposalSha256": "f8e6abcd011242ab2d3bc640bb473077021f5b9ca15b08c6b858980ea6949fca",
+    "actualReadingPromptSha256": "1b864f841b10d6957ce33a6a45b499d970abdf75c5c1d346cc66efa62679e5a5",
+    "actualReadingSha256": "b64eb46c35f677856b0caf31986ba858df2d710ee2bdb8a43e48ff753cb4afcf",
+    "originalDatasetSha256": "c81ae4caca6c20e140c861ac91ce86acebaa47eefac1a4f7692faf69531a3bd4",
+    "oldModelOutputsSha256": "00fa5c221830eee552535d9435ce7caa9f31c27e4509e5b048221b2acb3ca5c8",
+    "oldScoredModelOutputsSha256": "bc3f27711f3aa93ce441f0cce54cf457dae12eebe96edeba77075dd49ab90180",
+    "oldCommittedComparisonSha256": "6eefc9fa4d691b3aec18112c55649a31f559ae93fe8776570fd61c535bcfd876"
+  },
+  {
+    "id": "s2",
+    "originalId": "ordered-holdout-dimension-exact",
+    "phase": "paired",
+    "factsSha256": "ee42f4802e6b858d26739bb700791b53a5a60d267dc5085126de04266bea743a",
+    "proposalSha256": "3532d043c7b3f1e0c8528124c806b99589c36a6a02eacaf70178e9afa459cd32",
+    "actualReadingPromptSha256": "db967e2b67a9aa709fd43a899ec8a94a2e1af226755444bda22a3ed61e8df510",
+    "actualReadingSha256": "f8ebc22399f325029176e580e0e3f94d051065b00a046a5b014e8ae84624924a",
+    "originalDatasetSha256": "abf755f496e884f2afef20f96420a4c77b315267549dcb44d0d6ae754c61c8b4",
+    "oldModelOutputsSha256": "aff49f6c8d29be03554136f653a4b4cf20a02a8b7ab0924f55648f6ecf4997c5",
+    "oldScoredModelOutputsSha256": "ec3009c900e0ccc4c5308dbded3bae41c610043fb88324444ba2ae5359bfa712",
+    "oldCommittedComparisonSha256": "6eefc9fa4d691b3aec18112c55649a31f559ae93fe8776570fd61c535bcfd876"
+  },
+  {
+    "id": "s3",
+    "originalId": "independent-status-changed",
+    "phase": "dimension-pair",
+    "factsSha256": "233386c7bff066293f6fac0f7e337d73a11ea0b62ffdf26e21b0237696b6f9e2",
+    "proposalSha256": "c65fb2c9c5ec76da3f24889ce47e1d9122dc5837544023476e3d88be882c0ca9",
+    "actualReadingPromptSha256": "61bc4953e639f965d25f6385616914c4f0051026ef1800286d321d72b9254280",
+    "actualReadingSha256": "ebd4a64c516d0a16296f2ce5e58a0b88f435a4d566a53d01c0af974b53a6266b",
+    "originalDatasetSha256": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+    "oldModelOutputsSha256": "1c16d50d1e646d3be2f474df8c0a51fcb6b02a65dcb31672392f020cbdee13f1",
+    "oldScoredModelOutputsSha256": "ca843db0ad8a8ec03b7ae76d861fffb3e3272a4cc6a596be35e0cfc96a21b1eb",
+    "oldCommittedComparisonSha256": "6eefc9fa4d691b3aec18112c55649a31f559ae93fe8776570fd61c535bcfd876"
+  },
+  {
+    "id": "s4",
+    "originalId": "ordered-holdout-status-exact",
+    "phase": "paired",
+    "factsSha256": "040aac6afedc7d824ff4587c402c19e006e501cdb0b1aaf73f2ef0e2dacd4398",
+    "proposalSha256": "3d6102cf1bd733bb14111f7f543b408dbc6e84a591291566bc5f5a5932ad6452",
+    "actualReadingPromptSha256": "c145a57dcc026d029cb970d69bf0952d7bf1c2b160c42e2d3944b38e89100610",
+    "actualReadingSha256": "d49968a4c301fcb26881219640bb907cceb882cb31bbf7775cc53c71af41fd94",
+    "originalDatasetSha256": "abf755f496e884f2afef20f96420a4c77b315267549dcb44d0d6ae754c61c8b4",
+    "oldModelOutputsSha256": "aff49f6c8d29be03554136f653a4b4cf20a02a8b7ab0924f55648f6ecf4997c5",
+    "oldScoredModelOutputsSha256": "ec3009c900e0ccc4c5308dbded3bae41c610043fb88324444ba2ae5359bfa712",
+    "oldCommittedComparisonSha256": "6eefc9fa4d691b3aec18112c55649a31f559ae93fe8776570fd61c535bcfd876"
+  },
+  {
+    "id": "s5",
+    "originalId": "ordered-holdout-dimension-wrong",
+    "phase": "paired",
+    "factsSha256": "ee42f4802e6b858d26739bb700791b53a5a60d267dc5085126de04266bea743a",
+    "proposalSha256": "d310fe7ad4f1495d2348ad240436cd913e4f989150fe3a622e902ad9c382a992",
+    "actualReadingPromptSha256": "758fcc4a100fc41cb70e7638a03013a34a601c5030d030b5b593a8ba78148aa5",
+    "actualReadingSha256": "f2f155e0a087b84bfb58f7277fccfddf6841e0e56063fd25ce62f8a307abf4d0",
+    "originalDatasetSha256": "abf755f496e884f2afef20f96420a4c77b315267549dcb44d0d6ae754c61c8b4",
+    "oldModelOutputsSha256": "aff49f6c8d29be03554136f653a4b4cf20a02a8b7ab0924f55648f6ecf4997c5",
+    "oldScoredModelOutputsSha256": "ec3009c900e0ccc4c5308dbded3bae41c610043fb88324444ba2ae5359bfa712",
+    "oldCommittedComparisonSha256": "6eefc9fa4d691b3aec18112c55649a31f559ae93fe8776570fd61c535bcfd876"
+  },
+  {
+    "id": "s6",
+    "originalId": "independent-status-exact",
+    "phase": "dimension-pair",
+    "factsSha256": "233386c7bff066293f6fac0f7e337d73a11ea0b62ffdf26e21b0237696b6f9e2",
+    "proposalSha256": "5fff2a64f4072eb55b11d05a268867feb35d22427cd893e82c8d85fd0a7de99a",
+    "actualReadingPromptSha256": "66b5b854a71097247b5e0d782b5352ee649aecc45baae6eac724302c4975f7a1",
+    "actualReadingSha256": "849db86574202d7667c6d6a4c0d8cdf9b651bc34a0e5766e1d9cfb570e500ba4",
+    "originalDatasetSha256": "9ef6d9561055ba89b2933f790c4918e8c0da49c7d2778bcf5f098a291cce75a8",
+    "oldModelOutputsSha256": "1c16d50d1e646d3be2f474df8c0a51fcb6b02a65dcb31672392f020cbdee13f1",
+    "oldScoredModelOutputsSha256": "ca843db0ad8a8ec03b7ae76d861fffb3e3272a4cc6a596be35e0cfc96a21b1eb",
+    "oldCommittedComparisonSha256": "6eefc9fa4d691b3aec18112c55649a31f559ae93fe8776570fd61c535bcfd876"
+  }
+]

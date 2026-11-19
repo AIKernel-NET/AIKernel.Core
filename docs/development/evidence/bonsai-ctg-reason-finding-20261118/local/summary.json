@@ -1,0 +1,28 @@
+{
+  "capturedUtc": "2026-11-18T17:01:30.325311+00:00",
+  "case": "pair-japanese-self-assertion",
+  "state": "waiting",
+  "sampleCount": 1589,
+  "minimumCpuPercent": 40.0,
+  "maximumCpuPercent": 100.0,
+  "lastSampleUtc": "2026-11-18T17:01:18.8374056Z",
+  "thresholdCpuPercent": 10,
+  "requiredConsecutive": 3,
+  "observedLongestLowStreak": 0,
+  "supervisor": {
+    "pid": 451624,
+    "startedUtc": "2026-11-18T10:16:08.541401+00:00",
+    "recordMatchesProcessStart": true,
+    "active": true
+  },
+  "supervisorStatus": {
+    "state": "watching-load",
+    "attempt": 14,
+    "pid": 451624,
+    "utc": "2026-11-18T16:56:55.9559059Z"
+  },
+  "liveStatus": "D:\\AIKernel\\.website-audit\\ctg-reason-order-local-20261118\\local-retry-status.json",
+  "liveResult": "D:\\AIKernel\\.website-audit\\ctg-reason-order-local-20261118\\local-baseline-retry.json",
+  "hasResult": false,
+  "inputSha256": "69052d38e136486e8e1d7dd0463303f41956395fce495d0f25c7fb896c3f0b5d"
+}

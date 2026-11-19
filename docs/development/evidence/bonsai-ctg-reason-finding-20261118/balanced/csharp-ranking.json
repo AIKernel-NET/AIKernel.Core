@@ -1,0 +1,99 @@
+{
+  "diagnosticOnly": true,
+  "rankings": [
+    {
+      "id": "ordered-holdout-status-invented-Logos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable"
+      ],
+      "centeredMeanLogits": [
+        0.12816609276665622,
+        0.08107429080539319,
+        -0.20924038357204822
+      ],
+      "winningFinding": "supported",
+      "tied": false
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Logos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable"
+      ],
+      "centeredMeanLogits": [
+        0.34520318773057745,
+        -0.08767053816053583,
+        -0.257532649570041
+      ],
+      "winningFinding": "supported",
+      "tied": false
+    },
+    {
+      "id": "ordered-holdout-status-invented-Ethos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable",
+        "safety_neutral"
+      ],
+      "centeredMeanLogits": [
+        -0.11191362142562866,
+        -0.21220701932907104,
+        -0.1593746542930603,
+        0.48349529504776
+      ],
+      "winningFinding": "safety_neutral",
+      "tied": false
+    },
+    {
+      "id": "ordered-holdout-dimension-wrong-Ethos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable",
+        "safety_neutral"
+      ],
+      "centeredMeanLogits": [
+        0.44349414110183716,
+        -0.6676363348960876,
+        -0.44460242986679077,
+        0.6687446236610413
+      ],
+      "winningFinding": "safety_neutral",
+      "tied": false
+    },
+    {
+      "id": "ordered-holdout-status-exact-Logos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable"
+      ],
+      "centeredMeanLogits": [
+        0.42789830101860876,
+        -0.17422940995958136,
+        -0.25366889105902796
+      ],
+      "winningFinding": "supported",
+      "tied": false
+    },
+    {
+      "id": "ordered-holdout-dimension-exact-Logos",
+      "findings": [
+        "supported",
+        "proposal_defect",
+        "evaluation_unavailable"
+      ],
+      "centeredMeanLogits": [
+        1.2450451321072051,
+        -0.5435729556613497,
+        -0.7014721764458548
+      ],
+      "winningFinding": "supported",
+      "tied": false
+    }
+  ]
+}

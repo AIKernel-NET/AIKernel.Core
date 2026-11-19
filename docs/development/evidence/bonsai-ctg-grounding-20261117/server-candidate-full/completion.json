@@ -1,0 +1,26 @@
+{
+  "exitCode": 1,
+  "stopReason": null,
+  "maximumRssBytes": 1153593344,
+  "seconds": 1758.1542620658875,
+  "cpuAffinity": [
+    4,
+    5
+  ],
+  "configuredWorkers": 4,
+  "performanceBenchmark": false,
+  "checks": {
+    "evidence-probe": {
+      "exitCode": 0,
+      "maximumRssBytes": 1106526208,
+      "stopReason": null,
+      "seconds": 151.78221321105957
+    },
+    "normal-128": {
+      "exitCode": 0,
+      "maximumRssBytes": 432189440,
+      "stopReason": null,
+      "seconds": 12.061255693435669
+    }
+  }
+}

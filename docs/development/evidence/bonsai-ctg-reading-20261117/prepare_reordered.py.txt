@@ -1,0 +1,14 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent
+rows=json.loads((root/'grounding-matrix.json').read_text(encoding='utf-8'))
+for r in rows:
+ text=r['user'];start=len('DATA TO COMPARE:\n');end=text.index('\nQUESTION:\n');data=json.loads(text[start:end])
+ r['priorPromptSha256']=r['promptSha256']
+ r['user']=text[:start]+json.dumps({k:data[k] for k in ['rationale','observations','candidate']},ensure_ascii=False,indent=2)+text[end:]
+ r['promptSha256']=hashlib.sha256((r['system']+'\n'+r['user']).encode()).hexdigest()
+ r['notes']+='; only field order changed: rationale, observations, candidate'
+(root/'grounding-reordered.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+for name in ('server_transfer.py','server_results.py'):
+ p=root/name;t=p.read_text(encoding='utf-8').replace("'grounding-matrix')","'grounding-matrix','grounding-reordered')",1);p.write_text(t,encoding='utf-8')
+print('Paired field-order diagnostic fixed.')

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "s1",
+    "originalId": "ordered-holdout-status-invented",
+    "expectedFinding": "proposal_defect"
+  },
+  {
+    "id": "s2",
+    "originalId": "ordered-holdout-dimension-exact",
+    "expectedFinding": "supported"
+  },
+  {
+    "id": "s3",
+    "originalId": "independent-status-changed",
+    "expectedFinding": "proposal_defect"
+  },
+  {
+    "id": "s4",
+    "originalId": "ordered-holdout-status-exact",
+    "expectedFinding": "supported"
+  },
+  {
+    "id": "s5",
+    "originalId": "ordered-holdout-dimension-wrong",
+    "expectedFinding": "proposal_defect"
+  },
+  {
+    "id": "s6",
+    "originalId": "independent-status-exact",
+    "expectedFinding": "supported"
+  }
+]

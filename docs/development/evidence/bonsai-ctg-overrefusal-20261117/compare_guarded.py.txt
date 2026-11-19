@@ -1,0 +1,42 @@
+from pathlib import Path
+import json
+root=Path(__file__).parent
+repo=Path(r'D:/AIKernel/artifacts/cuda-driver-native/core-context-free-pci')
+old={r['id']:r for r in json.loads((repo/'docs/development/evidence/bonsai-ctg-grounding-20261117/server-baseline/result.json').read_text())}
+inputs={r['id']:r for r in json.loads((root/'guarded-cases.json').read_text(encoding='utf-8'))}
+rows=json.loads((root/'server-guarded-full/result.json').read_text())
+failures=[];known=[];fresh=[];blocked=[];unchanged=[]
+for row in rows:
+ case=inputs[row['id']]
+ assert row['expectedGate']==case['expectedGate'] and row['expectedHostBlock']==case['expectedHostBlock']
+ if row['expectedHostBlock']:
+  if not row['pipelinePass'] or row['inferenceCalls']!=0:failures.append([row['id'],'host failure not closed'])
+  blocked.append(row['id']);continue
+ if row['inferenceCalls']!=3 or not row['result']['Evaluation']['Succeeded']:failures.append([row['id'],'model evaluation failed'])
+ if row['id'] not in old:
+  fresh.append(row)
+  if not row['pass']:failures.append([row['id'],'new model control failed'])
+  continue
+ known.append(row);b=old[row['id']];before=b['result']['Evaluation']['Metadata'];after=row['result']['Evaluation']['Metadata']
+ witness=row['legacyPromptWitness']
+ for key in ['facts.sha256','proposal.sha256','evaluation_input.sha256']+[r+'.prompt.sha256' for r in ('Logos','Ethos','Pathos')]:
+  assert witness[key]==before[key],(row['id'],key,'v4 baseline witness')
+ for key in ['model.sha256','facts.sha256','proposal.sha256','evaluation_input.sha256']+[r+'.'+k for r in ('Logos','Ethos') for k in ('prompt.sha256','response.sha256','rom.sha256','excerpt.sha256','backend','activation_precision')]+['Pathos.rom.sha256']:
+  assert after[key]==before[key],(row['id'],key,'unchanged roles')
+ unchanged.append(row['id'])
+ if b['result']['Gate']['Accepted']==b['expectedGate'] and row['result']['Gate']['Accepted']!=row['expectedGate']:failures.append([row['id'],'gate regression'])
+ checks={c['council']:c for c in b['checks']}
+ for c in row['checks']:
+  prior=checks[c['council']]
+  if prior['actual'] in prior['expected'] and c['actual'] not in c['expected']:failures.append([row['id'],c['council']+' vote regression'])
+def totals(data):
+ return {'n':len(data),'fullPass':sum(r['pass'] for r in data),
+  'gatePass':sum(r['result']['Gate']['Accepted']==r['expectedGate'] for r in data),
+  'falseAllow':[r['id'] for r in data if not r['expectedGate'] and r['result']['Gate']['Accepted']],
+  'falseDeny':[r['id'] for r in data if r['expectedGate'] and not r['result']['Gate']['Accepted']]}
+before=totals([old[r['id']] for r in known]);after=totals(known)
+result={'pairedModelBefore':before,'pairedModelAfter':after,'previouslyUnrunModelControls':totals(fresh),
+ 'hostBlockedCases':blocked,'hostBlocksAreNotCouncilPasses':True,'baselineReuseWitnessMatched':unchanged,
+ 'regressions':failures,'eligibleForAdoption':len(rows)==50 and len(blocked)==7 and len(known)==39 and len(fresh)==4 and not failures and len(after['falseDeny'])<len(before['falseDeny'])}
+(root/'guarded-comparison.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps({k:v for k,v in result.items() if k!='baselineReuseWitnessMatched'},indent=2))

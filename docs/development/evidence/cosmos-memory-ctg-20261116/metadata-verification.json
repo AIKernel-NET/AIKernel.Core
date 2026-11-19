@@ -1,0 +1,80 @@
+[
+  {
+    "model": "Edge",
+    "file": "config.json",
+    "sha256": "ffb75b654e65d10e337ea07f20ac4eadc3775dd22c9a8194c87c3b68df5c8f5f",
+    "sourceRevision": "6afc1256321c3a8e623d89be3bc5117a1e90f96b"
+  },
+  {
+    "model": "Edge",
+    "file": "tokenizer.json",
+    "sha256": "4dc692a99dca6d92a44e9529ffb53541eb79bb260eec7281bc51268c05d7311c",
+    "sourceRevision": "6afc1256321c3a8e623d89be3bc5117a1e90f96b"
+  },
+  {
+    "model": "Edge",
+    "file": "tokenizer_config.json",
+    "sha256": "85577f01be64ea03ee9aacc0536088e47b96971e4aff21e0aa604900b1410386",
+    "sourceRevision": "6afc1256321c3a8e623d89be3bc5117a1e90f96b"
+  },
+  {
+    "model": "Edge",
+    "file": "preprocessor_config.json",
+    "sha256": "111a151f82088f4e15cb4d488c5db0e9c481ae46ec8cf146d734ac62d13a57d6",
+    "sourceRevision": "6afc1256321c3a8e623d89be3bc5117a1e90f96b"
+  },
+  {
+    "model": "Edge",
+    "file": "video_preprocessor_config.json",
+    "sha256": "9cada8c04cb57ea22ff44984b8307a63c626c608e84a130c1f2e7fe134efc6d4",
+    "sourceRevision": "6afc1256321c3a8e623d89be3bc5117a1e90f96b"
+  },
+  {
+    "model": "Edge",
+    "file": "processor_config.json",
+    "sha256": "7444d3780a8ed0b11d850292fa54407cfd1f389c101d111090289da354b13333",
+    "sourceRevision": "6afc1256321c3a8e623d89be3bc5117a1e90f96b"
+  },
+  {
+    "model": "Edge",
+    "file": "chat_template.jinja",
+    "sha256": "7120ee6666468d4e9b2dc11e133ac5c2fa765fa5907706bf0f906270aa5510c8",
+    "sourceRevision": "6afc1256321c3a8e623d89be3bc5117a1e90f96b"
+  },
+  {
+    "model": "Nano",
+    "file": "config.json",
+    "sha256": "c32f2468a54542c21946bc8eab6172b911dcec9a7193a94c023ea2d4073bcda6",
+    "sourceRevision": "45666784803b3a7ad577e0def405f9afcc3bddb2"
+  },
+  {
+    "model": "Nano",
+    "file": "tokenizer.json",
+    "sha256": "a5d85b6dcc535e6b93115a9ef287e6132fdbf30270da6218194ba742261173c7",
+    "sourceRevision": "45666784803b3a7ad577e0def405f9afcc3bddb2"
+  },
+  {
+    "model": "Nano",
+    "file": "tokenizer_config.json",
+    "sha256": "c2da771801886ad9ae98181793ffd3dfb7f1af30f6f7c6a4e15d7dbba52e2399",
+    "sourceRevision": "45666784803b3a7ad577e0def405f9afcc3bddb2"
+  },
+  {
+    "model": "Nano",
+    "file": "preprocessor_config.json",
+    "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+    "sourceRevision": "45666784803b3a7ad577e0def405f9afcc3bddb2"
+  },
+  {
+    "model": "Nano",
+    "file": "video_preprocessor_config.json",
+    "sha256": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+    "sourceRevision": "45666784803b3a7ad577e0def405f9afcc3bddb2"
+  },
+  {
+    "model": "Nano",
+    "file": "chat_template.json",
+    "sha256": "5c72a170d2a4a1a3bc5adad2e689ae28138a9700e5b8c96c0266331e86c0acce",
+    "sourceRevision": "45666784803b3a7ad577e0def405f9afcc3bddb2"
+  }
+]

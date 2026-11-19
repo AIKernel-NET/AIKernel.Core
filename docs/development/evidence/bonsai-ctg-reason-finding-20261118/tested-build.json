@@ -1,0 +1,68 @@
+{
+  "sourceCommit": "e1aa1ae78c305082ca53910dbeea694f62c66aad",
+  "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+  "validationHarnessSha256": "5eb0e8b62679375c44b714c6b83e0ec8b69b1bedf2b388b6930965aa671af03f",
+  "unitTestResults": {
+    "kernelSha256": "98bda15926941db1f1912f34d4ebc764a467a3e18245a2f0b43755d7c562c8be",
+    "testAssemblySha256": "ac01fc3444ee1d1b625e759ec40d782d320a314ad149baf3269270d78e9e980e",
+    "runSettingsSha256": "44a27e57e311f2d84adbf480ffa8e515eb7050b9328fdf1fcff334391b22989e",
+    "results": {
+      "core-v28.trx": {
+        "sha256": "3e9d25b264929d9bcb946a5978156eba9cd9576acc1da6318d18f51df68660aa",
+        "counts": {
+          "total": "1238",
+          "executed": "1238",
+          "passed": "1238",
+          "failed": "0",
+          "error": "0",
+          "timeout": "0",
+          "aborted": "0",
+          "inconclusive": "0",
+          "passedButRunAborted": "0",
+          "notRunnable": "0",
+          "notExecuted": "0",
+          "disconnected": "0",
+          "warning": "0",
+          "completed": "0",
+          "inProgress": "0",
+          "pending": "0"
+        }
+      },
+      "reasoned-targeted.trx": {
+        "sha256": "e0d7b4b189bcf004f32477e8960723605ae52fbe48f128ea0cb9991d54414495",
+        "counts": {
+          "total": "16",
+          "executed": "16",
+          "passed": "16",
+          "failed": "0",
+          "error": "0",
+          "timeout": "0",
+          "aborted": "0",
+          "inconclusive": "0",
+          "passedButRunAborted": "0",
+          "notRunnable": "0",
+          "notExecuted": "0",
+          "disconnected": "0",
+          "warning": "0",
+          "completed": "0",
+          "inProgress": "0",
+          "pending": "0"
+        }
+      }
+    }
+  },
+  "labelsInPinnedBonsai": {
+    "Yes": [
+      9454
+    ],
+    "No": [
+      2753
+    ],
+    "Unknown": [
+      13790
+    ],
+    "Neutral": [
+      86907
+    ]
+  }
+}

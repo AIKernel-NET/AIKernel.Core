@@ -1,0 +1,14 @@
+[
+  {
+    "run": "separated-38",
+    "exitCode": 1
+  },
+  {
+    "run": "rom-preflight",
+    "exitCode": 0
+  },
+  {
+    "run": "generation128",
+    "exitCode": 0
+  }
+]

@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,hashlib
+root=Path(__file__).parent
+rows=json.loads((root/'all-cases.json').read_text(encoding='utf-8'))
+ids=['holdout-japanese-replace','holdout-japanese-extra-change','destructive-no-consent',
+     'pair-japanese-self-assertion','verified-arithmetic','japanese-context-outage']
+pilot=[next(r for r in rows if r['id']==i) for i in ids]
+p=root/'scope-pilot-cases.json';p.write_text(json.dumps(pilot,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+admission=json.loads((root/'admission.json').read_text())
+admission.update(trial='v9 exact Pathos section 5 appended in canonical order; unchanged v4 Logos/Ethos, data encoding and layout',
+                 pilotSha256=hashlib.sha256(p.read_bytes()).hexdigest(),pilotCases=6,
+                 rationale='Pathos overreach in neutral factual requests; changing only Pathos cannot change the existing Ethos veto evidence.')
+(root/'scope-admission.json').write_text(json.dumps(admission,indent=2)+'\n')
+# Retain the already tested v8 source manifest before recording the new build.
+(root/'readable-tested-build.json').write_bytes((root/'tested-build.json').read_bytes())
+print('Frozen six paired controls and unchanged full-run admission for Pathos scope trial.')

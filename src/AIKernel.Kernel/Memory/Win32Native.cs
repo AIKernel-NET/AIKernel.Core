@@ -39,6 +39,10 @@ internal static class Win32Native
         uint maximumSizeLow,
         string? name);
 
+    [DllImport("kernel32.dll", EntryPoint = "OpenFileMappingW", CharSet = CharSet.Unicode, SetLastError = true)]
+    internal static extern SafeFileHandle OpenFileMapping(uint desiredAccess,
+        [MarshalAs(UnmanagedType.Bool)] bool inherit, string name);
+
     [DllImport(
         "kernel32.dll",
         EntryPoint = "MapViewOfFile",

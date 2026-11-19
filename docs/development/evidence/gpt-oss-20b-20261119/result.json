@@ -1,0 +1,50 @@
+{
+  "digest": "27cd6c432c7672cb812a92f611cf3ba7bbc35928262bb1e1253ff4ee6ae35901",
+  "passed": true,
+  "rows": [
+    {
+      "user": "What is 2\u002B2? Answer with one digit.",
+      "inputMatch": true,
+      "matches": true,
+      "actual": {
+        "Text": "4",
+        "InputTokens": 21,
+        "OutputTokens": 1,
+        "FinishReason": "stop",
+        "ElapsedMilliseconds": 185629,
+        "CpuBackend": "gpt-oss-mxfp4-cpu",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": "eba09f2f48f209cfa2dfbf19fc678d755d05559671eceda0164f3e080cb49765",
+        "PrefillMilliseconds": 180456,
+        "DecodeMilliseconds": 5173,
+        "PrefillForwardTokens": 21,
+        "DecodeForwardTokens": 1,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    },
+    {
+      "user": "What is the capital of France? Answer with the city name.",
+      "inputMatch": true,
+      "matches": true,
+      "actual": {
+        "Text": "Paris.",
+        "InputTokens": 22,
+        "OutputTokens": 2,
+        "FinishReason": "stop",
+        "ElapsedMilliseconds": 112134,
+        "CpuBackend": "gpt-oss-mxfp4-cpu",
+        "ActivationPrecision": "fp32",
+        "Profile": null,
+        "GeneratedTokenSha256": "a91e52b42386e2ecd9e733187a4306dbb99f73a156fcc858265f5bf23e24af67",
+        "PrefillMilliseconds": 103634,
+        "DecodeMilliseconds": 8500,
+        "PrefillForwardTokens": 22,
+        "DecodeForwardTokens": 2,
+        "PrefillThreads": 4,
+        "DecodeThreads": 4
+      }
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "reference": "b12532",
+  "archive": "sha256:beb8c051a782fb0970d4ae20fa276a6dfd3e7245685b185244a22570e9e473fa",
+  "answers": [
+    {
+      "user": "What is 2+2? Answer with one digit.",
+      "promptTokens": [
+        200006,
+        1428,
+        200008,
+        4827,
+        382,
+        220,
+        17,
+        10,
+        17,
+        30,
+        30985,
+        483,
+        1001,
+        19181,
+        13,
+        200007,
+        200006,
+        173781,
+        200005,
+        17196,
+        200008
+      ],
+      "output": "4",
+      "tokens": [
+        19,
+        200002
+      ],
+      "stop": "eos"
+    },
+    {
+      "user": "What is the capital of France? Answer with the city name.",
+      "promptTokens": [
+        200006,
+        1428,
+        200008,
+        4827,
+        382,
+        290,
+        9029,
+        328,
+        10128,
+        30,
+        30985,
+        483,
+        290,
+        5030,
+        1308,
+        13,
+        200007,
+        200006,
+        173781,
+        200005,
+        17196,
+        200008
+      ],
+      "output": "Paris.",
+      "tokens": [
+        72782,
+        13,
+        200002
+      ],
+      "stop": "eos"
+    }
+  ],
+  "checkpointSha256": "27cd6c432c7672cb812a92f611cf3ba7bbc35928262bb1e1253ff4ee6ae35901"
+}

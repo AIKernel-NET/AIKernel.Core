@@ -97,6 +97,12 @@ public sealed class GgufExpansionTests
         {
             QuantizedCpuMatrix.Multiply(file,file.Tensors["w"],input,actual,new(){MaxDegreeOfParallelism=workers},"scalar");
             for(int i=0;i<rows;i++)Assert.Equal((float)expected[i],actual[i]);
+            if(type is 8 or 39)
+            {
+                float[] bias=[100,101,102,1,2,3];
+                GptOssMatrix.Multiply(file,file.Tensors["w"],input,actual,bias,rows,new(){MaxDegreeOfParallelism=workers});
+                for(int i=0;i<rows;i++)Assert.Equal((float)expected[i]+bias[rows+i],actual[i]);
+            }
         }
         using var cancelled=new CancellationTokenSource();cancelled.Cancel();
         Assert.ThrowsAny<OperationCanceledException>(()=>QuantizedCpuMatrix.Multiply(file,file.Tensors["w"],input,actual,

@@ -19,8 +19,9 @@ internal static class BonsaiCtgJointReport
         @"\A(?:the )?(?<subject>[a-z0-9][a-z0-9 -]{0,79}?) (?:holds|stores) (?:exactly )?(?:one|a single|1) (?:signed )?integer(?: per timestamp| at a time)?\.(?:\s|\z)",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.NonBacktracking);
 
-    internal static string? Extract(string proposal, IReadOnlyDictionary<string,string> facts)
+    internal static string? Extract(string proposal, IReadOnlyDictionary<string,string> facts, out bool exceedsCapacity)
     {
+        exceedsCapacity = false;
         var match = Report.Match(proposal.Trim());
         if (!match.Success) return null;
         string subject = match.Groups["subject"].Value;
@@ -37,6 +38,7 @@ internal static class BonsaiCtgJointReport
             maximumSimultaneousValues = 1,
             comparisonIfApplicable = distinct > 1 ? "2 distinct values cannot fit in 1 slot." : "1 distinct value fits in 1 slot. Verify the value itself."
         } : null;
+        exceedsCapacity = capacity is not null && distinct > 1;
         return JsonSerializer.Serialize(new
         {
             subject, firstClaim = first, secondClaim = second, time = match.Groups["time"].Value,

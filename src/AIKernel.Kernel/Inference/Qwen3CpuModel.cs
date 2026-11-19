@@ -322,6 +322,7 @@ public sealed class Qwen3CpuModel : IDisposable
     internal string? DevicePciBusId=>gpu?.PciBusId;
     internal CudaQ8Statistics? CudaQ8Statistics=>(gpu as CudaQuantizedMatrix)?.Statistics;
     internal object? VulkanDiagnostics=>(gpu as VulkanQuantizedMatrix)?.Diagnostics;
+    internal long VulkanRecoveredProjections=>(gpu as VulkanQuantizedMatrix)?.RecoveredProjections ?? 0;
     internal VulkanComputeDeviceInfo? VulkanDevice=>(gpu as VulkanQuantizedMatrix)?.DeviceInfo;
     private T WithCleanup<T>(Func<T> work)
     {

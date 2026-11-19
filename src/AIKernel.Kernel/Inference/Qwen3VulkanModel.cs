@@ -22,6 +22,8 @@ public sealed class Qwen3VulkanModel : IDisposable
     public VulkanComputeDeviceInfo Device=>engine.VulkanDevice!;
     /// <summary>Encoded resident model size; additional scratch buffers are bounded to 16 MiB total.</summary>
     public long DeviceWeightBytes=>engine.DeviceWeightBytes;
+    /// <summary>Number of matrix results recovered by replaying a non-finite GPU projection on the same device.</summary>
+    public long RecoveredProjectionCount=>engine.VulkanRecoveredProjections;
     /// <summary>Activation rounding; the Vulkan shader uses FP32 arithmetic.</summary>
     public string ActivationPrecision {get;}
     /// <summary>Precomputes a trusted system prefix.</summary>

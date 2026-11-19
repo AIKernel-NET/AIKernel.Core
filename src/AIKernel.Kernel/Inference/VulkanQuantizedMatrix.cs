@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using Silk.NET.Vulkan;
 using Buffer = Silk.NET.Vulkan.Buffer;
@@ -14,6 +15,7 @@ public sealed record VulkanComputeDeviceInfo(int Ordinal, string Name, uint Vend
 internal sealed unsafe class VulkanQuantizedMatrix : IMatrixOffload
 {
     private readonly Vk vk;
+    private readonly Action submitRecorded;
     private Instance instance;
     private PhysicalDevice physical;
     private Device device;
@@ -32,12 +34,13 @@ internal sealed unsafe class VulkanQuantizedMatrix : IMatrixOffload
     private uint timestampBits;
     private bool subgroup;
     private readonly bool profile=Environment.GetEnvironmentVariable("AIKERNEL_VULKAN_PROFILE")=="1";
-    private long calls, cpuTicks, waitTicks;
+    private long calls, cpuTicks, waitTicks, recoveredProjections;
+    internal long RecoveredProjections => Interlocked.Read(ref recoveredProjections);
     private double gpuNanoseconds;
     internal bool DiagnosticReadOnly {get;set;}
     internal object Diagnostics=>new {calls,cpuMilliseconds=cpuTicks*1000.0/Stopwatch.Frequency,
         waitMilliseconds=waitTicks*1000.0/Stopwatch.Frequency,gpuMilliseconds=timingQueries.Handle==0?(double?)null:gpuNanoseconds/1e6,
-        timestampBits,subgroup,weightMemoryFlags=weights?.Flags.ToString()};
+        timestampBits,subgroup,recoveredProjections,weightMemoryFlags=weights?.Flags.ToString()};
     private Allocation? weights, input, output;
     private bool disposed;
     private readonly object sync = new();
@@ -81,6 +84,7 @@ internal sealed unsafe class VulkanQuantizedMatrix : IMatrixOffload
         if (file.Length <= 0 || file.Length > maximumWeightBytes || file.Length > int.MaxValue)
             throw new ArgumentException("Encoded model exceeds the Vulkan weight budget.");
         vk = Vk.GetApi();
+        submitRecorded = SubmitRecorded;
         WeightBytes = file.Length;
         try
         {
@@ -272,7 +276,8 @@ internal sealed unsafe class VulkanQuantizedMatrix : IMatrixOffload
             for(uint i=0;i<3;i++)writes[i]=new(){SType=StructureType.WriteDescriptorSet,DstSet=set,DstBinding=i,DescriptorCount=1,DescriptorType=DescriptorType.StorageBuffer,PBufferInfo=buffers+i};
             vk.UpdateDescriptorSets(device,3,writes,0,null);
             Check(vk.ResetCommandBuffer(command,0),"reset command");
-            var begin=new CommandBufferBeginInfo{SType=StructureType.CommandBufferBeginInfo,Flags=CommandBufferUsageFlags.OneTimeSubmitBit};
+            // A non-finite readback can replay this same command after its fence signals.
+            var begin=new CommandBufferBeginInfo{SType=StructureType.CommandBufferBeginInfo};
             Check(vk.BeginCommandBuffer(command,&begin),"begin command");
             if(timingQueries.Handle!=0)
             {
@@ -288,13 +293,9 @@ internal sealed unsafe class VulkanQuantizedMatrix : IMatrixOffload
             var barrier=new MemoryBarrier{SType=StructureType.MemoryBarrier,SrcAccessMask=AccessFlags.ShaderWriteBit,DstAccessMask=AccessFlags.HostReadBit};
             vk.CmdPipelineBarrier(command,PipelineStageFlags.ComputeShaderBit,PipelineStageFlags.HostBit,0,1,&barrier,0,null,0,null);
             Check(vk.EndCommandBuffer(command),"end command");
-            var f=fence;Check(vk.ResetFences(device,1,&f),"reset fence");
-            var cmd=command;var submit=new SubmitInfo{SType=StructureType.SubmitInfo,CommandBufferCount=1,PCommandBuffers=&cmd};
-            long waiting=profile?Stopwatch.GetTimestamp():0;
-            Check(vk.QueueSubmit(queue,1,&submit,fence),"submit compute");
-            Check(vk.WaitForFences(device,1,&f,true,ulong.MaxValue),"wait for compute");
-            if(profile)waitTicks+=Stopwatch.GetTimestamp()-waiting;
-            new ReadOnlySpan<float>(output.Mapped,tensor.Rows).CopyTo(y);
+            if (ReadProjection(new ReadOnlySpan<float>(output.Mapped,tensor.Rows),
+                               y.AsSpan(0,tensor.Rows),submitRecorded,token))
+                Interlocked.Increment(ref recoveredProjections);
             if(profile)
             {
                 calls++;cpuTicks+=Stopwatch.GetTimestamp()-started;
@@ -308,6 +309,49 @@ internal sealed unsafe class VulkanQuantizedMatrix : IMatrixOffload
             }
             token.ThrowIfCancellationRequested();
         }
+    }
+    private void SubmitRecorded()
+    {
+        var f=fence;
+        Check(vk.ResetFences(device,1,&f),"reset fence");
+        var cmd=command;
+        var submit=new SubmitInfo{SType=StructureType.SubmitInfo,CommandBufferCount=1,PCommandBuffers=&cmd};
+        long waiting=profile?Stopwatch.GetTimestamp():0;
+        Check(vk.QueueSubmit(queue,1,&submit,fence),"submit compute");
+        Check(vk.WaitForFences(device,1,&f,true,ulong.MaxValue),"wait for compute");
+        if(profile)waitTicks+=Stopwatch.GetTimestamp()-waiting;
+    }
+
+    internal static bool ReadProjection(ReadOnlySpan<float> mapped, Span<float> destination,
+        Action submit, CancellationToken token)
+    {
+        // Scan the cached host copy. The mapped allocation may be write-combined.
+        for (int attempt = 0; attempt < 2; attempt++)
+        {
+            token.ThrowIfCancellationRequested();
+            submit();
+            token.ThrowIfCancellationRequested();
+            mapped.CopyTo(destination);
+            if (AllFinite(destination))
+                return attempt != 0;
+        }
+        throw new ArithmeticException("Vulkan projection returned a non-finite value after replay.");
+    }
+
+    private static bool AllFinite(ReadOnlySpan<float> values)
+    {
+        var bits = MemoryMarshal.Cast<float,uint>(values);
+        var exponent = new Vector<uint>(0x7f800000u);
+        int i = 0;
+        if (Vector.IsHardwareAccelerated)
+        {
+            for (; i <= bits.Length - Vector<uint>.Count; i += Vector<uint>.Count)
+                if (Vector.EqualsAny(new Vector<uint>(bits.Slice(i)) & exponent, exponent))
+                    return false;
+        }
+        for (; i < values.Length; i++)
+            if (!float.IsFinite(values[i])) return false;
+        return true;
     }
     public void ZeroScratch()
     {

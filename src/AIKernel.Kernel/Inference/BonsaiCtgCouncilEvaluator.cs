@@ -180,7 +180,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
         BonsaiCtgResponseMode.FieldBoundReadingVotes => "canonical-field-bound-reading-v32",
         BonsaiCtgResponseMode.ScopedReportVotes => "canonical-scoped-report-v33",
         BonsaiCtgResponseMode.ConciseReportRetryVotes => "canonical-concise-report-retry-v34",
-        BonsaiCtgResponseMode.JointReportVotes => "canonical-joint-report-v35",
+        BonsaiCtgResponseMode.JointReportVotes => "canonical-joint-report-v36",
         BonsaiCtgResponseMode.ReasonedFindingVotes => BonsaiCtgReasonedFindingPrompt.Contract,
         _ => null
     };
@@ -298,7 +298,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                 if (edits is not null) metadata["record.edits.sha256"] = Hash(edits);
                 string? comparison = witness?.ToPromptData();
                 string? jointReport = witness is null && responseMode == BonsaiCtgResponseMode.JointReportVotes
-                    ? BonsaiCtgJointReport.Extract(proposal!) : null;
+                    ? BonsaiCtgJointReport.Extract(proposal!, inputFacts) : null;
                 if (jointReport is not null) metadata["joint.claims.sha256"] = Hash(jointReport);
                 if (comparison is not null) metadata["comparison.sha256"] = Hash(comparison);
                 string? recordComparison = responseMode == BonsaiCtgResponseMode.RecordFindingVotes && witness is not null
@@ -306,7 +306,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     : null;
                 if (recordComparison is not null) metadata["binding.policy"] = BonsaiCtgFindingPolicy.Contract;
                 string? reasonedComparison = reasoned ? witness?.DescribeForCouncil() : null;
-                if (reasonedComparison is not null || edits is not null)
+                if (reasonedComparison is not null || edits is not null || jointReport is not null)
                 {
                     metadata["binding.policy"] = BonsaiCtgFindingPolicy.Contract;
                     if (reasonedComparison is not null) metadata["draft.binding"] = "false";
@@ -364,10 +364,12 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     bool routed = responseMode == BonsaiCtgResponseMode.RoutedReadingVotes || compareLiterals;
                     bool anchored = responseMode == BonsaiCtgResponseMode.AnchoredReadingVotes ||
                         (routed && council is CouncilKind.Logos or CouncilKind.Ethos);
-                    var rule=rules[council];var prompt=edits is not null?BonsaiCtgReasonedFindingPrompt.BuildFromRecord(rule,council,facts,proposalJson!,edits):
+                    bool jointFinding = jointReport is not null && council is CouncilKind.Logos or CouncilKind.Ethos;
+                    var rule=rules[council];var prompt=jointFinding?BonsaiCtgJointReport.Build(rule,council,facts,proposalJson!,jointReport!):
+                        edits is not null?BonsaiCtgReasonedFindingPrompt.BuildFromRecord(rule,council,facts,proposalJson!,edits):
                         reasonedComparison is not null?BonsaiCtgReasonedFindingPrompt.Build(rule,council,facts,proposalJson!,actionReading,reasonedComparison):
                         recordComparison is not null?BonsaiCtgRecordFindingPrompt.Build(rule,council,facts,proposalJson!,actionReading!,recordComparison):
-                        anchored?BonsaiCtgAnchoredVotePrompt.Build(rule,council,facts,proposalJson!,actionReading!,comparison,jointReport):
+                        anchored?BonsaiCtgAnchoredVotePrompt.Build(rule,council,facts,proposalJson!,actionReading!,comparison):
                         focused?BonsaiCtgFocusedPrompt.Build(rule,council,facts,proposalJson!,actionReading!,defined,voteFirst,literalComparison:comparison):
                         provenance?BonsaiCtgProvenancePrompt.Build(rule,council,facts,proposalJson!):
                         councilScoped?BonsaiCtgDirectVotePrompt.BuildWithCouncilScopes(rule,council,facts,proposalJson!):
@@ -386,7 +388,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     if (reasonedComparison is not null) user = BonsaiCtgReasonedFindingPrompt.ForReason(user);
                     metadata[council+".prompt.sha256"]=Hash(system+"\n"+user);metadata[council+".rom.sha256"]=rule.Reference.ContentHash!;
                     metadata[council+".excerpt.sha256"]=Hash(prompt.Excerpt);
-                    var answer=edits is not null
+                    var answer=edits is not null || jointFinding
                         ? await select!(system,user,BonsaiCtgReasonedFindingPrompt.Choices(council),timeout.Token).ConfigureAwait(false)
                         : await classify(system,user,timeout.Token).ConfigureAwait(false);
                     if(reviewed || reasonedComparison is not null)
@@ -473,13 +475,14 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                     CouncilVoteValue value;var voteMetadata=new Dictionary<string,string>{["prompt.sha256"]=metadata[council+".prompt.sha256"]};
                     try
                     {
-                        if (reasonedComparison is not null || edits is not null)
+                        if (reasonedComparison is not null || edits is not null || jointFinding)
                         {
                             string finding = challengedFinding ?? BonsaiCtgReasonedFindingPrompt.Finding(council, answer);
                             value = BonsaiCtgFindingPolicy.Resolve(council, finding);
                             voteMetadata["finding"] = metadata[council+".finding"] = finding;
                             voteMetadata["binding.policy"] = BonsaiCtgFindingPolicy.Contract;
-                            if (edits is not null) voteMetadata["record.edits.sha256"] = metadata["record.edits.sha256"];
+                            if (jointFinding) voteMetadata["joint.claims.sha256"] = metadata["joint.claims.sha256"];
+                            else if (edits is not null) voteMetadata["record.edits.sha256"] = metadata["record.edits.sha256"];
                             else voteMetadata["draft.response.sha256"] = metadata[council+".draft.response.sha256"];
                         }
                         else if(findings||citedFinding||recordComparison is not null)
@@ -499,7 +502,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
                         else if(anchored)value=BonsaiCtgAnchoredVotePrompt.Parse(answer,inputFacts,council);
                         else value=BonsaiCtgDirectVotePrompt.Parse(answer,requireVoteFirst:voteFirst);
                     }
-                    catch(InvalidDataException){return Failure(findings||cited||citedFinding||recordComparison is not null||reasonedComparison is not null?"ctg.bonsai.invalid_assessment":"ctg.bonsai.invalid_vote",metadata);}
+                    catch(InvalidDataException){return Failure(findings||cited||citedFinding||recordComparison is not null||reasonedComparison is not null||jointFinding?"ctg.bonsai.invalid_assessment":"ctg.bonsai.invalid_vote",metadata);}
                     voteMetadata["label"]=value.ToString();
                     votes.Add(new(){CouncilKind=council,VoteValue=value,CanonReferences=[prompt.Reference],ObservedAt=clock.Now,Metadata=voteMetadata});
                 }

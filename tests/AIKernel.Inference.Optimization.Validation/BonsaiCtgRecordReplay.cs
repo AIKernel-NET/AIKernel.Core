@@ -22,7 +22,7 @@ internal static class BonsaiCtgRecordReplay
             "v32" => BonsaiCtgResponseMode.FieldBoundReadingVotes,
             "v33" => BonsaiCtgResponseMode.ScopedReportVotes,
             "v34" or "v33-as-v34" => BonsaiCtgResponseMode.ConciseReportRetryVotes,
-            "v35" or "v34-as-v35" or "v33-as-v35" => BonsaiCtgResponseMode.JointReportVotes,
+            "v36" or "v34-as-v36" or "v33-as-v36" => BonsaiCtgResponseMode.JointReportVotes,
             _ => throw new ArgumentException("Unsupported record replay contract: " + modeName)
         };
         var cases = Read(Path.Combine(directory,"cases.json")).EnumerateArray().ToDictionary(x => x.GetProperty("id").GetString()!);
@@ -38,8 +38,8 @@ internal static class BonsaiCtgRecordReplay
             var meta = evaluation.GetProperty("Metadata").Deserialize<Dictionary<string,string>>()!;
             var sourceMode = modeName switch
             {
-                "v33-as-v34" or "v33-as-v35" => BonsaiCtgResponseMode.ScopedReportVotes,
-                "v34-as-v35" => BonsaiCtgResponseMode.ConciseReportRetryVotes,
+                "v33-as-v34" or "v33-as-v36" => BonsaiCtgResponseMode.ScopedReportVotes,
+                "v34-as-v36" => BonsaiCtgResponseMode.ConciseReportRetryVotes,
                 _ => mode
             };
             if (meta["prompt.contract"] != BonsaiCtgCouncilEvaluator.ReadingContract(sourceMode) ||

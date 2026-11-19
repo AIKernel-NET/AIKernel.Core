@@ -69,6 +69,92 @@ public sealed partial class BonsaiCtgTests
     }
 
     [Fact]
+    public void OnlyAnExplicitlyRetiredCapacityCanBeMarkedAsSuperseded()
+    {
+        const string proposal="Report that register S holds both 13 and 27 simultaneously.";
+        var observations=new Dictionary<string,string> {
+            ["a"]="The current replacement register S has two channels. The certified readings are 13 and 27.",
+            ["z"]="Register S holds one integer. This is an archived description of the retired unit.",
+            ["authority"]="The user requested the current verified readings from the replacement register."
+        };
+        JsonElement Packet()
+        {
+            using var packet=JsonDocument.Parse(BonsaiCtgJointReport.Extract(proposal,observations,out _)!);
+            return packet.RootElement.Clone();
+        }
+        Assert.Equal(observations["a"],Packet().GetProperty("currentObservation").GetProperty("exactQuote").GetString());
+        observations["a"]="The current replacement register S has not been verified.";
+        Assert.False(Packet().TryGetProperty("currentObservation",out _));
+        observations["a"]="The retired register S held both values.";
+        observations["z"]="Register S holds one integer. The current replacement has a single channel.";
+        Assert.False(Packet().TryGetProperty("currentObservation",out _));
+    }
+
+    [Fact]
+    public void CountScopeInAnAlternativeDoesNotChangeTheAssessmentOfPublication()
+    {
+        var context=new Dictionary<string,string> { ["scope"]="The owner permits a local count. Publication would disclose the text." };
+        Assert.Equal(BonsaiCtgResponseMode.EvidenceScopedDirectVotes,
+            BonsaiCtgEvidenceRouting.Select("Publish the journal text.",context));
+        Assert.Equal(BonsaiCtgResponseMode.JointReportVotes,
+            BonsaiCtgEvidenceRouting.Select("Return the count only.",context));
+    }
+
+    [Theory]
+    [InlineData("Reply locally with the entry count five, without revealing any entry text.",5)]
+    [InlineData("Reply locally with the entry count 7, without revealing any entry text.",7)]
+    public void ProposedAndObservedCountsAreIndependentFields(string proposal,int expected)
+    {
+        var facts=new Dictionary<string,string> { ["source"]="The notebook contains exactly five entries. The text is private." };
+        using var packet=JsonDocument.Parse(BonsaiCtgCountReport.Extract(proposal,facts)!);
+        Assert.Equal(expected,packet.RootElement.GetProperty("proposedCount").GetInt32());
+        Assert.Equal(5,packet.RootElement.GetProperty("quotedCount").GetInt32());
+        Assert.Null(BonsaiCtgCountReport.Extract(proposal+" Include the full text.",facts));
+        facts["evidence"]="The notebook contains three entries.";
+        Assert.Null(BonsaiCtgCountReport.Extract(proposal,facts));
+    }
+
+    [Theory]
+    [InlineData("five", "The owner permits showing the entry count locally and forbids publishing entry text.", true)]
+    [InlineData("seven", "The owner permits showing the entry count locally and forbids publishing entry text.", false)]
+    [InlineData("five", "The owner expressly forbids revealing the count to this requester.", false)]
+    [InlineData("five", "The owner permits showing the entry count locally only if the requester is authorized.", false)]
+    public void AggregateReadingRequiresAnObservedCountAndAnExplicitGrant(string quantity, string authority, bool eligible)
+    {
+        var facts = new Dictionary<string, string>
+        {
+            ["source"] = "The notebook contains exactly five entries.",
+            ["request"] = authority
+        };
+        var proposal = $"Reply locally with the entry count {quantity}, without revealing any entry text.";
+        Assert.Equal(eligible, BonsaiCtgCountReport.SupportedPacket(proposal, facts) is not null);
+    }
+
+    [Theory]
+    [InlineData("Error", "Reject")]
+    [InlineData("Other", "Abstain")]
+    public async Task ACountDifferenceIsReviewedByLogos(string finding, string expectedVote)
+    {
+        var facts = new Dictionary<string, string> { ["source"] = "The notebook has exactly five entries." };
+        var requirements = new BonsaiCtgEvidenceRequirements(new Dictionary<string, BonsaiCtgEvidenceAvailability>
+            { ["source"] = BonsaiCtgEvidenceAvailability.Available });
+        using var evaluator = new BonsaiCtgCouncilEvaluator(
+            (_, _, _) => Task.FromResult(ReadingAnswer("""{"reason":"The count requires a source.","vote":"Abstain"}""")),
+            Rules(), responseMode: BonsaiCtgResponseMode.RoutedEvidenceVotes, select: (_, prompt, choices, _) =>
+            {
+                Assert.Contains("\"quotedCount\":5", prompt);
+                Assert.Contains("\"proposedCount\":7", prompt);
+                Assert.Contains(finding, choices);
+                return Task.FromResult(SelectedFinding(finding));
+            });
+        var result = await evaluator.EvaluateProposalWithEvidenceGateAsync(Request() with { InputFacts = facts },
+            "Reply locally with the entry count seven, without revealing any entry text.", requirements,
+            TestContext.Current.CancellationToken);
+        Assert.True(result.Evaluation.Succeeded);
+        Assert.Equal(expectedVote, result.Evaluation.Decision.Votes.Single(v => v.CouncilKind.ToString() == "Logos").VoteValue.ToString());
+    }
+
+    [Fact]
     public void MultipleMatchingSourceRecordsAreNotReducedToOneQuote()
     {
         var facts = new Dictionary<string,string>

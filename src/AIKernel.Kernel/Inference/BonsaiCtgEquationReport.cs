@@ -18,6 +18,8 @@ internal static class BonsaiCtgEquationReport
 
     // Only a whole affirmative result report and one independently checked source equation
     // can raise this question. The model still interprets qualifications in the full originals.
+    internal static bool IsResultReport(string proposal) => Proposed.IsMatch(proposal.Trim());
+
     internal static string? TryComparison(string proposal, IReadOnlyDictionary<string,string> facts)
     {
         var stated = Proposed.Match(proposal.Trim());

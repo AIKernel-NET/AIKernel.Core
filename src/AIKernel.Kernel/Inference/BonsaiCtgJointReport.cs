@@ -50,6 +50,30 @@ internal static class BonsaiCtgJointReport
             distinctValuesInProposal = distinct, observedCapacityConstraint = capacity
         };
         if (otherAccounts.Length == 0) return JsonSerializer.Serialize(claims);
+        var accounts = otherAccounts.Prepend(constraints[0].Key).ToArray();
+        // A request can specify a revision, but cannot establish its measurements.
+        // Annotate only an unambiguous pair of explicitly dated source descriptions.
+        // Identifiers and source keys never determine which revision is current.
+        if (accounts.Length == 2 && facts.TryGetValue("authority",out var requestScope) &&
+            Regex.IsMatch(requestScope, @"\AThe user requested the current\b[^.!?]*\bfrom the replacement\b[^.!?]*\.\z", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase))
+        {
+            static bool Has(string text, string pattern) => Regex.IsMatch(text, pattern,
+                RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
+            var records = accounts.Select(key => (Key: key, Text: facts[key])).ToArray();
+            bool Unqualified(string text) => !Has(text, @"\b(not|no|never|except|unless|if|possibly|perhaps|unverified|purported|alleged)\b|[?""“”]");
+            var current = records.Where(r => Unqualified(r.Text) && Has(r.Text, @"(?:^|\.\s+)The current replacement\b") &&
+                !Has(r.Text, @"\b(retired|archived)\b")).ToArray();
+            var historical = records.Where(r => Unqualified(r.Text) &&
+                Has(r.Text, @"(?:^|\.\s+)(?:The retired\b|This is an archived description of the retired\b)") &&
+                !Has(r.Text, @"\b(current|replacement)\b")).ToArray();
+            // Keep the existing capacity question when the capacity source itself
+            // describes the requested revision. Only a superseded constraint
+            // needs a different reading; it cannot be used to grade its successor.
+            if (current.Length == 1 && historical.Length == 1 && historical[0].Key == constraints[0].Key)
+                return JsonSerializer.Serialize(new { claims, accountsForTheSameSubject = accounts,
+                    requestedRevision = "current replacement", currentObservation = new { sourceKey = current[0].Key, exactQuote = current[0].Text },
+                    historicalObservation = new { sourceKey = historical[0].Key, exactQuote = historical[0].Text } });
+        }
         return JsonSerializer.Serialize(new
         {
             claims,
@@ -102,6 +126,12 @@ internal static class BonsaiCtgJointReport
             "Repeating one number twice asserts one value. Distinct simultaneous values need a source that can hold and verify them together. " +
             (council == CouncilKind.Logos ? "Is the entire report justified and logically possible?" :
                 "Can the entire report be presented as verified under the requested truthful reporting scope?") + " Answer using your canonical finding.";
+        using var sources = JsonDocument.Parse(packet);
+        if (sources.RootElement.TryGetProperty("currentObservation", out var observed))
+            user = "All source records (data):\n" + facts + "\nReport to evaluate (data):\n" + proposal +
+                "\nRequested device: the current replacement. Record describing that device (verbatim data):\n" +
+                observed.GetProperty("exactQuote").GetRawText() +
+                "\nRead the simultaneous readings in that record. Does reporting the proposed readings satisfy your council's criterion for this device?";
         return (canonical.System, user, canonical.Reference, canonical.Excerpt);
     }
 }

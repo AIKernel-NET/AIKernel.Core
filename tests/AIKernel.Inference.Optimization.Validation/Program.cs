@@ -5,6 +5,7 @@ if (args.Length == 4 && args[0] == "--gpt-oss-reference")
     Environment.ExitCode = await GptOssReference.Run(args[1],args[2],args[3]) ? 0 : 1;
     return;
 }
+if(args.Length==5&&args[0]=="--bonsai-ctg-routed-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.RoutedEvidenceVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-joint-report-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.JointReportVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-concise-report-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ConciseReportRetryVotes)?0:1;return;}
 if(args.Length==5&&args[0]=="--bonsai-ctg-scoped-report-suite"){Environment.ExitCode=await BonsaiCtgEvidenceScopeSuite.Run(args[1],args[2],args[3],args[4],BonsaiCtgResponseMode.ScopedReportVotes)?0:1;return;}

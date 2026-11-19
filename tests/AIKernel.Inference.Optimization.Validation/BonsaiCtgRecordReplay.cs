@@ -17,12 +17,13 @@ internal static class BonsaiCtgRecordReplay
     {
         var mode = modeName switch
         {
+            "routed" => BonsaiCtgResponseMode.RoutedEvidenceVotes,
             "v30" => BonsaiCtgResponseMode.SourceBoundRecordVotes,
             "v31" => BonsaiCtgResponseMode.ChallengedRecordVotes,
             "v32" => BonsaiCtgResponseMode.FieldBoundReadingVotes,
             "v33" => BonsaiCtgResponseMode.ScopedReportVotes,
             "v34" or "v33-as-v34" => BonsaiCtgResponseMode.ConciseReportRetryVotes,
-            "v39" or "v38-as-v39" or "v37-as-v39" or "v34-as-v39" or "v33-as-v39" => BonsaiCtgResponseMode.JointReportVotes,
+            "v41" or "v39" or "v38-as-v39" or "v37-as-v39" or "v34-as-v39" or "v33-as-v39" => BonsaiCtgResponseMode.JointReportVotes,
             _ => throw new ArgumentException("Unsupported record replay contract: " + modeName)
         };
         var cases = Read(Path.Combine(directory,"cases.json")).EnumerateArray().ToDictionary(x => x.GetProperty("id").GetString()!);
@@ -44,11 +45,15 @@ internal static class BonsaiCtgRecordReplay
             };
             string? sourceContract = modeName switch
             {
+                "v39" => "canonical-numeric-report-v39",
                 "v38-as-v39" => "canonical-numeric-report-v38",
                 "v37-as-v39" => "canonical-joint-report-v37",
                 _ => BonsaiCtgCouncilEvaluator.ReadingContract(sourceMode)
             };
-            if (meta["prompt.contract"] != sourceContract ||
+            bool routedSource=modeName=="routed" && meta["prompt.contract"] is "canonical-evidence-scope-json-v10"
+                or "canonical-routed-evidence-v44" or "canonical-numeric-report-v41" or "canonical-numeric-report-v39" or "canonical-numeric-report-v38"
+                or "canonical-joint-report-v37" or "canonical-concise-report-retry-v34" or "canonical-scoped-report-v33";
+            if ((!routedSource && meta["prompt.contract"] != sourceContract) ||
                 meta["model.sha256"] != "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3")
                 throw new InvalidDataException("Unexpected source model or contract.");
             if(evaluation.GetProperty("ErrorCode").GetString() == "ctg.bonsai.timeout")
@@ -60,7 +65,8 @@ internal static class BonsaiCtgRecordReplay
             foreach (var r in responses[id])
             {
                 string role = r.GetProperty("council").GetString()!;
-                string key = r.GetProperty("stage").GetString() switch
+                string key = (r.TryGetProperty("stage",out var stage)?stage.GetString():
+                    meta["prompt.contract"]=="canonical-evidence-scope-json-v10"?"final":null) switch
                 {
                     "reading" => "reading", "draft" => role + ".draft", "final" => role,
                     "criterion" => r.GetProperty("criterion").GetString() switch
@@ -89,7 +95,13 @@ internal static class BonsaiCtgRecordReplay
                 InputFacts=item.GetProperty("facts").Deserialize<Dictionary<string,string>>()! };
             var requirements = new BonsaiCtgEvidenceRequirements(item.GetProperty("hostRequirements").EnumerateObject()
                 .ToDictionary(x => x.Name, x => Enum.Parse<BonsaiCtgEvidenceAvailability>(x.Value.GetString()!)));
-            var result = await evaluator.EvaluateProposalWithEvidenceGateAsync(request,item.GetProperty("proposal").GetString()!,requirements);
+            BonsaiCtgDecision result;
+            try { result=await evaluator.EvaluateProposalWithEvidenceGateAsync(request,item.GetProperty("proposal").GetString()!,requirements); }
+            catch (KeyNotFoundException) when (modeName=="routed")
+            {
+                rows.Add(new {id,outcome="requires-fresh-run",calls=count-saved.Count});
+                continue;
+            }
             var votes = evaluation.GetProperty("Decision").GetProperty("Votes").EnumerateArray()
                 .ToDictionary(v => v.GetProperty("CouncilKind").GetInt32(),v => v.GetProperty("VoteValue").GetInt32());
             if (saved.Count != 0 || count != row.GetProperty("inferenceCalls").GetInt32() ||
@@ -97,7 +109,11 @@ internal static class BonsaiCtgRecordReplay
                 result.Evaluation.ErrorCode != evaluation.GetProperty("ErrorCode").GetString() ||
                 result.Gate.Accepted != actual.GetProperty("Gate").GetProperty("Accepted").GetBoolean() ||
                 !result.Evaluation.Decision.Votes.All(v => votes[(int)v.CouncilKind] == (int)v.VoteValue))
-                throw new InvalidDataException("Recorded decisions did not replay for " + id);
+            {
+                if (modeName!="routed") throw new InvalidDataException("Recorded decisions did not replay for " + id);
+                rows.Add(new {id,outcome="requires-fresh-run",calls=count-saved.Count});
+                continue;
+            }
             rows.Add(new { id, outcome="matched", calls=count });
         }
         File.WriteAllText(output,JsonSerializer.Serialize(new { replayOnly=true, newModelCalls=0, rows },new JsonSerializerOptions{WriteIndented=true}));

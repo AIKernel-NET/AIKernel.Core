@@ -8,7 +8,7 @@ public sealed record CosmosGeneration(string Text,ImmutableArray<int> TokenIds,i
 {
     /// <summary>Resource/dependency decision made before inference, when paging is enabled.</summary>
     public CosmosMemoryPlan? MemoryPlan { get; init; }
-    /// <summary>Verified checkpoint provenance, when paging is enabled.</summary>
+    /// <summary>Verified checkpoint provenance when paging or an explicit manifest pin is enabled.</summary>
     public CosmosArtifactIdentity? Artifact { get; init; }
 }
 
@@ -49,7 +49,13 @@ internal sealed class CosmosModelRuntime : IDisposable
         if(definition.Family!=requiredFamily)throw new NotSupportedException("Checkpoint does not match the requested Cosmos family.");
         if(requiredFamily=="qwen3_vl" && (definition.Width!=2048 || definition.Layers!=28 || definition.VisionWidth!=1024 || definition.VisionLayers!=24))
             throw new NotSupportedException("This entry point requires the Cosmos Reason2 2B architecture.");
-        if(options.Memory is not null){options.Memory.Validate();identity=CosmosArtifactVerifier.Verify(modelDirectory,requiredFamily,options.Memory.ExpectedImportManifestSha256);}
+        options.Memory?.Validate();
+        string? memoryPin = options.Memory?.ExpectedImportManifestSha256;
+        if (memoryPin is not null && options.ExpectedImportManifestSha256 is { } pin &&
+            !string.Equals(pin, memoryPin, StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("The checkpoint manifest pins disagree.");
+        if (options.Memory is not null || options.ExpectedImportManifestSha256 is not null)
+            identity=CosmosArtifactVerifier.Verify(modelDirectory,requiredFamily,options.ExpectedImportManifestSha256 ?? memoryPin);
         tokenizer=new(Path.Combine(modelDirectory,"tokenizer.json"),definition.Vocabulary);
         foreach(var (name,id) in new[]{("<|image_pad|>",definition.ImageToken),("<|video_pad|>",definition.VideoToken),
             ("<|vision_start|>",definition.VisionStart),("<|vision_end|>",definition.VisionEnd),("<|im_end|>",definition.EndToken)})
@@ -64,22 +70,37 @@ internal sealed class CosmosModelRuntime : IDisposable
     }
 
     /// <summary>Generates a greedy reply. In-flight requests serialize; cancellation clears private pixel features, KV and scratch state.</summary>
-    public async Task<CosmosGeneration> GenerateAsync(string system,IReadOnlyList<CosmosContent> content,int maxNewTokens=128,CancellationToken cancellationToken=default)
+    public async Task<CosmosGeneration> GenerateAsync(string system,IReadOnlyList<CosmosContent> content,int maxNewTokens=128,CancellationToken cancellationToken=default,
+        IReadOnlyList<CosmosChatTurn>? history=null)
     {
         ArgumentNullException.ThrowIfNull(system);ArgumentNullException.ThrowIfNull(content);
         if(maxNewTokens<1 || maxNewTokens>options.ContextTokens)throw new ArgumentOutOfRangeException(nameof(maxNewTokens));
         // Snapshot the content collection before awaiting. Caller must keep frame memory immutable for the request duration.
-        var items=content.Select(item=>item is CosmosContent.Video video
-            ? new CosmosContent.Video(video.Frames.ToArray()) : item).ToArray();
+        if (history is { Count: > 128 }) throw new ArgumentException("Too many conversation turns.");
+        int remaining = 256;
+        CosmosContent[] Snapshot(IReadOnlyList<CosmosContent> parts)
+        {
+            if (parts.Count > remaining) throw new ArgumentException("Too many content items.");
+            remaining -= parts.Count;
+            return parts.Select(item => item switch {
+                CosmosContent.Video video when video.Frames is { } frames && frames.Count <= options.MaximumVideoFrames => new CosmosContent.Video(video.Frames.ToArray()),
+                CosmosContent.Video => throw new ArgumentException("Too many video frames."),
+                CosmosContent.Text { Value: not null } or CosmosContent.Image { Frame: not null } => item,
+                _ => throw new ArgumentException("Invalid content item.")
+            }).ToArray();
+        }
+        var turns=history?.Select(t => t is { UserContent: not null, AssistantReply: not null }
+            ? new CosmosChatTurn(Snapshot(t.UserContent),t.AssistantReply) : throw new ArgumentException("Invalid conversation turn.")).ToArray() ?? [];
+        var items=Snapshot(content);
         await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             ObjectDisposedException.ThrowIf(disposed,this);
-            return await Task.Run(()=>Run(system,items,maxNewTokens,cancellationToken),cancellationToken).ConfigureAwait(false);
+            return await Task.Run(()=>Run(system,turns,items,maxNewTokens,cancellationToken),cancellationToken).ConfigureAwait(false);
         }
         finally{gate.Release();}
     }
-    private CosmosGeneration Run(string system,CosmosContent[] content,int maxNewTokens,CancellationToken token)
+    private CosmosGeneration Run(string system,CosmosChatTurn[] history,CosmosContent[] content,int maxNewTokens,CancellationToken token)
     {
         memory?.Check();
         // Reserve normalized patches before preparing them, plus metadata/input headroom.
@@ -87,7 +108,7 @@ internal sealed class CosmosModelRuntime : IDisposable
         memory?.Reserve(mediaReserve);
         try
         {
-        using var prompt=CosmosPrompt.Build(tokenizer,definition,system,content,options);
+        using var prompt=CosmosPrompt.Build(tokenizer,definition,system,content,options,history);
         if(prompt.Tokens.Count+maxNewTokens>options.ContextTokens)throw new ArgumentException("Prompt plus generation exceeds the context budget.");
         using var arena=new CosmosWorkspace(memory);using var state=new CosmosTextDecoder.State(definition,prompt.Tokens.Count+maxNewTokens,options.CpuThreads,token,memory);
         bool visual=prompt.Media.Count>0;

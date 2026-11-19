@@ -21,6 +21,8 @@ public sealed record CosmosExecutionOptions
     public int CpuThreads { get; init; } = 4;
     /// <summary>Enables bounded weight/KV paging and adaptive cache allocation. Null preserves the mapped path.</summary>
     public CosmosMemoryOptions? Memory { get; init; }
+    /// <summary>Pin the imported checkpoint in mapped or paged mode. Verification precedes weight access.</summary>
+    public string? ExpectedImportManifestSha256 { get; init; }
     /// <summary>Total prompt and output token admission limit.</summary>
     public int ContextTokens { get; init; } = 2048;
     /// <summary>Total unmerged visual patches per request. A 256×256 image has 256 patches.</summary>
@@ -55,7 +57,7 @@ internal static class CosmosMediaProcessor
     // Exactly the Qwen3-VL layout: time, block-row, block-column, merge-row,
     // merge-column, channel, temporal-slice, patch-row, patch-column.
     // No hidden resize or synthetic FPS. Caller can supply any multiple of 32.
-    internal static CosmosPatches Prepare(IReadOnlyList<CosmosRgbFrame> frames, bool video, CosmosExecutionOptions limits, int temporalPatch=2)
+    internal static CosmosPatches Prepare(IReadOnlyList<CosmosRgbFrame> frames, bool video, CosmosExecutionOptions limits, int temporalPatch=2, int previousPatches=0)
     {
         if(temporalPatch is not (1 or 2))throw new ArgumentOutOfRangeException(nameof(temporalPatch));
         if(frames.Count==0 || frames.Count>(video?limits.MaximumVideoFrames:1)) throw new ArgumentException("Invalid frame count.");
@@ -64,7 +66,7 @@ internal static class CosmosMediaProcessor
             throw new ArgumentException("RGB dimensions must be bounded positive multiples of 32; resize before admission.");
         int time=(frames.Count+temporalPatch-1)/temporalPatch, gh=height/16, gw=width/16;
         long patches=(long)time*gh*gw;
-        if(patches>limits.MaximumVisionPatches) throw new ArgumentException("Visual patch budget exceeded.");
+        if(patches+previousPatches>limits.MaximumVisionPatches) throw new ArgumentException("Visual patch budget exceeded.");
         for(int f=0;f<frames.Count;f++)
         {
             var frame=frames[f];

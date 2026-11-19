@@ -107,6 +107,15 @@ public sealed class CosmosInferenceTests
     {
         var arena=new CosmosWorkspace();float[] a=arena.Rent(100);Array.Fill(a,37);arena.Dispose();Assert.All(a,x=>Assert.Equal(0,x));
     }
+    [Fact]
+    public void MediaInAnEarlierTurnConsumesTheSamePatchBudget()
+    {
+        var options = new CosmosExecutionOptions { MaximumVisionPatches = 8 };
+        using var first = CosmosMediaProcessor.Prepare([Frame(0, 0)], false, options, 1);
+        using var second = CosmosMediaProcessor.Prepare([Frame(255, 0)], false, options, 1, first.Count);
+        Assert.Throws<ArgumentException>(() => CosmosMediaProcessor.Prepare([Frame(0, 0)], false, options, 1, first.Count + second.Count));
+    }
+
     private static CosmosRgbFrame Frame(byte value,double time)=>new(32,32,Enumerable.Repeat(value,32*32*3).ToArray(),time);
     private static void Save(string path,object header,byte[] data)
     {

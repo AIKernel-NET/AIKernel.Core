@@ -93,7 +93,8 @@ internal sealed class CosmosPrompt : IDisposable
         foreach(var p in Media)p.Dispose();CollectionsMarshal.AsSpan(Tokens).Clear();CollectionsMarshal.AsSpan(Positions).Clear();
         CollectionsMarshal.AsSpan(VisualIndices).Clear();Tokens.Clear();Positions.Clear();VisualIndices.Clear();
     }
-    internal static CosmosPrompt Build(CosmosTokenizer tokenizer,CosmosModelDefinition d,string system,IReadOnlyList<CosmosContent> content,CosmosExecutionOptions options)
+    internal static CosmosPrompt Build(CosmosTokenizer tokenizer,CosmosModelDefinition d,string system,IReadOnlyList<CosmosContent> content,CosmosExecutionOptions options,
+        IReadOnlyList<CosmosChatTurn>? history=null)
     {
         var p=new CosmosPrompt();int position=0,visual=0,patches=0;var pending=new StringBuilder();
         void Add(int id){p.Tokens.Add(id);p.Positions.Add((position,position,position));p.VisualIndices.Add(-1);position++;}
@@ -103,37 +104,51 @@ internal sealed class CosmosPrompt : IDisposable
         {
             // The published Edge Jinja macro leaves one leading newline.
             if(d.IsEdge)pending.Append('\n');
-            if(system.Length+(long)content.OfType<CosmosContent.Text>().Sum(x=>(long)x.Value.Length)>options.ContextTokens*64L || content.Count>256)
+            long historyLength = history?.Sum(t => t.AssistantReply.Length + t.UserContent.OfType<CosmosContent.Text>().Sum(x => (long)x.Value.Length)) ?? 0;
+            if(historyLength+system.Length+content.OfType<CosmosContent.Text>().Sum(x=>(long)x.Value.Length)>options.ContextTokens*64L || content.Count>256)
                 throw new ArgumentException("Text or content item budget exceeded.");
             if(d.IsEdge || !string.IsNullOrEmpty(system)){Control("<|im_start|>");pending.Append("system\n").Append(system);Control("<|im_end|>");pending.Append('\n');}
-            Control("<|im_start|>");pending.Append("user\n");
-            foreach(var item in content)
+            void AppendUser(IReadOnlyList<CosmosContent> userContent)
             {
-                if(item is CosmosContent.Text text){pending.Append(text.Value);continue;}
-                bool video=item is CosmosContent.Video;
-                CosmosPatches media=item switch
+                Control("<|im_start|>");pending.Append("user\n");
+                foreach(var item in userContent)
                 {
-                    CosmosContent.Image img=>CosmosMediaProcessor.Prepare([img.Frame],false,options,d.TemporalPatchSize),
-                    CosmosContent.Video clip=>CosmosMediaProcessor.Prepare(clip.Frames,true,options,d.TemporalPatchSize),
-                    _=>throw new ArgumentException("Unsupported content.")
-                };
-                p.Media.Add(media);patches=checked(patches+media.Count);
-                if(patches>options.MaximumVisionPatches)throw new ArgumentException("Total visual patch budget exceeded.");
-                // Cosmos3 Nano's pinned Qwen3-VL processor preserves the outer
-                // video wrapper; Edge's dedicated processor removes it.
-                bool wrapped=video && d.Family=="cosmos3_omni";
-                if(wrapped)Control("<|vision_start|>");
-                for(int t=0;t<media.Time;t++)
-                {
-                    if(video)pending.Append('<').Append(media.Timestamps[t].ToString("F1",CultureInfo.InvariantCulture)).Append(" seconds>");
-                    Control("<|vision_start|>");int h=media.Height/2,w=media.Width/2;
-                    for(int y=0;y<h;y++)for(int x=0;x<w;x++)
-                    {p.Tokens.Add(video?d.VideoToken:d.ImageToken);p.Positions.Add((position,position+y,position+x));p.VisualIndices.Add(visual++);}
-                    position+=Math.Max(h,w);Control("<|vision_end|>");
+                    if(item is CosmosContent.Text text){pending.Append(text.Value);continue;}
+                    bool video=item is CosmosContent.Video;
+                    CosmosPatches media=item switch
+                    {
+                        CosmosContent.Image img=>CosmosMediaProcessor.Prepare([img.Frame],false,options,d.TemporalPatchSize,patches),
+                        CosmosContent.Video clip=>CosmosMediaProcessor.Prepare(clip.Frames,true,options,d.TemporalPatchSize,patches),
+                        _=>throw new ArgumentException("Unsupported content.")
+                    };
+                    p.Media.Add(media);patches=checked(patches+media.Count);
+                    if(patches>options.MaximumVisionPatches)throw new ArgumentException("Total visual patch budget exceeded.");
+                    // Cosmos3 Nano's pinned Qwen3-VL processor preserves the outer
+                    // video wrapper; Edge's dedicated processor removes it.
+                    bool wrapped=video && d.Family=="cosmos3_omni";
+                    if(wrapped)Control("<|vision_start|>");
+                    for(int t=0;t<media.Time;t++)
+                    {
+                        if(video)pending.Append('<').Append(media.Timestamps[t].ToString("F1",CultureInfo.InvariantCulture)).Append(" seconds>");
+                        Control("<|vision_start|>");int h=media.Height/2,w=media.Width/2;
+                        for(int y=0;y<h;y++)for(int x=0;x<w;x++)
+                        {p.Tokens.Add(video?d.VideoToken:d.ImageToken);p.Positions.Add((position,position+y,position+x));p.VisualIndices.Add(visual++);}
+                        position+=Math.Max(h,w);Control("<|vision_end|>");
+                    }
+                    if(wrapped)Control("<|vision_end|>");
                 }
-                if(wrapped)Control("<|vision_end|>");
+                Control("<|im_end|>");pending.Append('\n');
             }
-            Control("<|im_end|>");pending.Append('\n');Control("<|im_start|>");pending.Append("assistant\n");Flush();
+            foreach (var turn in history ?? [])
+            {
+                AppendUser(turn.UserContent);
+                Control("<|im_start|>");pending.Append("assistant\n");
+                if (d.IsEdge) { Flush(); Add(tokenizer.Added("<think>")); Add(tokenizer.Added("</think>")); }
+                pending.Append(turn.AssistantReply);
+                Control("<|im_end|>");pending.Append('\n');
+            }
+            AppendUser(content);
+            Control("<|im_start|>");pending.Append("assistant\n");Flush();
             if(d.IsEdge)
             {
                 Add(tokenizer.Added("<think>"));

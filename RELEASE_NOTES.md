@@ -6,7 +6,8 @@
 
 - Imported Cosmos 3 Edge and Nano checkpoints generate text from text, RGB images and timestamped video frames on CPU. The runtime requires neither CUDA nor LibTorch. Multi-turn generation preserves each speaker and earlier attachments.
 - Monolith can register either local reasoner with a pinned SHA-256 import manifest. The bilingual website chat checks availability and accepts follow-up questions about the same image without a visitor API key.
-- GPT-OSS-20B ran with SSD paging under the Server's 7 GB physical-memory budget. Its generated tokens matched llama.cpp on the two validation prompts. Cosmos has separate model and input memory requirements.
+- Cosmos 3 Edge and Nano ran with four CPU workers under a 7 GB model-host limit. Replies and generated token IDs matched the reference in all six text, image and video cases. Peak host RSS was 3.564 GB with the default 128 MB KV cache. Across the six requests the host wrote 84 KiB to SSD at that setting and 18.09 GB with an 8 MiB KV cache. [Development-machine comparison and test conditions](docs/development/evidence/cosmos3-server-7gb-20261120/README.md)
+- GPT-OSS-20B ran with SSD paging under the Server's 7 GB physical-memory budget. Its generated tokens matched llama.cpp on the two validation prompts.
 - CTG evaluation with Bonsai 1.7B separates a proposal from the observations supporting it and applies the governance ROM. Its acceptance results cover the evaluated cases.
 - CPU is the standard distribution. Supported GPUs can use the optional CUDA Driver path. The legacy LibTorch add-on stays at 0.1.3.
 

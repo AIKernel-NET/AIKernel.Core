@@ -55,39 +55,160 @@ internal sealed class CosmosTextDecoder
     {
         s.Options.CancellationToken.ThrowIfCancellationRequested();
         if((uint)token>=(uint)d.Vocabulary || (uint)index>=(uint)s.Context)throw new ArgumentOutOfRangeException(nameof(token));
-        if(visual is null)embedding.Row(token,s.X);else
-        {if(visual.Length!=d.Width)throw new ArgumentException("Visual feature width mismatch.");visual.CopyTo(s.X,0);}
-        CosmosMath.TextFrequencies(d,position,s.Cos,s.Sin);int kv=d.KvHeads*d.HeadSize,hs=d.HeadSize;
-        float attentionScale=(float)Math.Pow(hs,-.5);
+        Embed(token, visual, s.X);
+        CosmosMath.TextFrequencies(d,position,s.Cos,s.Sin);
         for(int layer=0;layer<layers.Length;layer++)
+            ForwardLayer(layer,index,s,s.X,s.Cos,s.Sin,deep is not null && layer<deep.Length ? deep[layer] : null);
+        if(logits) ProjectLogits(s.X,s);
+    }
+
+    // Within each layer the tokens stay in causal order. A small weight cache can now
+    // serve a whole tile before advancing to the next layer. Decode uses the same kernel.
+    internal bool TryPrefill(CosmosPrompt prompt, List<float[]> embeddings, List<float[]>[] deep, State s)
+    {
+        int tile = Math.Min(32, prompt.Tokens.Count);
+        int kv = d.KvHeads * d.HeadSize;
+        long bytesPerToken = sizeof(float) * (5L*d.Width + 2L*kv + (d.IsEdge ? 1L : 2L)*d.Hidden + d.HeadSize);
+        // Reserve the entire tile before touching KV. Under pressure, retry with a smaller tile.
+        var budget = weights.Budget;
+        while (tile >= 2)
         {
-            var l=layers[layer];InferenceVectorMath.Norm(s.X,l.Norm,s.Norm,d.Epsilon);
-            weights.Linear(l.Q,s.Norm,s.Q,s.Options);weights.Linear(l.K,s.Norm,s.K,s.Options);weights.Linear(l.V,s.Norm,s.V,s.Options);
-            for(int h=0;h<d.Heads;h++)
-            {var v=s.Q.AsSpan(h*hs,hs);if(!d.IsEdge)InferenceVectorMath.Norm(v,l.QNorm,v,d.Epsilon);CosmosMath.Rotate(v,s.Cos,s.Sin);}
-            for(int h=0;h<d.KvHeads;h++)
-            {var v=s.K.AsSpan(h*hs,hs);if(!d.IsEdge)InferenceVectorMath.Norm(v,l.KNorm,v,d.Epsilon);CosmosMath.Rotate(v,s.Cos,s.Sin);}
-            var keys=s.Keys[s.PagedKv is null?layer:0];var values=s.Values[s.PagedKv is null?layer:0];
-            if(s.PagedKv is null){s.K.CopyTo(keys,index*kv);s.V.CopyTo(values,index*kv);}
-            else{s.PagedKv.Append(layer,index,s.K,s.V);s.PagedKv.ReadLayer(layer,keys,values);}
-            Parallel.For(0,s.Options.MaxDegreeOfParallelism,s.Options,worker=>
-            {
-                var scores=s.Scores[worker].AsSpan(0,index+1);
-                for(int h=worker;h<d.Heads;h+=s.Options.MaxDegreeOfParallelism)
-                {
-                    int kh=h/(d.Heads/d.KvHeads);var query=s.Q.AsSpan(h*hs,hs);
-                    for(int t=0;t<=index;t++)scores[t]=InferenceVectorMath.Dot(query,keys.AsSpan(t*kv+kh*hs,hs))*attentionScale;
-                    CosmosMath.Softmax(scores);var target=s.Attention.AsSpan(h*hs,hs);target.Clear();
-                    for(int t=0;t<=index;t++)for(int c=0;c<hs;c++)target[c]+=scores[t]*values[t*kv+kh*hs+c];
-                }
-            });
-            weights.Linear(l.O,s.Attention,s.Projection,s.Options);InferenceVectorMath.Add(s.X,s.Projection);
-            InferenceVectorMath.Norm(s.X,l.FfnNorm,s.Norm,d.Epsilon);weights.Linear(l.Gate,s.Norm,s.Gate,s.Options);
-            if(d.IsEdge){for(int i=0;i<s.Gate.Length;i++){float x=MathF.Max(s.Gate[i],0);s.Gate[i]=x*x;}}
-            else{weights.Linear(l.Up!,s.Norm,s.Up,s.Options);InferenceVectorMath.SwiGlu(s.Gate,s.Up);}
-            weights.Linear(l.Down,s.Gate,s.Projection,s.Options);InferenceVectorMath.Add(s.X,s.Projection);
-            if(deep is not null&&layer<deep.Length)InferenceVectorMath.Add(s.X,deep[layer]);
+            try { budget?.Reserve(tile * bytesPerToken); break; }
+            catch (OutOfMemoryException) { tile /= 2; }
         }
-        if(logits){InferenceVectorMath.Norm(s.X,finalNorm,s.Norm,d.Epsilon);weights.Linear(output,s.Norm,s.Logits,s.Options);}
+        if (tile < 2) return false;
+        try { PrefillTiles(prompt, embeddings, deep, s, tile, kv); }
+        finally { budget?.Release(tile * bytesPerToken); }
+        return true;
+    }
+
+    private void PrefillTiles(CosmosPrompt prompt, List<float[]> embeddings, List<float[]>[] deep, State s, int tile, int kv)
+    {
+        using var scratch = new CosmosWorkspace();
+        var hidden = scratch.Rows(tile, d.Width);
+        var norm = scratch.Rows(tile, d.Width);
+        var q = scratch.Rows(tile, d.Width);
+        var k = scratch.Rows(tile, kv);
+        var v = scratch.Rows(tile, kv);
+        var attention = scratch.Rows(tile, d.Width);
+        var projection = scratch.Rows(tile, d.Width);
+        var gate = scratch.Rows(tile, d.Hidden);
+        var up = d.IsEdge ? [] : scratch.Rows(tile, d.Hidden);
+        var cos = scratch.Rows(tile, d.HeadSize / 2);
+        var sin = scratch.Rows(tile, d.HeadSize / 2);
+        for (int first = 0; first < prompt.Tokens.Count; first += tile)
+        {
+            int count = Math.Min(tile, prompt.Tokens.Count - first);
+            for (int t = 0; t < count; t++)
+            {
+                s.Options.CancellationToken.ThrowIfCancellationRequested();
+                int index = first + t, image = prompt.VisualIndices[index];
+                Embed(prompt.Tokens[index], image < 0 ? null : embeddings[image], hidden[t]);
+                CosmosMath.TextFrequencies(d, prompt.Positions[index], cos[t], sin[t]);
+            }
+            for (int layer = 0; layer < layers.Length; layer++)
+            {
+                var l = layers[layer];
+                for (int t = 0; t < count; t++)
+                    InferenceVectorMath.Norm(hidden[t], l.Norm, norm[t], d.Epsilon);
+                weights.LinearBatch(l.Q, norm, q, count, s.Options);
+                weights.LinearBatch(l.K, norm, k, count, s.Options);
+                weights.LinearBatch(l.V, norm, v, count, s.Options);
+                for (int t = 0; t < count; t++)
+                    Attend(layer, first + t, s, q[t], k[t], v[t], attention[t], cos[t], sin[t], restorePrefix: t == 0);
+                weights.LinearBatch(l.O, attention, projection, count, s.Options);
+                for (int t = 0; t < count; t++)
+                {
+                    InferenceVectorMath.Add(hidden[t], projection[t]);
+                    InferenceVectorMath.Norm(hidden[t], l.FfnNorm, norm[t], d.Epsilon);
+                }
+                weights.LinearBatch(l.Gate, norm, gate, count, s.Options);
+                if (!d.IsEdge) weights.LinearBatch(l.Up!, norm, up, count, s.Options);
+                for (int t = 0; t < count; t++) Activate(gate[t], d.IsEdge ? null : up[t]);
+                weights.LinearBatch(l.Down, gate, projection, count, s.Options);
+                for (int t = 0; t < count; t++)
+                {
+                    InferenceVectorMath.Add(hidden[t], projection[t]);
+                    int image = prompt.VisualIndices[first + t];
+                    if (image >= 0 && layer < deep.Length) InferenceVectorMath.Add(hidden[t], deep[layer][image]);
+                }
+            }
+            if (first + count == prompt.Tokens.Count) ProjectLogits(hidden[count - 1], s);
+        }
+    }
+
+    private void Embed(int token, float[]? visual, float[] destination)
+    {
+        if (visual is null) embedding.Row(token, destination);
+        else
+        {
+            if (visual.Length != d.Width) throw new ArgumentException("Visual feature width mismatch.");
+            visual.CopyTo(destination, 0);
+        }
+    }
+
+    private void ProjectLogits(float[] x, State s)
+    {
+        InferenceVectorMath.Norm(x,finalNorm,s.Norm,d.Epsilon);
+        weights.Linear(output,s.Norm,s.Logits,s.Options);
+    }
+
+    private void ForwardLayer(int layer, int index, State s, float[] x, float[] cos, float[] sin, float[]? deep)
+    {
+        var l=layers[layer];InferenceVectorMath.Norm(x,l.Norm,s.Norm,d.Epsilon);
+        weights.Linear(l.Q,s.Norm,s.Q,s.Options);weights.Linear(l.K,s.Norm,s.K,s.Options);weights.Linear(l.V,s.Norm,s.V,s.Options);
+        Attend(layer,index,s,s.Q,s.K,s.V,s.Attention,cos,sin);
+        weights.Linear(l.O,s.Attention,s.Projection,s.Options);InferenceVectorMath.Add(x,s.Projection);
+        InferenceVectorMath.Norm(x,l.FfnNorm,s.Norm,d.Epsilon);weights.Linear(l.Gate,s.Norm,s.Gate,s.Options);
+        if (!d.IsEdge) weights.Linear(l.Up!,s.Norm,s.Up,s.Options);
+        Activate(s.Gate, d.IsEdge ? null : s.Up);
+        weights.Linear(l.Down,s.Gate,s.Projection,s.Options);InferenceVectorMath.Add(x,s.Projection);
+        if(deep is not null)InferenceVectorMath.Add(x,deep);
+    }
+
+    private static void Activate(float[] gate,float[]? up)
+    {
+        if (up is not null) { InferenceVectorMath.SwiGlu(gate,up); return; }
+        for (int i=0;i<gate.Length;i++) { float x=MathF.Max(gate[i],0); gate[i]=x*x; }
+    }
+
+    private void Attend(int layer, int index, State s, float[] q, float[] k, float[] v, float[] attention,
+        float[] cos, float[] sin, bool restorePrefix = true)
+    {
+        int hs = d.HeadSize, kv = d.KvHeads * hs;
+        float scale = (float)Math.Pow(hs,-.5);
+        var l = layers[layer];
+        for (int h = 0; h < d.Heads; h++)
+        {
+            var head = q.AsSpan(h * hs, hs);
+            if (!d.IsEdge) InferenceVectorMath.Norm(head,l.QNorm,head,d.Epsilon);
+            CosmosMath.Rotate(head,cos,sin);
+        }
+        for (int h = 0; h < d.KvHeads; h++)
+        {
+            var head = k.AsSpan(h * hs, hs);
+            if (!d.IsEdge) InferenceVectorMath.Norm(head,l.KNorm,head,d.Epsilon);
+            CosmosMath.Rotate(head,cos,sin);
+        }
+        var keys = s.Keys[s.PagedKv is null ? layer : 0];
+        var values = s.Values[s.PagedKv is null ? layer : 0];
+        if (s.PagedKv is not null)
+        {
+            // The layer staging arrays also hold earlier tokens from this tile.
+            if (restorePrefix && index > 0) s.PagedKv.ReadLayer(layer,keys,values);
+            s.PagedKv.Append(layer,index,k,v);
+        }
+        k.CopyTo(keys,index*kv); v.CopyTo(values,index*kv);
+        Parallel.For(0,s.Options.MaxDegreeOfParallelism,s.Options,worker =>
+        {
+            var scores=s.Scores[worker].AsSpan(0,index+1);
+            for(int h=worker;h<d.Heads;h+=s.Options.MaxDegreeOfParallelism)
+            {
+                int kh=h/(d.Heads/d.KvHeads);var query=q.AsSpan(h*hs,hs);
+                for(int t=0;t<=index;t++)scores[t]=InferenceVectorMath.Dot(query,keys.AsSpan(t*kv+kh*hs,hs))*scale;
+                CosmosMath.Softmax(scores);var target=attention.AsSpan(h*hs,hs);target.Clear();
+                for(int t=0;t<=index;t++)for(int c=0;c<hs;c++)target[c]+=scores[t]*values[t*kv+kh*hs+c];
+            }
+        });
     }
 }

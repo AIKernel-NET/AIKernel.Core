@@ -29,16 +29,40 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
         internal void CopyTo(Span<float> destination)
         {
             if(destination.Length!=Count)throw new ArgumentException("Tensor destination shape mismatch.");
-            if(Paging is not null)Paging.Read(this,0,destination);else for(int i=0;i<destination.Length;i++)destination[i]=At(i);
+            CopyRange(0,destination);
         }
         internal float[] Read()
         {
-            var result=new float[checked((int)Count)];if(Paging is not null)Paging.Read(this,0,result);else for(int i=0;i<result.Length;i++)result[i]=At(i);return result;
+            var result=new float[checked((int)Count)];CopyRange(0,result);return result;
         }
         internal void Row(int row, Span<float> result)
         {
             if(Shape.Length!=2 || row<0 || row>=Shape[0] || result.Length!=Shape[1])throw new ArgumentException("Tensor row shape mismatch.");
-            long offset=(long)row*Shape[1];if(Paging is not null)Paging.Read(this,offset,result);else for(int i=0;i<result.Length;i++)result[i]=At(offset+i);
+            CopyRange((long)row*Shape[1],result);
+        }
+        internal void CopyRange(long offset, Span<float> result)
+        {
+            if (offset < 0 || offset > Count - result.Length) throw new ArgumentOutOfRangeException(nameof(offset));
+            if (Paging is not null) { Paging.Read(this, offset, result); return; }
+            if (Type == "F32")
+            {
+                new ReadOnlySpan<float>((float*)Address + offset, result.Length).CopyTo(result);
+                return;
+            }
+            int i = 0;
+            if (Type == "BF16")
+            {
+                ushort* source = (ushort*)Address + offset;
+                if (Avx2.IsSupported)
+                {
+                    fixed (float* dest = result)
+                        for (; i <= result.Length - 8; i += 8) Avx.Store(dest + i, Bfloat(source + i));
+                }
+                for (; i < result.Length; i++)
+                    result[i] = BitConverter.Int32BitsToSingle(Unsafe.ReadUnaligned<ushort>(source + i) << 16);
+                return;
+            }
+            for (; i < result.Length; i++) result[i] = At(offset + i);
         }
         internal float Dot(long offset, ReadOnlySpan<float> input)
         {
@@ -182,6 +206,23 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
         if(options.MaxDegreeOfParallelism==1 || rows<32)Range(0,rows);
         else Parallel.For(0,Math.Min(rows,options.MaxDegreeOfParallelism),options,worker=>
         {int parts=Math.Min(rows,options.MaxDegreeOfParallelism);Range(rows*worker/parts,rows*(worker+1)/parts);});
+    }
+    internal void LinearBatch(Tensor tensor, float[][] inputs, float[][] outputs, int count, ParallelOptions options)
+    {
+        if (count < 1 || count > inputs.Length || count > outputs.Length)
+            throw new ArgumentOutOfRangeException(nameof(count));
+        int columns = inputs[0].Length, rows = outputs[0].Length;
+        if (tensor.Shape.Length != 2 || tensor.Shape[0] != rows || tensor.Shape[1] != columns)
+            throw new ArgumentException("Matrix dimensions mismatch.");
+        for (int t = 1; t < count; t++)
+            if (inputs[t].Length != columns || outputs[t].Length != rows)
+                throw new ArgumentException("All token projections must use the same matrix dimensions.");
+        if (paging is null)
+        {
+            for (int t = 0; t < count; t++) Linear(tensor, inputs[t], outputs[t], options);
+            return;
+        }
+        paging.LinearBatch(tensor, inputs, outputs, count, options);
     }
     public void Dispose(){try{paging?.Dispose();}finally{foreach(var map in maps)map.Dispose();maps.Clear();tensors.Clear();}}
 }

@@ -35,9 +35,19 @@ public sealed class CosmosPagingTests
             var a=paged.Require("w",rows,columns);var b=mapped.Require("w",rows,columns);
             float[] x=Enumerable.Range(0,columns).Select(i=>(i%13-6)*.0625f).ToArray();float[] actual=new float[rows],expected=new float[rows];
             mapped.Linear(b,x,expected,new(){MaxDegreeOfParallelism=2});paged.Linear(a,x,actual,new(){MaxDegreeOfParallelism=2});Assert.Equal(expected,actual);
+            float[][] inputs = [x, x.Select(v => -v).ToArray()];
+            float[][] outputs = [new float[rows], new float[rows]];
+            float[] negative = new float[rows];
+            mapped.Linear(b,inputs[1],negative,new(){MaxDegreeOfParallelism=2});
+            long beforeBatch=budget.Statistics.WeightBackingReads;
+            paged.LinearBatch(a,inputs,outputs,2,new(){MaxDegreeOfParallelism=2});
+            Assert.Equal(2L,budget.Statistics.WeightBackingReads-beforeBatch); // Two pages for both prompts together.
+            Assert.Equal(expected,outputs[0]);Assert.Equal(negative,outputs[1]);
             float[] row=new float[columns],reference=new float[columns];
             foreach(int index in new[]{0,rows-1,0}){a.Row(index,row);b.Row(index,reference);Assert.Equal(reference,row);Assert.Equal(b.Dot((long)index*columns,x),a.Dot((long)index*columns,x));}
-            Assert.True(budget.Statistics.WeightBackingReads>=4);Assert.Equal(CosmosPagedWeights.PageBytes,budget.Statistics.WeightResidentBytes);
+            Assert.True(budget.Statistics.WeightBackingReads>=4);
+            long encodedPageBytes=(CosmosPagedWeights.PageBytes/(columns*size))*columns*size;
+            Assert.Equal(OperatingSystem.IsWindowsVersionAtLeast(6,2) ? encodedPageBytes : CosmosPagedWeights.PageBytes,budget.Statistics.WeightResidentBytes);
             using var cancel=new CancellationTokenSource();cancel.Cancel();
             Assert.ThrowsAny<OperationCanceledException>(()=>paged.Linear(a,x,actual,new(){MaxDegreeOfParallelism=2,CancellationToken=cancel.Token}));
         }
@@ -99,7 +109,7 @@ public sealed class CosmosPagingTests
     public void WorkspacePressureShrinksAndReleasesCacheBudget()
     {
         using var folder=new Folder();using var budget=new CosmosMemoryBudget(new(){SwapDirectory=folder.Path,MaximumResidentBytes=256L<<20,RuntimeReserveBytes=64L<<20,WeightCacheBytes=128L<<20},()=>64L<<20);
-        using var space=new VirtualMemorySpace(40,4<<20,1,folder.Path);budget.RegisterWeights(space,32);
+        using var space=new BufferedCosmosWeightPages(new VirtualMemorySpace(40,4<<20,1,folder.Path));budget.RegisterWeights(space,32);
         Assert.Equal(128L<<20,budget.Statistics.WeightCacheCapacityBytes);
         budget.Reserve(80L<<20);Assert.Equal(48L<<20,budget.Statistics.WeightCacheCapacityBytes);
         budget.Release(80L<<20);budget.Check();Assert.Equal(128L<<20,budget.Statistics.WeightCacheCapacityBytes);
@@ -150,7 +160,7 @@ public sealed class CosmosPagingTests
     {
         using var folder=new Folder();using var budget=new CosmosMemoryBudget(new(){SwapDirectory=folder.Path,MaximumResidentBytes=256L<<20,
             RuntimeReserveBytes=64L<<20,ProtectedResidentBytes=32L<<20},()=>64L<<20);
-        using var space=new VirtualMemorySpace(40,4<<20,1,folder.Path);budget.RegisterWeights(space,40);
+        using var space=new BufferedCosmosWeightPages(new VirtualMemorySpace(40,4<<20,1,folder.Path));budget.RegisterWeights(space,40);
         Assert.Equal(96L<<20,budget.Statistics.WeightCacheCapacityBytes);
         Assert.Throws<OutOfMemoryException>(()=>budget.Reserve(96L<<20));
     }

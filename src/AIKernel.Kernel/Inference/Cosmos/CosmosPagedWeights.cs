@@ -8,10 +8,10 @@ internal sealed unsafe class CosmosPagedWeights : IVirtualMemorySource,IDisposab
 {
     internal const int PageBytes=4*1024*1024;
     internal sealed record Layout(SafeTensorWeights.Tensor Tensor,SafeFileHandle File,long Offset,long FirstPage,int ElementsPerPage,int Pages);
-    private readonly List<(SafeFileHandle File,long Offset,int Bytes)> pages=[];
+    private readonly List<CosmosWeightPage> pages=[];
     private readonly Dictionary<string,Layout> layouts=new(StringComparer.Ordinal);
     private readonly List<SafeFileHandle> files=[];
-    private VirtualMemorySpace? space;
+    private ICosmosWeightPages? space;
     internal CosmosMemoryBudget Budget { get; }
     internal CosmosPagedWeights(CosmosMemoryBudget budget)=>Budget=budget;
     internal void Add(string path,IEnumerable<(SafeTensorWeights.Tensor Tensor,long Offset)> tensors)
@@ -25,14 +25,16 @@ internal sealed unsafe class CosmosPagedWeights : IVirtualMemorySource,IDisposab
             int elements=checked((int)(PageBytes/(row*size)*row));int count=checked((int)((tensor.Count+elements-1)/elements));
             var layout=new Layout(tensor,file,offset,pages.Count,elements,count);layouts.Add(tensor.Name,layout);tensor.Paging=this;
             for(long first=0;first<tensor.Count;first+=elements)
-                pages.Add((file,checked(offset+first*size),checked((int)Math.Min(elements,tensor.Count-first)*size)));
+                pages.Add(new(file,checked(offset+first*size),checked((int)Math.Min(elements,tensor.Count-first)*size)));
         }
     }
     internal void Initialize()
     {
         int capacity=checked((int)Math.Min(pages.Count,Budget.Options.WeightCacheBytes/PageBytes));
         if(capacity<1)throw new InvalidDataException("Empty Cosmos weight store.");
-        space=new(pages.Count,PageBytes,1,Budget.Options.SwapDirectory,source:this);
+        space = OperatingSystem.IsWindowsVersionAtLeast(6, 2)
+            ? new WindowsCosmosWeightPages(pages)
+            : new BufferedCosmosWeightPages(new(pages.Count,PageBytes,1,Budget.Options.SwapDirectory,source:this));
         Budget.RegisterWeights(space,capacity);
     }
     public void ReadBlock(long index,Span<byte> destination)
@@ -50,12 +52,12 @@ internal sealed unsafe class CosmosPagedWeights : IVirtualMemorySource,IDisposab
             while(done<output.Length)
             {
                 long index=start+done;int offset=(int)(index%layout.ElementsPerPage),n=Math.Min(output.Length-done,layout.ElementsPerPage-offset),destination=done;
-                Budget.PageBoundary();space!.UseComputeBlock(layout.FirstPage+index/layout.ElementsPerPage,(bytes,_)=>
+                Budget.PageBoundary();space!.Visit(checked((int)(layout.FirstPage+index/layout.ElementsPerPage)),false,(bytes,_)=>
                 {
                     fixed(byte* p=bytes)
                     {
                         var view=new SafeTensorWeights.Tensor(tensor.Name,tensor.Type,[n],n,(nint)(p+offset*size));
-                        for(int i=0;i<n;i++)((float*)address)[destination+i]=view.At(i);
+                        view.CopyRange(0,new Span<float>((float*)address+destination,n));
                     }
                 });done+=n;
             }
@@ -69,28 +71,56 @@ internal sealed unsafe class CosmosPagedWeights : IVirtualMemorySource,IDisposab
         fixed(float* x=input)
         {
             nint address=(nint)x;Budget.PageBoundary();
-            space!.UseComputeBlock(layout.FirstPage+offset/layout.ElementsPerPage,(bytes,_)=>
+            space!.Visit(checked((int)(layout.FirstPage+offset/layout.ElementsPerPage)),false,(bytes,_)=>
             {fixed(byte* p=bytes)result=new SafeTensorWeights.Tensor(tensor.Name,tensor.Type,[n],n,(nint)(p+local*size)).Dot(0,new ReadOnlySpan<float>((void*)address,n));});
         }
         return result;
     }
     internal void Linear(SafeTensorWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,float[]? bias)
     {
-        var layout=layouts[tensor.Name];int size=tensor.Type=="F32"?4:2,columns=input.Length;
+        int columns = input.Length;
+        VisitMatrixRows(tensor, columns, output.Length, options, (view, first, start, end) =>
+        {
+            for (int row = start; row < end; row++)
+            {
+                options.CancellationToken.ThrowIfCancellationRequested();
+                output[first + row] = view.Dot((long)row * columns, input) + (bias?[first + row] ?? 0);
+            }
+        });
+    }
+
+    internal void LinearBatch(SafeTensorWeights.Tensor tensor,float[][] inputs,float[][] outputs,int count,ParallelOptions options)
+    {
+        int columns = inputs[0].Length;
+        VisitMatrixRows(tensor, columns, outputs[0].Length, options, (view, first, start, end) =>
+        {
+            for (int row = start; row < end; row++)
+            {
+                options.CancellationToken.ThrowIfCancellationRequested();
+                for (int t = 0; t < count; t++)
+                    // Match Linear's addition of a zero bias, including signed zero.
+                    outputs[t][first + row] = view.Dot((long)row * columns, inputs[t]) + 0f;
+            }
+        });
+    }
+
+    private void VisitMatrixRows(SafeTensorWeights.Tensor tensor, int columns, int rows, ParallelOptions options,
+        Action<SafeTensorWeights.Tensor,int,int,int> compute)
+    {
+        var layout=layouts[tensor.Name];
         if(layout.ElementsPerPage%columns!=0)throw new ArgumentException("Matrix rows must align to paging layout.");
         int rowsPerPage=layout.ElementsPerPage/columns;
         for(int page=0;page<layout.Pages;page++)
         {
-            options.CancellationToken.ThrowIfCancellationRequested();Budget.PageBoundary();int first=page*rowsPerPage,count=Math.Min(rowsPerPage,output.Length-first);
-            space!.UseComputeBlock(layout.FirstPage+page,(bytes,_)=>
+            options.CancellationToken.ThrowIfCancellationRequested();Budget.PageBoundary();int first=page*rowsPerPage,count=Math.Min(rowsPerPage,rows-first);
+            space!.Visit(checked((int)(layout.FirstPage+page)),true,(bytes,_)=>
             {
                 fixed(byte* p=bytes)
                 {
                     var view=new SafeTensorWeights.Tensor(tensor.Name,tensor.Type,[count,columns],(long)count*columns,(nint)p);
-                    void Range(int start,int end){for(int row=start;row<end;row++){options.CancellationToken.ThrowIfCancellationRequested();output[first+row]=view.Dot((long)row*columns,input)+(bias?[first+row]??0);}}
                     int parts=Math.Min(count,options.MaxDegreeOfParallelism);
-                    if(parts<=1||count<32)Range(0,count);
-                    else Parallel.For(0,parts,options,worker=>Range(count*worker/parts,count*(worker+1)/parts));
+                    if(parts<=1||count<32)compute(view,first,0,count);
+                    else Parallel.For(0,parts,options,worker=>compute(view,first,count*worker/parts,count*(worker+1)/parts));
                 }
             });
         }

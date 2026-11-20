@@ -10,6 +10,12 @@ public sealed record CosmosGeneration(string Text,ImmutableArray<int> TokenIds,i
     public CosmosMemoryPlan? MemoryPlan { get; init; }
     /// <summary>Verified checkpoint provenance when paging or an explicit manifest pin is enabled.</summary>
     public CosmosArtifactIdentity? Artifact { get; init; }
+    /// <summary>Time spent processing the text prompt, including the final prompt logits.</summary>
+    public long PrefillMilliseconds { get; init; }
+    /// <summary>Time spent selecting output tokens and running subsequent decode steps.</summary>
+    public long DecodeMilliseconds { get; init; }
+    /// <summary>Logical weight page misses during text prefill. Excludes vision encoding.</summary>
+    public long PrefillWeightPageMisses { get; init; }
 }
 
 /// <summary>Managed CPU Qwen3-VL inference for Cosmos-Reason2-2B safetensors. No Python, LibTorch or remote API is used.
@@ -31,6 +37,7 @@ internal sealed class CosmosModelRuntime : IDisposable
     private readonly SafeTensorWeights weights;
     private readonly CosmosMemoryBudget? memory;
     internal CosmosMemoryStatistics? MemoryStatistics=>memory?.Statistics;
+    internal long VerificationMilliseconds { get; }
     private readonly CosmosModelDefinition definition;
     private readonly CosmosTokenizer tokenizer;
     private Func<CosmosPatches,CosmosWorkspace,ParallelOptions,CosmosVisionEncoder.Features>? vision;
@@ -55,7 +62,11 @@ internal sealed class CosmosModelRuntime : IDisposable
             !string.Equals(pin, memoryPin, StringComparison.OrdinalIgnoreCase))
             throw new ArgumentException("The checkpoint manifest pins disagree.");
         if (options.Memory is not null || options.ExpectedImportManifestSha256 is not null)
-            identity=CosmosArtifactVerifier.Verify(modelDirectory,requiredFamily,options.ExpectedImportManifestSha256 ?? memoryPin);
+        {
+            long start = Stopwatch.GetTimestamp();
+            identity=CosmosArtifactVerifier.Verify(modelDirectory,requiredFamily,options.ExpectedImportManifestSha256 ?? memoryPin,options.CpuThreads);
+            VerificationMilliseconds = (long)Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+        }
         tokenizer=new(Path.Combine(modelDirectory,"tokenizer.json"),definition.Vocabulary);
         foreach(var (name,id) in new[]{("<|image_pad|>",definition.ImageToken),("<|video_pad|>",definition.VideoToken),
             ("<|vision_start|>",definition.VisionStart),("<|vision_end|>",definition.VisionEnd),("<|im_end|>",definition.EndToken)})
@@ -123,12 +134,22 @@ internal sealed class CosmosModelRuntime : IDisposable
             var features=vision!(media,arena,state.Options);embeddings.AddRange(features.Embeddings);
             for(int i=0;i<deep.Length;i++)deep[i].AddRange(features.DeepStack[i]);
         }
-        for(int i=0;i<prompt.Tokens.Count;i++)
+        var beforePrefill = memory?.Statistics;
+        long prefillStart = Stopwatch.GetTimestamp();
+        bool tiled = prompt.Tokens.Count > 1 && beforePrefill is not null && beforePrefill.WeightCacheCapacityBytes < weights.StoredBytes(false)
+            && decoder.TryPrefill(prompt, embeddings, deep, state);
+        if (!tiled)
         {
-            int image=prompt.VisualIndices[i];
-            decoder.Forward(prompt.Tokens[i],i,prompt.Positions[i],state,image<0?null:embeddings[image],
-                image<0?null:deep.Select(x=>x[image]).ToArray(),i==prompt.Tokens.Count-1);
+            for(int i=0;i<prompt.Tokens.Count;i++)
+            {
+                int image=prompt.VisualIndices[i];
+                decoder.Forward(prompt.Tokens[i],i,prompt.Positions[i],state,image<0?null:embeddings[image],
+                    image<0?null:deep.Select(x=>x[image]).ToArray(),i==prompt.Tokens.Count-1);
+            }
         }
+        long prefillMs = (long)Stopwatch.GetElapsedTime(prefillStart).TotalMilliseconds;
+        long misses = beforePrefill is null ? 0 : memory!.Statistics.WeightBackingReads - beforePrefill.WeightBackingReads;
+        long decodeStart = Stopwatch.GetTimestamp();
         var generated=ImmutableArray.CreateBuilder<int>();string finish="length";
         for(int n=0;n<maxNewTokens;n++)
         {
@@ -138,7 +159,11 @@ internal sealed class CosmosModelRuntime : IDisposable
             generated.Add(next);if(next==definition.EndToken){finish="stop";break;}
             if(n+1<maxNewTokens){int p=prompt.NextPosition+n;decoder.Forward(next,prompt.Tokens.Count+n,(p,p,p),state);}
         }
-        return new(tokenizer.Decode(generated),generated.ToImmutable(),prompt.Tokens.Count,finish,watch.ElapsedMilliseconds){MemoryPlan=plan,Artifact=identity};
+        long decodeMs = (long)Stopwatch.GetElapsedTime(decodeStart).TotalMilliseconds;
+        return new(tokenizer.Decode(generated),generated.ToImmutable(),prompt.Tokens.Count,finish,watch.ElapsedMilliseconds)
+        {
+            MemoryPlan=plan,Artifact=identity,PrefillMilliseconds=prefillMs,DecodeMilliseconds=decodeMs,PrefillWeightPageMisses=misses
+        };
         }
         finally{memory?.Release(mediaReserve);}
     }

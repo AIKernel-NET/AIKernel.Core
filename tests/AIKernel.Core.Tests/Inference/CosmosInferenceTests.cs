@@ -117,6 +117,79 @@ public sealed class CosmosInferenceTests
     }
 
     private static CosmosRgbFrame Frame(byte value,double time)=>new(32,32,Enumerable.Repeat(value,32*32*3).ToArray(),time);
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TiledPrefillMatchesSequentialLogitsAndKvAcrossTheTileBoundary(bool edge)
+    {
+        using var folder = new Folder();
+        const int width=16, hidden=24, kv=8, vocab=32, layers=2, length=35;
+        var d = new CosmosModelDefinition(width,hidden,layers,2,1,8,vocab,1e-6f,10000,[2,1,1],true,
+            8,16,1,1,4,16,edge ? 1 : 2,2,edge ? [] : [0,1],1,2,3,4,5,128)
+            { Family=edge ? "cosmos3_edge" : "cosmos3_omni" };
+        var header = new Dictionary<string,object>();
+        using var data = new MemoryStream();
+        var rng = new Random(602);
+        void Add(string name, params int[] shape)
+        {
+            long start=data.Length;
+            int n=shape.Aggregate(1,(a,b)=>a*b);
+            Span<byte> word=stackalloc byte[2];
+            for(int i=0;i<n;i++)
+            {
+                float value = shape.Length==1 ? 1f : (float)(rng.NextDouble()-.5)*.125f;
+                BinaryPrimitives.WriteUInt16LittleEndian(word,(ushort)(BitConverter.SingleToUInt32Bits(value)>>16));
+                data.Write(word);
+            }
+            header.Add("model.language_model."+name,new {dtype="BF16",shape,data_offsets=new[]{start,data.Length}});
+        }
+        Add("embed_tokens.weight",vocab,width); Add("norm.weight",width);
+        for(int layer=0;layer<layers;layer++)
+        {
+            string p=$"layers.{layer}.";
+            Add(p+"self_attn.q_proj.weight",width,width); Add(p+"self_attn.k_proj.weight",kv,width);
+            Add(p+"self_attn.v_proj.weight",kv,width); Add(p+"self_attn.o_proj.weight",width,width);
+            Add(p+(edge ? "mlp.fc1.weight" : "mlp.gate_proj.weight"),hidden,width);
+            Add(p+(edge ? "mlp.fc2.weight" : "mlp.down_proj.weight"),width,hidden);
+            Add(p+"input_layernorm.weight",width); Add(p+"post_attention_layernorm.weight",width);
+            if(!edge) { Add(p+"mlp.up_proj.weight",hidden,width); Add(p+"self_attn.q_norm.weight",kv); Add(p+"self_attn.k_norm.weight",kv); }
+        }
+        Save(folder.Path,header,data.ToArray());
+        using var mapped = new SafeTensorWeights(folder.Path);
+        using var budget = new CosmosMemoryBudget(new() { SwapDirectory=folder.Path,WeightCacheBytes=CosmosPagedWeights.PageBytes },()=>64L<<20);
+        using var paged = new SafeTensorWeights(folder.Path,budget);
+        var sequential = new CosmosTextDecoder(mapped,d);
+        var tiled = new CosmosTextDecoder(paged,d);
+        using var original = new CosmosTextDecoder.State(d,length+1,2,default);
+        using var actual = new CosmosTextDecoder.State(d,length+1,2,default,budget);
+        using var prompt = new CosmosPrompt();
+        List<float[]> embeddings=[Enumerable.Range(0,width).Select(i=>i*.02f).ToArray()];
+        List<float[]>[] deep=edge ? [] : [[embeddings[0]],[embeddings[0]]];
+        for(int i=0;i<length;i++)
+        {
+            int token=i%vocab, image=i is 31 or 32 ? 0 : -1;
+            prompt.Tokens.Add(token);prompt.VisualIndices.Add(image);prompt.Positions.Add((i,i/2,i/3));
+            sequential.Forward(token,i,prompt.Positions[i],original,image<0 ? null : embeddings[image],
+                image<0 ? null : deep.Select(x=>x[image]).ToArray(),i==length-1);
+        }
+        long before=budget.Statistics.WeightBackingReads;
+        Assert.True(tiled.TryPrefill(prompt,embeddings,deep,actual));
+        // Two tiles. Each projection has one page, even though the entire cache holds only one page.
+        int projections=edge ? 6 : 7;
+        Assert.InRange(budget.Statistics.WeightBackingReads-before,1,2*(layers*projections+1)+1);
+        static int[] Bits(float[] x)=>Array.ConvertAll(x,BitConverter.SingleToInt32Bits);
+        Assert.Equal(Bits(original.Logits),Bits(actual.Logits));
+        for(int layer=0;layer<layers;layer++)
+        {
+            actual.PagedKv!.ReadLayer(layer,actual.Keys[0],actual.Values[0]);
+            Assert.Equal(Bits(original.Keys[layer]),Bits(actual.Keys[0]));
+            Assert.Equal(Bits(original.Values[layer]),Bits(actual.Values[0]));
+        }
+        sequential.Forward(3,length,(length,length,length),original);
+        tiled.Forward(3,length,(length,length,length),actual);
+        Assert.Equal(Bits(original.Logits),Bits(actual.Logits));
+    }
     private static void Save(string path,object header,byte[] data)
     {
         byte[] json=JsonSerializer.SerializeToUtf8Bytes(header);using var stream=File.Create(System.IO.Path.Combine(path,"model.safetensors"));

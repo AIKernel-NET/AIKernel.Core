@@ -21,7 +21,8 @@ internal sealed class CosmosTokenizer
     internal CosmosTokenizer(string path,int vocabulary)
     {
         if(new FileInfo(path).Length>33_554_432)throw new InvalidDataException("Tokenizer metadata exceeds 32 MiB.");
-        using var document=JsonDocument.Parse(File.ReadAllText(path));var root=document.RootElement;
+        using var stream=File.OpenRead(path);
+        using var document=JsonDocument.Parse(stream);var root=document.RootElement;
         var model=root.GetProperty("model");
         normalize=root.GetProperty("normalizer").ValueKind!=JsonValueKind.Null;
         if(model.GetProperty("type").GetString()!="BPE" || (normalize && root.GetProperty("normalizer").GetProperty("type").GetString()!="NFC"))

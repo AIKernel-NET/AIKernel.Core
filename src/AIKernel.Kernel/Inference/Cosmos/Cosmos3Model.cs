@@ -50,6 +50,8 @@ public sealed class Cosmos3Model : IDisposable
     }
     /// <summary>Memory paging counters; null when paging is disabled. Read between requests.</summary>
     public CosmosMemoryStatistics? MemoryStatistics=>runtime.MemoryStatistics;
+    /// <summary>Time spent verifying the import manifest and file digests during this model's initialization.</summary>
+    public long VerificationMilliseconds => runtime.VerificationMilliseconds;
     /// <summary>Waits for active generation, then releases model mappings.</summary>
     public void Dispose()=>runtime.Dispose();
 }

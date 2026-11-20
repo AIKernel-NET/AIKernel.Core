@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections.Immutable;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -13,8 +14,8 @@ public sealed record CosmosMemoryPlan(ImmutableArray<string> Modules,int Context
 
 internal static class CosmosArtifactVerifier
 {
-    internal static CosmosArtifactIdentity Verify(string directory,string family,string? expectedDigest)
-        => Inspect(directory, family, expectedDigest, verifyContents: true);
+    internal static CosmosArtifactIdentity Verify(string directory,string family,string? expectedDigest,int workers = 1)
+        => Inspect(directory, family, expectedDigest, verifyContents: true, workers);
 
     internal static bool IsAvailable(string directory,string family,string expectedDigest)
     {
@@ -27,7 +28,7 @@ internal static class CosmosArtifactVerifier
             or JsonException or InvalidOperationException or KeyNotFoundException) { return false; }
     }
 
-    private static CosmosArtifactIdentity Inspect(string directory,string family,string? expectedDigest,bool verifyContents)
+    private static CosmosArtifactIdentity Inspect(string directory,string family,string? expectedDigest,bool verifyContents,int workers = 1)
     {
         string path=Path.Combine(directory,"import-manifest.json");
         if(!File.Exists(path)||new FileInfo(path).Length>1_048_576)throw new InvalidDataException("A bounded import manifest is required for Cosmos paging.");
@@ -59,24 +60,51 @@ internal static class CosmosArtifactVerifier
         using var index=JsonDocument.Parse(File.ReadAllText(indexPath));
         var names=index.RootElement.GetProperty("weight_map").EnumerateObject().Select(x=>x.Value.GetString()!).ToHashSet(StringComparer.Ordinal);
         var shards=root.GetProperty("shards");if(shards.GetArrayLength() is <1 or >32)throw new InvalidDataException("Invalid shard manifest.");
+        var files = new List<(string Path, string Digest)>();
         foreach(var item in shards.EnumerateArray())
         {
             string name=item.GetProperty("output").GetString()!,hash=item.GetProperty("outputSha256").GetString()!;
             if(string.IsNullOrWhiteSpace(name)||name!=Path.GetFileName(name)||name.IndexOfAny(['/', '\\', ':'])>=0||!name.EndsWith(".safetensors",StringComparison.Ordinal)||!names.Remove(name))
                 throw new InvalidDataException("Invalid or duplicate manifest shard.");
-            CheckDigest(Path.Combine(directory,name),hash,verifyContents);
+            files.Add((Path.Combine(directory,name),hash));
         }
         if(names.Count!=0)throw new InvalidDataException("Incomplete Cosmos shard manifest.");
+        void CheckFiles(int first, int stride)
+        {
+            for (int i = first; i < files.Count; i += stride)
+                CheckDigest(files[i].Path, files[i].Digest, verifyContents, large: true);
+        }
+        if (verifyContents && workers >= 2 && files.Count >= 2 && OperatingSystem.IsWindows())
+        {
+            // Hash independent shards concurrently, bounded to two sequential readers.
+            var second = Task.Run(() => CheckFiles(1, 2));
+            try { CheckFiles(0, 2); }
+            finally { second.GetAwaiter().GetResult(); }
+        }
+        else CheckFiles(0, 1);
         return new(repository,revision,digest,expectedDigest is not null);
     }
 
-    private static void CheckDigest(string path,string? expected,bool verifyContents)
+    private static void CheckDigest(string path,string? expected,bool verifyContents,bool large = false)
     {
         if (expected is not { Length:64 } || !expected.All(Uri.IsHexDigit))
             throw new InvalidDataException("Invalid digest for Cosmos file: "+Path.GetFileName(path));
-        using var file=File.OpenRead(path);
+        using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 1, FileOptions.SequentialScan);
         if (file.Length==0 || (verifyContents &&
-            !string.Equals(Convert.ToHexStringLower(SHA256.HashData(file)),expected,StringComparison.OrdinalIgnoreCase)))
+            !string.Equals(Convert.ToHexStringLower(large ? HashShard(file) : SHA256.HashData(file)),expected,StringComparison.OrdinalIgnoreCase)))
             throw new InvalidDataException("Empty Cosmos file or digest mismatch: "+Path.GetFileName(path));
+    }
+
+    private static byte[] HashShard(Stream file)
+    {
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(1024 * 1024);
+        try
+        {
+            using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            int read;
+            while ((read = file.Read(buffer)) != 0) hash.AppendData(buffer, 0, read);
+            return hash.GetHashAndReset();
+        }
+        finally { ArrayPool<byte>.Shared.Return(buffer, clearArray: true); }
     }
 }

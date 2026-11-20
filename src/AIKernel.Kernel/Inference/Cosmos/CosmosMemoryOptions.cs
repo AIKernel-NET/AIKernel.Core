@@ -19,7 +19,8 @@ public sealed record CosmosMemoryOptions
     public long ProtectedResidentBytes { get; init; }
     /// <summary>Optional trusted manifest digest. Without it, shard hashes establish consistency, not publisher authenticity.</summary>
     public string? ExpectedImportManifestSha256 { get; init; }
-    internal void Validate()
+    /// <summary>Checks the paging budgets and path without allocating memory or creating the swap directory.</summary>
+    public void Validate()
     {
         if(MaximumResidentBytes<256L<<20 || RuntimeReserveBytes<64L<<20 ||
             WeightCacheBytes<CosmosPagedWeights.PageBytes || KvCacheBytes<1L<<20 ||
@@ -27,7 +28,6 @@ public sealed record CosmosMemoryOptions
             RuntimeReserveBytes>MaximumResidentBytes-ProtectedResidentBytes-32L*1024*1024)
             throw new ArgumentOutOfRangeException(nameof(CosmosMemoryOptions));
         ArgumentException.ThrowIfNullOrWhiteSpace(SwapDirectory);
-        Directory.CreateDirectory(SwapDirectory);
     }
 }
 

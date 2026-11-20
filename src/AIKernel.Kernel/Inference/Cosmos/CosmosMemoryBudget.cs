@@ -16,7 +16,9 @@ internal sealed class CosmosMemoryBudget : IDisposable
     private int checks;
     internal CosmosMemoryBudget(CosmosMemoryOptions options,Func<long>? resident=null)
     {
-        options.Validate();Options=options;
+        options.Validate();
+        Directory.CreateDirectory(options.SwapDirectory);
+        Options=options;
         this.resident=resident??(()=>{process.Refresh();return process.WorkingSet64;});
         try{baseline=this.resident();Check();}catch{process.Dispose();throw;}
     }

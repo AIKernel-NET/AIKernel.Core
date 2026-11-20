@@ -14,6 +14,20 @@ public sealed record CosmosMemoryPlan(ImmutableArray<string> Modules,int Context
 internal static class CosmosArtifactVerifier
 {
     internal static CosmosArtifactIdentity Verify(string directory,string family,string? expectedDigest)
+        => Inspect(directory, family, expectedDigest, verifyContents: true);
+
+    internal static bool IsAvailable(string directory,string family,string expectedDigest)
+    {
+        try
+        {
+            Inspect(directory, family, expectedDigest, verifyContents: false);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException
+            or JsonException or InvalidOperationException or KeyNotFoundException) { return false; }
+    }
+
+    private static CosmosArtifactIdentity Inspect(string directory,string family,string? expectedDigest,bool verifyContents)
     {
         string path=Path.Combine(directory,"import-manifest.json");
         if(!File.Exists(path)||new FileInfo(path).Length>1_048_576)throw new InvalidDataException("A bounded import manifest is required for Cosmos paging.");
@@ -23,7 +37,7 @@ internal static class CosmosArtifactVerifier
         using var doc=JsonDocument.Parse(bytes);var root=doc.RootElement;
         string repository=root.GetProperty("repository").GetString()!,revision=root.GetProperty("revision").GetString()!;
         string required=family switch{"cosmos3_edge"=>"nvidia/Cosmos3-Edge","cosmos3_omni"=>"nvidia/Cosmos3-Nano",_=>"nvidia/Cosmos-Reason2-2B"};
-        if(repository!=required||revision.Length!=40||revision.Any(c=>!Uri.IsHexDigit(c)))throw new InvalidDataException("Unexpected Cosmos import lineage.");
+        if(repository!=required||revision is not { Length:40 }||revision.Any(c=>!Uri.IsHexDigit(c)))throw new InvalidDataException("Unexpected Cosmos import lineage.");
         if(!root.TryGetProperty("metadataSha256",out var metadata)||metadata.ValueKind!=JsonValueKind.Object)
             throw new InvalidDataException("Cosmos metadata digests are required.");
         var requiredMetadata=new HashSet<string>(["config.json","tokenizer.json","preprocessor_config.json","video_preprocessor_config.json",
@@ -36,9 +50,7 @@ internal static class CosmosArtifactVerifier
                 throw new InvalidDataException("Invalid or duplicate Cosmos metadata entry.");
             string metadataPath=Path.Combine(directory,entry.Name);
             if(new FileInfo(metadataPath).Length>128L*1024*1024)throw new InvalidDataException("Cosmos metadata exceeds the file budget.");
-            using var metadataFile=File.OpenRead(metadataPath);
-            if(!string.Equals(Convert.ToHexStringLower(SHA256.HashData(metadataFile)),entry.Value.GetString(),StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Cosmos metadata hash mismatch: "+entry.Name);
+            CheckDigest(metadataPath,entry.Value.GetString(),verifyContents);
             requiredMetadata.Remove(entry.Name);
         }
         if(requiredMetadata.Count!=0)throw new InvalidDataException("Incomplete Cosmos metadata manifest.");
@@ -52,10 +64,19 @@ internal static class CosmosArtifactVerifier
             string name=item.GetProperty("output").GetString()!,hash=item.GetProperty("outputSha256").GetString()!;
             if(string.IsNullOrWhiteSpace(name)||name!=Path.GetFileName(name)||name.IndexOfAny(['/', '\\', ':'])>=0||!name.EndsWith(".safetensors",StringComparison.Ordinal)||!names.Remove(name))
                 throw new InvalidDataException("Invalid or duplicate manifest shard.");
-            using var file=File.OpenRead(Path.Combine(directory,name));
-            if(!string.Equals(Convert.ToHexStringLower(SHA256.HashData(file)),hash,StringComparison.OrdinalIgnoreCase))throw new InvalidDataException("Cosmos shard hash mismatch: "+name);
+            CheckDigest(Path.Combine(directory,name),hash,verifyContents);
         }
         if(names.Count!=0)throw new InvalidDataException("Incomplete Cosmos shard manifest.");
         return new(repository,revision,digest,expectedDigest is not null);
+    }
+
+    private static void CheckDigest(string path,string? expected,bool verifyContents)
+    {
+        if (expected is not { Length:64 } || !expected.All(Uri.IsHexDigit))
+            throw new InvalidDataException("Invalid digest for Cosmos file: "+Path.GetFileName(path));
+        using var file=File.OpenRead(path);
+        if (file.Length==0 || (verifyContents &&
+            !string.Equals(Convert.ToHexStringLower(SHA256.HashData(file)),expected,StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidDataException("Empty Cosmos file or digest mismatch: "+Path.GetFileName(path));
     }
 }

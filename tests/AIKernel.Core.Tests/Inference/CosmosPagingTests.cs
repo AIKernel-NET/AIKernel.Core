@@ -122,6 +122,18 @@ public sealed class CosmosPagingTests
         }
         File.WriteAllText(manifest,JsonSerializer.Serialize(new{repository="nvidia/Cosmos3-Edge",revision=new string('a',40),metadataSha256=metadata,shards=new[]{new{output="reasoner.safetensors",outputSha256=hash}}}));
         string pin=Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(manifest)));
+        Assert.True(Cosmos3Model.IsCheckpointAvailable(folder.Path,Cosmos3Variant.Edge,pin));
+        Assert.False(Cosmos3Model.IsCheckpointAvailable(folder.Path,Cosmos3Variant.Nano,pin));
+        Assert.False(Cosmos3Model.IsCheckpointAvailable(folder.Path,Cosmos3Variant.Edge,new string('0',64)));
+        string tokenizer=System.IO.Path.Combine(folder.Path,"tokenizer.json");
+        File.Delete(tokenizer);
+        Assert.False(Cosmos3Model.IsCheckpointAvailable(folder.Path,Cosmos3Variant.Edge,pin));
+        File.WriteAllText(tokenizer,"{}");
+        string index=System.IO.Path.Combine(folder.Path,"model.safetensors.index.json");
+        string originalIndex=File.ReadAllText(index);
+        File.WriteAllText(index,"{}");
+        Assert.False(Cosmos3Model.IsCheckpointAvailable(folder.Path,Cosmos3Variant.Edge,pin));
+        File.WriteAllText(index,originalIndex);
         Assert.True(CosmosArtifactVerifier.Verify(folder.Path,"cosmos3_edge",pin).TrustedManifestPinned);
         Assert.Throws<InvalidDataException>(()=>CosmosArtifactVerifier.Verify(folder.Path,"cosmos3_omni",pin));
         Assert.Throws<InvalidDataException>(()=>CosmosArtifactVerifier.Verify(folder.Path,"cosmos3_edge",new string('0',64)));
@@ -129,6 +141,9 @@ public sealed class CosmosPagingTests
         Assert.Throws<InvalidDataException>(()=>CosmosArtifactVerifier.Verify(folder.Path,"cosmos3_edge",pin));
         File.WriteAllText(System.IO.Path.Combine(folder.Path,"tokenizer.json"),"{}");
         File.WriteAllBytes(shard,[4,3,2,1]);Assert.Throws<InvalidDataException>(()=>CosmosArtifactVerifier.Verify(folder.Path,"cosmos3_edge",pin));
+        Assert.True(Cosmos3Model.IsCheckpointAvailable(folder.Path,Cosmos3Variant.Edge,pin)); // A probe does not reread model weights.
+        File.Delete(shard);
+        Assert.False(Cosmos3Model.IsCheckpointAvailable(folder.Path,Cosmos3Variant.Edge,pin));
     }
     [Fact]
     public void ProtectedResidentCapacityCannotBeReclaimed()

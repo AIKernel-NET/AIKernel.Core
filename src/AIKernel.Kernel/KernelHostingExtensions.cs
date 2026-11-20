@@ -27,6 +27,7 @@ public static class KernelHostingExtensions
             _ => OperatingSystem.IsWindows()
                 ? new Win32MemoryMapper()
                 : new PosixMemoryMapper());
+        services.TryAddSingleton<AIKernel.Abstractions.Memory.IMemoryMapper>(sp => sp.GetRequiredService<IMemoryMapper>());
         services.TryAddSingleton<IKernel, Kernel>();
         services.TryAddSingleton<IKernelVersionProvider>(
             serviceProvider => serviceProvider.GetRequiredService<IKernel>());

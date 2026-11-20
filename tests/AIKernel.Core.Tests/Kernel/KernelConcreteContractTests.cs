@@ -1,6 +1,7 @@
 namespace AIKernel.Core.Tests.Kernel;
 
 using System.Collections.Immutable;
+using Microsoft.Extensions.DependencyInjection;
 using AIKernel.Abstractions.Context;
 using AIKernel.Abstractions.Execution;
 using AIKernel.Abstractions.Kernel;
@@ -23,6 +24,14 @@ using AIKernel.Vfs;
 
 public sealed class KernelConcreteContractTests : KernelContractTests
 {
+    [Fact]
+    public void HostResolvesTheSameMemoryMapperThroughBothContracts()
+    {
+        using var host = new ServiceCollection().AddAIKernelKernel().BuildServiceProvider();
+        var core = host.GetRequiredService<AIKernel.Core.Memory.IMemoryMapper>();
+        Assert.Same(core, host.GetRequiredService<AIKernel.Abstractions.Memory.IMemoryMapper>());
+    }
+
     protected override AIKernel.Kernel.Kernel CreateKernel()
     {
         var requestHasher = new AIKernel.Kernel.KernelRequestHasher();

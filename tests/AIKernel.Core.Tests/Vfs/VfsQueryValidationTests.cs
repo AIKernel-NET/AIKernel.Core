@@ -2,6 +2,7 @@ namespace AIKernel.Core.Tests.Vfs;
 
 using AIKernel.Core.Time;
 using AIKernel.Core.Vfs.Memory;
+using AIKernel.Core.Vfs.Local;
 using AIKernel.Dtos.Vfs;
 using AIKernel.Vfs;
 using Xunit;
@@ -62,11 +63,36 @@ public sealed class VfsQueryValidationTests
         Assert.Contains("Path traversal", result.ErrorMessage, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Theory]
+    [InlineData("/")]
+    [InlineData(".")]
+    public async Task WritableSessionProtectsItsOwnRoot(string rootAlias)
+    {
+        var root = Directory.CreateTempSubdirectory();
+        try
+        {
+            var provider = new LocalFileProvider(new LocalFileProviderOptions
+            {
+                RootPath = root.FullName,
+                AllowWrite = true,
+                CredentialValidator = _ => true
+            });
+            await using var session = await provider.OpenSessionAsync(new TestVfsCredentials());
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => session.DeleteAsync(rootAlias));
+            Assert.True(Directory.Exists(root.FullName));
+        }
+        finally
+        {
+            if (Directory.Exists(root.FullName)) root.Delete();
+        }
+    }
+
     private static async Task<IVfsSession> OpenSessionAsync()
     {
         var provider = new MemoryFileProvider(
             new MemoryFileProviderOptions
             {
+                CredentialValidator = _ => true,
                 Clock = KernelClock.Replay(DateTimeOffset.UnixEpoch)
             });
         var session = await provider.OpenSessionAsync(new TestVfsCredentials());

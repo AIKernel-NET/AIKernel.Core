@@ -19,7 +19,7 @@ internal sealed partial class CompiledDslPipeline
         var initial = ValidatePipelineValue(context.Input, OriginStep.KernelFacade, capabilityName: null)
             .Match(InvalidExecutionContext, _ => ResultStep<DslPipelineState, DslPipelineValue>.Success(
                 DslPipelineState.Initial("dsl.pipeline"), context.Input));
-        var result = await ExecuteNodeAsync(_root, initial, context, cancellationToken).ConfigureAwait(false);
+        var result = await ExecuteNodeAsync(_root, initial, context with { RemainingSteps = DslPipelineExecutionContext.MaximumSteps }, cancellationToken).ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
         return result;
     }
@@ -32,13 +32,14 @@ internal sealed partial class CompiledDslPipeline
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (current.IsFailure) return current;
+        if (!context.SpendStep()) return InvalidExecutionContext("Pipeline execution budget exhausted.");
         return node switch
         {
             PipelineRootNode pipeline => await ExecuteNodesAsync(pipeline.Steps, current, context, cancellationToken).ConfigureAwait(false),
             CallCapabilityNode call => await ExecuteCapabilityAsync(call, current, cancellationToken).ConfigureAwait(false),
             LoopNode loop => await ExecuteLoopAsync(loop, current, context, cancellationToken).ConfigureAwait(false),
             LoopUntilNode loop => await ExecuteLoopUntilAsync(loop, current, context, cancellationToken).ConfigureAwait(false),
-            _ => ExecuteNode(node, current, context)
+            _ => ExecuteNode(node, current, context, countStep: false)
         };
     }
 
@@ -100,6 +101,7 @@ internal sealed partial class CompiledDslPipeline
         var result = current;
         for (var iteration = 0; iteration < node.MaxIterations; iteration++)
         {
+            if (!context.SpendStep()) return InvalidExecutionContext("Pipeline execution budget exhausted.");
             await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
             cancellationToken.ThrowIfCancellationRequested();
             result = await ExecuteNodesAsync(node.BodyNodes, result, context, cancellationToken).ConfigureAwait(false);
@@ -126,6 +128,7 @@ internal sealed partial class CompiledDslPipeline
         var result = current;
         for (var iteration = 0; iteration < node.MaxIterations; iteration++)
         {
+            if (!context.SpendStep()) return InvalidExecutionContext("Pipeline execution budget exhausted.");
             await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
             cancellationToken.ThrowIfCancellationRequested();
             DateTimeOffset now;

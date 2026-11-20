@@ -33,7 +33,7 @@ public sealed class KernelConcreteContractTests : KernelContractTests
             new FakeModelProviderSelector(),
             new FakeKernelExecutor(),
             requestHasher,
-            new AIKernel.Kernel.KernelTransactionIdFactory(requestHasher));
+            new AIKernel.Kernel.KernelTransactionIdFactory(requestHasher), guard: new TestPolicy(), pdp: new TestPolicy());
     }
 
     protected override KernelRequest CreateValidRequest()
@@ -320,7 +320,7 @@ public sealed class KernelConcreteContractTests : KernelContractTests
     }
 
     private static AIKernel.Kernel.Kernel CreateKernel(
-        AIKernel.Abstractions.Execution.IKernelExecutor kernelExecutor)
+        AIKernel.Abstractions.Execution.IKernelExecutor kernelExecutor, TestPolicy? policy = null)
     {
         var requestHasher = new AIKernel.Kernel.KernelRequestHasher();
 
@@ -330,7 +330,44 @@ public sealed class KernelConcreteContractTests : KernelContractTests
             new FakeModelProviderSelector(),
             kernelExecutor,
             requestHasher,
-            new AIKernel.Kernel.KernelTransactionIdFactory(requestHasher));
+            new AIKernel.Kernel.KernelTransactionIdFactory(requestHasher), guard: policy ?? new TestPolicy(), pdp: policy ?? new TestPolicy());
+    }
+
+    [Theory]
+    [InlineData("vfs.open", false, false, ExecutionStatus.Rejected)]
+    [InlineData("model.execute", false, false, ExecutionStatus.Rejected)]
+    [InlineData("model.execute", true, false, ExecutionStatus.Rejected)]
+    [InlineData("vfs.open", false, true, ExecutionStatus.Failed)]
+    public async Task AuthorizationStopsBeforeSideEffects(string boundary, bool guardDenies, bool policyFails, ExecutionStatus expected)
+    {
+        var policy = new TestPolicy(boundary, guardDenies, policyFails);
+        var result = await CreateKernel(new FakeKernelExecutor(), policy).ExecuteAsync(CreateValidRequest(), TestContext.Current.CancellationToken);
+        Assert.Equal(expected, result.Status);
+        Assert.Equal(boundary, policy.Actions.Last());
+        Assert.Null(result.OutputText);
+        if (boundary == "vfs.open") Assert.Empty(result.ContextSnapshotId);
+    }
+
+    private sealed class TestPolicy(string? boundary = null, bool guardDenies = false, bool policyFails = false) : AIKernel.Abstractions.Security.IPdp, AIKernel.Abstractions.Security.IGuard
+    {
+        public List<string> Actions { get; } = [];
+        public Task<AIKernel.Dtos.Security.AccessDecision> EvaluateAsync(AIKernel.Dtos.Security.AccessRequest request)
+            {
+            Actions.Add(request.Action);
+            if (request.Action == boundary && policyFails) throw new InvalidOperationException("Policy unavailable");
+            return Task.FromResult(new AIKernel.Dtos.Security.AccessDecision { Allowed = request.Action != boundary || guardDenies, Reason = "Test fixture" });
+        }
+        public Task<GuardAction> EnforceAsync(AIKernel.Abstractions.Security.IPrincipal principal, string action, string resource)
+            => Task.FromResult(action == boundary && guardDenies ? GuardAction.Block : GuardAction.Continue);
+        public Task<bool> CanExecuteAsync(AIKernel.Abstractions.Security.IPrincipal principal, string action, string resource) => throw new NotSupportedException();
+        public Task<bool> CanAccessContextAsync(AIKernel.Abstractions.Security.IPrincipal principal, UnifiedContextDto contract) => throw new NotSupportedException();
+        public Task<bool> CanReadAsync(AIKernel.Abstractions.Security.IPrincipal principal, string resource) => throw new NotSupportedException();
+        public Task<bool> CanWriteAsync(AIKernel.Abstractions.Security.IPrincipal principal, string resource) => throw new NotSupportedException();
+        public Task<GuardAction> OnFailureModeDetectedAsync(FailureMode mode, string context) => throw new NotSupportedException();
+        public void AddPolicy(AIKernel.Abstractions.Security.IPolicy policy) => throw new NotSupportedException();
+        public bool RemovePolicy(string policyId) => throw new NotSupportedException();
+        public IReadOnlyList<AIKernel.Abstractions.Security.IPolicy> GetPolicies() => [];
+        public Task<AIKernel.Dtos.Security.PolicyEvaluationResult> EvaluatePoliciesAsync(UnifiedContextDto contract) => throw new NotSupportedException();
     }
 
     private sealed class FakeVfsSessionFactory : IKernelVfsSessionFactory

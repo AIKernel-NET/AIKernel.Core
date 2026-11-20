@@ -24,6 +24,9 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
         new(JsonSerializerDefaults.Web);
     private readonly ICapabilityModuleRegistry? _capabilityModuleRegistry;
 
+    /// <summary>Host-provisioned SHA-256 digests for executable provider assemblies.</summary>
+    public IReadOnlySet<string> TrustedAssemblyDigests { get; init; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
     /// <summary>[EN] Documents this public package API member. [JA] InMemoryProviderRegistry を実行します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Providers.InMemoryProviderRegistry.#ctor']/summary" />
@@ -141,20 +144,26 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
         var assemblyPath = Path.GetFullPath(path);
-        var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+        using var source = File.OpenRead(assemblyPath);
+        var digest = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(source));
+        if (!TrustedAssemblyDigests.Contains(digest))
+            throw new UnauthorizedAccessException("Provider assembly digest is not trusted.");
+        source.Position = 0;
+        var assembly = AssemblyLoadContext.Default.LoadFromStream(source);
         var providers = new List<IProvider>();
 
-        foreach (var type in assembly.GetTypes().Where(IsConcrete))
+        var instances = assembly.GetTypes().Where(IsConcrete)
+            .Where(t => typeof(IProvider).IsAssignableFrom(t) || typeof(ICapabilityModuleInvoker).IsAssignableFrom(t))
+            .Select(t => Activator.CreateInstance(t)).ToArray();
+        foreach (var instance in instances)
         {
-            if (typeof(IProvider).IsAssignableFrom(type) &&
-                Activator.CreateInstance(type) is IProvider provider)
+            if (instance is IProvider provider)
             {
                 RegisterProvider(provider);
                 providers.Add(provider);
             }
 
-            if (typeof(ICapabilityModuleInvoker).IsAssignableFrom(type) &&
-                Activator.CreateInstance(type) is ICapabilityModuleInvoker invoker)
+            if (instance is ICapabilityModuleInvoker invoker)
             {
                 RegisterInvoker(invoker);
             }
@@ -185,6 +194,16 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
             ?? throw new InvalidOperationException("Provider manifest could not be parsed.");
 
         manifest.Validate();
+        IReadOnlyList<IProvider> providers = [];
+        if (!string.IsNullOrWhiteSpace(manifest.Assembly))
+        {
+            if (!string.Equals(Path.GetFileName(manifest.Assembly), manifest.Assembly, StringComparison.Ordinal)
+                || manifest.Assembly.Contains('\\') || manifest.Assembly.Contains(':'))
+                throw new InvalidDataException("The provider assembly must be a file in the manifest directory.");
+            var file = Path.Combine(Path.GetDirectoryName(manifestPath)!, manifest.Assembly);
+            if (new FileInfo(file).LinkTarget is not null) throw new InvalidDataException("Linked provider assemblies are not permitted.");
+            providers = LoadProviderFromAssembly(file);
+        }
 
         if (_capabilityModuleRegistry is not null)
         {
@@ -193,15 +212,7 @@ public sealed class InMemoryProviderRegistry : IDynamicProviderRegistry
                 cancellationToken).ConfigureAwait(false);
         }
 
-        if (string.IsNullOrWhiteSpace(manifest.Assembly))
-        {
-            return [];
-        }
-
-        var assemblyPath = Path.Combine(
-            Path.GetDirectoryName(manifestPath) ?? "",
-            manifest.Assembly);
-        return LoadProviderFromAssembly(assemblyPath);
+        return providers;
     }
 
     /// <summary>[EN] Documents this public package API member. [JA] UnregisterProvider を実行します。</summary>

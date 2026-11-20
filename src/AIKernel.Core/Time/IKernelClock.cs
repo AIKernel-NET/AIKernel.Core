@@ -30,8 +30,9 @@ namespace AIKernel.Core.Time;
 /// </summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.IKernelClock']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Time.IKernelClock']/summary" />
-public interface IKernelClock
+public interface IKernelClock : AIKernel.Abstractions.Time.IKernelClock
 {
+    KernelTimestamp AIKernel.Abstractions.Time.IKernelClock.GetCurrentTimestamp() => GetLogicalTimestamp();
     /// <summary>EN: Gets the Physical value exposed by the AIKernel public contract surface. JA: AIKernel の公開契約サーフェスで公開される Physical 値を取得します。</summary>
     TimeProvider Physical { get; }
 

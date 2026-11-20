@@ -34,6 +34,9 @@ public sealed class Kernel : IKernel
     private readonly IKernelClock _clock;
     private readonly KernelFailureResultFactory _failureResultFactory;
 
+    /// <summary>Supplies the authenticated host principal for a request. A missing identity is evaluated as anonymous.</summary>
+    public Func<System.Security.Principal.IPrincipal?> GetCurrentPrincipal { get; init; } = () => Thread.CurrentPrincipal;
+
     /// <summary>[EN] Documents this public package API member. [JA] Kernel を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.#ctor']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Kernel.Kernel.#ctor']/summary" />
@@ -104,6 +107,9 @@ public sealed class Kernel : IKernel
 
             cancellationToken.ThrowIfCancellationRequested();
 
+            var principal = GetCurrentPrincipal() ?? new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity());
+            await AuthorizeAsync(principal, "vfs.open", request.VfsProviderId, request, cancellationToken).ConfigureAwait(false);
+
             // Side effect boundary:
             // Opens the selected VFS session. Provider-specific I/O starts beyond this boundary.
             await using var session = await _vfsSessionFactory
@@ -141,6 +147,7 @@ public sealed class Kernel : IKernel
                 RequestedModelId = request.RequestedModelId
             };
 
+            await AuthorizeAsync(principal, "model.execute", provider.ProviderId, request, cancellationToken).ConfigureAwait(false);
             // Execution boundary:
             // IKernelExecutor generates prompt and calls IModelProvider.
             var result = await _kernelExecutor
@@ -225,7 +232,7 @@ public sealed class Kernel : IKernel
             .GetName()
             .Version?
             .ToString()
-            ?? "0.1.3";
+            ?? "unknown";
     }
 
     /// <summary>[EN] Documents this public package API member. [JA] ExecuteAsync を実行します。</summary>
@@ -312,6 +319,42 @@ public sealed class Kernel : IKernel
         return _pdp;
     }
 
+    private async Task AuthorizeAsync(System.Security.Principal.IPrincipal principal, string action, string resource, KernelRequest request, CancellationToken token)
+    {
+        token.ThrowIfCancellationRequested();
+        var decision = await _pdp.EvaluateAsync(new AccessRequest
+        {
+            Principal = principal, Action = action, Resource = resource,
+            Environment = new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["rootRomId"] = request.RootRomId.Value,
+                ["requestedModelId"] = request.RequestedModelId ?? string.Empty
+            }
+        }).WaitAsync(token).ConfigureAwait(false);
+        if (decision?.Allowed != true)
+            throw new KernelAccessDeniedException(action);
+
+        var enforcement = await _guard.EnforceAsync(new HostPrincipal(principal), action, resource)
+            .WaitAsync(token).ConfigureAwait(false);
+        if (enforcement != GuardAction.Continue)
+            throw new KernelAccessDeniedException(action);
+        token.ThrowIfCancellationRequested();
+    }
+
+    private sealed class KernelAccessDeniedException(string action)
+        : UnauthorizedAccessException($"Authorization denied for {action}.");
+
+    private sealed class HostPrincipal(System.Security.Principal.IPrincipal principal) : IPrincipal
+    {
+        public string GetId() => (principal as System.Security.Claims.ClaimsPrincipal)?
+            .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? GetName();
+        public string GetName() => principal.Identity?.Name ?? string.Empty;
+        public bool HasRole(string role) => principal.IsInRole(role);
+        public IReadOnlyList<string> GetRoles() => principal is System.Security.Claims.ClaimsPrincipal claims
+            ? claims.Identities.SelectMany(id => id.FindAll(id.RoleClaimType)).Select(role => role.Value).Distinct().ToArray()
+            : [];
+    }
+
     private static void ValidateRequest(KernelRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -364,7 +407,7 @@ public sealed class Kernel : IKernel
 
     private static bool IsRejectedException(Exception ex)
     {
-        return ex is KernelRequestValidationException
+        return ex is KernelAccessDeniedException or KernelRequestValidationException
             or ContextAssemblyGovernanceException
             or RomSignatureVerificationException
             or RomRequiredMetadataMissingException

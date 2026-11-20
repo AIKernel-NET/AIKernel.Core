@@ -29,7 +29,16 @@ public sealed class ChatHistoryRomExporterTests
             "rom/chat-history/demo.md",
             System.Text.Encoding.UTF8.GetBytes(generated.Value!));
 
-        var loader = new RomLoader(
+        var parser = new MarkdownFrontMatterParser();
+        var verifier = new RomSignatureVerifier(new DefaultRomCanonicalizer(), new Sha256SemanticHasher());
+        var path = "rom/chat-history/demo.md";
+        await Assert.ThrowsAsync<RomSignatureVerificationException>(() =>
+            new RomLoader(parser, verifier).LoadAsync(session, path, TestContext.Current.CancellationToken));
+        var pins = new Dictionary<string, string> { [path] = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(generated.Value!))) };
+        var pinned = new RomLoader(parser, verifier, pins, KernelClock.Replay(DateTimeOffset.UnixEpoch));
+        Assert.Equal("chat://share/demo", (await pinned.LoadAsync(session, path, TestContext.Current.CancellationToken)).RomId.Value);
+
+        var loader = RomLoader.ForIntegrityCheck(
             new MarkdownFrontMatterParser(),
             new RomSignatureVerifier(
                 new DefaultRomCanonicalizer(),
@@ -99,6 +108,7 @@ public sealed class ChatHistoryRomExporterTests
         var provider = new MemoryFileProvider(
             new MemoryFileProviderOptions
             {
+                CredentialValidator = _ => true,
                 Clock = KernelClock.Replay(DateTimeOffset.UnixEpoch)
             });
 

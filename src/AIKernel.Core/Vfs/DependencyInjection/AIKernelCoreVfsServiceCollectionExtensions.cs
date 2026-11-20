@@ -282,7 +282,7 @@ public static class AIKernelCoreVfsServiceCollectionExtensions
                 }
 
                 httpClient.Timeout = options.Timeout;
-            });
+            }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
 
         return services;
     }

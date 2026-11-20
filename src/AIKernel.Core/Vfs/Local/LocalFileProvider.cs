@@ -113,7 +113,8 @@ public sealed class LocalFileProvider : FileProviderBase
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.ReadFileAsync']/summary" />
         public async Task<IVfsFile> ReadFileAsync(string path)
         {
-            var normalized = VfsPathRules.Normalize(path);
+            var normalized = path == "" ? "" : VfsPathRules.Normalize(path);
+            if (normalized.Length == 0) throw new UnauthorizedAccessException("A VFS file path is required.");
             var fullPath = ResolveFilePath(normalized);
 
             if (!File.Exists(fullPath))
@@ -127,8 +128,7 @@ public sealed class LocalFileProvider : FileProviderBase
 
             var info = new FileInfo(fullPath);
 
-            var content = await File.ReadAllBytesAsync(fullPath)
-                .ConfigureAwait(false);
+            var content = await ReadBoundedAsync(fullPath).ConfigureAwait(false);
 
             // 読み取り時は物理ファイルが持つ timestamp を使用する。
             // これは OS から現在時刻を読むのではなく、対象リソースに記録された観測事実を読む行為である。
@@ -140,7 +140,7 @@ public sealed class LocalFileProvider : FileProviderBase
                 modifiedAt: info.LastWriteTimeUtc,
                 metadata: new Dictionary<string, string>(StringComparer.Ordinal)
                 {
-                    ["PhysicalPath"] = fullPath
+                    ["ProviderPath"] = ToVirtualPath(fullPath)
                 });
         }
 
@@ -156,7 +156,8 @@ public sealed class LocalFileProvider : FileProviderBase
 
             ArgumentNullException.ThrowIfNull(content);
 
-            var normalized = VfsPathRules.Normalize(path);
+            var normalized = path == "" ? "" : VfsPathRules.Normalize(path);
+            if (normalized.Length == 0) throw new UnauthorizedAccessException("A VFS file path is required.");
             var fullPath = ResolveFilePath(normalized);
             var directory = Path.GetDirectoryName(fullPath);
 
@@ -190,7 +191,7 @@ public sealed class LocalFileProvider : FileProviderBase
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Local.LocalFileProvider.GetDirectoryAsync']/summary" />
         public Task<IVfsDirectory> GetDirectoryAsync(string path)
         {
-            var normalized = VfsPathRules.Normalize(path);
+            var normalized = path == "" ? "" : VfsPathRules.Normalize(path);
             var fullPath = ResolveDirectoryPath(normalized);
 
             if (!Directory.Exists(fullPath))
@@ -201,22 +202,13 @@ public sealed class LocalFileProvider : FileProviderBase
 
             RejectReparsePoint(fullPath);
 
-            var directFiles = Directory
-                .EnumerateFiles(fullPath, "*", SearchOption.TopDirectoryOnly)
-                .Where(IsSafeLocalPath)
+            var recursiveFiles = Bounded(Directory.EnumerateFiles(fullPath, "*", SafeEnumeration(true)))
                 .OrderBy(x => x, StringComparer.Ordinal)
-                .Select(ToVfsFileSnapshot)
-                .ToArray();
+                .Select(ToVfsFileSnapshot).ToArray();
+            var directFiles = recursiveFiles.Where(file =>
+                StringComparer.Ordinal.Equals(Path.GetDirectoryName(file.Path)?.Replace('\\', '/') ?? "", normalized)).ToArray();
 
-            var recursiveFiles = Directory
-                .EnumerateFiles(fullPath, "*", SearchOption.AllDirectories)
-                .Where(IsSafeLocalPath)
-                .OrderBy(x => x, StringComparer.Ordinal)
-                .Select(ToVfsFileSnapshot)
-                .ToArray();
-
-            var directories = Directory
-                .EnumerateDirectories(fullPath, "*", SearchOption.TopDirectoryOnly)
+            var directories = Bounded(Directory.EnumerateDirectories(fullPath, "*", SafeEnumeration(false)))
                 .Where(IsSafeLocalPath)
                 .OrderBy(x => x, StringComparer.Ordinal)
                 .Select(x => new VfsDirectorySnapshot(
@@ -243,7 +235,7 @@ public sealed class LocalFileProvider : FileProviderBase
 
             return Task.FromResult<IVfsDirectory>(
                 new VfsDirectorySnapshot(
-                    name: VfsPathRules.GetName(normalized),
+                    name: normalized.Length == 0 ? "/" : VfsPathRules.GetName(normalized),
                     path: normalized,
                     directFiles: directFiles,
                     recursiveFiles: recursiveFiles,
@@ -274,8 +266,8 @@ public sealed class LocalFileProvider : FileProviderBase
             }
 
             var fullPath = ResolvePath(path);
-
-            RejectReparsePoint(fullPath);
+            if (Path.GetRelativePath(_rootPath, fullPath) == ".")
+                throw new UnauthorizedAccessException("The VFS root cannot be deleted.");
 
             if (File.Exists(fullPath))
             {
@@ -296,8 +288,7 @@ public sealed class LocalFileProvider : FileProviderBase
         {
             ArgumentNullException.ThrowIfNull(query);
 
-            var entries = Directory
-                .EnumerateFiles(_rootPath, "*", SearchOption.AllDirectories)
+            var entries = Bounded(Directory.EnumerateFiles(ResolvePath("/"), "*", SafeEnumeration(true)))
                 .Where(IsSafeLocalPath)
                 .OrderBy(x => x, StringComparer.Ordinal)
                 .Select(x =>
@@ -338,7 +329,7 @@ public sealed class LocalFileProvider : FileProviderBase
 
         private string ResolvePath(string path)
         {
-            var normalized = VfsPathRules.Normalize(path);
+            var normalized = path == "" ? "" : VfsPathRules.Normalize(path);
 
             var combined = Path.Combine(
                 _rootPath,
@@ -352,6 +343,13 @@ public sealed class LocalFileProvider : FileProviderBase
                     $"Path escapes local VFS root. Path='{path}'.");
             }
 
+            RejectReparsePoint(_rootPath);
+            var current = _rootPath;
+            foreach (var segment in Path.GetRelativePath(_rootPath, fullPath).Split(Path.DirectorySeparatorChar))
+            {
+                current = Path.Combine(current, segment);
+                RejectReparsePoint(current);
+            }
             return fullPath;
         }
 
@@ -373,12 +371,10 @@ public sealed class LocalFileProvider : FileProviderBase
 
         private static void RejectReparsePoint(string fullPath)
         {
-            if (!File.Exists(fullPath) && !Directory.Exists(fullPath))
-            {
-                return;
-            }
-
-            var attributes = File.GetAttributes(fullPath);
+            FileAttributes attributes;
+            try { attributes = File.GetAttributes(fullPath); }
+            catch (FileNotFoundException) { return; }
+            catch (DirectoryNotFoundException) { return; }
 
             if ((attributes & FileAttributes.ReparsePoint) != 0)
             {
@@ -387,25 +383,40 @@ public sealed class LocalFileProvider : FileProviderBase
             }
         }
 
+        private static EnumerationOptions SafeEnumeration(bool recursive) => new()
+        {
+            RecurseSubdirectories = recursive,
+            AttributesToSkip = FileAttributes.ReparsePoint,
+            IgnoreInaccessible = false
+        };
+
         private IVfsFile ToVfsFileSnapshot(string fullPath)
         {
             RejectReparsePoint(fullPath);
 
             var info = new FileInfo(fullPath);
-            var content = File.ReadAllBytes(fullPath);
+            var virtualPath = ToVirtualPath(fullPath);
+            return new VfsFileSnapshot(info.Name, virtualPath, info.Length, info.CreationTimeUtc, info.LastWriteTimeUtc,
+                () => ReadBoundedAsync(ResolveFilePath(virtualPath)));
+        }
 
-            // ここではシステムクロックを読んでいない。
-            // ファイルが保持する物理 timestamp を VFS Snapshot の観測値として採用している。
-            return new VfsFileSnapshot(
-                name: info.Name,
-                path: ToVirtualPath(fullPath),
-                content: content,
-                createdAt: info.CreationTimeUtc,
-                modifiedAt: info.LastWriteTimeUtc,
-                metadata: new Dictionary<string, string>(StringComparer.Ordinal)
-                {
-                    ["PhysicalPath"] = fullPath
-                });
+        private static IEnumerable<string> Bounded(IEnumerable<string> paths)
+        {
+            var count = 0;
+            foreach (var path in paths)
+            {
+                if (++count > 65_536) throw new IOException("Local VFS listing limit exceeded.");
+                yield return path;
+            }
+        }
+
+        private static async Task<byte[]> ReadBoundedAsync(string fullPath)
+        {
+            using var stream = File.OpenRead(fullPath);
+            if (stream.Length > 64 * 1024 * 1024) throw new IOException("Local VFS file exceeds 64 MiB.");
+            var data = new byte[checked((int)stream.Length)];
+            await stream.ReadExactlyAsync(data).ConfigureAwait(false);
+            return data;
         }
 
         private string ToVirtualPath(string fullPath)

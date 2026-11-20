@@ -7,7 +7,8 @@ namespace AIKernel.Core.Vfs.Abstractions;
 
 internal sealed class VfsFileSnapshot : IVfsFile
 {
-    private readonly byte[] _content;
+    private readonly byte[] _content = [];
+    private readonly Func<Task<byte[]>>? _read;
     private readonly IReadOnlyDictionary<string, string>? _metadata;
     /// <summary>
     /// EN: Gets VfsFileSnapshot.
@@ -36,6 +37,16 @@ internal sealed class VfsFileSnapshot : IVfsFile
     /// EN: Gets Name.
     /// [EN] Documents this public package API member. [JA] Name を取得します。
     /// </summary>
+
+    internal VfsFileSnapshot(string name, string path, long size, DateTime created, DateTime modified, Func<Task<byte[]>> read)
+    {
+        Name = name;
+        Path = path;
+        Size = size;
+        CreatedAt = created;
+        ModifiedAt = modified;
+        _read = read;
+    }
 
     public string Name { get; }
     /// <summary>
@@ -71,7 +82,7 @@ internal sealed class VfsFileSnapshot : IVfsFile
     {
         // Side effect: none.
         // Returns defensive copy to avoid shared mutable state.
-        return Task.FromResult(_content.ToArray());
+        return _read is null ? Task.FromResult(_content.ToArray()) : _read();
     }
     /// <summary>
     /// EN: Executes ReadAsTextAsync.

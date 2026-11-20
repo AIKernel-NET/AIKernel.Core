@@ -16,6 +16,21 @@ public sealed class RomLoader : IRomLoader
     private readonly IMarkdownFrontMatterParser _frontMatterParser;
     private readonly IRomSignatureVerifier _signatureVerifier;
     private readonly IKernelClock _clock;
+    private bool _integrityOnly;
+    private readonly ImmutableDictionary<string, string> _trustedFiles =
+        ImmutableDictionary<string, string>.Empty.WithComparers(StringComparer.Ordinal);
+
+    /// <summary>Loads ROMs whose exact file bytes match hashes provisioned independently by the host.</summary>
+    public RomLoader(IMarkdownFrontMatterParser parser, IRomSignatureVerifier verifier,
+        IReadOnlyDictionary<string, string> trustedFileHashes, IKernelClock clock)
+        : this(parser, verifier, clock)
+    {
+        _trustedFiles = trustedFileHashes.ToImmutableDictionary(StringComparer.Ordinal);
+    }
+
+    /// <summary>Checks the embedded semantic digest for trusted archival input. This mode does not authenticate a publisher.</summary>
+    public static RomLoader ForIntegrityCheck(IMarkdownFrontMatterParser parser, IRomSignatureVerifier verifier, IKernelClock? clock = null)
+        => new(parser, verifier, clock) { _integrityOnly = true };
 
     /// <summary>[EN] Documents this public package API member. [JA] RomLoader を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Rom.RomLoader.#ctor']/summary" />
@@ -55,6 +70,12 @@ public sealed class RomLoader : IRomLoader
         // VFS read is the only physical I/O performed by RomLoader.
         var file = await session.ReadFileAsync(path).ConfigureAwait(false);
         var bytes = await file.ReadAsync().ConfigureAwait(false);
+        if (!_integrityOnly && _signatureVerifier is RomSignatureVerifier)
+        {
+            var digest = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes));
+            if (!_trustedFiles.TryGetValue(path, out var pin) || !string.Equals(digest, pin, StringComparison.OrdinalIgnoreCase))
+                throw new RomSignatureVerificationException(path, "host-provisioned file digest", digest);
+        }
         var markdown = Encoding.UTF8.GetString(bytes);
 
         // Pure boundary:

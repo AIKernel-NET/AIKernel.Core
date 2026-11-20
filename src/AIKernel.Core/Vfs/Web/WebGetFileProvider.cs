@@ -61,7 +61,7 @@ public sealed class WebGetFileProvider : FileProviderBase
                 nameof(options));
         }
 
-        _baseUri = options.BaseUri;
+        _baseUri = new Uri(options.BaseUri.GetLeftPart(UriPartial.Path).TrimEnd('/') + "/");
         _probePath = options.ProbePath;
         _httpClient = httpClient;
     }
@@ -157,15 +157,17 @@ public sealed class WebGetFileProvider : FileProviderBase
         /// <summary>[EN] Documents this public package API member. [JA] ReadFileAsync を実行します。</summary>
         /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileProvider.ReadFileAsync']/summary" />
         /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Vfs.Web.WebGetFileProvider.ReadFileAsync']/summary" />
-        public async Task<IVfsFile> ReadFileAsync(string path)
+        public Task<IVfsFile> ReadFileAsync(string path) => ReadFileAsync(path, CancellationToken.None);
+
+        public async Task<IVfsFile> ReadFileAsync(string path, CancellationToken cancellationToken)
         {
             var normalized = VfsPathRules.Normalize(path);
             var uri = ResolveUri(normalized);
-
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            timeout.CancelAfter(_httpClient.Timeout);
             using var request = new HttpRequestMessage(HttpMethod.Get, uri);
-
             using var response = await _httpClient
-                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
+                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, timeout.Token)
                 .ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.NotFound)
@@ -181,9 +183,8 @@ public sealed class WebGetFileProvider : FileProviderBase
                     $"Web VFS GET failed. StatusCode={response.StatusCode}");
             }
 
-            var content = await response.Content
-                .ReadAsByteArrayAsync()
-                .ConfigureAwait(false);
+            await response.Content.LoadIntoBufferAsync(16 * 1024 * 1024, timeout.Token).ConfigureAwait(false);
+            var content = await response.Content.ReadAsByteArrayAsync(timeout.Token).ConfigureAwait(false);
 
             // Last-Modified が存在する場合は HTTP レスポンスの観測事実として採用する。
             // 欠落時のみ IKernelClock で補完する。

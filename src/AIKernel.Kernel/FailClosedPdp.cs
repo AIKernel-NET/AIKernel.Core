@@ -38,6 +38,7 @@ internal sealed class FailClosedPdp : IPdp
         IPolicy policy)
     {
         ArgumentNullException.ThrowIfNull(policy);
+        throw new NotSupportedException("Configure a policy decision provider to register policies.");
     }
     /// <summary>
     /// EN: Gets RemovePolicy.

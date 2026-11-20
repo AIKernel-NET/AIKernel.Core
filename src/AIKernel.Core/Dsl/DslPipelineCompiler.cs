@@ -35,6 +35,9 @@ internal sealed class DslPipelineCompiler :
                 "DSL document is required."));
         }
 
+        long remaining = DslPipelineExecutionContext.MaximumSteps;
+        if (!WithinBudget(document.Root, 1, 0, ref remaining))
+            return Result<IKernelPipeline>.Fail(CompileBoundaryFailure("Pipeline exceeds its step or nesting limit."));
         return ValidateRoot(document.Root)
             .Map<IKernelPipeline>(root => new CompiledDslPipeline(
                 root,
@@ -57,6 +60,28 @@ internal sealed class DslPipelineCompiler :
                         "DSL compiler produced a pipeline that does not implement the contract interface."));
 
         return await Task.FromResult(pipeline).ConfigureAwait(false);
+    }
+
+    private static bool WithinBudget(PipelineNode node, long multiplier, int depth, ref long remaining)
+    {
+        if (depth > 64 || (remaining -= multiplier) < 0) return false;
+        var repeats = node switch { LoopNode loop => loop.MaxIterations, LoopUntilNode until => until.MaxIterations, _ => 1 };
+        if (repeats < 0) return true; // ValidateLoop reports the semantic error.
+        if (node is LoopUntilNode timed && timed.Timeout > TimeSpan.FromDays(1)) return false;
+        if (repeats > 10_000 || multiplier * repeats > DslPipelineExecutionContext.MaximumSteps) return false;
+        IReadOnlyList<PipelineNode>? children = node switch
+        {
+            PipelineRootNode root => root.Steps,
+            LoopNode loop => loop.BodyNodes,
+            LoopUntilNode until => until.BodyNodes,
+            _ => null
+        };
+        if (children is null) return true;
+        var cost = multiplier * Math.Max(1, repeats);
+        if (node is LoopNode or LoopUntilNode && (remaining -= cost) < 0) return false;
+        foreach (var child in children)
+            if (!WithinBudget(child, cost, depth + 1, ref remaining)) return false;
+        return true;
     }
 
     private Result<PipelineRootNode> ValidateRoot(PipelineNode root)

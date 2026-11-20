@@ -21,7 +21,7 @@ public sealed class LocalFileProviderOptions
     /// </summary>
     public LocalFileProviderOptions(
         string rootPath,
-        bool allowWrite = true,
+        bool allowWrite = false,
         string providerId = "local-file",
         string name = "Local File Provider",
         IKernelClock? clock = null,
@@ -43,7 +43,7 @@ public sealed class LocalFileProviderOptions
     /// <summary>[EN] Documents this public package API member. [JA] AllowWrite を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.AllowWrite']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.AllowWrite']/summary" />
-    public bool AllowWrite { get; set; } = true;
+    public bool AllowWrite { get; set; }
 
     /// <summary>[EN] Documents this public package API member. [JA] ProviderId を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='P:AIKernel.Core.Vfs.Local.LocalFileProviderOptions.ProviderId']/summary" />

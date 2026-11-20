@@ -180,7 +180,7 @@ public sealed class StandardProviderTests
     [Fact]
     public async Task VfsInvokerReadsListsExistsAndReturnsMetadata()
     {
-        var memory = new MemoryFileProvider();
+        var memory = new MemoryFileProvider(new MemoryFileProviderOptions { CredentialValidator = _ => true });
         memory.Seed("/skills/demo/SKILL.md", Encoding.UTF8.GetBytes("hello skill"));
         var invoker = new VfsInvoker([memory]);
 

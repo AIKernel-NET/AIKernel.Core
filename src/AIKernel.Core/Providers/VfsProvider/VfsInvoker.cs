@@ -80,7 +80,7 @@ public sealed class VfsInvoker : ICapabilityModuleInvoker
         metadata["vfs.provider_id"] = resolvedProvider.ProviderId;
         metadata["path"] = resolvedPath;
 
-        return (await Try.RunAsync(async () =>
+        return (await Try.RunCancellableAsync(async () =>
         {
             await using var session = await resolvedProvider.OpenSessionAsync(CreateCredentials(request))
                 .ConfigureAwait(false);

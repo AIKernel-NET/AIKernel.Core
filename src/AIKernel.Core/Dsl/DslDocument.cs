@@ -121,6 +121,9 @@ internal sealed record DslPipelineExecutionContext(
     DslPipelineValue Input,
     DateTimeOffset StartedAtUtc)
 {
+    internal const int MaximumSteps = 100_000;
+    internal int RemainingSteps { get; set; } = MaximumSteps;
+    internal bool SpendStep() => RemainingSteps-- > 0;
     /// <summary>
     /// EN: Executes Create.
     /// [EN] Documents this public package API member. [JA] Create を実行します。

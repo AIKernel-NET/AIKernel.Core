@@ -36,6 +36,16 @@ public static class Try
     }
 
     // -------------------------
+    /// <summary>Preserves cancellation while projecting other failures to Result.</summary>
+    public static async Task<Result<T>> RunCancellableAsync<T>(Func<Task<T>> action)
+    {
+        try { return Result<T>.Success(await action().ConfigureAwait(false)); }
+        catch (Exception ex) when (!CancellationExceptionClassifier.IsCancellation(ex))
+        {
+            return Result<T>.Fail(ErrorContext.FromException(ex));
+        }
+    }
+
     // Functional Extensions
     // -------------------------
 

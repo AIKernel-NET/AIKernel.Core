@@ -43,14 +43,15 @@ public sealed class CtgCouncilVoteExtractor
         IReadOnlyList<CouncilVote> votes,
         CouncilKind councilKind)
     {
-        foreach (var vote in votes)
-        {
-            if (vote.CouncilKind == councilKind)
-            {
-                return vote.VoteValue;
-            }
-        }
-
-        return CouncilVoteValue.Unknown;
+        return votes.Where(vote => vote.CouncilKind == councilKind)
+            .OrderBy(vote => vote.VoteValue switch
+                    {
+                        CouncilVoteValue.Reject => 0,
+                        CouncilVoteValue.Abstain => 2,
+                        CouncilVoteValue.Approve => 3,
+                        _ => 1
+                    }).ThenBy(vote => vote.VoteId, StringComparer.Ordinal)
+            .Select(vote => vote.VoteValue)
+            .FirstOrDefault(CouncilVoteValue.Unknown);
     }
 }

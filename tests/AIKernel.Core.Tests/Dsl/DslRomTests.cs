@@ -641,6 +641,7 @@ public sealed class DslRomTests
         var provider = new MemoryFileProvider(
             new MemoryFileProviderOptions
             {
+                CredentialValidator = _ => true,
                 Clock = KernelClock.Replay(DateTimeOffset.UnixEpoch)
             });
 

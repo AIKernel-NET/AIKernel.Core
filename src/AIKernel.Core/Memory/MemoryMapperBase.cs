@@ -5,8 +5,25 @@ namespace AIKernel.Core.Memory;
 /// <summary>[EN] Documents this public package API member. [JA] MemoryMapperBase を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Core.Memory.MemoryMapperBase']/summary" />
-public abstract class MemoryMapperBase : IMemoryMapper
+public abstract class MemoryMapperBase : IMemoryMapper, AIKernel.Abstractions.Memory.IMemoryMapper
 {
+    AIKernel.Abstractions.Memory.IMemoryRegion AIKernel.Abstractions.Memory.IMemoryMapper.Open(string path, AIKernel.Enums.MemoryAccessMode accessMode)
+        => new ContractRegion(Open(path, accessMode switch
+        {
+            AIKernel.Enums.MemoryAccessMode.Read => MemoryAccessMode.Read,
+            AIKernel.Enums.MemoryAccessMode.ReadWrite => MemoryAccessMode.ReadWrite,
+            _ => throw new ArgumentOutOfRangeException(nameof(accessMode))
+        }), accessMode);
+
+    private sealed class ContractRegion(IMemoryRegion region, AIKernel.Enums.MemoryAccessMode mode) : AIKernel.Abstractions.Memory.IMemoryRegion
+    {
+        public AIKernel.Dtos.Memory.MemoryRegionInfo Info => new(region.Info.Path, region.Length, mode);
+        public IntPtr Pointer => region.Pointer;
+        public long Length => region.Length;
+        public bool IsMapped => region.IsMapped;
+        public bool Unmap() => region.Unmap();
+        public void Dispose() => region.Dispose();
+    }
     /// <summary>[EN] Documents this public package API member. [JA] Open を取得します。</summary>
     /// <include file="docs.en.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']/summary" />
     /// <include file="docs.ja.xml" path="doc/members/member[@name='M:AIKernel.Core.Memory.MemoryMapperBase.Open']/summary" />

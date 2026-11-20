@@ -72,7 +72,7 @@ internal sealed partial class CompiledDslPipeline :
                         DslPipelineState.Initial("dsl.pipeline"),
                         context.Input);
 
-                    return ExecuteNode(_root, initial, context);
+                    return ExecuteNode(_root, initial, context with { RemainingSteps = DslPipelineExecutionContext.MaximumSteps });
                 });
     }
 
@@ -132,8 +132,9 @@ internal sealed partial class CompiledDslPipeline :
     private ResultStep<DslPipelineState, DslPipelineValue> ExecuteNode(
         PipelineNode node,
         ResultStep<DslPipelineState, DslPipelineValue> current,
-        DslPipelineExecutionContext context)
+        DslPipelineExecutionContext context, bool countStep = true)
     {
+        if (countStep && !context.SpendStep()) return InvalidExecutionContext("Pipeline execution budget exhausted.");
         return current.Match(
             (_, _) => current,
             (_, _) => node switch
@@ -258,6 +259,7 @@ internal sealed partial class CompiledDslPipeline :
         var result = current;
         for (var iteration = 0; iteration < node.MaxIterations; iteration++)
         {
+            if (!context.SpendStep()) return InvalidExecutionContext("Pipeline execution budget exhausted.");
             result = ExecuteNodes(node.BodyNodes, result, context);
             result = DslResultStepAppender.AppendLoopTransition(
                 result,
@@ -299,6 +301,7 @@ internal sealed partial class CompiledDslPipeline :
         var result = current;
         for (var iteration = 0; iteration < node.MaxIterations; iteration++)
         {
+            if (!context.SpendStep()) return InvalidExecutionContext("Pipeline execution budget exhausted.");
             var nowOrFailure = Try.Run(() => _clock.Now)
                 .Match(
                     error => (Error: error, Now: (DateTimeOffset?)null),

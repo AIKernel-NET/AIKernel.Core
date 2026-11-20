@@ -23,6 +23,7 @@ public sealed class VfsReplayClockTests
         var provider = new MemoryFileProvider(
             new MemoryFileProviderOptions
             {
+                CredentialValidator = _ => true,
                 Clock = clock
             });
 

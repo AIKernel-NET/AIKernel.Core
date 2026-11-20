@@ -184,7 +184,7 @@ public sealed class HistoryRomStoreTests
         => new(
             new HistoryRomProvider(),
             registry,
-            new RomLoader(
+            RomLoader.ForIntegrityCheck(
                 new MarkdownFrontMatterParser(),
                 new RomSignatureVerifier(
                     new DefaultRomCanonicalizer(),
@@ -196,6 +196,7 @@ public sealed class HistoryRomStoreTests
         var provider = new MemoryFileProvider(
             new MemoryFileProviderOptions
             {
+                CredentialValidator = _ => true,
                 Clock = KernelClock.Replay(DateTimeOffset.UnixEpoch)
             });
 

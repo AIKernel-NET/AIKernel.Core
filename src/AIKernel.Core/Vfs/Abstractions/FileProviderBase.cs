@@ -50,7 +50,7 @@ public abstract class FileProviderBase(
     {
         ArgumentNullException.ThrowIfNull(credentials);
 
-        if (credentialValidator is not null && !credentialValidator(credentials))
+        if (credentialValidator?.Invoke(credentials) != true)
         {
             throw new VfsAuthenticationFailedException(ProviderId);
         }

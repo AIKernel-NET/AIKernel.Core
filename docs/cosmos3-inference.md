@@ -25,8 +25,9 @@ BF16の内積はFP64で累積して最後にFP32へ丸める。視覚LayerNorm�
 公開モデルの4B／16Bという呼称には生成側も含まれる。このAPIは公式Transformersのreasonerが必要とする
 テンソルだけを取り込む。再量子化はしない。KV・視覚特徴・OSのページキャッシュなどは上の重み量に含まれない。
 CPUの重み・KVは `CosmosExecutionOptions.Memory` を指定するとAIKernel仮想メモリ層でページングする。
-既定は従来のマップ方式。GPU対応、Server実機の7GB枠、OSによる厳密な上限保証は未検証。
-詳細は [メモリ制御とCTG接続](development/cosmos-memory-ctg-20261116-jp.md) を参照。
+SDKで `Memory` を省略するとマップ方式を使う。MonolithのCosmos登録ではページングが既定。CPU 4ワーカー・Serverの7 GB枠で文章、画像、動画を両モデルに入力し、6条件で参照の生成トークン列と一致した。標準KV設定で計測したプロセスの最大RSSは3.564 GB。SDKのメモリ予算は協調制御のため、厳密な上限が必要な配置ではOS側でも制限する。[Serverの測定条件と結果](development/evidence/cosmos3-server-7gb-20261120/README.md) · [メモリ制御とCTG接続](development/cosmos-memory-ctg-20261116-jp.md)
+
+重みがキャッシュに収まらないときは、入力を最大32トークンのタイルにまとめ、一つの射影で同じ重みページを再利用する。初回応答を調べるには、Monolithの非公開監査でモデル読み込み、Prefill、Decodeの各時間を見る。`weight_backing_reads` は論理ページの再取得回数なので、物理SSDの待ち時間を調べるにはOSのI/Oトレースも使う。[ホストの計測項目とWindows Native AOTの比較手順](https://github.com/AIKernel-NET/AIKernel.Monolith/blob/dev/README.md)
 
 ## 重みの準備
 

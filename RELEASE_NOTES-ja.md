@@ -4,11 +4,15 @@
 
 ## 0.1.4（公開準備中）
 
+0.1.3から更新する方は、[モデルの選び方と最初の回答の確認手順](https://github.com/AIKernel-NET/AIKernel.NET/blob/dev/docs/overview/upgrade-0-1-4-jp.md)から始めてください。
+
 - Cosmos 3 Edge／Nano の取り込み済み重みで、文章・RGB画像・時刻付き動画フレームから応答を生成できます。CPU推論は CUDA と LibTorch が不要です。対話APIは各ターンの発言者と画像を保って次の質問を処理します。
 - Monolith のモデル登録で、使用するモデルと import-manifest.json の SHA-256 を固定できます。WebSite の日英チャットでは、接続状態を確認し、同じ写真について続けて質問できます。利用者のAPIキーは不要です。
 - Cosmos 3 Edge／Nano を4ワーカー、モデルホストの7 GB枠で実行し、文章・画像・動画の全6条件で参照回答と生成トークン列が一致しました。標準KV設定（128 MB）での最大RSSは3.564 GBです。6件合計のSSD書き込み量は標準設定で84 KiB、KVを8 MiBに制限した試験で18.09 GBでした。 [開発機との比較と測定条件](docs/development/evidence/cosmos3-server-7gb-20261120/README.md)
 - GPT-OSS-20B は Server の実メモリ7GB枠でSSDへのページングを使用し、検証用2入力で llama.cpp と生成トークン列を照合しました。
-- Bonsai 1.7B を用いる CTG 評価では、審査対象の提案と裏付けとなる観測を分け、governance ROM の規則に従って判定します。対象例の合格は任意の提案に対する精度を保証するものではありません。
+- Gemma 4 E2Bでテキストを生成できます。CPU実行と、対応するNVIDIA GPUに重み・KV・forward処理を置く実行に対応します。[対応GGUFと数値検証](docs/gemma4-e2b-inference.md)
+- Bonsai 1.7B のCTGは、操作の提案とホストが取得した観測を分け、governance ROMの規則で判断します。Serverでの再生成16例と保存応答の再生60例を合わせた76例で、期待した許可30件・拒否46件と一致しました。[運用手順と評価の内訳](docs/development/bonsai-ctg-operations-jp.md)
+- Cosmosの重みがキャッシュに収まらない場合、Prefillは最大32トークンずつ重みページを共有します。ホストの非公開監査で初回読み込み、入力処理、生成にかかった時間を確認できます。[メモリ設定と監査](docs/cosmos3-inference.md)
 - CPU版を標準とし、対応GPUには CUDA Driver 経路を用意します。旧 LibTorch 追加パッケージの配布版は 0.1.3 です。
 
 ## 0.1.3

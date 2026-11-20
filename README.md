@@ -661,8 +661,8 @@ AIKernel.Core proves them through implementation.
 
 Core changes must follow the shared AIKernel development discipline:
 
-- [AIKernel Development Guidelines](../AIKernel.NET/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES.md)
-- [AIKernel 開発ガイドライン](../AIKernel.NET/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES-jp.md)
+- [AIKernel Development Guidelines](https://github.com/AIKernel-NET/AIKernel.NET/blob/dev/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES.md)
+- [AIKernel 開発ガイドライン](https://github.com/AIKernel-NET/AIKernel.NET/blob/dev/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES-jp.md)
 
 These guidelines define the required monadic LINQ style, fail-closed behavior,
 DRY/DGA rules, bilingual public documentation comments, tests, and release

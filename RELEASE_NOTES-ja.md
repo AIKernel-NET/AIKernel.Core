@@ -4,6 +4,8 @@
 
 ## 0.1.4（公開準備中）
 
+[推論・操作評価APIと最小コード例](https://github.com/AIKernel-NET/AIKernel.NET/blob/dev/docs/overview/inference-api-0-1-4-jp.md)。
+
 0.1.3から更新する方は、[モデルの選び方と最初の回答の確認手順](https://github.com/AIKernel-NET/AIKernel.NET/blob/dev/docs/overview/upgrade-0-1-4-jp.md)から始めてください。
 
 - Cosmos 3 Edge／Nano の取り込み済み重みで、文章・RGB画像・時刻付き動画フレームから応答を生成できます。CPU推論は CUDA と LibTorch が不要です。対話APIは各ターンの発言者と画像を保って次の質問を処理します。

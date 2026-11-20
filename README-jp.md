@@ -586,8 +586,8 @@ AIKernel.Core はそれを実装によって証明する。
 
 Core の変更は、AIKernel 共通の開発規律に従ってください。
 
-- [AIKernel 開発ガイドライン](../AIKernel.NET/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES-jp.md)
-- [AIKernel Development Guidelines](../AIKernel.NET/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES.md)
+- [AIKernel 開発ガイドライン](https://github.com/AIKernel-NET/AIKernel.NET/blob/dev/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES-jp.md)
+- [AIKernel Development Guidelines](https://github.com/AIKernel-NET/AIKernel.NET/blob/dev/docs/guidelines/AIKERNEL_DEVELOPMENT_GUIDELINES.md)
 
 このガイドラインは、package code に求められる monadic LINQ style、
 fail-closed behavior、DRY/DGA rules、public API の bilingual comment、

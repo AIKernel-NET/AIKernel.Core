@@ -102,11 +102,12 @@ internal static unsafe class Gemma4CpuMatrix
     // Q6_K stores 128 low-nibble bytes, 64 high-bit bytes, sixteen signed
     // scales and one Half. Each 32-element slice has two independent scales.
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static Vector256<byte> UnpackQ6(Vector256<byte> low, Vector256<byte> high, byte lowShift, byte highShift)
+    private static Vector256<byte> UnpackQ6(Vector256<ushort> low, Vector256<ushort> high)
     {
-        low = Avx2.And(Avx2.ShiftRightLogical(low.AsUInt16(), lowShift).AsByte(), Vector256.Create((byte)15));
-        high = Avx2.And(Avx2.ShiftRightLogical(high.AsUInt16(), highShift).AsByte(), Vector256.Create((byte)3));
-        return Avx2.Or(low, Avx2.ShiftLeftLogical(high.AsUInt16(), 4).AsByte());
+        // Mask each byte after the word shifts to discard bits from its neighbour.
+        var nibbles = Avx2.And(low.AsByte(), Vector256.Create((byte)15));
+        var upperBits = Avx2.And(high.AsByte(), Vector256.Create((byte)3));
+        return Avx2.Or(nibbles, Avx2.ShiftLeftLogical(upperBits.AsUInt16(), 4).AsByte());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -135,14 +136,14 @@ internal static unsafe class Gemma4CpuMatrix
             float scale = HalfToSingle(Unsafe.ReadUnaligned<ushort>(w + 208));
             for (int half = 0; half < 2; half++)
             {
-                var low0 = Avx.LoadVector256(w + half * 64);
-                var low1 = Avx.LoadVector256(w + half * 64 + 32);
-                var high = Avx.LoadVector256(w + 128 + half * 32);
+                var low0 = Avx.LoadVector256(w + half * 64).AsUInt16();
+                var low1 = Avx.LoadVector256(w + half * 64 + 32).AsUInt16();
+                var high = Avx.LoadVector256(w + 128 + half * 32).AsUInt16();
                 var s = (sbyte*)(w + 192 + half * 8); var input = x + k + half * 128;
-                AccumulateQ6_256(UnpackQ6(low0, high, 0, 0), scale, s, input, ref a, ref b, ref c, ref d);
-                AccumulateQ6_256(UnpackQ6(low1, high, 0, 2), scale, s + 2, input + 32, ref a, ref b, ref c, ref d);
-                AccumulateQ6_256(UnpackQ6(low0, high, 4, 4), scale, s + 4, input + 64, ref a, ref b, ref c, ref d);
-                AccumulateQ6_256(UnpackQ6(low1, high, 4, 6), scale, s + 6, input + 96, ref a, ref b, ref c, ref d);
+                AccumulateQ6_256(UnpackQ6(low0, high), scale, s, input, ref a, ref b, ref c, ref d);
+                AccumulateQ6_256(UnpackQ6(low1, high >> 2), scale, s + 2, input + 32, ref a, ref b, ref c, ref d);
+                AccumulateQ6_256(UnpackQ6(low0 >> 4, high >> 4), scale, s + 4, input + 64, ref a, ref b, ref c, ref d);
+                AccumulateQ6_256(UnpackQ6(low1 >> 4, high >> 6), scale, s + 6, input + 96, ref a, ref b, ref c, ref d);
             }
         }
         return Vector256.Sum(Avx.Add(Avx.Add(a, b), Avx.Add(c, d)));
@@ -167,14 +168,14 @@ internal static unsafe class Gemma4CpuMatrix
             float scale = HalfToSingle(Unsafe.ReadUnaligned<ushort>(w + 208));
             for (int half = 0; half < 2; half++)
             {
-                var low0 = Avx.LoadVector256(w + half * 64);
-                var low1 = Avx.LoadVector256(w + half * 64 + 32);
-                var high = Avx.LoadVector256(w + 128 + half * 32);
+                var low0 = Avx.LoadVector256(w + half * 64).AsUInt16();
+                var low1 = Avx.LoadVector256(w + half * 64 + 32).AsUInt16();
+                var high = Avx.LoadVector256(w + 128 + half * 32).AsUInt16();
                 var s = (sbyte*)(w + 192 + half * 8); var input = x + k + half * 128;
-                AccumulateQ6_512(UnpackQ6(low0, high, 0, 0), scale, s, input, ref a, ref b);
-                AccumulateQ6_512(UnpackQ6(low1, high, 0, 2), scale, s + 2, input + 32, ref a, ref b);
-                AccumulateQ6_512(UnpackQ6(low0, high, 4, 4), scale, s + 4, input + 64, ref a, ref b);
-                AccumulateQ6_512(UnpackQ6(low1, high, 4, 6), scale, s + 6, input + 96, ref a, ref b);
+                AccumulateQ6_512(UnpackQ6(low0, high), scale, s, input, ref a, ref b);
+                AccumulateQ6_512(UnpackQ6(low1, high >> 2), scale, s + 2, input + 32, ref a, ref b);
+                AccumulateQ6_512(UnpackQ6(low0 >> 4, high >> 4), scale, s + 4, input + 64, ref a, ref b);
+                AccumulateQ6_512(UnpackQ6(low1 >> 4, high >> 6), scale, s + 6, input + 96, ref a, ref b);
             }
         }
         // The former tile path left c and d at +0; retain that final addition.

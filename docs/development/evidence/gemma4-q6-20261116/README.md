@@ -25,7 +25,7 @@ the gates are max absolute error 1e-3, RMS 1e-4 and 12 token IDs. The reference 
 `unit-tests.json` records 889 passed; `server-tests.json` records 35 passed.
 
 `local-jit-check.json` records optimized-JIT inspection: Q6 shifts use immediate operands, helpers inline, no calls to Half conversion or generic decoder, no new FMA.
-The analyzer still emits CA1857 for helper parameters even though these callers are literal constants; measured optimized code has the required instructions.
+The November 16 build emitted two CA1857 warnings for shift counts passed through the unpack helper. The current [Q6_K decoder](../../../../src/AIKernel.Kernel/Inference/Gemma4CpuMatrix.cs) shifts the packed words by constant offsets at each call site. It keeps the byte masks and the FP32 accumulation order used for this comparison.
 
 Run `python plot.py` with matplotlib to regenerate PNG/SVG using only saved observations. No new inference is performed by plotting.
 The graph uses one seconds axis and Development AVX2 before = 100%; whiskers are observed min/max, not confidence intervals.

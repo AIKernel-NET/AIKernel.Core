@@ -17,6 +17,8 @@ public abstract record CosmosContent
 /// <summary>Bounds for the initial CPU multimodal implementation. Resizing and frame sampling are explicit caller decisions.</summary>
 public sealed record CosmosExecutionOptions
 {
+    /// <summary>Record page acquisition, projection, attention and process CPU time during text prefill.</summary>
+    public bool ProfilePrefill { get; init; }
     /// <summary>Maximum simultaneous matrix workers.</summary>
     public int CpuThreads { get; init; } = 4;
     /// <summary>Enables bounded weight/KV paging and adaptive cache allocation. Null preserves the mapped path.</summary>

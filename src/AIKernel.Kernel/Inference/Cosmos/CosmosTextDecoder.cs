@@ -77,6 +77,7 @@ internal sealed class CosmosTextDecoder
             catch (OutOfMemoryException) { tile /= 2; }
         }
         if (tile < 2) return false;
+        if (weights.PrefillTimer is { } timer) timer.TileTokens = tile;
         try { PrefillTiles(prompt, embeddings, deep, s, tile, kv); }
         finally { budget?.Release(tile * bytesPerToken); }
         return true;
@@ -175,6 +176,8 @@ internal sealed class CosmosTextDecoder
     private void Attend(int layer, int index, State s, float[] q, float[] k, float[] v, float[] attention,
         float[] cos, float[] sin, bool restorePrefix = true)
     {
+        var timer = weights.PrefillTimer;
+        long start = timer?.Start() ?? 0;
         int hs = d.HeadSize, kv = d.KvHeads * hs;
         float scale = (float)Math.Pow(hs,-.5);
         var l = layers[layer];
@@ -210,5 +213,6 @@ internal sealed class CosmosTextDecoder
                 for(int t=0;t<=index;t++)for(int c=0;c<hs;c++)target[c]+=scores[t]*values[t*kv+kh*hs+c];
             }
         });
+        timer?.AttentionCompleted(start);
     }
 }

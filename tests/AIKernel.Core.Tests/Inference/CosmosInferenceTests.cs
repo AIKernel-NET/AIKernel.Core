@@ -174,7 +174,16 @@ public sealed class CosmosInferenceTests
                 image<0 ? null : deep.Select(x=>x[image]).ToArray(),i==length-1);
         }
         long before=budget.Statistics.WeightBackingReads;
+        paged.PrefillTimer = new CosmosPrefillTimer();
         Assert.True(tiled.TryPrefill(prompt,embeddings,deep,actual));
+        var profile = paged.PrefillTimer.Snapshot();
+        paged.PrefillTimer = null;
+        Assert.Equal(32,profile.TileTokens);
+        Assert.Equal(2*layers*(edge ? 6 : 7)+1,profile.ProjectionPageVisits);
+        Assert.Equal(System.Runtime.Intrinsics.X86.Avx2.IsSupported ? "avx2-fp64" : "scalar-fp64",profile.Bf16DotKernel);
+        Assert.True(profile.ProjectionRowsMilliseconds > 0);
+        Assert.True(profile.ProjectionPageSetupMilliseconds > 0);
+        Assert.True(profile.AttentionMilliseconds > 0);
         // Two tiles. Each projection has one page, even though the entire cache holds only one page.
         int projections=edge ? 6 : 7;
         Assert.InRange(budget.Statistics.WeightBackingReads-before,1,2*(layers*projections+1)+1);

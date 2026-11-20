@@ -120,6 +120,8 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
     private readonly List<Mapping> maps=[];
     private readonly CosmosPagedWeights? paging;
     internal CosmosMemoryBudget? Budget { get; }
+    // Scoped to text prefill while the model's generation gate is held.
+    internal CosmosPrefillTimer? PrefillTimer { get; set; }
     private readonly Dictionary<string,Tensor> tensors=new(StringComparer.Ordinal);
     internal IEnumerable<string> Names => tensors.Keys;
     internal long StoredBytes(bool includeVision)=>tensors.Values.Where(t=>includeVision||t.Name.StartsWith("model.language_model.",StringComparison.Ordinal)||t.Name=="lm_head.weight").Sum(t=>checked(t.Count*(t.Type=="F32"?4:2)));
@@ -201,11 +203,15 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
     {
         int rows=output.Length,columns=input.Length;
         if(weights.Count!=(long)rows*columns || (bias is not null&&bias.Length!=rows))throw new ArgumentException("Matrix dimensions mismatch.");
-        if(paging is not null){paging.Linear(weights,input,output,options,bias);return;}
+        var timer = PrefillTimer;
+        timer?.Matrix(weights.Type);
+        if(paging is not null){paging.Linear(weights,input,output,options,bias,timer);return;}
+        long start = timer?.Start() ?? 0;
         void Range(int start,int end){for(int r=start;r<end;r++){options.CancellationToken.ThrowIfCancellationRequested();output[r]=weights.Dot((long)r*columns,input)+(bias?[r]??0);}}
         if(options.MaxDegreeOfParallelism==1 || rows<32)Range(0,rows);
         else Parallel.For(0,Math.Min(rows,options.MaxDegreeOfParallelism),options,worker=>
         {int parts=Math.Min(rows,options.MaxDegreeOfParallelism);Range(rows*worker/parts,rows*(worker+1)/parts);});
+        timer?.RowsCompleted(start);
     }
     internal void LinearBatch(Tensor tensor, float[][] inputs, float[][] outputs, int count, ParallelOptions options)
     {
@@ -222,7 +228,8 @@ internal sealed unsafe class SafeTensorWeights : IDisposable
             for (int t = 0; t < count; t++) Linear(tensor, inputs[t], outputs[t], options);
             return;
         }
-        paging.LinearBatch(tensor, inputs, outputs, count, options);
+        PrefillTimer?.Matrix(tensor.Type);
+        paging.LinearBatch(tensor, inputs, outputs, count, options, PrefillTimer);
     }
     public void Dispose(){try{paging?.Dispose();}finally{foreach(var map in maps)map.Dispose();maps.Clear();tensors.Clear();}}
 }

@@ -76,10 +76,10 @@ internal sealed unsafe class CosmosPagedWeights : IVirtualMemorySource,IDisposab
         }
         return result;
     }
-    internal void Linear(SafeTensorWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,float[]? bias)
+    internal void Linear(SafeTensorWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,float[]? bias,CosmosPrefillTimer? timer)
     {
         int columns = input.Length;
-        VisitMatrixRows(tensor, columns, output.Length, options, (view, first, start, end) =>
+        VisitMatrixRows(tensor, columns, output.Length, options, timer, (view, first, start, end) =>
         {
             for (int row = start; row < end; row++)
             {
@@ -89,10 +89,10 @@ internal sealed unsafe class CosmosPagedWeights : IVirtualMemorySource,IDisposab
         });
     }
 
-    internal void LinearBatch(SafeTensorWeights.Tensor tensor,float[][] inputs,float[][] outputs,int count,ParallelOptions options)
+    internal void LinearBatch(SafeTensorWeights.Tensor tensor,float[][] inputs,float[][] outputs,int count,ParallelOptions options,CosmosPrefillTimer? timer)
     {
         int columns = inputs[0].Length;
-        VisitMatrixRows(tensor, columns, outputs[0].Length, options, (view, first, start, end) =>
+        VisitMatrixRows(tensor, columns, outputs[0].Length, options, timer, (view, first, start, end) =>
         {
             for (int row = start; row < end; row++)
             {
@@ -105,7 +105,7 @@ internal sealed unsafe class CosmosPagedWeights : IVirtualMemorySource,IDisposab
     }
 
     private void VisitMatrixRows(SafeTensorWeights.Tensor tensor, int columns, int rows, ParallelOptions options,
-        Action<SafeTensorWeights.Tensor,int,int,int> compute)
+        CosmosPrefillTimer? timer, Action<SafeTensorWeights.Tensor,int,int,int> compute)
     {
         var layout=layouts[tensor.Name];
         if(layout.ElementsPerPage%columns!=0)throw new ArgumentException("Matrix rows must align to paging layout.");
@@ -113,8 +113,11 @@ internal sealed unsafe class CosmosPagedWeights : IVirtualMemorySource,IDisposab
         for(int page=0;page<layout.Pages;page++)
         {
             options.CancellationToken.ThrowIfCancellationRequested();Budget.PageBoundary();int first=page*rowsPerPage,count=Math.Min(rowsPerPage,rows-first);
+            long pageStart = timer?.Start() ?? 0;
             space!.Visit(checked((int)(layout.FirstPage+page)),true,(bytes,_)=>
             {
+                timer?.PageReady(pageStart);
+                long rowsStart = timer?.Start() ?? 0;
                 fixed(byte* p=bytes)
                 {
                     var view=new SafeTensorWeights.Tensor(tensor.Name,tensor.Type,[count,columns],(long)count*columns,(nint)p);
@@ -122,6 +125,7 @@ internal sealed unsafe class CosmosPagedWeights : IVirtualMemorySource,IDisposab
                     if(parts<=1||count<32)compute(view,first,0,count);
                     else Parallel.For(0,parts,options,worker=>compute(view,first,count*worker/parts,count*(worker+1)/parts));
                 }
+                timer?.RowsCompleted(rowsStart);
             });
         }
     }

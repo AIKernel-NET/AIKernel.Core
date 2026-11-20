@@ -16,6 +16,8 @@ public sealed record CosmosGeneration(string Text,ImmutableArray<int> TokenIds,i
     public long DecodeMilliseconds { get; init; }
     /// <summary>Logical weight page misses during text prefill. Excludes vision encoding.</summary>
     public long PrefillWeightPageMisses { get; init; }
+    /// <summary>Optional diagnostics for the prompt's text decoder, before output-token selection.</summary>
+    public CosmosPrefillProfile? PrefillProfile { get; init; }
 }
 
 /// <summary>Managed CPU Qwen3-VL inference for Cosmos-Reason2-2B safetensors. No Python, LibTorch or remote API is used.
@@ -135,19 +137,26 @@ internal sealed class CosmosModelRuntime : IDisposable
             for(int i=0;i<deep.Length;i++)deep[i].AddRange(features.DeepStack[i]);
         }
         var beforePrefill = memory?.Statistics;
+        var timer = options.ProfilePrefill ? new CosmosPrefillTimer() : null;
         long prefillStart = Stopwatch.GetTimestamp();
-        bool tiled = prompt.Tokens.Count > 1 && beforePrefill is not null && beforePrefill.WeightCacheCapacityBytes < weights.StoredBytes(false)
-            && decoder.TryPrefill(prompt, embeddings, deep, state);
-        if (!tiled)
+        weights.PrefillTimer = timer;
+        try
         {
-            for(int i=0;i<prompt.Tokens.Count;i++)
+            bool tiled = prompt.Tokens.Count > 1 && beforePrefill is not null && beforePrefill.WeightCacheCapacityBytes < weights.StoredBytes(false)
+                && decoder.TryPrefill(prompt, embeddings, deep, state);
+            if (!tiled)
             {
-                int image=prompt.VisualIndices[i];
-                decoder.Forward(prompt.Tokens[i],i,prompt.Positions[i],state,image<0?null:embeddings[image],
-                    image<0?null:deep.Select(x=>x[image]).ToArray(),i==prompt.Tokens.Count-1);
+                for(int i=0;i<prompt.Tokens.Count;i++)
+                {
+                    int image=prompt.VisualIndices[i];
+                    decoder.Forward(prompt.Tokens[i],i,prompt.Positions[i],state,image<0?null:embeddings[image],
+                        image<0?null:deep.Select(x=>x[image]).ToArray(),i==prompt.Tokens.Count-1);
+                }
             }
         }
+        finally { weights.PrefillTimer = null; }
         long prefillMs = (long)Stopwatch.GetElapsedTime(prefillStart).TotalMilliseconds;
+        var profile = timer?.Snapshot();
         long misses = beforePrefill is null ? 0 : memory!.Statistics.WeightBackingReads - beforePrefill.WeightBackingReads;
         long decodeStart = Stopwatch.GetTimestamp();
         var generated=ImmutableArray.CreateBuilder<int>();string finish="length";
@@ -162,7 +171,8 @@ internal sealed class CosmosModelRuntime : IDisposable
         long decodeMs = (long)Stopwatch.GetElapsedTime(decodeStart).TotalMilliseconds;
         return new(tokenizer.Decode(generated),generated.ToImmutable(),prompt.Tokens.Count,finish,watch.ElapsedMilliseconds)
         {
-            MemoryPlan=plan,Artifact=identity,PrefillMilliseconds=prefillMs,DecodeMilliseconds=decodeMs,PrefillWeightPageMisses=misses
+            MemoryPlan=plan,Artifact=identity,PrefillMilliseconds=prefillMs,DecodeMilliseconds=decodeMs,PrefillWeightPageMisses=misses,
+            PrefillProfile=profile
         };
         }
         finally{memory?.Release(mediaReserve);}

@@ -31,10 +31,11 @@ public sealed partial class VirtualMemorySpace
                     if (cancellationToken.IsCancellationRequested) return Cancelled();
                     MoveToSwap(host.Value);
                 }
+                arena.ReservedRamBlocks = 0;
                 while (freeRam.TryPeek(out var buffer))
                 {
                     if (cancellationToken.IsCancellationRequested) return Cancelled();
-                    buffer.Dispose();
+                    ReleaseRam(buffer);
                     freeRam.Pop();
                 }
                 return cancellationToken.IsCancellationRequested ? Cancelled() : Result<int>.Success(devicePages);

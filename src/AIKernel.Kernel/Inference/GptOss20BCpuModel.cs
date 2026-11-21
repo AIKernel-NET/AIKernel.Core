@@ -15,6 +15,8 @@ public sealed class GptOss20BCpuModel : IDisposable
     private readonly GgufPagedWeights? pages;
     /// <summary>Page residency and page-ins for a model opened with an explicit RAM budget.</summary>
     public AIKernel.Kernel.Memory.VirtualMemoryStatistics? MemoryStatistics => pages?.Statistics;
+    /// <summary>Allocated and reserved host page buffers for paged CPU weights.</summary>
+    public AIKernel.Kernel.Memory.VirtualMemoryRamUsage? WeightRamUsage => pages?.RamUsage;
     internal long BackingBytesRead => pages?.BackingBytesRead ?? 0;
     internal long DistinctPagesRead => pages?.DistinctPagesRead ?? 0;
     internal long WeightCacheCapacityBytes => pages?.CacheCapacityBytes ?? 0;

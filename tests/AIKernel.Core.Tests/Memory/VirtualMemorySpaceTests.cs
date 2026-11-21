@@ -10,6 +10,64 @@ public sealed class VirtualMemorySpaceTests : IDisposable
     private readonly DirectoryInfo directory = Directory.CreateTempSubdirectory("aikernel-vmem-");
 
     [Fact]
+    public void ReservedBuffersAreReusedAndCountedOnceAcrossForks()
+    {
+        using var space = new VirtualMemorySpace(5, BlockSize, 4, directory.FullName);
+        var cancellationToken = TestContext.Current.CancellationToken;
+        Assert.Equal(new VirtualMemoryRamUsage(4 * BlockSize, 0, 0, 0, 0, 0), space.GetRamUsage());
+        space.ReserveRam(4, cancellationToken);
+        using var fork = Assert.IsType<VirtualMemorySpace>(space.ForkSpace().Value);
+        Assert.Equal(new VirtualMemoryRamUsage(4 * BlockSize, 4 * BlockSize, 0, 4 * BlockSize,
+            4 * BlockSize, 4 * BlockSize), fork.GetRamUsage());
+        Assert.Throws<ArgumentOutOfRangeException>(() => fork.ReserveRam(5, cancellationToken));
+
+        for (int i = 0; i < 4; i++) space.WriteBlock(i, Bytes((byte)(i + 1)));
+        Assert.Equal(new VirtualMemoryRamUsage(4 * BlockSize, 4 * BlockSize, 4 * BlockSize, 0,
+            4 * BlockSize, 4 * BlockSize), fork.GetRamUsage());
+        space.WriteBlock(4, Bytes(5));
+        Assert.Equal(VirtualMemoryTier.Swap, space.GetBlockTier(0));
+        Assert.Equal(5 * BlockSize, fork.GetRamUsage().PeakAllocatedBytes);
+
+        fork.TrimRam(0);
+        Assert.Equal(new VirtualMemoryRamUsage(4 * BlockSize, 0, 0, 0, 0, 5 * BlockSize),
+            space.GetRamUsage());
+        AssertBlock(space, 0, 1);
+        AssertBlock(space, 4, 5);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void InterruptedReservationReleasesNewBuffersAndKeepsPreviousReservation(bool cancel)
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        int allocationCalls = 0;
+        var device = new TestDevice
+        {
+            OnAllocateHost = () =>
+            {
+                if (++allocationCalls != 3) return;
+                if (cancel) cancellation.Cancel();
+                else throw new OutOfMemoryException();
+            }
+        };
+        using var space = new VirtualMemorySpace(4, BlockSize, 4, directory.FullName, 1, device);
+        space.ReserveRam(1, cancellationToken);
+        void ReserveRemaining() => space.ReserveRam(4, cancellation.Token);
+        if (cancel) Assert.Throws<OperationCanceledException>(ReserveRemaining);
+        else Assert.Throws<OutOfMemoryException>(ReserveRemaining);
+        Assert.Equal(1, device.LiveHostBlocks);
+        Assert.Equal(BlockSize, space.GetRamUsage().ReservedBytes);
+        Assert.Equal(BlockSize, space.GetRamUsage().AllocatedBytes);
+
+        space.ReserveRam(4, cancellationToken);
+        Assert.Equal(4, device.LiveHostBlocks);
+        space.Dispose();
+        Assert.Equal(0, device.LiveHostBlocks);
+    }
+
+    [Fact]
     public void RamPressureUsesLruAndSparseSwapAddresses()
     {
         const long last = 1_000_000_000;
@@ -320,12 +378,20 @@ public sealed class VirtualMemorySpaceTests : IDisposable
         internal bool RejectUploads { get; init; }
         internal bool VerifyWipe { get; init; }
         internal Action? OnDownload { get; init; }
+        internal Action? OnAllocateHost { get; init; }
         internal int WipedDeviceBlocks { get; private set; }
         internal int WipedHostBlocks { get; private set; }
+        internal int LiveHostBlocks { get; private set; }
 
         public void ZeroScratch() { }
 
-        public IMemoryOwner<byte> AllocateHostBlock(int length) => new HostTestBlock(this, length);
+        public IMemoryOwner<byte> AllocateHostBlock(int length)
+        {
+            OnAllocateHost?.Invoke();
+            var block = new HostTestBlock(this, length);
+            LiveHostBlocks++;
+            return block;
+        }
         internal int LiveBlocks { get; private set; }
 
         public IVirtualMemoryDeviceBlock Upload(ReadOnlySpan<byte> source)
@@ -372,6 +438,7 @@ public sealed class VirtualMemorySpaceTests : IDisposable
 
             public void Dispose()
             {
+                owner.LiveHostBlocks--;
                 if (!owner.VerifyWipe) return;
                 Assert.True(Memory.Span.IndexOfAnyExcept((byte)0) < 0);
                 owner.WipedHostBlocks++;

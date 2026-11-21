@@ -34,6 +34,8 @@ public sealed class Gemma4E2BCpuModel : IDisposable
     internal Gemma4CudaForward.Statistics? GpuStatistics=>resident?.ReadStatistics();
     /// <summary>Current RAM residency and disk-source page-ins when explicit paging is enabled.</summary>
     public AIKernel.Kernel.Memory.VirtualMemoryStatistics? MemoryStatistics=>paged?.Statistics;
+    /// <summary>Allocated and reserved host page buffers for paged CPU weights.</summary>
+    public AIKernel.Kernel.Memory.VirtualMemoryRamUsage? WeightRamUsage => paged?.RamUsage;
     private readonly SemaphoreSlim gate=new(1,1);
     private bool disposed;
     internal sealed record Layer(int HeadSize,int Hidden,int Owner,GgufWeights.Tensor Q,GgufWeights.Tensor? K,GgufWeights.Tensor? V,

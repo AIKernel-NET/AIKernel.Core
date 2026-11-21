@@ -111,6 +111,15 @@ keeps one block resident for a synchronous operation. The CUDA backend
 provides `MultiplyRows` to run FP32 matrix-vector multiplication directly
 against that block. `GetStatistics` exposes tier counts and transfer counters.
 
+Call `ReserveRam(minimumBlocks)` before work starts to allocate and touch
+reusable host buffers within the configured RAM tier capacity. `GetRamUsage()`
+reports the capacity, reservation, active pages, spare buffers, and current
+and peak buffer allocations in bytes. Forks share this accounting. Page
+transfers can require temporary buffers beyond the configured payload capacity,
+so keep headroom when choosing the capacity. `TrimRam` releases spare buffers
+and clears the reservation. Use OS working-set and account-level measurements
+for memory outside these buffers, including the runtime and file cache.
+
 ## Reference Module
 
 The CUDA 13.0 reference implementation belongs in the external

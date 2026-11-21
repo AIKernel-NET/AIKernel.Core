@@ -34,8 +34,16 @@ public sealed class Gemma4PagingTests
         {
             using(var file=File.Create(path))
             {file.SetLength(tensor.ByteLength);file.Write(MemoryMarshal.AsBytes(Enumerable.Repeat((Half)2,32).ToArray().AsSpan()));file.Position=tensor.ByteLength-64;file.Write(MemoryMarshal.AsBytes(Enumerable.Repeat((Half)3,32).ToArray().AsSpan()));}
-            using(var weights=new Gemma4PagedWeights(path,[tensor],new(){SwapDirectory=dir.FullName,WeightCacheBytes=Gemma4PagedWeights.PageBytes}))
+            using(var weights=new Gemma4PagedWeights(path,[tensor],new()
             {
+                SwapDirectory=dir.FullName,WeightCacheBytes=Gemma4PagedWeights.PageBytes,
+                InitialWeightCacheBytes=Gemma4PagedWeights.PageBytes
+            }))
+            {
+                Assert.Equal(Gemma4PagedWeights.PageBytes, weights.RamUsage.ReservedBytes);
+                Assert.Equal(Gemma4PagedWeights.PageBytes, weights.RamUsage.SpareBytes);
+                Assert.Equal(0, weights.RamUsage.ResidentBytes);
+                Assert.Equal(0, weights.Statistics.BackingReads);
                 float[] row=new float[32];weights.ReadRow(tensor,0,row);Assert.All(row,v=>Assert.Equal(2,v));
                 weights.ReadRow(tensor,rows-1,row);Assert.All(row,v=>Assert.Equal(3,v));
                 weights.ReadRow(tensor,0,row);Assert.All(row,v=>Assert.Equal(2,v));

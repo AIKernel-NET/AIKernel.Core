@@ -32,6 +32,8 @@ internal class GgufPagedWeights : IVirtualMemorySource,IDisposable
         if(options.MaximumResidentBytes<256L*1024*1024||options.RuntimeReserveBytes<64L*1024*1024||
             options.WeightCacheBytes<pageSize||options.WeightCacheBytes>options.MaximumResidentBytes-options.RuntimeReserveBytes-3L*pageSize)
             throw new ArgumentOutOfRangeException(nameof(options),"The RAM cache must leave runtime and transient-buffer headroom.");
+        ArgumentOutOfRangeException.ThrowIfNegative(options.InitialWeightCacheBytes);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(options.InitialWeightCacheBytes, options.WeightCacheBytes);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.SwapDirectory);this.options=options;
         foreach(var tensor in tensors.DistinctBy(t=>t.Offset))
         {
@@ -45,7 +47,18 @@ internal class GgufPagedWeights : IVirtualMemorySource,IDisposable
         addressSpaceLimit=ReadAddressSpaceLimit();
         ownsHandle=backingHandle is null;
         handle=backingHandle??File.OpenHandle(path,FileMode.Open,FileAccess.Read,FileShare.Read,FileOptions.RandomAccess);
-        try{space=new(pages.Count,pageSize,cacheSlots,options.SwapDirectory,source:this);CheckBudget();}
+        try
+        {
+            space = new(pages.Count, pageSize, cacheSlots, options.SwapDirectory, source: this);
+            CheckBudget();
+            if (options.InitialWeightCacheBytes > 0)
+            {
+                long headroom = options.MaximumResidentBytes - options.RuntimeReserveBytes - 3L * pageSize - process.WorkingSet64;
+                long initialBytes = Math.Min(options.InitialWeightCacheBytes, Math.Max(0, headroom));
+                space.ReserveRam((int)Math.Min(cacheSlots, initialBytes / pageSize));
+                CheckBudget();
+            }
+        }
         catch
         {
             try{space?.Dispose();}
@@ -63,6 +76,7 @@ internal class GgufPagedWeights : IVirtualMemorySource,IDisposable
         if(!loaded[(int)index]){loaded[(int)index]=true;DistinctPagesRead++;}
     }
     internal VirtualMemoryStatistics Statistics=>space.GetStatistics();
+    internal VirtualMemoryRamUsage RamUsage => space.GetRamUsage();
     private static long? ReadAddressSpaceLimit()
     {
         const string path="/proc/self/limits", label="Max address space";
@@ -84,9 +98,9 @@ internal class GgufPagedWeights : IVirtualMemorySource,IDisposable
         // before a native page allocation fails even though measured RSS is still low.
         if(addressSpaceLimit is long limit)
         {
-            int resident=cacheSlots-space.GetAvailableBlocks().RamBlocks;
+            long allocated = space.GetRamUsage().AllocatedBytes / pageSize;
             long headroom=limit-process.VirtualMemorySize64-reserve;
-            int affordable=(int)Math.Clamp(resident+headroom/pageSize,1,cacheSlots);
+            int affordable=(int)Math.Clamp(allocated+headroom/pageSize,1,cacheSlots);
             if(affordable<cacheSlots)
             {
                 space.SetRamCapacity(affordable);

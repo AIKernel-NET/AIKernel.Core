@@ -416,6 +416,56 @@ public sealed partial class VirtualMemorySpace : IDisposable
         }
     }
 
+    /// <summary>Returns shared RAM accounting without enumerating pages or faults.</summary>
+    public VirtualMemoryRamUsage GetRamUsage()
+    {
+        lock (gate)
+        {
+            ObjectDisposedException.ThrowIf(disposed, this);
+            return new((long)ramCapacity * BlockSize, (long)arena.ReservedRamBlocks * BlockSize,
+                (long)ram.Count * BlockSize, (long)freeRam.Count * BlockSize,
+                arena.AllocatedRamBlocks * BlockSize, arena.PeakRamBlocks * BlockSize);
+        }
+    }
+
+    /// <summary>Allocates and touches host page buffers ahead of use, up to the RAM tier capacity.</summary>
+    /// <remarks>
+    /// All forks share the reservation. TrimRam releases spares and clears the reservation.
+    /// Leave headroom for temporary buffers during page transfers and for other process allocations.
+    /// </remarks>
+    public void ReserveRam(int minimumBlocks, CancellationToken cancellationToken = default)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(minimumBlocks);
+        lock (gate)
+        {
+            ObjectDisposedException.ThrowIf(disposed, this);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(minimumBlocks, ramCapacity);
+            cancellationToken.ThrowIfCancellationRequested();
+            if (minimumBlocks <= arena.ReservedRamBlocks) return;
+
+            var originalSpares = freeRam.Count;
+            var targetSpares = Math.Max(originalSpares, minimumBlocks - ram.Count);
+            freeRam.EnsureCapacity(minimumBlocks);
+            try
+            {
+                while (freeRam.Count < targetSpares)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var owner = AllocateRam();
+                    freeRam.Push(owner);
+                    owner.Memory.Span.Clear();
+                }
+                cancellationToken.ThrowIfCancellationRequested();
+                arena.ReservedRamBlocks = minimumBlocks;
+            }
+            catch
+            {
+                while (freeRam.Count > originalSpares) ReleaseRam(freeRam.Pop());
+                throw;
+            }
+        }
+    }
+
     /// <summary>Evicts least-recently-used RAM pages across this arena's forks and releases spare buffers.
     /// Clean immutable pages return to their source; dirty pages use the configured swap policy.</summary>
     public void TrimRam(int maximumBlocks)
@@ -425,12 +475,13 @@ public sealed partial class VirtualMemorySpace : IDisposable
         {
             ObjectDisposedException.ThrowIf(disposed,this);
             while(ram.Count>maximumBlocks)MoveToSwap(ram.First!.Value);
-            while(freeRam.TryPop(out var owner))owner.Dispose();
+            arena.ReservedRamBlocks = 0;
+            while(freeRam.TryPop(out var owner)) ReleaseRam(owner);
         }
     }
 
     /// <summary>Changes the shared RAM capacity across forks, evicting before a shrink.
-    /// A failed eviction preserves the previous capacity. Growth allocates on demand.</summary>
+    /// A failed eviction preserves the previous capacity. A resize releases the reservation and growth allocates on demand.</summary>
     public void SetRamCapacity(int maximumBlocks)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumBlocks);
@@ -494,7 +545,7 @@ public sealed partial class VirtualMemorySpace : IDisposable
                 try
                 {
                     if (arena.Policy.ZeroWipe) CryptographicOperations.ZeroMemory(owner.Memory.Span);
-                    owner.Dispose();
+                    ReleaseRam(owner);
                 }
                 catch (Exception ex) { (errors ??= []).Add(ex); }
             }
@@ -538,19 +589,32 @@ public sealed partial class VirtualMemorySpace : IDisposable
     }
 
     private IMemoryOwner<byte> RentRam()
-        => freeRam.TryPop(out var owner) ? owner :
-            (device as IVirtualMemoryHostAllocator)?.AllocateHostBlock(BlockSize) ?? new HostBlock(BlockSize);
+        => freeRam.TryPop(out var owner) ? owner : AllocateRam();
+
+    private IMemoryOwner<byte> AllocateRam()
+    {
+        var owner = (device as IVirtualMemoryHostAllocator)?.AllocateHostBlock(BlockSize) ?? new HostBlock(BlockSize);
+        arena.AllocatedRamBlocks++;
+        arena.PeakRamBlocks = Math.Max(arena.PeakRamBlocks, arena.AllocatedRamBlocks);
+        return owner;
+    }
+
+    private void ReleaseRam(IMemoryOwner<byte> owner)
+    {
+        owner.Dispose();
+        arena.AllocatedRamBlocks--;
+    }
 
     private void ReturnRam(IMemoryOwner<byte> owner)
     {
         if (arena.Policy.ZeroWipe) CryptographicOperations.ZeroMemory(owner.Memory.Span);
-        if (freeRam.Count < 2)
+        if (freeRam.Count < 2 || arena.AllocatedRamBlocks <= arena.ReservedRamBlocks)
         {
             freeRam.Push(owner);
         }
         else
         {
-            owner.Dispose();
+            ReleaseRam(owner);
         }
     }
 
@@ -783,6 +847,9 @@ public sealed partial class VirtualMemorySpace : IDisposable
         internal Stack<long> FreeSlots { get; } = new();
         internal Stack<IMemoryOwner<byte>> FreeRam { get; } = new(2);
         internal int RamCapacity { get; set; } = ramCapacity;
+        internal int ReservedRamBlocks { get; set; }
+        internal long AllocatedRamBlocks { get; set; }
+        internal long PeakRamBlocks { get; set; }
         internal int VramCapacity { get; } = vramCapacity;
         internal string SwapDirectory { get; } = swapDirectory;
         internal IVirtualMemoryDevice? Device { get; set; } = device;

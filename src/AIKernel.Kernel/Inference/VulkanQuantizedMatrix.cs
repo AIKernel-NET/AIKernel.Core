@@ -176,23 +176,54 @@ internal sealed unsafe class VulkanQuantizedMatrix : IMatrixOffload
                 Usage=BufferUsageFlags.StorageBufferBit,SharingMode=SharingMode.Exclusive};
             Check(vk.CreateBuffer(device,&create,null,out a.Buffer),"create buffer");
             vk.GetBufferMemoryRequirements(device,a.Buffer,out var requirements);
-            uint? selected=null;
-            var required=MemoryPropertyFlags.HostVisibleBit|MemoryPropertyFlags.HostCoherentBit;
-            for(uint i=0;i<memory.MemoryTypeCount;i++)
-                if((requirements.MemoryTypeBits&(1u<<(int)i))!=0&&(memory.MemoryTypes[(int)i].PropertyFlags&required)==required)
-                {
-                    selected=i;
-                    if((memory.MemoryTypes[(int)i].PropertyFlags&MemoryPropertyFlags.DeviceLocalBit)!=0)break;
-                }
-            if(selected is null)throw new PlatformNotSupportedException("Vulkan coherent host-visible storage memory is required.");
-            a.Flags=memory.MemoryTypes[(int)selected.Value].PropertyFlags;
-            var info=new MemoryAllocateInfo {SType=StructureType.MemoryAllocateInfo,AllocationSize=requirements.Size,MemoryTypeIndex=selected.Value};
-            Check(vk.AllocateMemory(device,&info,null,out a.Memory),"allocate memory");
+            AllocateStorageMemory(a, requirements);
             Check(vk.BindBufferMemory(device,a.Buffer,a.Memory,0),"bind buffer");
             void* mapped=null;Check(vk.MapMemory(device,a.Memory,0,size,0,&mapped),"map memory");a.Mapped=mapped;
             return a;
         }
         catch{Free(a);throw;}
+    }
+
+    private void AllocateStorageMemory(Allocation allocation, MemoryRequirements requirements)
+    {
+        const MemoryPropertyFlags required = MemoryPropertyFlags.HostVisibleBit | MemoryPropertyFlags.HostCoherentBit;
+        bool foundType = false;
+        // A discrete GPU can expose only a small host-visible portion of its local VRAM.
+        // Prefer local storage, then try coherent host memory when that heap cannot fit.
+        for (int pass = 0; pass < 2; pass++)
+        {
+            bool preferLocal = pass == 0;
+            for (uint index = 0; index < memory.MemoryTypeCount; index++)
+            {
+                var type = memory.MemoryTypes[(int)index];
+                if ((requirements.MemoryTypeBits & (1u << (int)index)) == 0 ||
+                    (type.PropertyFlags & required) != required ||
+                    ((type.PropertyFlags & MemoryPropertyFlags.DeviceLocalBit) != 0) != preferLocal)
+                    continue;
+
+                foundType = true;
+                if (requirements.Size > memory.MemoryHeaps[(int)type.HeapIndex].Size)
+                    continue;
+
+                var info = new MemoryAllocateInfo
+                {
+                    SType = StructureType.MemoryAllocateInfo,
+                    AllocationSize = requirements.Size,
+                    MemoryTypeIndex = index
+                };
+                var result = vk.AllocateMemory(device, &info, null, out var bufferMemory);
+                if (result == Result.ErrorOutOfDeviceMemory)
+                    continue;
+                Check(result, "allocate memory");
+                allocation.Memory = bufferMemory;
+                allocation.Flags = type.PropertyFlags;
+                return;
+            }
+        }
+
+        if (!foundType)
+            throw new PlatformNotSupportedException("Vulkan coherent host-visible storage memory is required.");
+        Check(Result.ErrorOutOfDeviceMemory, "allocate coherent host-visible memory");
     }
     private void Free(Allocation? a)
     {

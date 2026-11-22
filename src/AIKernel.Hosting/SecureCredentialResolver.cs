@@ -8,10 +8,23 @@ using Microsoft.Extensions.Options;
 /// <summary>[EN] Documents this public package API member. [JA] SecureCredentialResolver を表します。</summary>
 /// <include file="docs.en.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureCredentialResolver']/summary" />
 /// <include file="docs.ja.xml" path="doc/members/member[@name='T:AIKernel.Hosting.SecureCredentialResolver']/summary" />
-public sealed class SecureCredentialResolver<TOptions>(
+public sealed class SecureCredentialResolver<TOptions> : ISecureCredentialResolver<TOptions>
+    where TOptions : class, ISecureOptions
+{
+    private readonly ISecureCredentialResolver<TOptions> resolver;
+    public SecureCredentialResolver(ISecureCredentialProvider credentialProvider, IOptions<TOptions> options,
+        IKernelClock? clock = null) : this(new ConfiguredCredentialResolver<TOptions>(credentialProvider, options, clock)) { }
+
+    internal SecureCredentialResolver(ISecureCredentialResolver<TOptions> resolver) => this.resolver = resolver;
+
+    public ValueTask<TOptions> ResolveAsync(CancellationToken cancellationToken = default) =>
+        resolver.ResolveAsync(cancellationToken);
+}
+
+internal sealed class ConfiguredCredentialResolver<TOptions>(
     ISecureCredentialProvider credentialProvider,
     IOptions<TOptions> options,
-    IKernelClock? clock = null)
+    IKernelClock? clock = null) : ISecureCredentialResolver<TOptions>
     where TOptions : class, ISecureOptions
 {
     private readonly ISecureCredentialProvider _credentialProvider = credentialProvider

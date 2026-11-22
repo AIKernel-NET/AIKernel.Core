@@ -17,7 +17,7 @@
     <FileVersion>$(StablePackageVersion)</FileVersion>
     <InformationalVersion>$(PackageVersion)</InformationalVersion>
     <AIKernelContractPackageVersion Condition="'$(AIKernelContractPackageVersion)' == '' and '$(UseLocalPackageVersion)' == 'true'">[$(LocalPackageVersionPrefix)-dev$(LocalPackageBuildNumber)]</AIKernelContractPackageVersion>
-    <AIKernelContractPackageVersion Condition="'$(AIKernelContractPackageVersion)' == ''">[$(StablePackageVersion)]</AIKernelContractPackageVersion>
+    <AIKernelContractPackageVersion Condition="'$(AIKernelContractPackageVersion)' == ''">[0.1.4]</AIKernelContractPackageVersion>
     <AIKernelProviderPackageVersion Condition="'$(AIKernelProviderPackageVersion)' == '' and '$(UseLocalPackageVersion)' == 'true'">$(LocalPackageVersionPrefix)-dev$(LocalPackageBuildNumber)</AIKernelProviderPackageVersion>
     <AIKernelProviderPackageVersion Condition="'$(AIKernelProviderPackageVersion)' == ''">$(StablePackageVersion)</AIKernelProviderPackageVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

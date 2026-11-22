@@ -1,4 +1,8 @@
 using AIKernel.Hosting;
+using AIKernel.Abstractions.Hosting;
+using AIKernel.Abstractions.Security;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.Text;
 
 string root=Path.Combine(Path.GetTempPath(),"aikernel-host-validation-"+Guid.NewGuid().ToString("N"));
@@ -6,7 +10,7 @@ Directory.CreateDirectory(root);
 try
 {
     string journal=Path.Combine(root,"budget.journal");
-    var budget=new DurableTokenBudget(journal,100,2);
+    ITokenReservationBudget budget=new DurableTokenBudget(journal,100,2);
     var first=budget.Reserve(80);
     ExpectFailure(()=>new DurableTokenBudget(journal,100,2).Reserve(30));
     budget.Settle(first,10,10);
@@ -42,7 +46,60 @@ try
         await ExpectAsyncFailure(async()=>{await provider.GetSecretAsync("allowed");});
     }
     Console.WriteLine("Secret allowlist, private location and file permissions: passed");
+    var services = new ServiceCollection();
+    var builder = services.AddAIKernelCore();
+    if (services.Any(x => x.ServiceType == typeof(IDistributedApplicationHost)))
+        throw new Exception("Default host opted into network listeners.");
+    var module = new ProbeModule();
+    var probe = new ProbeHost();
+    services.AddSingleton<IDistributedApplicationHost>(probe);
+    builder.WithDistributedApplication(module);
+    await using var container = services.BuildServiceProvider();
+    foreach (var lifetime in container.GetServices<IHostedService>())
+    {
+        await lifetime.StartAsync(default);
+        await lifetime.StopAsync(default);
+    }
+    if (!module.Configured || !probe.Started || !probe.Stopped) throw new Exception("Distributed provider substitution failed.");
+    Console.WriteLine("Generic host opt-in, module registrar and substitute transport: passed");
+    var security = new ServiceCollection();
+    var replacement = new ProbeResolver();
+    security.AddSingleton<ISecureCredentialResolver<ProbeOptions>>(replacement);
+    security.AddSecureCredentialResolution<ProbeOptions>();
+    using var securityProvider = security.BuildServiceProvider();
+    var compatibilityResolver = securityProvider.GetRequiredService<SecureCredentialResolver<ProbeOptions>>();
+    if (!ReferenceEquals(await compatibilityResolver.ResolveAsync(), replacement.Options))
+        throw new Exception("Legacy resolver did not use the substituted contract.");
+    Console.WriteLine("Secure credential resolver substitution: passed");
 }
 finally{Directory.Delete(root,true);}
 static void ExpectFailure(Action action){try{action();}catch(Exception e)when(e is InvalidOperationException or IOException or InvalidDataException or FormatException){return;}throw new Exception("Expected rejection.");}
 static async Task ExpectAsyncFailure(Func<Task> action){try{await action();}catch(InvalidOperationException){return;}throw new Exception("Expected secret rejection.");}
+
+sealed class ProbeModule : IKernelModule
+{
+    public string ModuleName => "probe";
+    public bool Configured { get; private set; }
+    public void ConfigureServices(IServiceRegistrar services) { }
+    public void ConfigureProviders(IProviderRegistrar providers) => Configured = true;
+}
+sealed class ProbeOptions : ISecureOptions
+{
+    public string? SecretKeyName => null;
+    public string? ApiKey { get; set; }
+}
+sealed class ProbeResolver : ISecureCredentialResolver<ProbeOptions>
+{
+    public ProbeOptions Options { get; } = new();
+    public ValueTask<ProbeOptions> ResolveAsync(CancellationToken ct = default) => ValueTask.FromResult(Options);
+}
+sealed class ProbeHost : IDistributedApplicationHost
+{
+    public Uri? ListeningAddress => null;
+    public Task ExportConnectionAsync(CancellationToken ct = default) => Task.CompletedTask;
+    public bool Started { get; private set; }
+    public bool Stopped { get; private set; }
+    public Task StartAsync(CancellationToken ct = default) { Started = true; return Task.CompletedTask; }
+    public Task StopAsync(CancellationToken ct = default) { Stopped = true; return Task.CompletedTask; }
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+}

@@ -1,0 +1,14 @@
+<Project>
+  <!-- When developing the repositories together, every project in the graph must use the same contracts. -->
+  <PropertyGroup>
+    <AIKernelContractSourceRoot Condition="'$(AIKernelContractSourceRoot)' == ''">$(MSBuildThisFileDirectory)../AIKernel.NET/src</AIKernelContractSourceRoot>
+    <UseAIKernelContractSource Condition="'$(UseAIKernelContractSource)' == '' and Exists('$(AIKernelContractSourceRoot)/AIKernel.Abstractions/AIKernel.Abstractions.csproj')">true</UseAIKernelContractSource>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(UseAIKernelContractSource)' == 'true'">
+    <_SharedContract Include="@(PackageReference->WithMetadataValue('Identity','AIKernel.Abstractions'))" />
+    <_SharedContract Include="@(PackageReference->WithMetadataValue('Identity','AIKernel.Dtos'))" />
+    <_SharedContract Include="@(PackageReference->WithMetadataValue('Identity','AIKernel.Enums'))" />
+    <PackageReference Remove="@(_SharedContract)" />
+    <ProjectReference Include="@(_SharedContract->'$(AIKernelContractSourceRoot)/%(Identity)/%(Identity).csproj')" />
+  </ItemGroup>
+</Project>

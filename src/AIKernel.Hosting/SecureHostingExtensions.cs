@@ -65,7 +65,9 @@ public static class SecureHostingExtensions
 
         services.TryAddSingleton<ISecureCredentialProvider, EnvironmentCredentialProvider>();
 
-        services.TryAddSingleton<SecureCredentialResolver<TOptions>>();
+        services.TryAddSingleton<ISecureCredentialResolver<TOptions>, ConfiguredCredentialResolver<TOptions>>();
+        services.TryAddSingleton(sp => new SecureCredentialResolver<TOptions>(
+            sp.GetRequiredService<ISecureCredentialResolver<TOptions>>()));
 
         services.TryAddEnumerable(
             ServiceDescriptor.Singleton<IHostedService, SecureOptionsStartupValidator<TOptions>>());

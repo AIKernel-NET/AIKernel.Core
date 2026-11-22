@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace AIKernel.Hosting;
 
 /// <summary>Single-host durable reservations. Incomplete journal records fail closed; unknown usage is not refunded.</summary>
-public sealed class DurableTokenBudget
+public sealed class DurableTokenBudget : AIKernel.Abstractions.Security.ITokenReservationBudget
 {
     private readonly string path;
     private readonly int dailyTokens,totalCalls;

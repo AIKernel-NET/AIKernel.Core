@@ -88,7 +88,19 @@ internal sealed unsafe class GgufWeights : IDisposable
     internal float[] Vector(Tensor t)
     {
         if(t.Rank>2||t.Rows!=1||t.Type is not (0 or 1 or 30))throw new InvalidDataException("Floating point normalization weights required.");
-        var result=new float[t.Columns];t.Encoding.Decode(new ReadOnlySpan<byte>(Pointer(t),t.RowBytes),result);return result;
+        var result = new float[t.Columns];
+        if (directReads is null)
+        {
+            t.Encoding.Decode(new ReadOnlySpan<byte>(Pointer(t), t.RowBytes), result);
+        }
+        else
+        {
+            var encoded = new byte[t.RowBytes];
+            directReads.Position = t.Offset;
+            directReads.ReadExactly(encoded);
+            t.Encoding.Decode(encoded, result);
+        }
+        return result;
     }
     public void Dispose(){directReads?.Dispose();if(address==null)return;view!.SafeMemoryMappedViewHandle.ReleasePointer();address=null;view.Dispose();map!.Dispose();}
 }

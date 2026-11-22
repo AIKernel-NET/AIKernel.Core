@@ -76,15 +76,37 @@ internal static unsafe class QuantizedCpuMatrix
         }
         finally {if(lut is not null)ArrayPool<float>.Shared.Return(lut,clearArray:true);}
     }
+
+    internal static void MultiplyPage(nint weights, GgufWeights.Tensor tensor, float[] input, float[] output,
+        ParallelOptions options, string backend, int first, int count)
+    {
+        int workers = Math.Min(options.MaxDegreeOfParallelism, Math.Max(1, count / 64));
+        fixed (float* x = input, y = output)
+        {
+            nint inputAddress = (nint)x;
+            nuint outputAddress = (nuint)y;
+            int end = first + count;
+            void Work(int worker)
+            {
+                int start = worker == 0 ? first : RowBoundary(first + count * worker / workers, end, outputAddress);
+                int last = worker + 1 == workers ? end : RowBoundary(first + count * (worker + 1) / workers, end, outputAddress);
+                MultiplyRows((byte*)weights, tensor.Columns, tensor.RowBytes, tensor.Type, (float*)inputAddress,
+                    (float*)outputAddress, start, last, backend, null, options.CancellationToken, false, first);
+            }
+            if (workers == 1) Work(0);
+            else Parallel.For(0, workers, options, Work);
+        }
+    }
+
     // Keep captured state and managed-array range checks outside the hot row loop.
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static void MultiplyRows(byte* weights,int columns,int rowBytes,int type,float* input,float* output,
-        int first,int last,string backend,float[]? lookup,CancellationToken cancellationToken,bool preserveArithmetic)
+        int first,int last,string backend,float[]? lookup,CancellationToken cancellationToken,bool preserveArithmetic,int pageFirst=0)
     {
         for(int row=first;row<last;row++)
         {
             if((row&63)==0)cancellationToken.ThrowIfCancellationRequested();
-            var p=weights+(long)row*rowBytes;
+            var p=weights+(long)(row-pageFirst)*rowBytes;
             output[row]=type==41?(lookup is null?(preserveArithmetic?Q1Legacy(p,input,columns,backend):Q1(p,input,columns,backend)):LookupDot(p,lookup,columns,preserveArithmetic)):F32((float*)p,input,columns);
         }
     }

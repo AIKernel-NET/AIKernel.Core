@@ -112,6 +112,46 @@ public sealed class GgufExpansionTests
         Assert.Throws<NotSupportedException>(()=>new VulkanQuantizedMatrix(file,0,1024*1024));
     }
 
+    [Fact]
+    public void PagedQ1MultiplicationPreservesRowsAndArithmeticAfterEviction()
+    {
+        const int columns = 256, rows = 285, stride = 36, pageBytes = 4096;
+        var packed = new byte[rows * stride];
+        for (int row = 0; row < rows; row++)
+        {
+            for (int block = 0; block < 2; block++)
+            {
+                Span<byte> bytes = packed.AsSpan(row * stride + 18 * block, 18);
+                bytes[1] = 0x3c;
+                for (int i = 2; i < bytes.Length; i++)
+                    bytes[i] = (byte)(row * 7 + block * 3 + i * 11);
+            }
+        }
+        using var fixture = new Fixture("qwen3", new Spec("w", [columns, rows], 41, 0, packed));
+        using var mapped = new GgufWeights(fixture.Path);
+        using var source = new GgufWeights(fixture.Path, mapTensorData: false);
+        var tensor = source.Tensors["w"];
+        var input = Enumerable.Range(0, columns).Select(i => MathF.Sin(i * 0.17f)).ToArray();
+        var expected = new float[rows];
+        var actual = new float[rows];
+        var options = new ParallelOptions { MaxDegreeOfParallelism = 2 };
+        string backend = QuantizedCpuMatrix.Resolve("auto");
+        QuantizedCpuMatrix.Multiply(mapped, tensor, input, expected, options, backend);
+        using var pages = new GgufPagedWeights(fixture.Path, [tensor], new()
+        {
+            MaximumResidentBytes = 6_000_000_000,
+            WeightCacheBytes = pageBytes,
+            SwapDirectory = System.IO.Path.GetTempPath()
+        }, pageBytes, source.BackingHandle);
+        for (int pass = 0; pass < 2; pass++)
+        {
+            pages.VisitRows(tensor, default, (pointer, first, count) =>
+                QuantizedCpuMatrix.MultiplyPage(pointer, tensor, input, actual, options, backend, first, count));
+            Assert.Equal(expected.Select(BitConverter.SingleToInt32Bits), actual.Select(BitConverter.SingleToInt32Bits));
+        }
+        Assert.Equal((long)packed.Length * 2, pages.BackingBytesRead);
+    }
+
     [Theory]
     [InlineData(0,128)]
     [InlineData(8,34)]

@@ -8,6 +8,7 @@ namespace AIKernel.Kernel.Inference;
 public sealed class Qwen3CpuModel : IDisposable
 {
     private readonly GgufWeights file;
+    private readonly GgufPagedWeights? paged;
     private readonly IMatrixOffload? gpu;
     private readonly bool quantizeGpuActivations;
     private readonly bool preserveQ8Arithmetic;
@@ -44,8 +45,13 @@ public sealed class Qwen3CpuModel : IDisposable
     public Qwen3CpuModel(string modelPath,int cpuThreads,int contextTokens,string? instructionSet)
         :this(modelPath,cpuThreads,contextTokens,null,0,instructionSet:instructionSet) { }
 
+    /// <summary>Runs F32 and Q1_0 models with bounded, SSD-backed encoded weight pages.</summary>
+    public Qwen3CpuModel(string modelPath, int cpuThreads, int contextTokens, string? instructionSet, GgufMemoryOptions memory)
+        : this(modelPath, cpuThreads, contextTokens, null, 0, instructionSet: instructionSet,
+            memory: memory ?? throw new ArgumentNullException(nameof(memory))) { }
+
     internal Qwen3CpuModel(string modelPath,int cpuThreads,int contextTokens,int? deviceOrdinal,long maximumWeightBytes,
-        bool vulkan=false,bool gpuQ8=false,string? instructionSet=null,CudaQ8Kernel? gpuInt8=null)
+        bool vulkan=false,bool gpuQ8=false,string? instructionSet=null,CudaQ8Kernel? gpuInt8=null,GgufMemoryOptions? memory=null)
     {
         if(cpuThreads<1||cpuThreads>6||contextTokens<64||contextTokens>2048)throw new ArgumentOutOfRangeException(nameof(cpuThreads));
         requestedInstructionSet=instructionSet??Environment.GetEnvironmentVariable("AIKERNEL_CPU_GEMV")??"auto";
@@ -53,10 +59,12 @@ public sealed class Qwen3CpuModel : IDisposable
         threads=cpuThreads;context=contextTokens;backend=QuantizedCpuMatrix.Resolve(requestedInstructionSet);prefillBackend=decodeBackend=backend;prefillThreads=decodeThreads=cpuThreads;
         quantizeGpuActivations=gpuQ8;
         preserveQ8Arithmetic=deviceOrdinal.HasValue?gpuQ8||gpuInt8.HasValue:backend.EndsWith("-q8",StringComparison.Ordinal);
-        file=new(modelPath);
+        if (memory is not null && (deviceOrdinal.HasValue || preserveQ8Arithmetic))
+            throw new NotSupportedException("Paged Qwen3 weights currently require CPU kernels with FP32 activations.");
+        file=new(modelPath, mapTensorData: memory is null);
         try
         {
-            var definition=Qwen3ModelDefinition.Read(file,context,deviceOrdinal.HasValue,preserveQ8Arithmetic);
+            var definition=Qwen3ModelDefinition.Read(file,context,deviceOrdinal.HasValue,preserveQ8Arithmetic,memory is not null);
             width=definition.Width;hidden=definition.Hidden;heads=definition.Heads;kvHeads=definition.KvHeads;
             headSize=definition.HeadSize;var count=definition.LayerCount;epsilon=definition.Epsilon;
             querySize=heads*headSize;kvSize=kvHeads*headSize;
@@ -94,9 +102,18 @@ public sealed class Qwen3CpuModel : IDisposable
             if(deviceOrdinal.HasValue)gpu=vulkan
                 ? new VulkanQuantizedMatrix(file,deviceOrdinal.Value,maximumWeightBytes)
                 : new CudaQuantizedMatrix(file,deviceOrdinal.Value,maximumWeightBytes,gpuInt8);
+            if (memory is not null)
+                paged = new(modelPath, layers.SelectMany(layer => new[] { layer.Q, layer.K, layer.V, layer.O, layer.Gate, layer.Up, layer.Down })
+                    .Append(embedding).Append(output), memory, backingHandle: file.BackingHandle);
         }
         catch{file.Dispose();throw;}
     }
+
+    /// <summary>Total encoded weight bytes requested from the backing file by the AIKernel cache.</summary>
+    public long? WeightBackingBytesRead => paged?.BackingBytesRead;
+
+    /// <summary>The current capacity of the encoded weight cache.</summary>
+    public long? WeightCacheCapacityBytes => paged?.CacheCapacityBytes;
     /// <summary>Selected and OS-supported instruction family.</summary>
     public string RequestedInstructionSet=>requestedInstructionSet;
     /// <summary>Actual matrix instruction set(s), including tuning decisions.</summary>
@@ -119,6 +136,7 @@ public sealed class Qwen3CpuModel : IDisposable
     public async Task<CpuTuningStatus> TuneCpuAsync(CpuAutoTuningOptions options,bool refresh=false,CancellationToken cancellationToken=default)
     {
         ArgumentNullException.ThrowIfNull(options);
+        if (paged is not null) throw new NotSupportedException("CPU kernel tuning currently requires mapped weights.");
         await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
@@ -333,7 +351,10 @@ public sealed class Qwen3CpuModel : IDisposable
     private void Multiply(GgufWeights.Tensor tensor,float[] input,float[] output,ParallelOptions options,string selectedBackend,InferenceProfiler? profile=null,PreparedQ8Activation? prepared=null)
     {
         long started=profile?.Start()??0;
-        if(gpu is null)QuantizedCpuMatrix.Multiply(file,tensor,input,output,options,selectedBackend,profile,prepared);
+        if (paged is not null)
+            paged.VisitRows(tensor, options.CancellationToken,
+                (address, first, count) => QuantizedCpuMatrix.MultiplyPage(address, tensor, input, output, options, selectedBackend, first, count));
+        else if(gpu is null)QuantizedCpuMatrix.Multiply(file,tensor,input,output,options,selectedBackend,profile,prepared);
         else if(quantizeGpuActivations&&tensor.Type==41)
         {
             options.CancellationToken.ThrowIfCancellationRequested();
@@ -356,7 +377,8 @@ public sealed class Qwen3CpuModel : IDisposable
     {
         long stage=profile?.Start()??0;
         s.MarkUsed(position+1);
-        QuantizedCpuMatrix.Row(file,embedding,id,s.X);
+        if (paged is not null) paged.ReadRow(embedding, id, s.X);
+        else QuantizedCpuMatrix.Row(file,embedding,id,s.X);
         profile?.Add(InferenceStage.Embedding,stage);
         stage=profile?.Start()??0;s.PrepareRope(position,frequencies,ropeAmplitude);profile?.Add(InferenceStage.Rope,stage);
         for(int index=0;index<layers.Length;index++)
@@ -425,7 +447,7 @@ public sealed class Qwen3CpuModel : IDisposable
         float sum=Dot(x,x);float scale=1/MathF.Sqrt(sum/x.Length+eps);for(int i=0;i<x.Length;i++)y[i]=x[i]*scale*weights[i];
     }
     /// <summary>Dispose only after active requests have stopped.</summary>
-    public void Dispose(){workspace?.Dispose();workspace=null;prefixCache.Dispose();try{gpu?.Dispose();}finally{file.Dispose();gate.Dispose();}}
+    public void Dispose(){workspace?.Dispose();workspace=null;prefixCache.Dispose();try{gpu?.Dispose();paged?.Dispose();}finally{file.Dispose();gate.Dispose();}}
 }
 /// <summary>Measured result of a completed CPU generation.</summary>
 public sealed record CpuGeneration(string Text,int InputTokens,int OutputTokens,string FinishReason,long ElapsedMilliseconds,string CpuBackend)

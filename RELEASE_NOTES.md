@@ -4,6 +4,8 @@
 
 ## 0.1.4 (release candidate in development)
 
+Use `WithDistributedApplication()` to start and stop the registered HTTP/MCP listener with the Generic Host. The application supplies the handlers for its routes and tools.
+
 [Inference and governed operations API examples](https://github.com/AIKernel-NET/AIKernel.NET/blob/dev/docs/overview/inference-api-0-1-4.md).
 
 For an existing 0.1.3 application, start with the [model selection and first-reply checks](https://github.com/AIKernel-NET/AIKernel.NET/blob/dev/docs/overview/upgrade-0-1-4.md).

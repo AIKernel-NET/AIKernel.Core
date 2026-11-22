@@ -4,6 +4,8 @@
 
 ## 0.1.4（公開準備中）
 
+`WithDistributedApplication()` で、登録済みの HTTP／MCP 待受を Generic Host と一緒に開始・停止できます。ルートとツールの業務処理はアプリケーションが登録します。
+
 [推論・操作評価APIと最小コード例](https://github.com/AIKernel-NET/AIKernel.NET/blob/dev/docs/overview/inference-api-0-1-4-jp.md)。
 
 0.1.3から更新する方は、[モデルの選び方と最初の回答の確認手順](https://github.com/AIKernel-NET/AIKernel.NET/blob/dev/docs/overview/upgrade-0-1-4-jp.md)から始めてください。

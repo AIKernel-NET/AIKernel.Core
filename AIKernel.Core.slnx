@@ -4,6 +4,7 @@
     <Project Path="src/AIKernel.Core/AIKernel.Core.csproj" />
     <Project Path="src/AIKernel.Hosting/AIKernel.Hosting.csproj" />
     <Project Path="src/AIKernel.Kernel/AIKernel.Kernel.csproj" />
+    <Project Path="src/AIKernel.Kernel.ProviderPlacement/AIKernel.Kernel.ProviderPlacement.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AIKernel.Core.Tests/AIKernel.Core.Tests.csproj" />

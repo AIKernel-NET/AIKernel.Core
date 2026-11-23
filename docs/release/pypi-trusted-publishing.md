@@ -32,10 +32,13 @@ Configure a Trusted Publisher for each PyPI project that will be released:
 | `aikernel-providers` | `AIKernel-NET/AIKernel.Providers` | `publish-pypi.yml` | `pypi` |
 | `aikernel-governance` | `AIKernel-NET/AIKernel.Control` | `publish-pypi.yml` | `pypi` |
 | `aikernel-wasm` | `AIKernel-NET/AIKernel.Wasm` | `publish-pypi.yml` | `pypi` |
-| `aikernel-cuda13-libtorch2-12-win-x64` | `AIKernel-NET/AIKernel.Cuda13.0` | `publish-python.yml` | `pypi` |
 
 Verify the repository owner and repository name against GitHub before saving
 the PyPI publisher entry. PyPI requires exact matches.
+
+CUDA users on Windows x64 and Linux x64 use the CUDA Driver in
+`AIKernel.Kernel` 0.1.4. In Python, the `aikernel-net[gpu]` extra installs the
+platform-specific `aikernel-cuda-driver` wheel.
 
 ## GitHub Environment
 

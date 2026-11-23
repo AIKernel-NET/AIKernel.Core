@@ -256,17 +256,13 @@ dotnet add package AIKernel.Common --version 0.1.3
 dotnet add package AIKernel.TestKit --version 0.1.3
 ```
 
-CUDA は任意機能であり、このリポジトリの外側に分離されています。GPU ホストでは、
-`AIKernel.Cuda13.0.Libtorch2.12.win-x64` などの外部 Capability package を
-明示的に追加してください。CUDA Capability package は split distribution を採用する場合があります。
-NuGet.org には小さな metadata package のみを置き、LibTorch / CUDA / native payload を含む
-full runtime package は対応する Capability GitHub Release に添付します。CUDA 実行には
-full `.nupkg` を取得し、そのフォルダを local NuGet source として追加してから install します。
+Windows x64 と Linux x64 では、`AIKernel.Kernel` 0.1.4 同梱の CUDA Driver を使います。実行時に必要なネイティブ依存は NVIDIA ドライバのみです。
 
 ```bash
-dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
-dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.1.3
+dotnet add package AIKernel.Kernel --version 0.1.4
 ```
+
+`AIKernel.Cuda13.0` は 0.1.3 までの旧 LibTorch 参照実装で、保守は終了しました。
 
 CUDA を直接利用したい LLM / SLM 開発者向けの仮想メモリレイヤー、仕様、
 モナド Pipeline、module 作成方針は
@@ -386,9 +382,7 @@ Dynamic provider loading については、Core は stable provider registry con
 Core-owned extension として `IDynamicProviderRegistry` を公開します。Host と CLI tool は、
 Core に外部 Provider 依存を追加せずに、provider manifest の読み込み、capability metadata
 登録、任意の provider assembly loading を行えます。
-GPU と Native ABI の実装は外部 Capability package に分離します。たとえば
-`AIKernel.Cuda13.0.Libtorch2.12.win-x64` が native bridge、runtime version metadata、CUDA 固有実装を
-所有し、AIKernel Capability 契約に従います。
+CUDA のネイティブ実装は、Core リポジトリの `AIKernel.Kernel` が同梱する CUDA Driver にあります。
 信頼済みホストでは、`AddAIKernelKernel()` が Core の memory abstraction の背後に
 OS 固有の `IMemoryMapper`（Windows では `Win32MemoryMapper`、それ以外では
 `PosixMemoryMapper`）を登録します。Native Capability package は Core 抽象のみを利用し、

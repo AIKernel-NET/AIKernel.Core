@@ -75,10 +75,9 @@ AIKernel.Core は CPU/default package family を公開します。
 `AIKernel.Providers.MicrosoftAI` は外部 Provider package として利用し、Provider
 repository が更新されるまでは provider package line のまま扱います。
 
-CUDA support は optional で、この repository の外側にあります。既定の
-AIKernel.Core と AIKernel.Python install は CUDA、LibTorch、native bridge を要求しません。
-GPU host は `AIKernel.Cuda13.0.Libtorch2.12.win-x64` のような外部 CUDA Capability
-module を明示的に install / register します。
+Windows x64 と Linux x64 では、`AIKernel.Kernel` 0.1.4 同梱の CUDA Driver を使います。
+実行時に必要なネイティブ依存は NVIDIA ドライバのみです。
+`AIKernel.Cuda13.0` は 0.1.3 までの旧 LibTorch 参照実装で、保守は終了しました。
 
 対応する distribution path:
 

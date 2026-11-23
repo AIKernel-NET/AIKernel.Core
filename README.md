@@ -301,18 +301,13 @@ dotnet add package AIKernel.Common --version 0.1.3
 dotnet add package AIKernel.TestKit --version 0.1.3
 ```
 
-CUDA is optional and lives outside this repository. GPU hosts should install an
-external Capability package such as `AIKernel.Cuda13.0.Libtorch2.12.win-x64`
-explicitly. CUDA Capability packages may use split distribution: NuGet.org
-contains a small metadata package, while the full runtime package with
-LibTorch/CUDA/native payloads is attached to the matching Capability GitHub
-Release. For CUDA execution, download the full `.nupkg`, add its folder as a
-local NuGet source, and install from that source:
+For CUDA on Windows x64 and Linux x64, use the CUDA Driver bundled with `AIKernel.Kernel` 0.1.4. Its only native runtime prerequisite is the NVIDIA driver.
 
 ```bash
-dotnet nuget add source <folder-containing-full-cuda-nupkg> --name AIKernel-CUDA
-dotnet add package AIKernel.Cuda13.0.Libtorch2.12.win-x64 --version 0.1.3
+dotnet add package AIKernel.Kernel --version 0.1.4
 ```
+
+`AIKernel.Cuda13.0` is the legacy LibTorch reference implementation through 0.1.3. Maintenance has ended.
 
 LLM / SLM developers who need direct CUDA integration should read
 [docs/development/cuda-capability-development-guide.md](docs/development/cuda-capability-development-guide.md).
@@ -343,9 +338,8 @@ For source-based local validation, install from the repository subdirectory:
 pip install git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
-The default Python install is CPU-only/CUDA-free and does not include a native
-bridge. Install GPU integrations from the matching external Capability package
-and follow that Capability repository's distribution instructions.
+The default Python install runs on the CPU. For .NET CUDA integration, use the
+Driver bundled with `AIKernel.Kernel`.
 
 The v0.1.3 Core package family is aligned with the AIKernel.NET contract
 packages `AIKernel.Abstractions`, `AIKernel.Dtos`, and `AIKernel.Enums`
@@ -436,10 +430,8 @@ Core also exposes `IDynamicProviderRegistry` as a Core-owned extension over the
 stable provider registry contract. Hosts and CLI tools can use it to load
 provider manifests, register capability metadata, and optionally load provider
 assemblies without adding external provider dependencies to Core.
-GPU and Native ABI implementations are external Capability packages. For
-example, `AIKernel.Cuda13.0.Libtorch2.12.win-x64` owns its native bridge, runtime version metadata,
-and CUDA-specific implementation while conforming to AIKernel Capability
-contracts.
+The Core repository provides the native CUDA implementation through the Driver
+bundled with `AIKernel.Kernel`.
 For trusted hosts, `AddAIKernelKernel()` registers an OS-specific
 `IMemoryMapper` (`Win32MemoryMapper` on Windows, `PosixMemoryMapper` elsewhere)
 behind the Core memory abstraction. Native Capability packages consume only the

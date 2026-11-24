@@ -2,6 +2,10 @@
 
 [English](RELEASE_NOTES.md)
 
+## 0.3.0 開発版
+
+LocalLlm は登録からセッションを開き、Kernel が配置を決定します。旧 5 型と `DenseModelRegistration.Open` は 0.3 系で警告付きで利用でき、.NET 11 を使う 0.4 系で削除予定です。`chat.local` の呼び出し、応答、取消の契約は継続します。[5 型の移行先・差分プロファイル・メモリ配置](docs/local-model-registration-0.3.md)
+
 ## 0.1.4（公開準備中）
 
 `WithDistributedApplication()` で、登録済みの HTTP／MCP 待受を Generic Host と一緒に開始・停止できます。ルートとツールの業務処理はアプリケーションが登録します。

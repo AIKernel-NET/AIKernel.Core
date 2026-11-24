@@ -2,6 +2,10 @@
 
 [日本語](RELEASE_NOTES-ja.md)
 
+## 0.3.0 development
+
+LocalLlm model registration now opens device-neutral sessions. The five direct-use model types and `DenseModelRegistration.Open` remain callable with deprecation warnings through the 0.3 series. Removal is scheduled for 0.4 on .NET 11. The `chat.local` capability retains its request and response contract. [Migration, profile inheritance and placement](docs/local-model-registration-0.3.md)
+
 ## 0.1.4 (release candidate in development)
 
 Use `WithDistributedApplication()` to start and stop the registered HTTP/MCP listener with the Generic Host. The application supplies the handlers for its routes and tools.

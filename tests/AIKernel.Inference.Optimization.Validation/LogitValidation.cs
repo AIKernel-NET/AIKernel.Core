@@ -17,8 +17,9 @@ internal static class LogitValidation
             ?new Qwen3CpuModel(modelPath,workers,1024,0,1024L*1024*1024,gpuInt8:backend=="cuda-dp4a"?CudaQ8Kernel.Dp4a:null)
             :new Qwen3CpuModel(modelPath,workers,1024,backend);
         var type=typeof(Qwen3CpuModel);
+        if(type.GetField("tokenizer",flags) is null)type=type.BaseType!;
         var tokenizer=(QwenTokenizer)type.GetField("tokenizer",flags)!.GetValue(model)!;
-        var output=(GgufWeights.Tensor)type.GetField("output",flags)!.GetValue(model)!;
+        var output=type.GetField("output",flags)!.GetValue(model)!;
         var forward=type.GetMethod("Forward",flags)!;var multiply=type.GetMethod("Multiply",flags)!;
         using var state=(Qwen3Workspace)type.GetMethod("AcquireWorkspace",flags)!.Invoke(model,[CancellationToken.None])!;
         string selected=backend.StartsWith("cuda-",StringComparison.Ordinal)?model.CpuBackend:backend;

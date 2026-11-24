@@ -120,7 +120,7 @@ public sealed class BonsaiCtgCouncilEvaluator : ICouncilEvaluator,IDisposable
     private readonly ImmutableDictionary<CouncilKind,BonsaiCouncilRule> rules;
     private readonly IKernelClock clock;
     private readonly string modelHash;
-    private readonly Qwen3CpuModel? model;
+    private readonly DenseModelSession? model;
     private readonly BonsaiCtgResponseMode responseMode;
     private readonly TimeSpan evaluationTimeout;
     private readonly SemaphoreSlim gate=new(1,1);

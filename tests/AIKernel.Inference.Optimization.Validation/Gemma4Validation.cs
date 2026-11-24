@@ -22,7 +22,9 @@ internal static class Gemma4Validation
             Memory=Environment.GetEnvironmentVariable("GEMMA_SWAP_DIRECTORY") is {Length:>0} swap?new Gemma4MemoryOptions{SwapDirectory=swap,
                 WeightCacheBytes=long.Parse(Environment.GetEnvironmentVariable("GEMMA_CACHE_BYTES")??"5000000000")}:null};
         var load=Stopwatch.StartNew();
-        using var model=new Gemma4E2BCpuModel(args[1],threads,context,4L*1024*1024*1024,execution);
+        using GemmaTextSession model = execution == new Gemma4ExecutionOptions()
+            ? ModelRegistration.Gemma4E2B.OpenSession(args[1], threads, context, deviceBudgetBytes: 0)
+            : new Gemma4E2BCpuModel(args[1],threads,context,4L*1024*1024*1024,execution);
         double loadMs=load.Elapsed.TotalMilliseconds;
         using var timeout=new CancellationTokenSource(TimeSpan.FromMinutes(30));
         if(Environment.GetEnvironmentVariable("GEMMA_PREFAULT")=="1")PrefaultMappedWeights(model);
@@ -100,9 +102,10 @@ internal static class Gemma4Validation
     }
     // Validation only: touch every page of this model's existing map, rather than measuring
     // only the small PLE rows referenced by a short prompt. Does not create another mapping.
-    private static unsafe void PrefaultMappedWeights(Gemma4E2BCpuModel model)
+    private static unsafe void PrefaultMappedWeights(GemmaTextSession model)
     {
-        var field=typeof(Gemma4E2BCpuModel).GetField("file",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!;
+        const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        var field = typeof(GemmaTextSession).GetField("file", flags)!;
         var file=(GgufWeights)field.GetValue(model)!;long checksum=0;
         for(long offset=0;offset<file.Length;offset+=4096)checksum+=*file.BytesAt(offset,1);
         Console.Error.WriteLine($"Prefaulted {file.Length} mapped bytes; checksum={checksum}");

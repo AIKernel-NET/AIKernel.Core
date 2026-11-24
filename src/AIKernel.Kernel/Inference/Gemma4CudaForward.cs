@@ -24,7 +24,7 @@ internal sealed unsafe class Gemma4CudaForward : IDisposable
     private readonly long budget;
     internal long WeightBytes{get;}
     internal long ResidentBytes{get;private set;}
-    internal Gemma4CudaForward(GgufWeights file,Gemma4E2BCpuModel.Layer[] layers,GgufWeights.Tensor embedding,
+    internal Gemma4CudaForward(GgufWeights file,GemmaTextSession.Layer[] layers,GgufWeights.Tensor embedding,
         GgufWeights.Tensor pleEmbedding,GgufWeights.Tensor pleProjection,float[] finalNorm,float[] pleNorm,
         float[] localFrequencies,float[] fullFrequencies,int context,int ordinal,long budget)
     {

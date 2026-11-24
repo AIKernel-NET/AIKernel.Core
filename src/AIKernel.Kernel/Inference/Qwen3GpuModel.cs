@@ -3,9 +3,10 @@ namespace AIKernel.Kernel.Inference;
 /// <summary>Qwen3 dense inference with resident quantized CUDA matrices and CPU attention, normalization and KV state.</summary>
 /// <remarks>Requires AIKernel's native CUDA Driver library and an NVIDIA driver. No Toolkit or LibTorch is loaded.
 /// GPU failures are reported; this class never silently falls back to CPU matrix multiplication.</remarks>
+[Obsolete("Use DenseModelRegistration.Parse(...).OpenSession(...) with a device residency budget. This type will be removed in 0.4.", false)]
 public sealed class Qwen3GpuModel : IDisposable
 {
-    private readonly Qwen3CpuModel engine;
+    private readonly DenseModelSession engine;
     /// <summary>Loads a bounded model and uploads its encoded weights to a private device context.</summary>
     /// <param name="modelPath">A supported Qwen3 dense GGUF with Q1_0 or FP32 matrices.</param>
     /// <param name="deviceOrdinal">CUDA device ordinal, starting at zero.</param>

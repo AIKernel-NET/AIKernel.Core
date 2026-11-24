@@ -7,55 +7,39 @@ using System.Text.Json.Serialization;
 namespace AIKernel.Kernel.Inference;
 
 /// <summary>Immutable host registration for a versioned dense checkpoint and its embedded tokenizer.</summary>
-public sealed class DenseModelRegistration
+public sealed class DenseModelRegistration : IModelRegistration<DenseModelSession>
 {
     private readonly DenseRegistrationDocument _document;
 
     private DenseModelRegistration(DenseRegistrationDocument document) => _document = document;
 
-    /// <summary>Parses a standalone registration. Inheritance is outside this schema.</summary>
+    /// <summary>Parses a complete registration or resolves a named profile within a host-supplied catalog.</summary>
     public static DenseModelRegistration Parse(string json, string registeredModelId)
-    {
-        ArgumentNullException.ThrowIfNull(json);
-        var document = ReadDocument(json);
-        document.Validate(registeredModelId);
-        return new(document);
-    }
-
-    private static DenseRegistrationDocument ReadDocument(string json)
-    {
-        try
-        {
-            return JsonSerializer.Deserialize(json, DenseRegistrationJson.Default.DenseRegistrationDocument)
-                ?? throw new InvalidDataException("A model registration is required.");
-        }
-        catch (JsonException error)
-        {
-            throw new InvalidDataException("Invalid standalone model registration.", error);
-        }
-    }
+        => new(ProfileReader.ReadVerified(json, registeredModelId));
 
     /// <summary>Opens and verifies the registered model before making it available for requests.</summary>
+    [Obsolete("Use OpenSession instead. Open will be removed in 0.4.", false)]
     public Qwen3CpuModel Open(string path, int threads, int context, GgufMemoryOptions? memory = null)
-        => new(new DenseCheckpoint(path, this), threads, context, null, 0, instructionSet: "auto", memory: memory);
+        => new(this, path, threads, context, memory);
+
+    /// <inheritdoc />
+    public DenseModelSession OpenSession(string path, int threads = 4, int context = 1024,
+        GgufMemoryOptions? memory = null, long? deviceBudgetBytes = null)
+        => ModelPlacement.OpenDense(new(path, this), threads, context, memory, PlacementBudget.Resolve(deviceBudgetBytes));
+
+    /// <summary>Uses the Kernel's configured device allocation budget.</summary>
+    public DenseModelSession OpenSession(string path, int threads, int context, GgufMemoryOptions? memory)
+        => OpenSession(path, threads, context, memory, null);
 
     internal void CheckWeights(Stream stream)
-    {
-        var digest = SHA256.HashData(stream);
-        stream.Position = 0;
-        Verify(digest, _document.WeightsSha256);
-    }
+        => ProfileReader.VerifyWeights(stream, _document.WeightsSha256);
 
     internal void CheckTokenizer(GgufWeights weights) =>
-        Verify(EmbeddedTokenizerDigest.Compute(weights), _document.TokenizerSha256);
+        ProfileReader.VerifyTokenizer(weights, _document.TokenizerSha256);
 
     internal Qwen3ModelDefinition BindShape(Qwen3ModelDefinition checkpoint) => _document.Shape.Bind(checkpoint);
 
-    private static void Verify(byte[] actual, string expected)
-    {
-        if (!CryptographicOperations.FixedTimeEquals(actual, Convert.FromHexString(expected)))
-            throw new InvalidDataException("Registered artifact digest mismatch.");
-    }
+
 }
 
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]

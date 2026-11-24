@@ -3,9 +3,10 @@ namespace AIKernel.Kernel.Inference;
 /// <summary>Explicit Vulkan Q1_0/FP32 matrix offload with CPU attention, normalization, KV and sampling.</summary>
 /// <remarks>Requires a Vulkan 1.1 driver with coherent host-visible storage memory. No CUDA or LibTorch is loaded.
 /// Device ordinals are Vulkan-specific. Failures are reported rather than silently using CPU matrices.</remarks>
+[Obsolete("Use DenseModelRegistration.Parse(...).OpenSession(...) with a device residency budget. This type will be removed in 0.4.", false)]
 public sealed class Qwen3VulkanModel : IDisposable
 {
-    private readonly Qwen3CpuModel engine;
+    private readonly DenseModelSession engine;
     internal object? Diagnostics=>engine.VulkanDiagnostics;
     /// <summary>Lists compute devices without allocating model memory.</summary>
     public static IReadOnlyList<VulkanComputeDeviceInfo> EnumerateDevices()=>VulkanQuantizedMatrix.Enumerate();

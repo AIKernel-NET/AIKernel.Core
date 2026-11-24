@@ -5,6 +5,8 @@ AIKernel implements the model and matrix kernels itself. Vulkan uses Silk.NET.Vu
 CPU FP32-activation path remains the default. CUDA constructors retain their original
 signature and behavior.
 
+In 0.3 use the [registered session API](local-model-registration-0.3.md). The explicit device examples below record the 0.1.4 benchmark configuration. The five legacy direct model types are scheduled for removal in 0.4.
+
 ## Vulkan (including Intel integrated graphics)
 
 Enumerate with Qwen3VulkanModel.EnumerateDevices(), select the desired vendor/name,

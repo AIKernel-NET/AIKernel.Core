@@ -67,7 +67,7 @@ GPT-OSS のCPU経路は o200k BPE、Harmony、上位4 expert のルーティン�
 ```csharp
 var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 var privateSwapDirectory = Directory.CreateDirectory(Path.Combine(home, ".aikernel", "model-swap")).FullName;
-using var model = new GptOss20BCpuModel("gpt-oss-20b-MXFP4.gguf", cpuThreads: 4, contextTokens: 128,
+using var model = ModelRegistration.GptOss20B.OpenSession("gpt-oss-20b-MXFP4.gguf", threads: 4, context: 128,
     memory: new GgufMemoryOptions {
         MaximumResidentBytes = 7_000_000_000,
         WeightCacheBytes = 5_000_000_000,

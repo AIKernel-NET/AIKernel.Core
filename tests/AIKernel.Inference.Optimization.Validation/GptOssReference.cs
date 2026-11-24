@@ -27,7 +27,7 @@ internal static partial class GptOssReference
         var samples=reference.RootElement.GetProperty("answers");
         if(sampleIndex is int i && (uint)i>=(uint)samples.GetArrayLength()) throw new ArgumentOutOfRangeException(nameof(sampleIndex));
         var load=Stopwatch.StartNew();
-        using var model=new GptOss20BCpuModel(checkpoint,4,128,memory);
+        using var model = ModelRegistration.GptOss20B.OpenSession(checkpoint, 4, 128, memory, deviceBudgetBytes: 0);
         load.Stop();
         var rows=new List<object>();
         bool passed=true;

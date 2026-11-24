@@ -1,6 +1,13 @@
 # Gemma 4 E2BのCPU／GPUテキスト生成
 
-`Gemma4E2BCpuModel` はGemma 4 E2Bの専用tokenizer、対話テンプレート、生成グラフを
+0.3 系では次の登録からセッションを開きます。旧型の直接利用は 0.3 系で警告となり、0.4 系で削除予定です。[配置と移行手順](local-model-registration-0.3.md)
+
+```csharp
+using var model = ModelRegistration.Gemma4E2B.OpenSession(path, threads: 4, context: 1024);
+var reply = await model.GenerateAsync("", "東京はどこの首都ですか？", 32, cancellationToken);
+```
+
+以下の 0.1.4 実測で使用した `Gemma4E2BCpuModel` はGemma 4 E2Bの専用tokenizer、対話テンプレート、生成グラフを
 AIKernel内で実行します。CPUではAVX-512／AVX2のFP32 SIMDを使用し、非対応CPUでは参照経路へ戻ります。
 CPU実行にはCUDA・LibTorch・Pythonは不要です。GPUは明示的に選択でき、NVIDIAドライバーと
 AIKernelのネイティブDLLを使います。CUDA Toolkit・LibTorchは実行時に必要ありません。

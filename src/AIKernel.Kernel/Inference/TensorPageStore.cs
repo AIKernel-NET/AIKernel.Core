@@ -44,9 +44,9 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
         }
         loaded=new bool[pages.Count];
         cacheSlots=checked((int)Math.Min(pages.Count,options.WeightCacheBytes/pageSize));
-        addressSpaceLimit=ReadAddressSpaceLimit();
+        addressSpaceLimit=ProcessAddressSpace.ReadAddressSpaceLimit();
         ownsHandle=backingHandle is null;
-        handle=backingHandle??File.OpenHandle(path,FileMode.Open,FileAccess.Read,FileShare.Read,FileOptions.RandomAccess);
+        handle=backingHandle??OpenBacking(path);
         try
         {
             space = new(pages.Count, pageSize, cacheSlots, options.SwapDirectory, source: this);
@@ -76,20 +76,18 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
         if(!loaded[(int)index]){loaded[(int)index]=true;DistinctPagesRead++;}
     }
     internal VirtualMemoryStatistics Statistics=>space.GetStatistics();
-    internal VirtualMemoryRamUsage RamUsage => space.GetRamUsage();
-    private static long? ReadAddressSpaceLimit()
+    private static SafeFileHandle OpenBacking(string path) =>
+        File.OpenHandle(path,FileMode.Open,FileAccess.Read,FileShare.Read,FileOptions.RandomAccess);
+
+    internal ResourceResidency Observe(long backing)
     {
-        const string path="/proc/self/limits", label="Max address space";
-        if(!OperatingSystem.IsLinux() || !File.Exists(path))return null;
-        foreach(string line in File.ReadLines(path))
-        {
-            if(!line.StartsWith(label,StringComparison.Ordinal))continue;
-            var value=line.AsSpan(label.Length).TrimStart();
-            int end=value.IndexOf(' ');
-            if(end>0 && long.TryParse(value[..end],out long limit))return limit;
-        }
-        return null;
+        var layout = layouts[backing];
+        int resident = 0;
+        for (int i = 0; i < layout.Pages; i++)
+            if (space.GetBlockTier(layout.FirstPage + i) == VirtualMemoryTier.Ram) resident++;
+        return new(layout.Pages, resident);
     }
+    internal VirtualMemoryRamUsage RamUsage => space.GetRamUsage();
     internal void CheckBudget()
     {
         process.Refresh();

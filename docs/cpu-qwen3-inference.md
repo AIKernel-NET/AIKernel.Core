@@ -5,7 +5,8 @@ This implementation runs dense Qwen3 GGUF models with **F32 and Q1_0 g128** tens
 ```csharp
 using AIKernel.Kernel.Inference;
 
-using var model = new Qwen3CpuModel(modelPath, cpuThreads: 4, contextTokens: 1024);
+var registration = DenseModelRegistration.Parse(File.ReadAllText("bonsai-1.7b.json"), "bonsai-1.7b");
+using var model = registration.OpenSession(modelPath, threads: 4, context: 1024);
 using var deadline = new CancellationTokenSource(TimeSpan.FromMinutes(3));
 var result = await model.GenerateAsync(
     "Draft a brief reply in Japanese.",
@@ -17,6 +18,8 @@ Console.WriteLine(result.FinishReason); // stop or length
 ```
 
 `ClassifyAsync(system, user, labels, cancellationToken)` scores only the supplied single-token labels. It reports the winning label, not a calibrated confidence probability. Prompts still affect classification quality.
+
+The 0.3 Kernel issues a migration warning on the original direct constructor. See [registered model sessions and the 0.4 removal schedule](local-model-registration-0.3.md).
 
 ## Bounds and state
 

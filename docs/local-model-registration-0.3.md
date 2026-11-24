@@ -25,6 +25,21 @@ The host supplies the GGUF path and registration. The Kernel verifies the checkp
 
 ## Placement and memory
 
+### Qwen3-0.6B CPU snapshots
+
+Use `qwen3-0.6b` as the registration ID. Choose one of the profiles shipped in the LocalLlm Provider's `profiles/` directory. Keep the upstream directory structure, including the configuration, tokenizer and generation files.
+
+| Profile | Local path passed to `OpenSession` | Verified upstream revision |
+| --- | --- | --- |
+| `qwen3-06b-onnx.json` | `onnx/model.onnx`, with its sibling `model.onnx_data` | `onnx-community/Qwen3-0.6B-ONNX@79346d370dfae34801d26993fda9ae2372900fd0` |
+| `qwen3-06b-safetensors.json` | `model.safetensors` | `Qwen/Qwen3-0.6B@c1899de289a04d12100db370d81485cdf75e47ca` |
+
+The ONNX reader accepts the exact FP32 graph fingerprint above. Any change to its operators, connections or dynamic axes requires a new reader review. The SafeTensors reader imports BF16 and FP32 directly. Both use the same dense CPU session. Opening a session builds a private FP32 backing in the OS temporary directory. Allow approximately 2.4 GB of free temporary storage per open Qwen session in addition to the checkpoint. The file is released on disposal. Set the existing weight memory options to use bounded paging.
+
+For a repack of the pinned SafeTensors weights, point the session at `model.safetensors.index.json`. Beside it, put a UTF-8 file named `model.safetensors.index.json.lock.json`. Its JSON object maps the index filename and each shard filename to the SHA-256 of that file. Copy the SafeTensors profile and set `weightsSha256` to the SHA-256 of the lock file itself. Every artifact is read from the handle used to verify it. The Kernel checks the index, shard membership and the original revision's per-tensor digest before making the session available. For the Provider, set `RegisteredLocalLlmSettings.RegistrationFile` to the updated profile.
+
+### Other registered graphs
+
 A host can supply `deviceBudgetBytes` in bytes, or configure `AIKERNEL_DEVICE_BUDGET_BYTES` for sessions with no explicit budget. The default is zero. With a positive budget and a checkpoint small enough to attempt device residency, the Kernel checks CUDA availability first and can use Vulkan for the dense graph. A supplied `GgufMemoryOptions` selects bounded host paging. The routed MXFP4 graph uses host kernels. Driver allocation and kernel initialization errors are surfaced to the caller. Budget the working state in addition to the encoded checkpoint.
 
 Paged GPT-OSS sessions expose `GetResourceResidency(layerIndex, resourceIndex)` for the gate, up and down projections together. `ResourceDispatchCounts` reports selection counts across layers per expert ID. Observing residency leaves page contents and eviction order intact. An OS-managed mapping returns no AIKernel page count.

@@ -37,5 +37,5 @@ internal sealed record DenseCheckpoint(string Path, DenseModelRegistration? Regi
 {
     internal IDenseModelWeights Open(int context, int? device, long gpuBudget,
         bool vulkan, bool q8, CudaQ8Kernel? kernel, GgufMemoryOptions? memory)
-        => GgufDenseWeights.Open(Path, context, device, gpuBudget, vulkan, q8, kernel, memory, Registration);
+        => SnapshotRegistration.Open(Path, context, device, gpuBudget, vulkan, q8, kernel, memory, Registration);
 }

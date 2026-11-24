@@ -10,6 +10,12 @@ internal sealed class QwenTokenizer : ITextTokenizer
     private readonly GgufByteBpe bpe;
     private readonly IChatTemplate chat;
     internal int End { get; }
+    internal QwenTokenizer(GgufByteBpe vocabulary, int end)
+    {
+        bpe = vocabulary;
+        End = end;
+        chat = new QwenChatTemplate(this, end);
+    }
     internal QwenTokenizer(GgufWeights file)
     {
         if (file.Metadata.GetValueOrDefault("tokenizer.ggml.pre") is not "qwen2")
@@ -37,28 +43,43 @@ internal sealed class GgufByteBpe
     private readonly byte[][] bytes;
     private readonly char[] alphabet=new char[256];
     private readonly int[] single=new int[256];
-    internal GgufByteBpe(GgufWeights file)
+    internal GgufByteBpe(GgufWeights file) : this(ReadTokens(file), file.Merges) { }
+    private static string[] ReadTokens(GgufWeights file)
     {
         if(file.Metadata.GetValueOrDefault("tokenizer.ggml.model") is not "gpt2")
             throw new NotSupportedException("Expected GPT-2 byte alphabet.");
-        var tokens=file.Tokens;bytes=new byte[tokens.Length][];
-        int extra=256;
-        for(int b=0;b<256;b++)alphabet[b]=(char)(b is >=33 and <=126 or >=161 and <=172 or >=174 and <=255?b:extra++);
-        var reverse=alphabet.Select((c,b)=>(c,b)).ToDictionary(x=>x.c,x=>(byte)x.b);
+        return file.Tokens;
+    }
+    internal GgufByteBpe(string[] tokens, string[] rankedMerges)
+    {
+        bytes=new byte[tokens.Length][];
+        var reverse = BuildAlphabet();
         for(int i=0;i<tokens.Length;i++)
         {
             vocab.Add(tokens[i],i);
             bytes[i]=tokens[i].All(reverse.ContainsKey)?tokens[i].Select(c=>reverse[c]).ToArray():[];
         }
         for(int b=0;b<256;b++)single[b]=vocab[alphabet[b].ToString()];
-        for(int rank=0;rank<file.Merges.Length;rank++)
+        for(int rank=0;rank<rankedMerges.Length;rank++) RegisterMerge(rankedMerges[rank],rank);
+    }
+    private Dictionary<char,byte> BuildAlphabet()
+    {
+        var reverse = new Dictionary<char,byte>();
+        int extra = 256;
+        for (int b=0; b<256; b++)
         {
-            var text=file.Merges[rank];int split=text.IndexOf(' ');
-            if(split<1)throw new InvalidDataException("Invalid merge.");
-            var a=text[..split];var b=text[(split+1)..];
-            if(vocab.TryGetValue(a,out int x)&&vocab.TryGetValue(b,out int y)&&vocab.TryGetValue(a+b,out int z))
-                merges.TryAdd((x,y),(z,rank));
+            alphabet[b]=(char)(b is >=33 and <=126 or >=161 and <=172 or >=174 and <=255 ? b : extra++);
+            reverse.Add(alphabet[b],(byte)b);
         }
+        return reverse;
+    }
+    private void RegisterMerge(string text,int rank)
+    {
+        int split=text.IndexOf(' ');
+        if(split<1)throw new InvalidDataException("Invalid merge.");
+        var a=text[..split];var b=text[(split+1)..];
+        if(vocab.TryGetValue(a,out int x)&&vocab.TryGetValue(b,out int y)&&vocab.TryGetValue(a+b,out int z))
+            merges.TryAdd((x,y),(z,rank));
     }
     internal List<int> Encode(string text, Regex pieces, bool unicodeScalars=false)
     {

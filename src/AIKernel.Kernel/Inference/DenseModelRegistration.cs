@@ -9,7 +9,7 @@ namespace AIKernel.Kernel.Inference;
 /// <summary>Immutable host registration for a versioned dense checkpoint and its embedded tokenizer.</summary>
 public sealed class DenseModelRegistration : IModelRegistration<DenseModelSession>
 {
-    private readonly DenseRegistrationDocument _document;
+    internal readonly DenseRegistrationDocument _document;
 
     private DenseModelRegistration(DenseRegistrationDocument document) => _document = document;
 
@@ -25,7 +25,7 @@ public sealed class DenseModelRegistration : IModelRegistration<DenseModelSessio
     /// <inheritdoc />
     public DenseModelSession OpenSession(string path, int threads = 4, int context = 1024,
         GgufMemoryOptions? memory = null, long? deviceBudgetBytes = null)
-        => ModelPlacement.OpenDense(new(path, this), threads, context, memory, PlacementBudget.Resolve(deviceBudgetBytes));
+        => SnapshotRegistration.OpenSession(this, path, threads, context, memory, deviceBudgetBytes);
 
     /// <summary>Uses the Kernel's configured device allocation budget.</summary>
     public DenseModelSession OpenSession(string path, int threads, int context, GgufMemoryOptions? memory)
@@ -49,20 +49,15 @@ internal sealed record DenseRegistrationDocument(string ModelId, string Version,
     internal void Validate(string registeredModelId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(registeredModelId);
-        if (ModelId != registeredModelId || ReaderId != "gguf")
-            throw new InvalidDataException("Unknown registered model or reader.");
-        if (Version != "Q1_0-1" || TokenizerVersion != "qwen2-bpe-1")
-            throw new InvalidDataException("Unsupported checkpoint or tokenizer revision.");
+        SnapshotRegistration.Check(this, registeredModelId);
         CheckDigest(WeightsSha256);
         CheckDigest(TokenizerSha256);
         ArgumentNullException.ThrowIfNull(Shape);
     }
 
+
     private static void CheckDigest(string value)
-    {
-        if (value is not { Length: 64 } || !value.All(Uri.IsHexDigit))
-            throw new InvalidDataException("Expected a SHA-256 digest.");
-    }
+        => SnapshotRegistration.CheckDigest(value);
 }
 
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]

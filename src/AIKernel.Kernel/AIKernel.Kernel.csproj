@@ -45,6 +45,7 @@ JA: AIKernel.NET の Kernel Facade およびオーケストレーション層で
 
   <ItemGroup>
     <EmbeddedResource Include="Inference/Shaders/quantized_gemv.spv" />
+    <EmbeddedResource Include="Inference/Import/Data/*" LogicalName="AIKernel.Dense.%(Filename)%(Extension)" />
     <EmbeddedResource Include="Inference/Shaders/quantized_gemv_subgroup.spv" />
   </ItemGroup>
 

@@ -98,6 +98,18 @@ if(args.Length==3&&args[0]=="--inspect-header")
         MaximumRank=info.Tensors.Max(t=>t.Dimensions.Length),HeaderBytesConsumed=stream.Position,GenerationValidated=false}));return;
 }
 if(args.Length==2&&args[0]=="--matrices"){MatrixValidation.Run(args[1]);return;}
+if(args.Length==5&&args[0]=="--registered-snapshot"){await RegisteredSnapshotValidation.Run(args);return;}
+if (args.Length == 3 && args[0] == "--reject-registered")
+{
+    var registration = DenseModelRegistration.Parse(File.ReadAllText(args[2]), "qwen3-0.6b");
+    try { using var unexpected = registration.OpenSession(args[1], threads: 1, context: 128); }
+    catch (Exception ex) when (ex is InvalidDataException or FileNotFoundException)
+    {
+        Console.WriteLine(ex.GetType().Name + " " + ex.Message);
+        return;
+    }
+    throw new InvalidOperationException("Invalid snapshot opened successfully.");
+}
 if(args.Length>=4&&args[0]=="--logits"){LogitValidation.Run(args);return;}
 if(args.Length!=3)throw new ArgumentException("model path, cpu|cuda, backend|precision required");
 Environment.SetEnvironmentVariable("AIKERNEL_INFERENCE_PROFILE","1");

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <None Include="..\..\assets\aikernel-logo128x128.png">
@@ -24,6 +24,7 @@
     <PackageReference Include="AIKernel.Dtos" Version="$(AIKernelContractPackageVersion)" />
     <PackageReference Include="AIKernel.Enums" Version="$(AIKernelContractPackageVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+    <PackageReference Include="Roslynator.Analyzers" Version="[5.0.1]" PrivateAssets="all" />
     <PackageReference Include="Silk.NET.Vulkan" Version="2.23.0" />
   </ItemGroup>
 
@@ -37,6 +38,7 @@
 
 JA: AIKernel.NET の Kernel Facade およびオーケストレーション層です。Core、Provider、Context、Governance、実行フローを統合された IKernel インターフェースで制御します。</Description>
     <Title>AIKernel.Kernel</Title>
+    <PackageVersion>0.3.0</PackageVersion>
     <PackageIcon>aikernel-logo128x128.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>

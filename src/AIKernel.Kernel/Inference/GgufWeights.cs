@@ -36,8 +36,10 @@ internal sealed unsafe class GgufWeights : IDisposable
     internal string[] Merges => (string[])Metadata["tokenizer.ggml.merges"];
 
     internal GgufWeights(string path, bool mapTensorData = true)
+        : this(File.OpenRead(path), mapTensorData) { }
+
+    internal GgufWeights(FileStream stream, bool mapTensorData)
     {
-        var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
         try
         {
             var directory=GgufDirectory.Read(stream);
@@ -87,7 +89,7 @@ internal sealed unsafe class GgufWeights : IDisposable
     }
     internal float[] Vector(Tensor t)
     {
-        if(t.Rank>2||t.Rows!=1||t.Type is not (0 or 1 or 30))throw new InvalidDataException("Floating point normalization weights required.");
+        if(t is not { Rank: <= 2, Rows: 1, Type: 0 or 1 or 30 })throw new InvalidDataException("Floating point normalization weights required.");
         var result = new float[t.Columns];
         if (directReads is null)
         {

@@ -8,10 +8,12 @@ namespace AIKernel.Kernel.Inference;
 internal class TensorPageStore : IVirtualMemorySource,IDisposable
 {
     internal const int PageBytes=4*1024*1024;
-    private readonly int pageSize;
-    private readonly bool[] loaded;
-    internal long BackingBytesRead { get; private set; }
-    internal long DistinctPagesRead { get; private set; }
+    internal readonly int pageSize;
+    internal readonly WeightPageFile backing;
+    internal WeightPageHints? Hints;
+    internal long BackingBytesRead => backing.Counts.Bytes;
+    internal long DistinctPagesRead => backing.Counts.Distinct;
+    internal WeightPrefetchStatistics PrefetchStatistics => backing.Statistics;
     private sealed record Layout(int RowsPerPage,long FirstPage,int Pages);
     private readonly Dictionary<long,Layout> layouts=new();
     private readonly List<(long Offset,int Bytes)> pages=new();
@@ -28,13 +30,8 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
         int pageSize=PageBytes, SafeFileHandle? backingHandle=null)
     {
         this.pageSize=pageSize;
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
-        if(options.MaximumResidentBytes<256L*1024*1024||options.RuntimeReserveBytes<64L*1024*1024||
-            options.WeightCacheBytes<pageSize||options.WeightCacheBytes>options.MaximumResidentBytes-options.RuntimeReserveBytes-3L*pageSize)
-            throw new ArgumentOutOfRangeException(nameof(options),"The RAM cache must leave runtime and transient-buffer headroom.");
-        ArgumentOutOfRangeException.ThrowIfNegative(options.InitialWeightCacheBytes);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(options.InitialWeightCacheBytes, options.WeightCacheBytes);
-        ArgumentException.ThrowIfNullOrWhiteSpace(options.SwapDirectory);this.options=options;
+        PagedWeightSetup.Validate(options, pageSize);
+        this.options=options;
         foreach(var tensor in tensors.DistinctBy(t=>t.Backing))
         {
             if(tensor.RowBytes>pageSize)throw new NotSupportedException("encoded tensor exceeds virtual page shape.");
@@ -42,13 +39,13 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
             layouts.Add(tensor.Backing,new(count,pages.Count,n));
             for(int row=0;row<tensor.Rows;row+=count)pages.Add((tensor.Backing+row*(long)tensor.RowBytes,Math.Min(count,tensor.Rows-row)*tensor.RowBytes));
         }
-        loaded=new bool[pages.Count];
         cacheSlots=checked((int)Math.Min(pages.Count,options.WeightCacheBytes/pageSize));
         addressSpaceLimit=ProcessAddressSpace.ReadAddressSpaceLimit();
         ownsHandle=backingHandle is null;
         handle=backingHandle??OpenBacking(path);
         try
         {
+            backing = new(handle, pages);
             space = new(pages.Count, pageSize, cacheSlots, options.SwapDirectory, source: this);
             CheckBudget();
             if (options.InitialWeightCacheBytes > 0)
@@ -66,15 +63,14 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
             throw;
         }
     }
-    public void ReadBlock(long index,Span<byte> destination)
+    public void ReadBlock(long index, Span<byte> destination) => backing.Demand(index, destination);
+
+    internal long FirstColdPage(long offset)
     {
-        var page=pages[checked((int)index)];var target=destination[..page.Bytes];long offset=page.Offset;
-        while(!target.IsEmpty)
-        {int count=RandomAccess.Read(handle,target,offset);if(count==0)throw new EndOfStreamException("Truncated encoded backing file.");target=target[count..];offset+=count;}
-        destination[page.Bytes..].Clear();
-        BackingBytesRead+=page.Bytes;
-        if(!loaded[(int)index]){loaded[(int)index]=true;DistinctPagesRead++;}
+        long first = layouts[offset].FirstPage;
+        return space.GetBlockTier(first) == VirtualMemoryTier.Ram ? -1 : first;
     }
+
     internal VirtualMemoryStatistics Statistics=>space.GetStatistics();
     private static SafeFileHandle OpenBacking(string path) =>
         File.OpenHandle(path,FileMode.Open,FileAccess.Read,FileShare.Read,FileOptions.RandomAccess);
@@ -94,6 +90,15 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
         long reserve=options.RuntimeReserveBytes+3L*pageSize;
         // RLIMIT_AS also counts the CLR's non-resident reservations. Keep room for them
         // before a native page allocation fails even though measured RSS is still low.
+        AdjustCapacity(reserve);
+        PagedWeightSetup.Restrict(Hints, process, options.MaximumResidentBytes - reserve, addressSpaceLimit, reserve);
+        if(process.WorkingSet64<=options.MaximumResidentBytes-reserve)return;
+        space.TrimRam(0);process.Refresh();
+        if(process.WorkingSet64>options.MaximumResidentBytes-reserve)
+            throw new OutOfMemoryException("Non-pageable process memory leaves insufficient headroom within the configured encoded RSS ceiling.");
+    }
+    private void AdjustCapacity(long reserve)
+    {
         if(addressSpaceLimit is long limit)
         {
             long allocated = space.GetRamUsage().AllocatedBytes / pageSize;
@@ -106,10 +111,6 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
                 process.Refresh();
             }
         }
-        if(process.WorkingSet64<=options.MaximumResidentBytes-reserve)return;
-        space.TrimRam(0);process.Refresh();
-        if(process.WorkingSet64>options.MaximumResidentBytes-reserve)
-            throw new OutOfMemoryException("Non-pageable process memory leaves insufficient headroom within the configured encoded RSS ceiling.");
     }
     private void CheckPage(){if((accesses++&15)==0)CheckBudget();}
     internal delegate void RowReader(ReadOnlySpan<byte> bytes);
@@ -153,5 +154,11 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
                 visit((nint)pointer, first, segment.RowCount);
         });
     }
-    public void Dispose(){try{space.Dispose();}finally{if(ownsHandle)handle.Dispose();process.Dispose();}}
+    private void ReleaseStorage()
+    {
+        backing.Ahead?.Dispose();
+        space.Dispose();
+    }
+
+    public void Dispose(){try{ReleaseStorage();}finally{if(ownsHandle)handle.Dispose();process.Dispose();}}
 }

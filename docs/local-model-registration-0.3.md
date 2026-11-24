@@ -44,6 +44,30 @@ A host can supply `deviceBudgetBytes` in bytes, or configure `AIKERNEL_DEVICE_BU
 
 Paged GPT-OSS sessions expose `GetResourceResidency(layerIndex, resourceIndex)` for the gate, up and down projections together. `ResourceDispatchCounts` reports selection counts across layers per expert ID. Observing residency leaves page contents and eviction order intact. An OS-managed mapping returns no AIKernel page count.
 
+### Optional read-ahead for dense and expert CPU weights
+
+The host can enable read-ahead in `RegisteredLocalLlmSettings.WeightMemory` or pass the same options to a direct session. The following configuration keeps a 7 GB process budget and allows up to 8 MiB for speculative reads.
+
+```csharp
+var memory = new GgufMemoryOptions
+{
+    SwapDirectory = privateSwapDirectory,
+    MaximumResidentBytes = 7_000_000_000,
+    Prefetch = new() { Enabled = true, Depth = 1, MaximumBytes = 8L << 20 }
+};
+using var session = ModelRegistration.GptOss20B.OpenSession(modelPath, 4, 128, memory, deviceBudgetBytes: 0);
+var answer = await session.GenerateAsync("", question, 8, cancellationToken);
+var counters = session.GetWeightPrefetchStatistics();
+```
+
+Read-ahead defaults to off. The depth ranges from 1 to 4 and the staging limit from 1 to 64 MiB. Dense sessions look ahead by this many layers and offer the first cold pages of their query and key projections. GPT-OSS offers up to this many expert gate pages using the selections for the same layer on the preceding token, or the preceding layer when there is no history. Each request starts with an empty expert history.
+
+A background reader stages immutable pages within the budget left after the demand cache, runtime reserve and transfer allowance. If there is less than one page of headroom it stays off. The demand path claims the staged bytes on its first fault. A demand for a queued page takes priority, and a demand for an in-flight page joins that read. Normal VM residency and eviction apply when the demand arrives.
+
+If an expert prediction misses, the next eligible prediction is 16 layer visits later. Consecutive misses double the interval up to 128 visits. A hit or the end of the request resets the interval. Dense look-ahead follows the known layer order independently.
+
+The counters are cumulative for the lifetime of a session. `Issued` counts admitted predictions, `Hits` counts staged pages consumed by demand, `Misses` counts expired or unselected predictions, and `Cancelled` includes superseded queued reads and work dropped on pressure or request completion. `Failures` counts optional read failures. `DemandReads` measures logical demand reads from the backing file. The OS may serve them from its file cache. `WaitedForInFlight` counts demand joins. Reading the counters does not touch VM residency. Mapped sessions return a null snapshot.
+
 ## Registering a base and a delta
 
 A standalone registration remains valid. A host can also supply one document with a `profiles` object and the name of the selected `profile`. Put the complete standalone registration under `profiles.base`. For example, add `"local": { "extends": "base", "shape": { "layers": 28 } }` to that object and set `"profile": "local"`. The selected profile inherits omitted shape fields. The parent is resolved first and the child overrides only the declared fields. All IDs refer to the same host-supplied document. Unknown keys, duplicate keys, missing parents and inheritance cycles fail registration. The resolved registration goes through the same checkpoint validation as a standalone registration.

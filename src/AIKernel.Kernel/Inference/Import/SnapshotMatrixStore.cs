@@ -10,7 +10,7 @@ internal sealed unsafe class SnapshotMatrixStore : IDisposable
     private MemoryMappedFile? mapping;
     private MemoryMappedViewAccessor? view;
     private byte* address;
-    private TensorPageStore? pages;
+    internal TensorPageStore? pages;
     private readonly List<ModelTensor> tensors = [];
     internal long Length => file.Length;
     internal long? Reads => pages?.BackingBytesRead;
@@ -40,7 +40,7 @@ internal sealed unsafe class SnapshotMatrixStore : IDisposable
         file.Flush();
         if (budget is not null)
         {
-            pages = new TensorPageStore(file.Name, tensors, GgufDenseWeights.PageBudget(budget), backingHandle: file.SafeFileHandle);
+            pages = budget.OpenSnapshot(file, tensors);
             return;
         }
         Map();

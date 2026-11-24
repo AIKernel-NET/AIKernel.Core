@@ -5,7 +5,7 @@ internal sealed class GgufDenseWeights : IDenseModelWeights
 {
     private readonly GgufWeights _file;
     private readonly Dictionary<long, GgufWeights.Tensor> _storage = [];
-    private TensorPageStore? _pages;
+    internal TensorPageStore? _pages;
 
     internal static IDenseModelWeights Open(string path, int context, int? device, long gpuBudget,
         bool vulkan, bool q8, CudaQ8Kernel? kernel, GgufMemoryOptions? memory, DenseModelRegistration? registration)
@@ -69,7 +69,7 @@ internal sealed class GgufDenseWeights : IDenseModelWeights
             options.RuntimeReserveBytes, options.SwapDirectory);
 
     private TensorPageStore OpenPages(string path, GgufMemoryOptions memory)
-        => new(path, Backings, PageBudget(memory), backingHandle: _file.BackingHandle);
+        => memory.OpenDense(path, Backings, _file);
 
     private IMatrixOffload OpenDevice(int device, long budget, bool vulkan, CudaQ8Kernel? kernel)
         => vulkan ? new VulkanQuantizedMatrix(_file, device, budget) : new CudaQuantizedMatrix(_file, device, budget, kernel);

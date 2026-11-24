@@ -2,7 +2,7 @@ namespace AIKernel.Kernel.Inference;
 
 internal sealed class SnapshotWeights : IDenseModelWeights
 {
-    private readonly SnapshotMatrixStore store;
+    internal readonly SnapshotMatrixStore store;
     public Qwen3ModelDefinition Shape { get; }
     public ModelTensor Embedding { get; }
     public ModelTensor Output => Embedding;

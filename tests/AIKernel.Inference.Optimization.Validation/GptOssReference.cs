@@ -39,13 +39,15 @@ internal static partial class GptOssReference
             var hash=Convert.ToHexStringLower(SHA256.HashData(MemoryMarshal.AsBytes(tokens.AsSpan(0,tokens.Length-1))));
             bool inputMatch=model.EncodeChat("",user).SequenceEqual(sample.GetProperty("promptTokens").Deserialize<int[]>()!);
             var generated=new List<int>();
+            var logitHashes = new List<string>();
+            model.LogitsObserver = values => logitHashes.Add(PrefetchValidation.Hash(values));
             long? diskBefore=LinuxReadBytes();
             var elapsed=Stopwatch.StartNew();
             var actual=await model.GenerateAsync("",user,8,default,generated.Add);
             elapsed.Stop();
             bool matches=inputMatch && generated.SequenceEqual(tokens) && actual.GeneratedTokenSha256==hash && actual.Text==sample.GetProperty("output").GetString() &&
                 actual.FinishReason=="stop" && actual.OutputTokens==tokens.Length-1;
-            rows.Add(new {user,inputMatch,matches,generatedTokens=generated,responseMilliseconds=elapsed.Elapsed.TotalMilliseconds,
+            rows.Add(new {user,inputMatch,matches,generatedTokens=generated,logitHashes,textHash=PrefetchValidation.TextHash(actual.Text),responseMilliseconds=elapsed.Elapsed.TotalMilliseconds,
                 linuxStorageReadBytes=LinuxReadBytes()-diskBefore,actual}); passed &= matches;
         }
         if (rows.Count==0) throw new InvalidDataException("No reference samples.");
@@ -56,7 +58,7 @@ internal static partial class GptOssReference
         if (memory is not null) passed &= peakRssBytes<=memory.MaximumResidentBytes;
         await File.WriteAllTextAsync(outputPath,JsonSerializer.Serialize(new {digest,passed,rows,coldFileCache,
             initializationMilliseconds=load.Elapsed.TotalMilliseconds,peakRssBytes,maximumResidentBytes=memory?.MaximumResidentBytes,weightCacheBytes=memory?.WeightCacheBytes,
-            statistics=stats,model.BackingBytesRead,model.DistinctPagesRead,model.WeightCacheCapacityBytes},new JsonSerializerOptions{WriteIndented=true}));
+            statistics=stats,prefetch=model.GetWeightPrefetchStatistics(),model.BackingBytesRead,model.DistinctPagesRead,model.WeightCacheCapacityBytes},new JsonSerializerOptions{WriteIndented=true}));
         return passed;
     }
 

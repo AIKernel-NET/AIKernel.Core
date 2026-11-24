@@ -1,5 +1,21 @@
 using AIKernel.Kernel.Inference;
 using System.Text.Json;
+if (args.Length == 2 && args[0] == "--prefetch-wrong-predictions")
+{
+    PrefetchMissBenchmark.Run(args[1]);
+    return;
+}
+if (args.Length == 7 && args[0] == "--gpt-prefetch")
+{
+    var policy = PrefetchValidation.Options(args[4], args[6]);
+    Environment.ExitCode = await GptOssReference.Run(args[1], args[2], args[3], policy, int.Parse(args[5])) ? 0 : 1;
+    return;
+}
+if (args.Length == 6 && args[0] == "--bonsai-prefetch")
+{
+    await PrefetchValidation.Bonsai(args[1], args[2], args[3], PrefetchValidation.Options(args[4], args[5]));
+    return;
+}
 if ((args.Length == 6 || args.Length == 7 && args[6]=="--cold-file-cache") && args[0] == "--gpt-oss-paged-reference")
 {
     Environment.ExitCode = await GptOssReference.Run(args[1],args[2],args[3],

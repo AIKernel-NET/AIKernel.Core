@@ -7,8 +7,9 @@ namespace AIKernel.Kernel.Inference;
 /// <summary>A dense transformer using immutable mapped Q1_0 weights and private request state.</summary>
 public class DenseModelSession : IModelSession
 {
-    private readonly IDenseModelWeights file;
-    private readonly IMatrixOffload? gpu;
+    internal readonly IDenseModelWeights file;
+    internal Action<float[]>? LogitsObserver;
+    internal readonly IMatrixOffload? gpu;
     private readonly bool quantizeGpuActivations;
     private readonly bool preserveQ8Arithmetic;
     private readonly bool profileEnabled=Environment.GetEnvironmentVariable("AIKERNEL_INFERENCE_PROFILE")=="1";
@@ -126,8 +127,7 @@ public class DenseModelSession : IModelSession
             if(tuner is null||tuningOptions!=options)
             {
                 var candidates=forced=="q8-auto"?Int8CpuMatrix.Candidates(includeAmx:false):new List<string>();
-                if(forced!="q8-auto"&&System.Runtime.Intrinsics.X86.Avx2.IsSupported&&System.Runtime.Intrinsics.X86.Fma.IsSupported)candidates.Add("avx2");
-                if(forced!="q8-auto"&&System.Runtime.Intrinsics.X86.Avx512F.IsSupported)candidates.Add("avx512");
+                if (forced != "q8-auto") CpuKernelTuner.AddFloatCandidates(candidates);
                 if(candidates.Count==0)candidates.Add(backend);
                 IEnumerable<int> counts=options.TuneThreadCount
                     ?new[]{1,2,4,6}.Where(n=>n<=Math.Min(threads,Environment.ProcessorCount)).Append(Math.Min(threads,Environment.ProcessorCount)).Distinct().OrderDescending()
@@ -286,11 +286,7 @@ public class DenseModelSession : IModelSession
             else
             {
                 Multiply(output,state.Normal,state.Logits,state.Options,decodeBackend,profile);
-                stage=profile?.Start()??0;
-                next=0;float best=float.NegativeInfinity;
-                for(int i=0;i<state.Logits.Length;i++)if(state.Logits[i]>best){best=state.Logits[i];next=i;}
-                profile?.Add(InferenceStage.Argmax,stage);
-                if(!float.IsFinite(best))throw new ArithmeticException("Non-finite model logits.");
+                next = SelectOutput(state.Logits, profile);
             }
             if(tokenizer.IsStopToken(next)&&!ignoreEos){finish="stop";break;}
             generated.Add(next);
@@ -316,6 +312,19 @@ public class DenseModelSession : IModelSession
     }
     internal long DeviceWeightBytes=>gpu?.WeightBytes??0;
     internal string? DevicePciBusId=>gpu?.PciBusId;
+    private int SelectOutput(float[] logits, InferenceProfiler? profile)
+    {
+        LogitsObserver?.Invoke(logits);
+        long start = profile?.Start() ?? 0;
+        float best = float.NegativeInfinity;
+        int selected = 0;
+        for (int i = 0; i < logits.Length; i++)
+            if (logits[i] > best) { best = logits[i]; selected = i; }
+        profile?.Add(InferenceStage.Argmax, start);
+        if (!float.IsFinite(best)) throw new ArithmeticException("Non-finite model logits.");
+        return selected;
+    }
+
     internal CudaQ8Statistics? CudaQ8Statistics=>(gpu as CudaQuantizedMatrix)?.Statistics;
     internal object? VulkanDiagnostics=>(gpu as VulkanQuantizedMatrix)?.Diagnostics;
     internal long VulkanRecoveredProjections=>(gpu as VulkanQuantizedMatrix)?.RecoveredProjections ?? 0;
@@ -324,7 +333,7 @@ public class DenseModelSession : IModelSession
     {
         if(cleanupFailed)throw new InvalidOperationException("Model disabled after GPU scratch clearing failure.");
         // Runs inside the admission gate. A cancelled queued request must not wipe another request's scratch.
-        return gpu is null?work():InferenceRequestCleanup.Execute(work,gpu.ZeroScratch,()=>cleanupFailed=true);
+        return WeightPaging.WithCleanup(this, work, () => cleanupFailed = true);
     }
     private void Multiply(ModelTensor tensor,float[] input,float[] output,ParallelOptions options,string selectedBackend,InferenceProfiler? profile=null,PreparedQ8Activation? prepared=null)
     {
@@ -357,7 +366,7 @@ public class DenseModelSession : IModelSession
         stage=profile?.Start()??0;s.PrepareRope(position,frequencies,ropeAmplitude);profile?.Add(InferenceStage.Rope,stage);
         foreach (int index in graph.Layers(s.Options.CancellationToken))
         {
-            var l=layers[index];
+            var l=WeightPaging.Layer(file, index, s.Options.CancellationToken);
             stage=profile?.Start()??0;
             Norm(s.X,l.Norm,s.Normal,epsilon);
             profile?.Add(InferenceStage.Normalization,stage);
@@ -390,8 +399,7 @@ public class DenseModelSession : IModelSession
                 Multiply(l.Up,s.Normal,s.Up,s.Options,selectedBackend,profile,prepared);
             }
             stage=profile?.Start()??0;
-            if(preserveQ8Arithmetic)for(int i=0;i<hidden;i++)s.Gate[i]=s.Gate[i]/(1+MathF.Exp(-s.Gate[i]))*s.Up[i];
-            else InferenceVectorMath.SwiGlu(s.Gate,s.Up);
+            InferenceVectorMath.SwiGlu(s.Gate, s.Up, hidden, preserveQ8Arithmetic);
             profile?.Add(InferenceStage.SwiGLU,stage);
             Multiply(l.Down,s.Gate,s.Projected,s.Options,selectedBackend,profile);
             stage=profile?.Start()??0;

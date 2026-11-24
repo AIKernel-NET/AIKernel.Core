@@ -9,7 +9,8 @@ namespace AIKernel.Kernel.Inference;
 public partial class MixtureModelSession : IModelSession
 {
     private readonly GgufWeights file;
-    private readonly GgufPagedWeights? pages;
+    internal Action<float[]>? LogitsObserver;
+    internal readonly GgufPagedWeights? pages;
     /// <summary>Page residency and page-ins for a model opened with an explicit RAM budget.</summary>
     public AIKernel.Kernel.Memory.VirtualMemoryStatistics? MemoryStatistics => pages?.Statistics;
     /// <summary>Allocated and reserved host page buffers for paged CPU weights.</summary>
@@ -46,8 +47,8 @@ public partial class MixtureModelSession : IModelSession
     private readonly int threads, context;
     private readonly SemaphoreSlim gate = new(1);
     private bool disposed;
-    private sealed record Linear(GgufWeights.Tensor Weight, float[] Bias);
-    private sealed record Layer(float[] Norm, Linear Q, Linear K, Linear V, Linear O, float[] Sinks,
+    internal sealed record Linear(GgufWeights.Tensor Weight, float[] Bias);
+    internal sealed record Layer(float[] Norm, Linear Q, Linear K, Linear V, Linear O, float[] Sinks,
         float[] MlpNorm, Linear Router, Linear Gate, Linear Up, Linear Down);
 
     /// <summary>Maps one checkpoint and validates its architecture, tensor shapes and Harmony controls before use.</summary>
@@ -72,19 +73,15 @@ public partial class MixtureModelSession : IModelSession
             outputNorm = Vector("output_norm.weight",Width);
             layers = Enumerable.Range(0,Layers).Select(i => LoadLayer(i, Width, Experts, AttentionWidth, KvWidth, Heads)).ToArray();
             chat = new(file);
-            if (memory is not null)
-                pages = new(modelPath,MatrixTensors(),memory,pageSize:1<<20,backingHandle:file.BackingHandle);
+            if (memory is not null) pages = memory.OpenExperts(modelPath, MatrixTensors(), file);
         }
         catch { file.Dispose(); throw; }
     }
 
     private GgufWeights.Tensor Weight(string name, int rows, int columns, int type)
-    {
-        var tensor = file.Require(name,rows,columns);
-        if (tensor.Type != type) throw new InvalidDataException("Unexpected storage format: "+name);
-        return tensor;
-    }
-    private float[] Vector(string name, int columns) => file.ReadFloat32(Weight(name,1,columns,0));
+        => ExpertWeights.Require(file, name, rows, columns, type);
+    private float[] Vector(string name, int columns) => ExpertWeights.Vector(file, name, columns);
+
     private IEnumerable<GgufWeights.Tensor> MatrixTensors()
     {
         yield return embedding;
@@ -98,23 +95,7 @@ public partial class MixtureModelSession : IModelSession
         }
     }
     private Layer LoadLayer(int index, int width, int experts, int attentionWidth, int kvWidth, int heads)
-    {
-        string prefix = $"blk.{index}.";
-        Linear Projection(string key, int rows, int columns, int type = 8) =>
-            new(Weight(prefix+key+".weight",rows,columns,type), Vector(prefix+key+".bias",rows));
-        Linear Expert(string key)
-        {
-            if (!file.Tensors.TryGetValue(prefix+key+".weight",out var tensor) || tensor.Rank != 3 || tensor.Type != 39 ||
-                tensor.Rows != width || tensor.Columns != width || tensor.Depth != experts)
-                throw new InvalidDataException("Invalid expert bank: "+key);
-            var bias = Weight(prefix+key+".bias",experts,width,0);
-            return new(tensor,file.ReadFloat32(bias));
-        }
-        return new(Vector(prefix+"attn_norm.weight",width),Projection("attn_q",attentionWidth,width),
-            Projection("attn_k",kvWidth,width),Projection("attn_v",kvWidth,width),Projection("attn_output",width,attentionWidth),
-            Vector(prefix+"attn_sinks.weight",heads),Vector(prefix+"post_attention_norm.weight",width),
-            Projection("ffn_gate_inp",experts,width,0), Expert("ffn_gate_exps"),Expert("ffn_up_exps"),Expert("ffn_down_exps"));
-    }
+        => ExpertWeights.Load(file, index, width, experts, attentionWidth, kvWidth, heads);
 
     internal List<int> EncodeChat(string system, string user) => chat.Encode(system, user);
 
@@ -136,8 +117,16 @@ public partial class MixtureModelSession : IModelSession
             pages?.CheckBudget();
             return await Task.Run(() => Run(prompt,maxNewTokens,cancellationToken,observeToken),cancellationToken).ConfigureAwait(false);
         }
+        finally { EndRequest(); }
+    }
+    private void ObserveLogits(float[] values) => LogitsObserver?.Invoke(values);
+
+    private void EndRequest()
+    {
+        try { WeightPaging.EndExperts(pages); }
         finally { gate.Release(); }
     }
+
     private CpuGeneration Run(List<int> prompt, int maximum, CancellationToken cancellation, Action<int>? observeToken)
     {
         var watch=Stopwatch.StartNew();
@@ -152,6 +141,7 @@ public partial class MixtureModelSession : IModelSession
         {
             Normalize(state.X,outputNorm,state.Norm);
             GptOssMatrix.Multiply(file,output,state.Norm,state.Logits,null,0,options,pages);
+            ObserveLogits(state.Logits);
             int best=0;
             for (int i=0;i<state.Logits.Length;i++)
             {
@@ -170,7 +160,7 @@ public partial class MixtureModelSession : IModelSession
           DecodeForwardTokens=position-prompt.Count,PrefillThreads=threads,DecodeThreads=threads };
     }
 
-    private sealed class State(int length)
+    internal sealed class State(int length)
     {
         public readonly float[] X=new float[Width],Norm=new float[Width],Q=new float[AttentionWidth],K=new float[KvWidth],
             V=new float[KvWidth],Attention=new float[AttentionWidth],Projection=new float[Width],Router=new float[Experts],
@@ -190,42 +180,26 @@ public partial class MixtureModelSession : IModelSession
             var (sin, cos)=MathF.SinCos(pos*frequencies[i]);
             s.Cos[i]=cos*amplitude; s.Sin[i]=sin*amplitude;
         }
-        void Project(Linear linear,float[] x,float[] dest,int expert=-1) =>
-            GptOssMatrix.Multiply(file,expert<0?linear.Weight:linear.Weight.MatrixSlice(expert),x,dest,linear.Bias,expert<0?0:expert*Width,options,pages);
-        Span<int> order=stackalloc int[Experts];
+        var project = new ExpertProjection(file, pages, options);
         foreach (int layer in graph.Layers(options.CancellationToken))
         {
             var w=layers[layer];
+            project.Predict(layer, w);
             Normalize(s.X,w.Norm,s.Norm);
-            Project(w.Q,s.Norm,s.Q); Project(w.K,s.Norm,s.K); Project(w.V,s.Norm,s.V);
+            project.Multiply(w.Q,s.Norm,s.Q); project.Multiply(w.K,s.Norm,s.K); project.Multiply(w.V,s.Norm,s.V);
             Rotate(s.Q,s.Cos,s.Sin); Rotate(s.K,s.Cos,s.Sin);
             s.K.CopyTo(s.Keys[layer],pos*KvWidth); s.V.CopyTo(s.Values[layer],pos*KvWidth);
             Attend(s,layer,pos,w.Sinks,Head,KvWidth,KvHeads);
-            Project(w.O,s.Attention,s.Projection);
+            project.Multiply(w.O,s.Attention,s.Projection);
             for (int i=0;i<Width;i++) s.X[i]+=s.Projection[i];
-            Normalize(s.X,w.MlpNorm,s.Norm); Project(w.Router,s.Norm,s.Router);
-            float total = Routing.Select(s.Router, order);
-            Array.Clear(s.Mlp);
-            for (int i=0;i<Routing.Active;i++)
-            {
-                int e=order[i];
-                Project(w.Gate,s.Norm,s.Gate,e); Project(w.Up,s.Norm,s.Up,e);
-                for (int j=0;j<Width;j++)
-                {
-                    float g=Math.Min(s.Gate[j],7);
-                    s.Gate[j]=g/(1+MathF.Exp(-1.702f*g))*(1+Math.Clamp(s.Up[j],-7,7));
-                }
-                Project(w.Down,s.Gate,s.Down,e);
-                float routing=s.Router[e]/total;
-                for (int j=0;j<Width;j++) s.Mlp[j]+=routing*s.Down[j];
-            }
-            for (int j=0;j<Width;j++) s.X[j]+=s.Mlp[j];
+            Normalize(s.X,w.MlpNorm,s.Norm); project.Multiply(w.Router,s.Norm,s.Router);
+            project.Dispatch(layer, w, s, Routing);
         }
     }
     private unsafe void ReadEmbedding(int token, float[] output)
     {
         if (pages is not null) pages.ReadRow(embedding,token,output);
-        else embedding.Encoding.Decode(new ReadOnlySpan<byte>(file.Pointer(embedding)+(long)token*embedding.RowBytes,embedding.RowBytes),output);
+        else ExpertWeights.ReadRow(file, embedding, token, output);
     }
 
     private static void Rotate(float[] values,float[] cos,float[] sin)

@@ -8,6 +8,12 @@ namespace AIKernel.Kernel.Inference;
 // checks also cover AVX-only hosts; no unconditional FMA or AVX2 integer intrinsic.
 internal static unsafe class InferenceVectorMath
 {
+    internal static void SwiGlu(float[] gate, float[] up, int hidden, bool ordered)
+    {
+        if (!ordered) { SwiGlu(gate, up); return; }
+        for (int i = 0; i < hidden; i++) gate[i] = gate[i] / (1 + MathF.Exp(-gate[i])) * up[i];
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     internal static float Dot(ReadOnlySpan<float> x,ReadOnlySpan<float> y)
     {

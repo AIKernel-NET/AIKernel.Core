@@ -30,6 +30,12 @@ internal sealed record CpuKernelChoice(string Backend,int Threads)
 
 internal sealed class CpuKernelTuner
 {
+    internal static void AddFloatCandidates(List<string> candidates)
+    {
+        if (System.Runtime.Intrinsics.X86.Avx2.IsSupported && System.Runtime.Intrinsics.X86.Fma.IsSupported) candidates.Add("avx2");
+        if (System.Runtime.Intrinsics.X86.Avx512F.IsSupported) candidates.Add("avx512");
+    }
+
     internal sealed record Score(string Phase,string Backend,double MedianMilliseconds,double EmaMilliseconds,int Samples);
     internal sealed record Observation(string Phase,string Backend,int ContextBucket,double EmaMillisecondsPerToken,long Tokens);
     internal sealed record Profile(int Schema,string Identity,DateTimeOffset Updated,string Prefill,string Decode,

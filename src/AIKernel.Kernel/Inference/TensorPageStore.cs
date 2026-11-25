@@ -19,11 +19,12 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
     private readonly List<(long Offset,int Bytes)> pages=new();
     private readonly SafeFileHandle handle;
     private readonly bool ownsHandle;
-    private readonly VirtualMemorySpace space;
+    private protected readonly VirtualMemorySpace space;
     private readonly TensorPageBudget options;
     private readonly Process process=Process.GetCurrentProcess();
     private int accesses;
     private readonly long? addressSpaceLimit;
+    private protected Action<long> CacheShrinking = static _ => { };
     private int cacheSlots;
     internal long CacheCapacityBytes => (long)cacheSlots*pageSize;
     internal TensorPageStore(string path,IEnumerable<ModelTensor> tensors,TensorPageBudget options,
@@ -40,7 +41,7 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
             for(int row=0;row<tensor.Rows;row+=count)pages.Add((tensor.Backing+row*(long)tensor.RowBytes,Math.Min(count,tensor.Rows-row)*tensor.RowBytes));
         }
         cacheSlots=checked((int)Math.Min(pages.Count,options.WeightCacheBytes/pageSize));
-        addressSpaceLimit=ProcessAddressSpace.ReadAddressSpaceLimit();
+        addressSpaceLimit=WeightFilePlatform.ReadLimit();
         ownsHandle=backingHandle is null;
         handle=backingHandle??OpenBacking(path);
         try
@@ -73,7 +74,13 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
 
     internal VirtualMemoryStatistics Statistics=>space.GetStatistics();
     private static SafeFileHandle OpenBacking(string path) =>
-        File.OpenHandle(path,FileMode.Open,FileAccess.Read,FileShare.Read,FileOptions.RandomAccess);
+        WeightFilePlatform.OpenRead(path);
+
+    private protected (long First, int Count) Range(long offset)
+    {
+        var layout = layouts[offset];
+        return new(layout.FirstPage, layout.Pages);
+    }
 
     internal ResourceResidency Observe(long backing)
     {
@@ -99,18 +106,12 @@ internal class TensorPageStore : IVirtualMemorySource,IDisposable
     }
     private void AdjustCapacity(long reserve)
     {
-        if(addressSpaceLimit is long limit)
-        {
-            long allocated = space.GetRamUsage().AllocatedBytes / pageSize;
-            long headroom=limit-process.VirtualMemorySize64-reserve;
-            int affordable=(int)Math.Clamp(allocated+headroom/pageSize,1,cacheSlots);
-            if(affordable<cacheSlots)
-            {
-                space.SetRamCapacity(affordable);
-                cacheSlots=affordable;
-                process.Refresh();
-            }
-        }
+        int affordable = WeightFilePlatform.Affordable(addressSpaceLimit, process, space, reserve, pageSize, cacheSlots);
+        if (affordable == cacheSlots) return;
+        CacheShrinking((long)affordable * pageSize);
+        space.SetRamCapacity(affordable);
+        cacheSlots = affordable;
+        process.Refresh();
     }
     private void CheckPage(){if((accesses++&15)==0)CheckBudget();}
     internal delegate void RowReader(ReadOnlySpan<byte> bytes);

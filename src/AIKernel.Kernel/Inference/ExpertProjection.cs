@@ -6,10 +6,7 @@ namespace AIKernel.Kernel.Inference;
 internal sealed class ExpertProjection(GgufWeights file, GgufPagedWeights? pages, ParallelOptions options)
 {
     internal void Predict(int index, Layer layer)
-    {
-        var bank = layer.Gate.Weight;
-        pages?.Hints?.Experts(index, bank.Offset, bank.RowByteLength * bank.Rows, options.CancellationToken);
-    }
+        => ExpertPaging.Predict(pages, index, layer, options.CancellationToken);
 
     internal void Multiply(Linear linear, float[] input, float[] output, int expert = -1)
     {
@@ -23,7 +20,7 @@ internal sealed class ExpertProjection(GgufWeights file, GgufPagedWeights? pages
         Span<int> order = stackalloc int[state.Router.Length];
         float total = routing.Select(state.Router, order);
         var active = order[..routing.Active];
-        pages?.Hints?.Selected(layer, active);
+        ExpertPaging.Selected(pages, layer, weights, active);
         Apply(state, weights, active, total);
     }
 

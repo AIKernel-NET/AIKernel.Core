@@ -68,6 +68,36 @@ If an expert prediction misses, the next eligible prediction is 16 layer visits 
 
 The counters are cumulative for the lifetime of a session. `Issued` counts admitted predictions, `Hits` counts staged pages consumed by demand, `Misses` counts expired or unselected predictions, and `Cancelled` includes superseded queued reads and work dropped on pressure or request completion. `Failures` counts optional read failures. `DemandReads` measures logical demand reads from the backing file. The OS may serve them from its file cache. `WaitedForInFlight` counts demand joins. Reading the counters does not touch VM residency. Mapped sessions return a null snapshot.
 
+### Frequency-based expert retention (development branch)
+
+Paged GPT-OSS CPU sessions can keep frequently routed experts in host RAM. The policy uses part of the configured weight cache. It applies to all three expert projections and takes effect as their pages are requested.
+
+~~~csharp
+var memory = new GgufMemoryOptions
+{
+    SwapDirectory = swapDirectory,
+    MaximumResidentBytes = 7_000_000_000,
+    WeightCacheBytes = 5_000_000_000,
+    ExpertFrequency = new()
+    {
+        Enabled = true,
+        Window = 8,
+        PromoteAt = 3,
+        DemoteAt = 1,
+        MinimumResidency = 4,
+        MaximumBytes = 512L << 20
+    }
+};
+using var session = ModelRegistration.GptOss20B.OpenSession(
+    modelPath, 4, 128, memory, deviceBudgetBytes: 0);
+var result = await session.GenerateAsync("", prompt, maxNewTokens: 8);
+var placement = session.GetExpertPlacement();
+~~~
+
+Each layer tracks its own rolling window of 2–256 router decisions. Promotion starts after the first complete window. Among eligible experts selected on this visit, higher counts get priority and ties retain router order. The thresholds must satisfy `0 ≤ DemoteAt < PromoteAt ≤ Window`. Minimum residency is measured in visits to the same layer (1–4096). The byte allowance must be at least 1 MiB and is capped by the actual weight cache with one page reserved for demand. An expert whose three projections exceed the remaining allowance stays in the normal cache. When the process address-space budget shrinks, the store releases preferences across layers before resizing. Explicit memory trims can evict preferred pages.
+
+The feature defaults to disabled. Read-ahead has a separate switch. Placement observations contain the policy, the current preferred page count and the last 4096 transitions with sequence numbers. A transition records layer, expert, direction, visit, window count, allowance and whether budget pressure triggered it. Use `GetResourceResidency(layer, expert)` to inspect actual RAM residence. Reading either diagnostic preserves the eviction order and does not read weight pages.
+
 ## Registering a base and a delta
 
 A standalone registration remains valid. A host can also supply one document with a `profiles` object and the name of the selected `profile`. Put the complete standalone registration under `profiles.base`. For example, add `"local": { "extends": "base", "shape": { "layers": 28 } }` to that object and set `"profile": "local"`. The selected profile inherits omitted shape fields. The parent is resolved first and the child overrides only the declared fields. All IDs refer to the same host-supplied document. Unknown keys, duplicate keys, missing parents and inheritance cycles fail registration. The resolved registration goes through the same checkpoint validation as a standalone registration.

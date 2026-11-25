@@ -5,6 +5,13 @@ if (args.Length == 2 && args[0] == "--prefetch-wrong-predictions")
     PrefetchMissBenchmark.Run(args[1]);
     return;
 }
+if (args.Length == 7 && args[0] == "--gpt-frequency")
+{
+    var enabled = bool.Parse(args[6]);
+    var memory = new GgufMemoryOptions { SwapDirectory = args[4], ExpertFrequency = new() { Enabled = enabled } };
+    Environment.ExitCode = await GptOssReference.Run(args[1], args[2], args[3], memory, int.Parse(args[5])) ? 0 : 1;
+    return;
+}
 if (args.Length == 7 && args[0] == "--gpt-prefetch")
 {
     var policy = PrefetchValidation.Options(args[4], args[6]);

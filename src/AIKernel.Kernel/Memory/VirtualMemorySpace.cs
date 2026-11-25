@@ -563,13 +563,26 @@ public sealed partial class VirtualMemorySpace : IDisposable
         InstallRam(block, LoadBytes(block));
     }
 
+    // Used only on the private read-only weight arena. Explicit trims still take precedence.
+    private Predicate<long>? preferRam;
+    internal void PreferRamPages(Predicate<long> predicate) => preferRam = predicate;
+
+    private Block RamVictim()
+    {
+        var first = ram.First!;
+        if (preferRam is null) return first.Value;
+        for (var node = first; node != null; node = node.Next)
+            if (!preferRam(node.Value.Index)) return node.Value;
+        return first.Value;
+    }
+
     private void InstallRam(Block block, IMemoryOwner<byte> bytes, bool allowVramEviction = true)
     {
         try
         {
             if (ram.Count == ramCapacity)
             {
-                var victim = ram.First!.Value;
+                var victim = RamVictim();
                 if (!allowVramEviction || vramCapacity == 0 || !MoveToVram(victim, allowSwapFallback: true, incoming: block))
                 {
                     MoveToSwap(victim);

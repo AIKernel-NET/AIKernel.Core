@@ -12,6 +12,23 @@ public record GgufMemoryOptions
     internal GgufPagedWeights OpenExperts(string path, IEnumerable<GgufWeights.Tensor> tensors, GgufWeights file)
         => PagedWeightSetup.OpenExperts(path, tensors, this, file.BackingHandle);
 
+    internal GgufPagedWeights CreateExpertStore(string path, IEnumerable<GgufWeights.Tensor> tensors,
+        Microsoft.Win32.SafeHandles.SafeFileHandle handle) => ExpertFrequency.Enabled
+        ? new FrequencyPagedWeights(path, tensors, this, handle)
+        : new GgufPagedWeights(path, tensors, this, 1 << 20, handle);
+
+    /// <summary>Opt-in retention for paged GPT-OSS experts. Its allowance is part of WeightCacheBytes.</summary>
+    public ExpertFrequencyOptions ExpertFrequency
+    {
+        get;
+        init
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            value.Validate();
+            field = value;
+        }
+    } = new();
+
     /// <summary>Optional CPU weight read-ahead within the resident-memory budget.</summary>
     public WeightPrefetchOptions Prefetch { get; init; } = new();
     /// <summary>Process RSS ceiling checked at admission and page boundaries. Not an OS cgroup limit.</summary>

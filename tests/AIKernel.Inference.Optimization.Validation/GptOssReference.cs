@@ -58,7 +58,7 @@ internal static partial class GptOssReference
         if (memory is not null) passed &= peakRssBytes<=memory.MaximumResidentBytes;
         await File.WriteAllTextAsync(outputPath,JsonSerializer.Serialize(new {digest,passed,rows,coldFileCache,
             initializationMilliseconds=load.Elapsed.TotalMilliseconds,peakRssBytes,maximumResidentBytes=memory?.MaximumResidentBytes,weightCacheBytes=memory?.WeightCacheBytes,
-            statistics=stats,prefetch=model.GetWeightPrefetchStatistics(),model.BackingBytesRead,model.DistinctPagesRead,model.WeightCacheCapacityBytes},new JsonSerializerOptions{WriteIndented=true}));
+            statistics=stats,expertPlacement=model.GetExpertPlacement(),prefetch=model.GetWeightPrefetchStatistics(),model.BackingBytesRead,model.DistinctPagesRead,model.WeightCacheCapacityBytes},new JsonSerializerOptions{WriteIndented=true}));
         return passed;
     }
 

@@ -32,7 +32,7 @@ internal static class PagedWeightSetup
 
     internal static GgufPagedWeights OpenExperts(string path, IEnumerable<GgufWeights.Tensor> tensors, GgufMemoryOptions memory, SafeFileHandle handle)
     {
-        var store = new GgufPagedWeights(path, tensors, memory, pageSize: 1 << 20, backingHandle: handle);
+        var store = memory.CreateExpertStore(path, tensors, handle);
         store.Configure(memory);
         return store;
     }

@@ -41,15 +41,16 @@ v0.1.3 package では generated managed API catalog も公開します。
 
 ## Scope
 
-`AIKernel.Python` は既定で CUDA-free です。native ABI bridge、CUDA Capability DLL、
-LibTorch binary、GPU runtime は含みません。GPU integration は
-`AIKernel.Cuda13.0.Libtorch2.12.win-x64` のような外部 Capability repository に属します。
+CUDA には `AIKernel.Kernel` 0.1.4 の CUDA Driver を使います。Windows x64 と
+Linux x64 の Python では `python -m pip install "aikernel-net[gpu]==0.1.4"`
+で、環境に合った `aikernel-cuda-driver` wheel を追加できます。実行には
+.NET 10 と互換性のある NVIDIA ドライバが必要です。
 
 想定 install path:
 
 - Windows/Linux C# application: `AIKernel.*` NuGet packages
 - Windows/Linux Python application: `aikernel-net` pip package
-- GPU host: matching external Capability package を明示追加
+- CUDA を使う場合: .NET では `AIKernel.Kernel` 0.1.4、Python では `aikernel-net[gpu]`
 
 提供するもの:
 
@@ -183,7 +184,7 @@ short-circuit container であり、例外は通常どおり伝播します。
 
 ## GPU Capability Packages
 
-CUDA、ROCm、DirectML、Vulkan、native model runtime は外部 Capability package として
-install してください。それらの package は model loading / inference 用の Python API を
+CUDA には `gpu` extra を使います。ROCm、DirectML、Vulkan、native model runtime
+は対応する外部 Capability package を確認してください。それらの package は model loading / inference 用の Python API を
 提供できますが、shared monad と managed assembly discovery behavior はこの package と
 整合させます。

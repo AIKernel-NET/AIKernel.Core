@@ -54,21 +54,20 @@ pip install --force-reinstall \
   git+https://github.com/AIKernel-NET/AIKernel.Core.git#subdirectory=python
 ```
 
-GPU integrations are opt-in Capability packages and are not installed by
-default. CUDA, ROCm, DirectML, and native model runtimes may publish their own
-platform-specific packages, but the base `aikernel-net` package stays universal.
+The base `aikernel-net` package stays universal. On Windows x64 and Linux x64,
+enable CUDA with `python -m pip install "aikernel-net[gpu]==0.1.4"`. The CUDA
+Driver path requires .NET 10 and a compatible NVIDIA driver.
 
 ## Scope
 
-`AIKernel.Python` is CUDA-free by default and does not include a native ABI
-bridge, CUDA Capability DLL, LibTorch binary, or GPU runtime. GPU integrations
-belong to external Capability repositories such as `AIKernel.Cuda13.0.Libtorch2.12.win-x64`.
+CUDA support uses the CUDA Driver in `AIKernel.Kernel` 0.1.4. The optional
+Python `gpu` extra supplies the platform-specific `aikernel-cuda-driver` wheel.
 
 The intended install paths are:
 
 - C# applications on Windows or Linux: install the `AIKernel.*` NuGet packages.
 - Python applications on Windows or Linux: install the `aikernel-net` pip package.
-- GPU hosts: explicitly add a matching external Capability package.
+- CUDA hosts: use `AIKernel.Kernel` 0.1.4 in .NET or `aikernel-net[gpu]` in Python.
 
 The package provides:
 
@@ -89,8 +88,8 @@ The package does not provide:
 - Kernel internals
 - CUDA / LibTorch runtime code
 
-Install GPU-specific Python or native bindings from the matching external
-Capability repository or package.
+For CUDA, use the `gpu` extra. For other GPU backends, install the matching
+external Capability package.
 
 ## Managed Assemblies
 
@@ -331,7 +330,7 @@ only the `Result` forms convert exceptions into failures.
 
 ## GPU Capability Packages
 
-CUDA, ROCm, DirectML, Vulkan, and native model runtimes should be installed as
+ROCm, DirectML, Vulkan, and native model runtimes may be available through
 external Capability packages. Those packages may provide their own Python API
 for model loading and inference while depending on this package for shared
 monad and managed assembly discovery behavior.
